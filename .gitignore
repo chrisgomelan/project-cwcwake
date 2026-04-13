@@ -1,0 +1,58 @@
+# ===========================================
+# WordPress wp-content .gitignore
+# Track: custom themes & plugins you develop
+# Ignore: everything that can be reinstalled
+# ===========================================
+
+# --- Uploads (media files are environment-specific) ---
+uploads/
+
+# --- Upgrade files ---
+upgrade/
+
+# --- Cache & backups ---
+cache/
+backup-db/
+backups/
+blogs.dir/
+*.bak
+*.swp
+
+# --- WordPress default/bundled themes ---
+# These ship with WordPress — no need to track them.
+# Add more lines here if new default themes appear.
+themes/twentytwentythree/
+themes/twentytwentyfour/
+themes/twentytwentyfive/
+
+# --- Third-party plugins (installed via WP admin / composer) ---
+# Ignore everything in plugins/ by default …
+plugins/*
+# … but keep the directory itself and any custom plugins you build.
+!plugins/.gitkeep
+
+# --- Dependency & build artifacts ---
+node_modules/
+vendor/
+*.map
+
+# --- OS & editor junk ---
+.DS_Store
+Thumbs.db
+*.log
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+
+# --- PHP & WordPress temp files ---
+*.php.bak
+php_errorlog
+debug.log
+wp-content-debug.log
+
+# --- Advanced Custom Fields Pro local JSON (uncomment if needed) ---
+# acf-json/
+
+# --- WP language files (auto-downloaded per environment) ---
+languages/
