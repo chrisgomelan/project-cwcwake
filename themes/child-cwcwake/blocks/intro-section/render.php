@@ -59,8 +59,6 @@ $wrapper_attrs = get_block_wrapper_attributes( [
 					</div>
 				<?php endif; ?>
 			</div>
-
-			<div class="cwc-intro__accent" aria-hidden="true"></div>
 		</div>
 
 	</div>

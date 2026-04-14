@@ -13,6 +13,7 @@ $primary_label    = $attributes['primaryBtnLabel'] ?? 'Book A Ride';
 $primary_url      = $attributes['primaryBtnUrl'] ?? '#book';
 $secondary_label  = $attributes['secondaryBtnLabel'] ?? 'Explore CWC';
 $secondary_url    = $attributes['secondaryBtnUrl'] ?? '#explore';
+$bg_video         = $attributes['backgroundVideo'] ?? '';
 $video_url        = $attributes['videoUrl'] ?? '';
 $min_height       = $attributes['minHeight'] ?? '100vh';
 
@@ -26,6 +27,13 @@ $wrapper_attrs = get_block_wrapper_attributes( [
 ?>
 
 <section <?php echo $wrapper_attrs; ?>>
+	<?php if ( ! empty( $bg_video ) ) : ?>
+		<video class="cwc-hero__video" autoplay muted loop playsinline preload="auto"
+			<?php if ( ! empty( $bg_src ) ) : ?>poster="<?php echo $bg_src; ?>"<?php endif; ?>>
+			<source src="<?php echo esc_url( $bg_video ); ?>" type="video/mp4">
+		</video>
+	<?php endif; ?>
+
 	<div class="cwc-hero__overlay" aria-hidden="true"></div>
 
 	<div class="cwc-hero__content">
@@ -53,6 +61,13 @@ $wrapper_attrs = get_block_wrapper_attributes( [
 			<?php endif; ?>
 		</div>
 	</div>
+
+	<?php if ( ! empty( $bg_video ) ) : ?>
+		<button class="cwc-hero__video-toggle" type="button" aria-label="Pause background video" data-playing="true">
+			<svg class="cwc-hero__icon-pause" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><rect x="5" y="3" width="5" height="18"/><rect x="14" y="3" width="5" height="18"/></svg>
+			<svg class="cwc-hero__icon-play" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><polygon points="6,3 20,12 6,21"/></svg>
+		</button>
+	<?php endif; ?>
 
 	<?php if ( ! empty( $video_url ) ) : ?>
 		<a href="<?php echo esc_url( $video_url ); ?>" class="cwc-hero__play" aria-label="Play video" target="_blank" rel="noopener noreferrer">

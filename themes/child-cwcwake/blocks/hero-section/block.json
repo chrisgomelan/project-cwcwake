@@ -54,6 +54,10 @@
 			"type": "string",
 			"default": "#explore"
 		},
+		"backgroundVideo": {
+			"type": "string",
+			"default": ""
+		},
 		"videoUrl": {
 			"type": "string",
 			"default": ""
@@ -64,5 +68,6 @@
 		}
 	},
 	"render": "file:./render.php",
-	"style": "file:./style.css"
+	"style": "file:./style.css",
+	"viewScript": "file:./view.js"
 }
