@@ -38,10 +38,25 @@ function cwc_enqueue_styles() {
 	);
 
 	wp_enqueue_style(
-		'cwc-style',
-		get_stylesheet_uri(),
+		'cwc-header',
+		get_stylesheet_directory_uri() . '/assets/css/header.css',
 		[ 'cwc-global' ],
 		CWC_VERSION
+	);
+
+	wp_enqueue_style(
+		'cwc-style',
+		get_stylesheet_uri(),
+		[ 'cwc-header' ],
+		CWC_VERSION
+	);
+
+	wp_enqueue_script(
+		'cwc-header',
+		get_stylesheet_directory_uri() . '/assets/js/header.js',
+		[],
+		CWC_VERSION,
+		true
 	);
 }
 add_action( 'wp_enqueue_scripts', 'cwc_enqueue_styles' );
@@ -234,3 +249,37 @@ function cwc_create_primary_menu() {
 	update_option( 'cwc_menu_created', true );
 }
 add_action( 'after_switch_theme', 'cwc_create_primary_menu', 20 );
+
+/**
+ * Register custom blocks.
+ */
+function cwc_register_blocks() {
+	register_block_type( get_stylesheet_directory() . '/blocks/hero-section' );
+	register_block_type( get_stylesheet_directory() . '/blocks/intro-section' );
+	register_block_type( get_stylesheet_directory() . '/blocks/showcase-section' );
+	register_block_type( get_stylesheet_directory() . '/blocks/accommodations-section' );
+	register_block_type( get_stylesheet_directory() . '/blocks/reviews-section' );
+}
+add_action( 'init', 'cwc_register_blocks' );
+
+/**
+ * Allow SVG uploads in the Media Library.
+ */
+function cwc_allow_svg_uploads( $mimes ) {
+	$mimes['svg'] = 'image/svg+xml';
+	return $mimes;
+}
+add_filter( 'upload_mimes', 'cwc_allow_svg_uploads' );
+
+/**
+ * Fix WordPress rejecting SVGs even when the MIME type is allowed.
+ */
+function cwc_fix_svg_filetype( $data, $file, $filename, $mimes ) {
+	$ext = pathinfo( $filename, PATHINFO_EXTENSION );
+	if ( 'svg' === strtolower( $ext ) ) {
+		$data['type'] = 'image/svg+xml';
+		$data['ext']  = 'svg';
+	}
+	return $data;
+}
+add_filter( 'wp_check_filetype_and_ext', 'cwc_fix_svg_filetype', 10, 4 );

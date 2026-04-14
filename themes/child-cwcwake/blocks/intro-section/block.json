@@ -1,0 +1,48 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "cwc/intro-section",
+	"version": "1.0.0",
+	"title": "Intro Section",
+	"category": "theme",
+	"icon": "format-video",
+	"description": "Two-column intro with heading, body text on the left and a featured video with tagline on the right.",
+	"textdomain": "child-cwcwake",
+	"supports": {
+		"align": ["full"],
+		"html": false,
+		"anchor": true
+	},
+	"attributes": {
+		"headingLine1": {
+			"type": "string",
+			"default": "The Ultimate"
+		},
+		"headingEmphasis": {
+			"type": "string",
+			"default": "WAKEBOARDING"
+		},
+		"headingLine2": {
+			"type": "string",
+			"default": "Destination"
+		},
+		"description": {
+			"type": "string",
+			"default": "CamSur Watersports Complex is the Philippines' premier destination for world-class wakeboarding, land sports, and elite relaxation. Experience a seamless blend of adrenaline-fueled action and professional-grade facilities designed for every traveler."
+		},
+		"tagline": {
+			"type": "string",
+			"default": "EXPERIENCE. THE. THRILL."
+		},
+		"videoUrl": {
+			"type": "string",
+			"default": ""
+		},
+		"videoPoster": {
+			"type": "string",
+			"default": ""
+		}
+	},
+	"render": "file:./render.php",
+	"style": "file:./style.css"
+}

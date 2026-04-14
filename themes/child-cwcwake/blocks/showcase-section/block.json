@@ -1,0 +1,71 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "cwc/showcase-section",
+	"version": "1.0.0",
+	"title": "Showcase Section",
+	"category": "theme",
+	"icon": "grid-view",
+	"description": "Reusable dark section with heading, subtitle, and a 3-column grid. Set variant to 'cards', 'videos', or 'social'.",
+	"textdomain": "child-cwcwake",
+	"supports": {
+		"align": ["full"],
+		"html": false,
+		"anchor": true
+	},
+	"attributes": {
+		"variant": {
+			"type": "string",
+			"default": "cards"
+		},
+		"headingStart": {
+			"type": "string",
+			"default": "Choose Your"
+		},
+		"headingEmphasis": {
+			"type": "string",
+			"default": "ADVENTURE"
+		},
+		"emphasisColor": {
+			"type": "string",
+			"default": "accent"
+		},
+		"subtitle": {
+			"type": "string",
+			"default": ""
+		},
+		"backgroundImage": {
+			"type": "string",
+			"default": ""
+		},
+		"items": {
+			"type": "array",
+			"default": [],
+			"items": {
+				"type": "object"
+			}
+		},
+		"profileLogo": {
+			"type": "string",
+			"default": ""
+		},
+		"profileName": {
+			"type": "string",
+			"default": "cwcwakepark"
+		},
+		"profileTagline": {
+			"type": "string",
+			"default": "Best Wakepark on Earth"
+		},
+		"profileUrl": {
+			"type": "string",
+			"default": ""
+		},
+		"profileBtnLabel": {
+			"type": "string",
+			"default": "Follow Us"
+		}
+	},
+	"render": "file:./render.php",
+	"style": "file:./style.css"
+}

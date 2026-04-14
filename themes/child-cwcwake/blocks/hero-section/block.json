@@ -1,0 +1,68 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "cwc/hero-section",
+	"version": "1.0.0",
+	"title": "Hero Section",
+	"category": "theme",
+	"icon": "cover-image",
+	"description": "Full-viewport hero with background image, heading, subtitle, two CTAs, and optional video button.",
+	"textdomain": "child-cwcwake",
+	"supports": {
+		"align": ["full"],
+		"html": false,
+		"anchor": true
+	},
+	"attributes": {
+		"backgroundImage": {
+			"type": "string",
+			"default": ""
+		},
+		"overlayOpacity": {
+			"type": "number",
+			"default": 50
+		},
+		"headingLine1": {
+			"type": "string",
+			"default": "RIDE THE"
+		},
+		"headingEmphasis": {
+			"type": "string",
+			"default": "BEST WAKEPARK"
+		},
+		"headingLine2": {
+			"type": "string",
+			"default": "IN THE PHILIPPINES"
+		},
+		"subtitle": {
+			"type": "string",
+			"default": "Adventure, Relaxation, and Unforgettable moments - all in one place"
+		},
+		"primaryBtnLabel": {
+			"type": "string",
+			"default": "Book A Ride"
+		},
+		"primaryBtnUrl": {
+			"type": "string",
+			"default": "#book"
+		},
+		"secondaryBtnLabel": {
+			"type": "string",
+			"default": "Explore CWC"
+		},
+		"secondaryBtnUrl": {
+			"type": "string",
+			"default": "#explore"
+		},
+		"videoUrl": {
+			"type": "string",
+			"default": ""
+		},
+		"minHeight": {
+			"type": "string",
+			"default": "100vh"
+		}
+	},
+	"render": "file:./render.php",
+	"style": "file:./style.css"
+}

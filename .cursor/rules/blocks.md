@@ -28,6 +28,21 @@ blocks/block-name/
 - One block = one purpose; use InnerBlocks for composition
 - Register blocks via `register_block_type(__DIR__ . '/blocks/block-name')` in the `init` hook
 
+## Block Attributes in Templates
+
+When writing `<!-- wp:cwc/block-name {...} /-->` in `.html` templates, **always format attributes on separate lines** for readability:
+
+```html
+<!-- wp:cwc/hero-section {
+	"backgroundImage": "/wp-content/uploads/2026/04/hero.jpg",
+	"headingLine1": "RIDE THE",
+	"headingEmphasis": "BEST WAKEPARK",
+	"align": "full"
+} /-->
+```
+
+Never put all attributes on a single line. Array attributes (`items`) should also have each object on its own lines.
+
 ## render.php Pattern
 
 ```php

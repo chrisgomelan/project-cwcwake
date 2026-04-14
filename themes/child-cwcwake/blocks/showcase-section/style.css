@@ -1,0 +1,329 @@
+/*
+ * CWC Wake — Showcase Section Block
+ *
+ * Reusable dark section: variant "cards", "videos", or "social".
+ */
+
+/* ----------------------------------------
+   Container
+   ---------------------------------------- */
+
+.cwc-showcase {
+	background-color: var(--wp--preset--color--text);
+	background-size: cover;
+	background-position: center;
+	background-repeat: no-repeat;
+	padding: var(--wp--preset--spacing--70) var(--wp--preset--spacing--40);
+	overflow: hidden;
+}
+
+.cwc-showcase__inner {
+	max-width: 1400px;
+	margin: 0 auto;
+}
+
+/* ----------------------------------------
+   Header
+   ---------------------------------------- */
+
+.cwc-showcase__header {
+	margin-bottom: var(--wp--preset--spacing--50);
+}
+
+.cwc-showcase__heading {
+	font-family: var(--wp--preset--font-family--heading);
+	font-weight: 700;
+	font-size: clamp(2rem, 4vw, 3.25rem);
+	line-height: 1.15;
+	color: var(--wp--preset--color--background);
+	margin: 0 0 var(--wp--preset--spacing--20);
+}
+
+.cwc-showcase__heading em {
+	font-style: italic;
+}
+
+.cwc-showcase__subtitle {
+	font-family: var(--wp--preset--font-family--body);
+	font-size: var(--wp--preset--font-size--small);
+	line-height: 1.6;
+	color: rgba(255, 255, 255, 0.7);
+	max-width: 460px;
+	margin: 0;
+}
+
+/* ----------------------------------------
+   Grid (shared)
+   ---------------------------------------- */
+
+.cwc-showcase__grid {
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	gap: var(--wp--preset--spacing--40);
+}
+
+/* ----------------------------------------
+   Cards variant — image cards
+   ---------------------------------------- */
+
+.cwc-showcase__card--image {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-end;
+	aspect-ratio: 3 / 4;
+	background-color: var(--wp--preset--color--text-muted);
+	background-size: cover;
+	background-position: center;
+	border-radius: var(--wp--custom--radius--md);
+	overflow: hidden;
+	text-decoration: none;
+	transition: transform 0.3s ease;
+}
+
+.cwc-showcase__card--image::before {
+	content: "";
+	position: absolute;
+	inset: 0;
+	background: linear-gradient(to top, rgba(0, 0, 0, 0.65) 0%, transparent 50%);
+	pointer-events: none;
+}
+
+.cwc-showcase__card--image:hover {
+	transform: translateY(-4px);
+}
+
+.cwc-showcase__card-content {
+	position: relative;
+	z-index: 1;
+	padding: var(--wp--preset--spacing--30);
+}
+
+.cwc-showcase__card-title {
+	font-family: var(--wp--preset--font-family--heading);
+	font-weight: 700;
+	font-size: clamp(1.25rem, 2vw, 1.75rem);
+	color: var(--wp--preset--color--background);
+	margin: 0 0 var(--wp--preset--spacing--20);
+}
+
+.cwc-showcase__card-btn {
+	display: block;
+	text-align: center;
+	padding: 0.6rem 0;
+	border: 2px solid rgba(255, 255, 255, 0.5);
+	border-radius: var(--wp--custom--radius--sm);
+	font-family: var(--wp--preset--font-family--heading);
+	font-weight: 600;
+	font-size: var(--wp--preset--font-size--small);
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: var(--wp--preset--color--background);
+	transition: var(--wp--custom--transition--default);
+}
+
+.cwc-showcase__card--image:hover .cwc-showcase__card-btn {
+	border-color: var(--wp--preset--color--background);
+	background: rgba(255, 255, 255, 0.1);
+}
+
+/* ----------------------------------------
+   Videos variant — video cards
+   ---------------------------------------- */
+
+.cwc-showcase__card--video {
+	position: relative;
+	border-radius: var(--wp--custom--radius--md);
+	overflow: hidden;
+	background: #000;
+}
+
+.cwc-showcase__video {
+	display: block;
+	width: 100%;
+	aspect-ratio: 16 / 9;
+	object-fit: cover;
+}
+
+.cwc-showcase__poster {
+	position: relative;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	aspect-ratio: 16 / 9;
+	background: #000;
+	cursor: pointer;
+}
+
+.cwc-showcase__poster--empty {
+	background: var(--wp--preset--color--text-muted);
+}
+
+.cwc-showcase__poster img {
+	position: absolute;
+	inset: 0;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+
+.cwc-showcase__play {
+	position: relative;
+	z-index: 1;
+	transition: transform 0.2s ease;
+}
+
+.cwc-showcase__poster:hover .cwc-showcase__play {
+	transform: scale(1.1);
+}
+
+/* ----------------------------------------
+   Carousel nav (videos variant)
+   ---------------------------------------- */
+
+.cwc-showcase__carousel-nav {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: var(--wp--preset--spacing--20);
+	margin-top: var(--wp--preset--spacing--40);
+}
+
+.cwc-showcase__arrow {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 36px;
+	height: 36px;
+	background: none;
+	border: none;
+	color: rgba(255, 255, 255, 0.6);
+	cursor: pointer;
+	transition: color 0.2s ease;
+}
+
+.cwc-showcase__arrow:hover {
+	color: var(--wp--preset--color--background);
+}
+
+.cwc-showcase__dots {
+	display: flex;
+	gap: 8px;
+}
+
+.cwc-showcase__dot {
+	width: 10px;
+	height: 10px;
+	border-radius: 50%;
+	background: rgba(255, 255, 255, 0.3);
+	transition: background 0.2s ease;
+}
+
+.cwc-showcase__dot--active {
+	background: var(--wp--preset--color--background);
+}
+
+/* ----------------------------------------
+   Social variant — profile header + photo grid
+   ---------------------------------------- */
+
+.cwc-showcase__social-header {
+	display: flex;
+	align-items: center;
+	gap: var(--wp--preset--spacing--30);
+	margin-bottom: var(--wp--preset--spacing--50);
+}
+
+.cwc-showcase__social-logo {
+	width: 80px;
+	height: 80px;
+	border-radius: 50%;
+	object-fit: cover;
+	flex-shrink: 0;
+}
+
+.cwc-showcase__social-info {
+	display: flex;
+	flex-direction: column;
+	gap: 0.15rem;
+	flex: 1;
+	min-width: 0;
+}
+
+.cwc-showcase__social-name {
+	font-family: var(--wp--preset--font-family--heading);
+	font-weight: 700;
+	font-size: clamp(1.125rem, 2vw, 1.5rem);
+	color: var(--wp--preset--color--background);
+}
+
+.cwc-showcase__social-tagline {
+	font-family: var(--wp--preset--font-family--body);
+	font-size: var(--wp--preset--font-size--small);
+	color: rgba(255, 255, 255, 0.6);
+}
+
+.cwc-showcase__social-btn {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	padding: 0.6rem 1.5rem;
+	border-radius: var(--wp--custom--radius--full);
+	background: var(--wp--preset--color--primary);
+	color: var(--wp--preset--color--background);
+	font-family: var(--wp--preset--font-family--heading);
+	font-weight: 600;
+	font-size: var(--wp--preset--font-size--small);
+	text-decoration: none;
+	white-space: nowrap;
+	flex-shrink: 0;
+	transition: var(--wp--custom--transition--default);
+}
+
+.cwc-showcase__social-btn:hover {
+	background: var(--wp--preset--color--primary-dark);
+}
+
+.cwc-showcase__card--social {
+	border-radius: var(--wp--custom--radius--md);
+	overflow: hidden;
+	aspect-ratio: 1 / 1;
+	background: var(--wp--preset--color--text-muted);
+}
+
+.cwc-showcase__card--social img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	display: block;
+	transition: transform 0.3s ease;
+}
+
+.cwc-showcase__card--social:hover img {
+	transform: scale(1.05);
+}
+
+.cwc-showcase__social-placeholder {
+	width: 100%;
+	height: 100%;
+	background: rgba(255, 255, 255, 0.05);
+}
+
+/* ----------------------------------------
+   Responsive
+   ---------------------------------------- */
+
+@media (max-width: 900px) {
+	.cwc-showcase__grid {
+		grid-template-columns: 1fr;
+		max-width: 480px;
+		margin: 0 auto;
+	}
+}
+
+@media (min-width: 601px) and (max-width: 900px) {
+	.cwc-showcase__grid {
+		grid-template-columns: repeat(2, 1fr);
+		max-width: none;
+	}
+}

@@ -1,0 +1,62 @@
+<?php
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
+$bg_image         = $attributes['backgroundImage'] ?? '';
+$overlay_opacity  = $attributes['overlayOpacity'] ?? 50;
+$heading_line1    = $attributes['headingLine1'] ?? 'RIDE THE';
+$heading_emphasis = $attributes['headingEmphasis'] ?? 'BEST WAKEPARK';
+$heading_line2    = $attributes['headingLine2'] ?? 'IN THE PHILIPPINES';
+$subtitle         = $attributes['subtitle'] ?? 'Adventure, Relaxation, and Unforgettable moments - all in one place';
+$primary_label    = $attributes['primaryBtnLabel'] ?? 'Book A Ride';
+$primary_url      = $attributes['primaryBtnUrl'] ?? '#book';
+$secondary_label  = $attributes['secondaryBtnLabel'] ?? 'Explore CWC';
+$secondary_url    = $attributes['secondaryBtnUrl'] ?? '#explore';
+$video_url        = $attributes['videoUrl'] ?? '';
+$min_height       = $attributes['minHeight'] ?? '100vh';
+
+$fallback_image = get_stylesheet_directory_uri() . '/assets/images/hero-fallback.jpg';
+$bg_src         = ! empty( $bg_image ) ? esc_url( $bg_image ) : esc_url( $fallback_image );
+
+$wrapper_attrs = get_block_wrapper_attributes( [
+	'class' => 'cwc-hero',
+	'style' => sprintf( '--cwc-hero-bg:url(%s);--cwc-hero-overlay:%s;min-height:%s;', $bg_src, $overlay_opacity / 100, esc_attr( $min_height ) ),
+] );
+?>
+
+<section <?php echo $wrapper_attrs; ?>>
+	<div class="cwc-hero__overlay" aria-hidden="true"></div>
+
+	<div class="cwc-hero__content">
+		<h1 class="cwc-hero__heading">
+			<?php echo esc_html( $heading_line1 ); ?>
+			<em><?php echo esc_html( $heading_emphasis ); ?></em><br>
+			<?php echo esc_html( $heading_line2 ); ?>
+		</h1>
+
+		<p class="cwc-hero__subtitle">
+			<?php echo esc_html( $subtitle ); ?>
+		</p>
+
+		<div class="cwc-hero__actions">
+			<?php if ( ! empty( $primary_label ) ) : ?>
+				<a href="<?php echo esc_url( $primary_url ); ?>" class="cwc-hero__btn cwc-hero__btn--primary">
+					<?php echo esc_html( $primary_label ); ?>
+				</a>
+			<?php endif; ?>
+
+			<?php if ( ! empty( $secondary_label ) ) : ?>
+				<a href="<?php echo esc_url( $secondary_url ); ?>" class="cwc-hero__btn cwc-hero__btn--secondary">
+					<?php echo esc_html( $secondary_label ); ?>
+				</a>
+			<?php endif; ?>
+		</div>
+	</div>
+
+	<?php if ( ! empty( $video_url ) ) : ?>
+		<a href="<?php echo esc_url( $video_url ); ?>" class="cwc-hero__play" aria-label="Play video" target="_blank" rel="noopener noreferrer">
+			<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg>
+		</a>
+	<?php endif; ?>
+</section>

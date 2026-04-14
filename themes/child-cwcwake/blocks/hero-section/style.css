@@ -1,0 +1,172 @@
+/*
+ * CWC Wake — Hero Section Block
+ */
+
+/* ----------------------------------------
+   Container
+   ---------------------------------------- */
+
+.cwc-hero {
+	position: relative;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 100%;
+	min-height: 100vh;
+	margin-top: -115px;
+	padding: 115px var(--wp--preset--spacing--40) var(--wp--preset--spacing--60);
+	background: var(--cwc-hero-bg) center / cover no-repeat;
+	overflow: hidden;
+}
+
+/* ----------------------------------------
+   Dark overlay
+   ---------------------------------------- */
+
+.cwc-hero__overlay {
+	position: absolute;
+	inset: 0;
+	background: rgba(0, 0, 0, var(--cwc-hero-overlay, 0.5));
+	pointer-events: none;
+}
+
+/* ----------------------------------------
+   Content
+   ---------------------------------------- */
+
+.cwc-hero__content {
+	position: relative;
+	z-index: 1;
+	text-align: center;
+	max-width: 800px;
+}
+
+/* ----------------------------------------
+   Heading
+   ---------------------------------------- */
+
+.cwc-hero__heading {
+	font-family: var(--wp--preset--font-family--heading);
+	font-weight: 700;
+	font-size: clamp(2.25rem, 5vw, 4rem);
+	line-height: 1.15;
+	text-transform: uppercase;
+	color: var(--wp--preset--color--background);
+	margin: 0 0 var(--wp--preset--spacing--30);
+}
+
+.cwc-hero__heading em {
+	font-style: italic;
+}
+
+/* ----------------------------------------
+   Subtitle
+   ---------------------------------------- */
+
+.cwc-hero__subtitle {
+	font-family: var(--wp--preset--font-family--body);
+	font-weight: 400;
+	font-size: clamp(1rem, 2vw, 1.25rem);
+	font-style: italic;
+	line-height: 1.5;
+	color: rgba(255, 255, 255, 0.85);
+	margin: 0 0 var(--wp--preset--spacing--40);
+}
+
+/* ----------------------------------------
+   CTA buttons
+   ---------------------------------------- */
+
+.cwc-hero__actions {
+	display: flex;
+	justify-content: center;
+	flex-wrap: wrap;
+	gap: var(--wp--preset--spacing--30);
+}
+
+.cwc-hero__btn {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	padding: 0.85rem 2rem;
+	border-radius: var(--wp--custom--radius--full);
+	font-family: var(--wp--preset--font-family--heading);
+	font-weight: 600;
+	font-size: var(--wp--preset--font-size--small);
+	letter-spacing: 0.03em;
+	text-transform: uppercase;
+	text-decoration: none;
+	white-space: nowrap;
+	transition: var(--wp--custom--transition--default);
+}
+
+.cwc-hero__btn--primary {
+	background: var(--wp--preset--color--primary);
+	color: var(--wp--preset--color--background);
+}
+
+.cwc-hero__btn--primary:hover {
+	background: var(--wp--preset--color--primary-dark);
+}
+
+.cwc-hero__btn--secondary {
+	background: transparent;
+	color: var(--wp--preset--color--background);
+	border: 2px solid rgba(255, 255, 255, 0.6);
+}
+
+.cwc-hero__btn--secondary:hover {
+	border-color: var(--wp--preset--color--background);
+	background: rgba(255, 255, 255, 0.1);
+}
+
+/* ----------------------------------------
+   Video play button
+   ---------------------------------------- */
+
+.cwc-hero__play {
+	position: absolute;
+	bottom: var(--wp--preset--spacing--40);
+	right: var(--wp--preset--spacing--40);
+	z-index: 1;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 48px;
+	height: 48px;
+	border-radius: 50%;
+	background: rgba(255, 255, 255, 0.15);
+	border: 2px solid rgba(255, 255, 255, 0.5);
+	color: var(--wp--preset--color--background);
+	text-decoration: none;
+	transition: var(--wp--custom--transition--default);
+}
+
+.cwc-hero__play:hover {
+	background: rgba(255, 255, 255, 0.3);
+	border-color: var(--wp--preset--color--background);
+}
+
+.cwc-hero__play svg {
+	margin-left: 2px;
+}
+
+/* ----------------------------------------
+   Responsive
+   ---------------------------------------- */
+
+@media (max-width: 600px) {
+	.cwc-hero {
+		min-height: 80vh;
+	}
+
+	.cwc-hero__actions {
+		flex-direction: column;
+		align-items: center;
+	}
+
+	.cwc-hero__btn {
+		width: 100%;
+		max-width: 280px;
+	}
+}

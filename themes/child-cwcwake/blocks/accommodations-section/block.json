@@ -1,0 +1,47 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "cwc/accommodations-section",
+	"version": "1.0.0",
+	"title": "Accommodations Section",
+	"category": "theme",
+	"icon": "building",
+	"description": "Staggered accommodation cards with image, price, capacity, and CTA. Dark secondary background with optional pattern.",
+	"textdomain": "child-cwcwake",
+	"supports": {
+		"align": ["full"],
+		"html": false,
+		"anchor": true
+	},
+	"attributes": {
+		"heading": {
+			"type": "string",
+			"default": "STAY With Us"
+		},
+		"subtitle": {
+			"type": "string",
+			"default": "Experience premier accommodations from lakeside cabins to luxury villas. Book your stay for the ultimate adventure retreat."
+		},
+		"ctaLabel": {
+			"type": "string",
+			"default": "View Accommodations"
+		},
+		"ctaUrl": {
+			"type": "string",
+			"default": "/accommodations/"
+		},
+		"backgroundImage": {
+			"type": "string",
+			"default": ""
+		},
+		"items": {
+			"type": "array",
+			"default": [],
+			"items": {
+				"type": "object"
+			}
+		}
+	},
+	"render": "file:./render.php",
+	"style": "file:./style.css"
+}

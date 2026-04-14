@@ -1,0 +1,40 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "cwc/reviews-section",
+	"version": "1.0.0",
+	"title": "Reviews Section",
+	"category": "theme",
+	"icon": "format-quote",
+	"description": "Client reviews slider with quote, reviewer info, star rating, and a featured image carousel with prev/next controls.",
+	"textdomain": "child-cwcwake",
+	"supports": {
+		"align": ["full"],
+		"html": false,
+		"anchor": true
+	},
+	"attributes": {
+		"headingStart": {
+			"type": "string",
+			"default": "Client"
+		},
+		"headingEmphasis": {
+			"type": "string",
+			"default": "REVIEWS"
+		},
+		"emphasisColor": {
+			"type": "string",
+			"default": "primary"
+		},
+		"items": {
+			"type": "array",
+			"default": [],
+			"items": {
+				"type": "object"
+			}
+		}
+	},
+	"render": "file:./render.php",
+	"style": "file:./style.css",
+	"viewScript": "file:./view.js"
+}
