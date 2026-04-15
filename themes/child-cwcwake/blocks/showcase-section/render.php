@@ -142,10 +142,14 @@ $wrapper_attrs = get_block_wrapper_attributes( [
 					<?php
 					$card_title = $item['title'] ?? '';
 					$card_image = $item['image'] ?? '';
+					$hover_gif  = $item['hoverGif'] ?? '';
 					$btn_label  = $item['buttonLabel'] ?? 'EXPLORE';
 					$btn_url    = $item['buttonUrl'] ?? '#';
 					?>
 					<a href="<?php echo esc_url( $btn_url ); ?>" class="cwc-showcase__card cwc-showcase__card--image" <?php echo ! empty( $card_image ) ? 'style="background-image:url(' . esc_url( $card_image ) . ')"' : ''; ?>>
+						<?php if ( ! empty( $hover_gif ) ) : ?>
+							<img class="cwc-showcase__card-gif" src="<?php echo esc_url( $hover_gif ); ?>" alt="" loading="lazy">
+						<?php endif; ?>
 						<div class="cwc-showcase__card-content">
 							<?php if ( ! empty( $card_title ) ) : ?>
 								<h3 class="cwc-showcase__card-title"><?php echo esc_html( $card_title ); ?></h3>
@@ -161,7 +165,7 @@ $wrapper_attrs = get_block_wrapper_attributes( [
 		<?php if ( 'videos' === $variant && count( $items ) > 1 ) : ?>
 			<div class="cwc-showcase__carousel-nav">
 				<button class="cwc-showcase__arrow cwc-showcase__arrow--prev" aria-label="Previous">
-					<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
 				</button>
 				<div class="cwc-showcase__dots">
 					<?php for ( $i = 0; $i < count( $items ); $i++ ) : ?>
@@ -169,7 +173,7 @@ $wrapper_attrs = get_block_wrapper_attributes( [
 					<?php endfor; ?>
 				</div>
 				<button class="cwc-showcase__arrow cwc-showcase__arrow--next" aria-label="Next">
-					<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
 				</button>
 			</div>
 		<?php endif; ?>

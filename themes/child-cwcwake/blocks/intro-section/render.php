@@ -11,6 +11,9 @@ $tagline          = $attributes['tagline'] ?? 'EXPERIENCE. THE. THRILL.';
 $video_url        = $attributes['videoUrl'] ?? '';
 $video_poster     = $attributes['videoPoster'] ?? '';
 
+$is_vimeo = ! empty( $video_url ) && preg_match( '/vimeo\.com\/(\d+)/', $video_url, $vimeo_match );
+$vimeo_id = $is_vimeo ? $vimeo_match[1] : '';
+
 $wrapper_attrs = get_block_wrapper_attributes( [
 	'class' => 'cwc-intro',
 ] );
@@ -38,8 +41,19 @@ $wrapper_attrs = get_block_wrapper_attributes( [
 				<span class="cwc-intro__tagline"><?php echo esc_html( $tagline ); ?></span>
 			<?php endif; ?>
 
+			<div class="cwc-intro__bracket cwc-intro__bracket--tl" aria-hidden="true"></div>
+			<div class="cwc-intro__bracket cwc-intro__bracket--br" aria-hidden="true"></div>
+
 			<div class="cwc-intro__video-wrap">
-				<?php if ( ! empty( $video_url ) ) : ?>
+				<?php if ( $is_vimeo ) : ?>
+					<iframe
+						class="cwc-intro__video"
+						src="https://player.vimeo.com/video/<?php echo esc_attr( $vimeo_id ); ?>?byline=0&portrait=0&title=0"
+						frameborder="0"
+						allow="autoplay; fullscreen; picture-in-picture"
+						allowfullscreen
+					></iframe>
+				<?php elseif ( ! empty( $video_url ) ) : ?>
 					<video
 						class="cwc-intro__video"
 						src="<?php echo esc_url( $video_url ); ?>"

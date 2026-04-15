@@ -29,7 +29,7 @@
    ---------------------------------------- */
 
 .cwc-intro__text {
-	max-width: 520px;
+	max-width: 80%;
 }
 
 .cwc-intro__heading {
@@ -82,25 +82,27 @@
 	color: #395144;
 }
 
-/* Corner bracket shapes (pseudo-elements on video wrap) */
-.cwc-intro__video-wrap::before,
-.cwc-intro__video-wrap::after {
-	content: "";
+/* Corner bracket shapes */
+.cwc-intro__bracket {
 	position: absolute;
-	width: 30px;
-	height: 55%;
-	background: var(--wp--preset--color--primary);
-	z-index: 1;
+    width: 100px;
+    height: 120px;
+    border: 230px solid var(--wp--preset--color--primary);
+    z-index: 1;
 }
 
-.cwc-intro__video-wrap::before {
-	top: -20px;
-	left: -15px;
+.cwc-intro__bracket--tl {
+	top: 0;
+	left: 0;
+	border-right: none;
+	border-bottom: none;
 }
 
-.cwc-intro__video-wrap::after {
-	bottom: -20px;
-	right: -15px;
+.cwc-intro__bracket--br {
+	bottom: 0;
+	right: 0;
+	border-left: none;
+	border-top: none;
 }
 
 /* Video wrapper */
@@ -118,6 +120,7 @@
 	width: 100%;
 	height: 100%;
 	object-fit: cover;
+	border: none;
 }
 
 /* Poster placeholder when no video src */
@@ -167,8 +170,7 @@
 		margin-bottom: var(--wp--preset--spacing--20);
 	}
 
-	.cwc-intro__video-wrap::before,
-	.cwc-intro__video-wrap::after {
+	.cwc-intro__bracket {
 		display: none;
 	}
 }

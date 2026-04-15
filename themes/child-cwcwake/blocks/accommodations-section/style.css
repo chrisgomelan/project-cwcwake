@@ -13,12 +13,15 @@
 	background-size: cover;
 	background-position: center;
 	background-repeat: no-repeat;
-	padding: var(--wp--preset--spacing--70) var(--wp--preset--spacing--40);
+	padding: var(--wp--preset--spacing--70) clamp(1.5rem, 4vw, 4rem);
+	margin-top: 0 !important;
+	margin-block-start: 0 !important;
+	margin-block-end: 0 !important;
 	overflow: hidden;
 }
 
 .cwc-accommodations__inner {
-	max-width: 1400px;
+	max-width: 1921px;
 	margin: 0 auto;
 }
 
@@ -36,24 +39,27 @@
 }
 
 .cwc-accommodations__header-text {
-	max-width: 520px;
+	max-width: 550px;
 }
 
 .cwc-accommodations__heading {
-	font-family: var(--wp--preset--font-family--heading);
+	font-family: var(--wp--preset--font-family--body);
 	font-weight: 700;
 	font-style: italic;
-	font-size: clamp(2rem, 4vw, 3.25rem);
-	line-height: 1.15;
-	color: var(--wp--preset--color--primary);
+	font-size: var(--wp--preset--font-size--huge);
+	line-height: 100%;
+	letter-spacing: 0;
+	color: #395144;
 	margin: 0 0 var(--wp--preset--spacing--20);
 }
 
 .cwc-accommodations__subtitle {
 	font-family: var(--wp--preset--font-family--body);
-	font-size: var(--wp--preset--font-size--small);
-	line-height: 1.6;
-	color: rgba(255, 255, 255, 0.7);
+	font-weight: 500;
+	font-size: clamp(1rem, 1.5vw, 1.25rem);
+	line-height: 100%;
+	letter-spacing: 0;
+	color: var(--wp--preset--color--text);
 	margin: 0;
 }
 
@@ -61,17 +67,22 @@
 .cwc-accommodations__cta {
 	display: inline-flex;
 	align-items: center;
-	gap: 0.5rem;
-	padding: 0.75rem 1.5rem;
-	border-radius: var(--wp--custom--radius--full);
+	justify-content: center;
+	width: 300px;
+	height: 60px;
+	gap: 10px;
+	padding: 15px 20px;
+	border-radius: 30px;
 	background: var(--wp--preset--color--primary);
-	color: var(--wp--preset--color--background);
-	font-family: var(--wp--preset--font-family--heading);
+	color: #F5F1EB;
+	font-family: var(--wp--preset--font-family--body);
 	font-weight: 600;
-	font-size: var(--wp--preset--font-size--small);
+	font-size: clamp(1rem, 1.5vw, 1.25rem);
+	line-height: 100%;
+	letter-spacing: 0;
 	text-decoration: none;
 	white-space: nowrap;
-	transition: var(--wp--custom--transition--default);
+	transition: background-color 0.3s ease;
 }
 
 .cwc-accommodations__cta:hover {
@@ -97,13 +108,25 @@
 
 .cwc-accommodations__card {
 	background: rgba(0, 0, 0, 0.25);
-	border-radius: var(--wp--custom--radius--lg);
+	border-radius: 5.25px;
 	overflow: visible;
-	transition: transform 0.3s ease;
+	box-shadow:
+		-0.5px -0.5px 0px 0px rgba(0, 0, 0, 0.69),
+		14px 14px 21.21px -3.75px rgba(0, 0, 0, 0.2),
+		5.9px 5.9px 8.35px -3px rgba(0, 0, 0, 0.19),
+		2.66px 2.66px 3.76px -2.25px rgba(0, 0, 0, 0.23),
+		1.21px 1.21px 1.71px -1.5px rgba(0, 0, 0, 0.25),
+		0.44px 0.44px 0.63px -0.75px rgba(0, 0, 0, 0.26),
+		inset -1px -1px 1px 0px rgba(0, 0, 0, 0.23),
+		inset 1px 1px 1px 0px rgba(255, 255, 255, 0.7);
+	transition: transform 0.3s ease, background-color 0.3s ease;
+	background: #395144;
+	padding: 10px;
 }
 
 .cwc-accommodations__card:hover {
 	transform: translateY(-4px);
+	background: #F5F1EB;
 }
 
 /* Stagger: even cards sit lower, odd cards sit higher */
@@ -122,6 +145,8 @@
 .cwc-accommodations__card-img {
 	padding: var(--wp--preset--spacing--20);
 	padding-bottom: 0;
+	overflow: hidden;
+	border-radius: var(--wp--custom--radius--md);
 }
 
 .cwc-accommodations__card-img img {
@@ -130,6 +155,11 @@
 	object-fit: cover;
 	border-radius: var(--wp--custom--radius--md);
 	display: block;
+	transition: transform 0.5s ease;
+}
+
+.cwc-accommodations__card:hover .cwc-accommodations__card-img img {
+	transform: scale(1.1);
 }
 
 .cwc-accommodations__card-img--empty {
@@ -151,17 +181,24 @@
 .cwc-accommodations__card-title {
 	font-family: var(--wp--preset--font-family--heading);
 	font-weight: 700;
-	font-size: clamp(1.25rem, 2vw, 1.75rem);
+	font-size: var(--wp--preset--font-size--xx-large);
+	line-height: 100%;
+	letter-spacing: 0;
 	text-transform: uppercase;
-	color: var(--wp--preset--color--background);
+	color: #F5F1EB;
 	margin: 0 0 var(--wp--preset--spacing--10);
+	transition: color 0.3s ease;
 }
 
 .cwc-accommodations__card-price {
 	font-family: var(--wp--preset--font-family--body);
-	font-size: var(--wp--preset--font-size--small);
-	color: rgba(255, 255, 255, 0.85);
+	font-weight: 500;
+	font-size: clamp(1rem, 1.5vw, 1.25rem);
+	line-height: 100%;
+	letter-spacing: 0;
+	color: #F5F1EB;
 	margin: 0 0 0.25rem;
+	transition: color 0.3s ease;
 }
 
 .cwc-accommodations__card-capacity {
@@ -169,9 +206,13 @@
 	align-items: center;
 	gap: 0.35rem;
 	font-family: var(--wp--preset--font-family--body);
-	font-size: 0.8125rem;
-	color: rgba(255, 255, 255, 0.6);
+	font-weight: 500;
+	font-size: clamp(0.875rem, 1.25vw, 1.125rem);
+	line-height: 100%;
+	letter-spacing: 0;
+	color: #F5F1EB;
 	margin: 0 0 var(--wp--preset--spacing--30);
+	transition: color 0.3s ease;
 }
 
 .cwc-accommodations__card-capacity svg {
@@ -180,22 +221,42 @@
 
 /* Card button — outline style */
 .cwc-accommodations__card-btn {
-	display: block;
-	text-align: center;
-	padding: 0.6rem 0;
-	border: 1.5px solid rgba(255, 255, 255, 0.4);
-	border-radius: var(--wp--custom--radius--sm);
-	font-family: var(--wp--preset--font-family--heading);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	height: 52px;
+	padding: 15px 20px;
+	gap: 10px;
+	border: none;
+	border-radius: 30px;
+	background: #F5F1EB;
+	font-family: var(--wp--preset--font-family--body);
 	font-weight: 600;
-	font-size: var(--wp--preset--font-size--small);
-	color: var(--wp--preset--color--background);
+	font-size: clamp(1rem, 1.5vw, 1.25rem);
+	line-height: 100%;
+	letter-spacing: 0;
+	color: var(--wp--preset--color--text);
 	text-decoration: none;
-	transition: var(--wp--custom--transition--default);
+	transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 .cwc-accommodations__card-btn:hover {
-	border-color: var(--wp--preset--color--background);
-	background: rgba(255, 255, 255, 0.08);
+	opacity: 0.9;
+}
+
+/* Card hover — invert colours */
+.cwc-accommodations__card:hover .cwc-accommodations__card-title,
+.cwc-accommodations__card:hover .cwc-accommodations__card-price {
+	color: #1A1A1A;
+}
+
+.cwc-accommodations__card:hover .cwc-accommodations__card-capacity {
+	color: #395144;
+}
+
+.cwc-accommodations__card:hover .cwc-accommodations__card-btn {
+	background: #395144;
+	color: #F5F1EB;
 }
 
 /* ----------------------------------------

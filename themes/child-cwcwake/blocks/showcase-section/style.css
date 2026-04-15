@@ -13,12 +13,13 @@
 	background-size: cover;
 	background-position: center;
 	background-repeat: no-repeat;
-	padding: var(--wp--preset--spacing--70) var(--wp--preset--spacing--40);
+	padding: var(--wp--preset--spacing--70) clamp(1.5rem, 4vw, 4rem);
+	margin-block-start: 0 !important;
 	overflow: hidden;
 }
 
 .cwc-showcase__inner {
-	max-width: 1400px;
+	max-width: 1921px;
 	margin: 0 auto;
 }
 
@@ -33,7 +34,7 @@
 .cwc-showcase__heading {
 	font-family: var(--wp--preset--font-family--heading);
 	font-weight: 700;
-	font-size: clamp(2rem, 4vw, 3.25rem);
+	font-size: var(--wp--preset--font-size--huge);
 	line-height: 1.15;
 	color: var(--wp--preset--color--background);
 	margin: 0 0 var(--wp--preset--spacing--20);
@@ -45,10 +46,12 @@
 
 .cwc-showcase__subtitle {
 	font-family: var(--wp--preset--font-family--body);
-	font-size: var(--wp--preset--font-size--small);
-	line-height: 1.6;
-	color: rgba(255, 255, 255, 0.7);
-	max-width: 460px;
+	font-weight: 500;
+	font-size: clamp(1rem, 1.5vw, 1.25rem);
+	line-height: 100%;
+	letter-spacing: 0;
+	color: #F5F1EB;
+	max-width: 600px;
 	margin: 0;
 }
 
@@ -75,9 +78,10 @@
 	background-color: var(--wp--preset--color--text-muted);
 	background-size: cover;
 	background-position: center;
-	border-radius: var(--wp--custom--radius--md);
+	border-radius: 0;
 	overflow: hidden;
 	text-decoration: none;
+	outline: none;
 	transition: transform 0.3s ease;
 }
 
@@ -89,36 +93,65 @@
 	pointer-events: none;
 }
 
+.cwc-showcase__card-gif {
+	position: absolute;
+	inset: 0;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	opacity: 0;
+	z-index: 0;
+	transform: scale(1.15);
+	transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
 .cwc-showcase__card--image:hover {
 	transform: translateY(-4px);
+}
+
+.cwc-showcase__card--image:hover .cwc-showcase__card-gif {
+	opacity: 1;
+	transform: scale(1);
 }
 
 .cwc-showcase__card-content {
 	position: relative;
 	z-index: 1;
 	padding: var(--wp--preset--spacing--30);
+	text-align: center;
+	display: flex;
+    flex-direction: column;
+    gap: 20px;
 }
 
 .cwc-showcase__card-title {
 	font-family: var(--wp--preset--font-family--heading);
 	font-weight: 700;
-	font-size: clamp(1.25rem, 2vw, 1.75rem);
-	color: var(--wp--preset--color--background);
+	font-size: var(--wp--preset--font-size--xx-large);
+	line-height: 100%;
+	letter-spacing: 0;
+	text-align: center;
+	color: #F5F1EB;
 	margin: 0 0 var(--wp--preset--spacing--20);
 }
 
 .cwc-showcase__card-btn {
-	display: block;
-	text-align: center;
-	padding: 0.6rem 0;
-	border: 2px solid rgba(255, 255, 255, 0.5);
-	border-radius: var(--wp--custom--radius--sm);
-	font-family: var(--wp--preset--font-family--heading);
+	height: 71px;
+	padding: 15px 20px;
+	gap: 10px;
+	border: 2px solid var(--wp--preset--color--background);
+	border-radius: var(--wp--custom--radius--full);
+	font-family: var(--wp--preset--font-family--body);
 	font-weight: 600;
-	font-size: var(--wp--preset--font-size--small);
-	letter-spacing: 0.08em;
+	font-size: clamp(1rem, 1.5vw, 1.25rem);
+	line-height: 100%;
+	letter-spacing: 0;
 	text-transform: uppercase;
 	color: var(--wp--preset--color--background);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	text-align: center;
 	transition: var(--wp--custom--transition--default);
 }
 
@@ -130,6 +163,25 @@
 /* ----------------------------------------
    Videos variant — video cards
    ---------------------------------------- */
+
+.cwc-showcase--videos .cwc-showcase__grid {
+	display: flex;
+	gap: var(--wp--preset--spacing--40);
+	overflow-x: auto;
+	scroll-snap-type: x mandatory;
+	scroll-behavior: smooth;
+	scrollbar-width: none;
+	-ms-overflow-style: none;
+}
+
+.cwc-showcase--videos .cwc-showcase__grid::-webkit-scrollbar {
+	display: none;
+}
+
+.cwc-showcase--videos .cwc-showcase__card--video {
+	flex: 0 0 calc((100% - var(--wp--preset--spacing--40) * 2) / 3);
+	scroll-snap-align: start;
+}
 
 .cwc-showcase__card--video {
 	position: relative;
@@ -193,13 +245,23 @@
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	width: 36px;
-	height: 36px;
+	width: 72px;
+	height: 72px;
 	background: none;
 	border: none;
 	color: rgba(255, 255, 255, 0.6);
 	cursor: pointer;
 	transition: color 0.2s ease;
+	outline: none;
+}
+
+.cwc-showcase__arrow:focus {
+	outline: none;
+}
+
+.cwc-showcase__arrow svg {
+	width: 50px;
+	height: 50px;
 }
 
 .cwc-showcase__arrow:hover {
@@ -208,12 +270,12 @@
 
 .cwc-showcase__dots {
 	display: flex;
-	gap: 8px;
+	gap: 16px;
 }
 
 .cwc-showcase__dot {
-	width: 10px;
-	height: 10px;
+	width: 20px;
+	height: 20px;
 	border-radius: 50%;
 	background: rgba(255, 255, 255, 0.3);
 	transition: background 0.2s ease;

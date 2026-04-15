@@ -10,12 +10,13 @@
 
 .cwc-reviews {
 	background: var(--wp--preset--color--surface);
-	padding: var(--wp--preset--spacing--70) var(--wp--preset--spacing--40);
+	padding: var(--wp--preset--spacing--70) clamp(1.5rem, 4vw, 4rem);
+	margin-block-start: 0 !important;
 	overflow: hidden;
 }
 
 .cwc-reviews__inner {
-	max-width: 1400px;
+	max-width: 1921px;
 	margin: 0 auto;
 }
 
@@ -26,8 +27,10 @@
 .cwc-reviews__heading {
 	font-family: var(--wp--preset--font-family--heading);
 	font-weight: 700;
-	font-size: clamp(2rem, 4vw, 3.25rem);
-	line-height: 1.15;
+	font-size: var(--wp--preset--font-size--huge);
+	line-height: 100%;
+	letter-spacing: 0;
+	text-align: center;
 	color: var(--wp--preset--color--text);
 	margin: 0 0 var(--wp--preset--spacing--50);
 }
@@ -62,18 +65,18 @@
 }
 
 .cwc-reviews__quote-mark {
-	font-family: var(--wp--preset--font-family--heading);
-	font-size: 5rem;
-	line-height: 0.6;
-	color: var(--wp--preset--color--text-muted);
-	opacity: 0.3;
+	width: 75px;
+	height: auto;
+	display: block;
 }
 
 .cwc-reviews__quote {
 	font-family: var(--wp--preset--font-family--body);
-	font-size: var(--wp--preset--font-size--medium);
-	line-height: 1.65;
-	color: var(--wp--preset--color--text-muted);
+	font-weight: 500;
+	font-size: clamp(1rem, 1.5vw, 1.25rem);
+	line-height: 100%;
+	letter-spacing: 0;
+	color: #1A1A1A;
 	margin: 0;
 	padding: 0;
 	border: none;
@@ -89,11 +92,12 @@
 }
 
 .cwc-reviews__reviewer-name {
-	font-family: var(--wp--preset--font-family--heading);
+	font-family: var(--wp--preset--font-family--body);
 	font-weight: 700;
-	font-size: var(--wp--preset--font-size--small);
-	text-transform: uppercase;
-	color: var(--wp--preset--color--text);
+	font-size: clamp(1rem, 1.5vw, 1.25rem);
+	line-height: 100%;
+	letter-spacing: 0;
+	color: #000000;
 }
 
 .cwc-reviews__stars {
@@ -131,22 +135,33 @@
 }
 
 /* ----------------------------------------
-   Arrows — positioned inside the image
+   Arrows & counter — inside the image, left edge
    ---------------------------------------- */
 
 .cwc-reviews__arrow {
 	position: absolute;
+	left: -20px;
 	z-index: 2;
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	width: 40px;
-	height: 40px;
+	width: 48px;
+	height: 48px;
 	background: none;
 	border: none;
 	color: var(--wp--preset--color--text);
 	cursor: pointer;
 	transition: color 0.2s ease;
+	outline: none;
+}
+
+.cwc-reviews__arrow:focus {
+	outline: none;
+}
+
+.cwc-reviews__arrow svg {
+	width: 36px;
+	height: 36px;
 }
 
 .cwc-reviews__arrow:hover {
@@ -155,30 +170,50 @@
 
 .cwc-reviews__arrow--next {
 	top: 50%;
-	left: -40px;
-	transform: translateY(-50%);
+	transform: translateY(-100%);
 }
 
 .cwc-reviews__arrow--prev {
-	bottom: 50%;
-	left: -40px;
-	transform: translateY(50%);
-	margin-bottom: -48px;
+	top: 50%;
+	transform: translateY(0%);
 }
 
-/* ----------------------------------------
-   Counter — rotated, right edge
-   ---------------------------------------- */
+/* Divider between arrows */
+.cwc-reviews__arrow--next::after {
+	content: "";
+	position: absolute;
+	bottom: -1px;
+	left: 50%;
+	transform: translateX(-50%);
+	width: 24px;
+	height: 2px;
+	background: rgba(0, 0, 0, 0.2);
+}
 
+/* Counter — rotated vertically, below arrows on left side */
 .cwc-reviews__counter {
 	position: absolute;
-	right: -36px;
-	bottom: 50%;
-	transform: rotate(90deg) translateX(50%);
+	left: -10px;
+	top: 50%;
+	margin-top: 60px;
+	transform: rotate(-90deg);
+	transform-origin: center center;
 	font-family: var(--wp--preset--font-family--body);
-	font-size: var(--wp--preset--font-size--small);
-	color: var(--wp--preset--color--text-muted);
+	font-weight: 500;
+	font-size: 1rem;
+	line-height: 100%;
+	letter-spacing: 0;
+	color: #1A1A1A;
 	white-space: nowrap;
+}
+
+.cwc-reviews__counter-total {
+	font-family: var(--wp--preset--font-family--body);
+	font-weight: 500;
+	font-size: 1rem;
+	line-height: 100%;
+	letter-spacing: 0;
+	color: #1A1A1A;
 }
 
 /* ----------------------------------------
@@ -197,7 +232,10 @@
 		top: auto;
 		bottom: -48px;
 		transform: none;
-		margin-bottom: 0;
+	}
+
+	.cwc-reviews__arrow--next::after {
+		display: none;
 	}
 
 	.cwc-reviews__arrow--prev {

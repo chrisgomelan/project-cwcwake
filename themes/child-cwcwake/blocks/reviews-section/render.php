@@ -66,7 +66,7 @@ $wrapper_attrs = get_block_wrapper_attributes( [
 
 					<!-- Left: quote -->
 					<div class="cwc-reviews__quote-col">
-						<span class="cwc-reviews__quote-mark" aria-hidden="true">&ldquo;</span>
+						<img class="cwc-reviews__quote-mark" src="/wp-content/uploads/2026/04/quote.svg" alt="" aria-hidden="true">
 
 						<blockquote class="cwc-reviews__quote">
 							<?php echo esc_html( $quote ); ?>
