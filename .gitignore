@@ -4,8 +4,10 @@
 # Ignore: everything that can be reinstalled
 # ===========================================
 
-# --- Uploads (media files are environment-specific) ---
-uploads/
+# --- Uploads ---
+# Tracked so collaborators get all media assets.
+# Ignore WordPress-generated thumbnail sizes to keep the repo lean.
+uploads/**/*-[0-9]*x[0-9]*.*
 
 # --- Upgrade files ---
 upgrade/
