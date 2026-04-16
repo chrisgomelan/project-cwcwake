@@ -140,7 +140,7 @@
 
 .cwc-reviews__arrow {
 	position: absolute;
-	left: -20px;
+	left: 16px;
 	z-index: 2;
 	display: flex;
 	align-items: center;
@@ -193,7 +193,7 @@
 /* Counter — rotated vertically, below arrows on left side */
 .cwc-reviews__counter {
 	position: absolute;
-	left: -10px;
+	left: 28px;
 	top: 50%;
 	margin-top: 60px;
 	transform: rotate(-90deg);

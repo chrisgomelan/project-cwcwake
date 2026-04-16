@@ -17,7 +17,7 @@
 
 .cwc-intro__inner {
 	display: grid;
-	grid-template-columns: 1fr 1fr;
+	grid-template-columns: 2fr 3fr;
 	gap: var(--wp--preset--spacing--60);
 	align-items: center;
 	max-width: 1921px;
@@ -29,7 +29,7 @@
    ---------------------------------------- */
 
 .cwc-intro__text {
-	max-width: 80%;
+	max-width: 100%;
 }
 
 .cwc-intro__heading {
@@ -87,7 +87,7 @@
 	position: absolute;
     width: 100px;
     height: 120px;
-    border: 230px solid var(--wp--preset--color--primary);
+    border: 400px solid var(--wp--preset--color--primary);
     z-index: 1;
 }
 
