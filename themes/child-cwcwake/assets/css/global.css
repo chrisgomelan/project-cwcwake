@@ -177,6 +177,41 @@ img {
 }
 
 /* ----------------------------------------
+   Tropical-bg section
+   ----------------------------------------
+   Shared wrapper used on Gallery, Accommodations, Contact, Terms,
+   and Privacy pages. Sits below the page banner and contains the
+   breadcrumbs + main content.
+
+   Direct children mirror `.cwc-header__inner` (max-width 1921 +
+   horizontal clamp padding) so the breadcrumbs and post-content
+   line up with the header logo. */
+
+.cwc-tropical-section {
+	background-image: url('/wp-content/uploads/2026/04/tropical-bg.webp');
+	background-size: cover;
+	background-position: center;
+	background-repeat: no-repeat;
+	margin-block-start: 0 !important;
+	/* No left/right padding here — children own the inset to mirror
+	   the header geometry exactly. */
+	padding-left: 0 !important;
+	padding-right: 0 !important;
+}
+
+.cwc-tropical-section > .cwc-breadcrumbs__wrap,
+.cwc-tropical-section > main,
+.cwc-tropical-section > .wp-block-group,
+.cwc-tropical-section > .wp-block-cwc-gallery-grid,
+.cwc-tropical-section > .wp-block-cwc-cards-section {
+	width: 100%;
+	max-width: 1921px;
+	margin-inline: auto;
+	padding-left: clamp(1.5rem, 4vw, 4rem);
+	padding-right: clamp(1.5rem, 4vw, 4rem);
+}
+
+/* ----------------------------------------
    Cards (reusable pattern)
    ---------------------------------------- */
 

@@ -1,0 +1,49 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "cwc/page-banner",
+	"version": "1.0.0",
+	"title": "Page Banner",
+	"category": "theme",
+	"icon": "format-image",
+	"description": "Inner-page hero banner with background image, title, optional subtitle, and corner brackets. Supports default and compact heights.",
+	"textdomain": "child-cwcwake",
+	"supports": {
+		"align": ["full"],
+		"html": false,
+		"anchor": true
+	},
+	"attributes": {
+		"backgroundImage": {
+			"type": "string",
+			"default": ""
+		},
+		"overlayOpacity": {
+			"type": "number",
+			"default": 40
+		},
+		"title": {
+			"type": "string",
+			"default": "Page Title"
+		},
+		"subtitle": {
+			"type": "string",
+			"default": ""
+		},
+		"size": {
+			"type": "string",
+			"default": "default",
+			"enum": ["default", "compact"]
+		},
+		"showCorners": {
+			"type": "boolean",
+			"default": true
+		},
+		"useFeaturedImage": {
+			"type": "boolean",
+			"default": false
+		}
+	},
+	"render": "file:./render.php",
+	"style": "file:./style.css"
+}

@@ -1,7 +1,12 @@
 /*
  * CWC Wake — Header
  *
- * Fixed header: transparent at top, white on scroll.
+ * Fixed header.
+ * - On the home page (body.cwc-home): transparent at top, becomes opaque
+ *   on scroll via the .cwc-header--scrolled class added by header.js.
+ * - On every other page (body:not(.cwc-home)): always rendered in the
+ *   opaque "scrolled" appearance — no transparency, no wave animation.
+ *
  * 3-column layout: Logo | Nav (centered) | Search + Book Now
  */
 
@@ -24,7 +29,9 @@
 	align-items: center;
 	padding: 0 !important;
 	margin: 0 !important;
-	overflow: hidden;
+	/* Clip the wave ::after that extends -40px above the header (and any side overflow),
+	   but leave the bottom open so navigation submenu dropdowns can extend below. */
+	clip-path: inset(0 0 -100vh 0);
 	transition: border-color 0.3s ease,
 		box-shadow 0.3s ease;
 }
@@ -288,6 +295,7 @@ body.admin-bar {
 	padding: 5px;
 	min-width: 280px;
 	box-shadow: var(--wp--custom--shadow--lg);
+	z-index: 101;
 }
 
 .cwc-header .wp-block-navigation__submenu-container .wp-block-navigation-item {
@@ -321,6 +329,13 @@ body.admin-bar {
 .cwc-header .wp-block-navigation__submenu-container a:hover {
 	background-color: var(--wp--preset--color--surface);
 	color: var(--wp--preset--color--primary) !important;
+}
+
+/* Inside a submenu container, suppress WordPress's built-in chevron SVG
+   so the custom side-pointing `›` is the only indicator on items that
+   open another submenu. Top-level items keep the default chevron. */
+.cwc-header .wp-block-navigation__submenu-container .wp-block-navigation__submenu-icon {
+	display: none;
 }
 
 .cwc-header .wp-block-navigation__submenu-container .wp-block-navigation-item.has-child>a::after {
@@ -376,4 +391,49 @@ body.admin-bar {
 		padding: 12px 20px;
 		font-size: 14px;
 	}
+}
+
+/* ----------------------------------------
+   Non-home pages — always opaque header
+   ----------------------------------------
+   The transparent-at-top + wave-on-scroll behavior is reserved for the
+   home page only. Every other page mirrors the .cwc-header--scrolled
+   appearance permanently and skips the wave animation entirely. */
+
+body:not(.cwc-home) .cwc-header {
+	background: var(--wp--preset--color--background);
+	border-color: var(--wp--preset--color--border);
+	box-shadow: var(--wp--custom--shadow--sm);
+}
+
+body:not(.cwc-home) .cwc-header::after {
+	display: none;
+}
+
+body:not(.cwc-home) .cwc-header__logo-link {
+	color: var(--wp--preset--color--text);
+	border-top-color: var(--wp--preset--color--text);
+	border-bottom-color: var(--wp--preset--color--text);
+}
+
+body:not(.cwc-home) .cwc-header .wp-block-navigation a,
+body:not(.cwc-home) .cwc-header .wp-block-navigation-item__content {
+	color: #1A1A1A !important;
+}
+
+body:not(.cwc-home) .cwc-header .wp-block-navigation__submenu-icon svg {
+	color: #1A1A1A;
+}
+
+body:not(.cwc-home) .cwc-header__search-toggle {
+	color: var(--wp--preset--color--text);
+}
+
+body:not(.cwc-home) .cwc-header__book-btn {
+	background: var(--wp--preset--color--primary);
+	color: var(--wp--preset--color--background);
+}
+
+body:not(.cwc-home) .cwc-header .wp-block-navigation__responsive-container-open {
+	color: var(--wp--preset--color--text);
 }

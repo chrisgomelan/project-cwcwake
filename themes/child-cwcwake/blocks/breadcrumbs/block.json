@@ -1,0 +1,28 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "cwc/breadcrumbs",
+	"version": "1.0.0",
+	"title": "Breadcrumbs",
+	"category": "theme",
+	"icon": "menu",
+	"description": "Server-rendered breadcrumb trail derived from the current page hierarchy.",
+	"textdomain": "child-cwcwake",
+	"supports": {
+		"align": ["full"],
+		"html": false,
+		"anchor": true
+	},
+	"attributes": {
+		"homeLabel": {
+			"type": "string",
+			"default": "Home"
+		},
+		"showHomeIcon": {
+			"type": "boolean",
+			"default": true
+		}
+	},
+	"render": "file:./render.php",
+	"style": "file:./style.css"
+}

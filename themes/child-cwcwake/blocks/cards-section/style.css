@@ -1,0 +1,241 @@
+/**
+ * cwc/cards-section block styles.
+ *
+ * Detailed variant: Rooms grid (image + title + price + capacity + button).
+ * Overlay variant:  Leisure Services grid (image + 30% dim + overlaid title).
+ */
+
+.cwc-cards-section {
+	margin-block-start: 0 !important;
+	padding-top: var(--wp--preset--spacing--50);
+	padding-bottom: var(--wp--preset--spacing--50);
+}
+
+/* ---------- Heading ---------- */
+
+.cwc-cards-section__heading {
+	margin: 0 0 var(--wp--preset--spacing--40);
+	font-family: var(--wp--preset--font-family--body);
+	font-style: italic;
+	font-weight: 700;
+	font-size: clamp(2rem, 5vw, 4rem);
+	line-height: 1;
+	letter-spacing: 0;
+}
+
+.cwc-cards-section__heading-primary {
+	font-style: italic;
+	text-transform: uppercase;
+	color: #0096c7;
+}
+
+.cwc-cards-section__heading-secondary {
+	font-style: italic;
+	color: #1a1a1a;
+}
+
+/* ---------- Grid ---------- */
+
+.cwc-cards-section__list {
+	display: grid;
+	grid-template-columns: repeat(12, minmax(0, 1fr));
+	gap: var(--wp--preset--spacing--30);
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.cwc-cards-section__item {
+	margin: 0;
+	grid-column: span var(--cwc-card-span, 3);
+	min-width: 0;
+}
+
+/* ---------- Detailed variant (Rooms) ---------- */
+
+.cwc-cards-section__card--detailed {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-end;
+	height: 100%;
+	min-height: clamp(420px, 50vw, 696px);
+	border-radius: 30px;
+	overflow: hidden;
+	isolation: isolate;
+}
+
+.cwc-cards-section__card--detailed .cwc-cards-section__card-media {
+	position: absolute;
+	inset: 0;
+	background-position: center;
+	background-size: cover;
+	background-repeat: no-repeat;
+	z-index: 0;
+}
+
+.cwc-cards-section__card--detailed .cwc-cards-section__card-body {
+	position: relative;
+	z-index: 1;
+	display: flex;
+	flex-direction: column;
+	gap: 0.65rem;
+	padding: clamp(1.25rem, 2vw, 1.95rem);
+	background: linear-gradient(
+		to top,
+		rgba(0, 0, 0, 0.78) 0%,
+		rgba(0, 0, 0, 0.55) 55%,
+		rgba(0, 0, 0, 0) 100%
+	);
+	color: #f5f1eb;
+}
+
+.cwc-cards-section__card--detailed .cwc-cards-section__card-title {
+	margin: 0;
+	font-family: var(--wp--preset--font-family--heading);
+	font-weight: 700;
+	font-size: clamp(1.6rem, 2.6vw, 3rem);
+	line-height: 1;
+	letter-spacing: 0;
+	text-transform: uppercase;
+	color: #f5f1eb;
+}
+
+.cwc-cards-section__card-price {
+	margin: 0;
+	font-family: var(--wp--preset--font-family--body);
+	font-weight: 600;
+	font-size: clamp(0.9rem, 1.1vw, 1.25rem);
+	line-height: 1;
+	letter-spacing: 0;
+	color: #f5f1eb;
+}
+
+.cwc-cards-section__card-capacity {
+	display: flex;
+	align-items: center;
+	gap: 0.4em;
+	margin: 0;
+	font-family: var(--wp--preset--font-family--body);
+	font-weight: 500;
+	font-size: clamp(0.85rem, 0.95vw, 1.125rem);
+	line-height: 1;
+	color: #f5f1eb;
+}
+
+.cwc-cards-section__icon {
+	flex-shrink: 0;
+	width: 1.05em;
+	height: 1.05em;
+}
+
+.cwc-cards-section__card-button {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 10px;
+	width: 100%;
+	min-height: clamp(48px, 5vw, 64px);
+	margin-top: 0.4rem;
+	padding: 0 20px;
+	border-radius: 30px;
+	background: #f5f1eb;
+	color: #1a1a1a;
+	font-family: var(--wp--preset--font-family--body);
+	font-weight: 400;
+	font-size: clamp(0.95rem, 1.2vw, 1.375rem);
+	line-height: 1;
+	letter-spacing: 0;
+	text-decoration: none;
+	transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.cwc-cards-section__card-button:hover,
+.cwc-cards-section__card-button:focus-visible {
+	background: #ffffff;
+	color: #1a1a1a;
+	transform: translateY(-1px);
+}
+
+/* ---------- Overlay variant (Leisure) ---------- */
+
+.cwc-cards-section__card--overlay {
+	position: relative;
+	display: block;
+	width: 100%;
+	height: clamp(260px, 28vw, 430px);
+	border-radius: 30px;
+	overflow: hidden;
+	isolation: isolate;
+	color: inherit;
+	text-decoration: none;
+}
+
+.cwc-cards-section__card--overlay .cwc-cards-section__card-media {
+	position: absolute;
+	inset: 0;
+	background-position: center;
+	background-size: cover;
+	background-repeat: no-repeat;
+	z-index: 0;
+	transition: transform 0.4s ease;
+}
+
+a.cwc-cards-section__card--overlay:hover .cwc-cards-section__card-media,
+a.cwc-cards-section__card--overlay:focus-visible .cwc-cards-section__card-media {
+	transform: scale(1.04);
+}
+
+.cwc-cards-section__card-dim {
+	position: absolute;
+	inset: 0;
+	z-index: 1;
+	background: rgba(0, 0, 0, 0.3);
+	pointer-events: none;
+}
+
+.cwc-cards-section__card--overlay .cwc-cards-section__card-title {
+	position: absolute;
+	left: clamp(1.25rem, 2.5vw, 2.25rem);
+	bottom: clamp(1.25rem, 2.5vw, 2.25rem);
+	right: clamp(1.25rem, 2.5vw, 2.25rem);
+	z-index: 2;
+	margin: 0;
+	font-family: var(--wp--preset--font-family--heading);
+	font-weight: 700;
+	font-size: clamp(1.4rem, 2.6vw, 3rem);
+	line-height: 1;
+	letter-spacing: 0;
+	text-transform: uppercase;
+	color: #f5f1eb;
+}
+
+/* ---------- Responsive collapse ---------- */
+
+@media (max-width: 1024px) {
+	.cwc-cards-section__item {
+		grid-column: span 6;
+	}
+
+	.cwc-cards-section__card--detailed {
+		min-height: clamp(440px, 70vw, 600px);
+	}
+}
+
+@media (max-width: 600px) {
+	.cwc-cards-section__list {
+		gap: var(--wp--preset--spacing--30);
+	}
+
+	.cwc-cards-section__item {
+		grid-column: span 12;
+	}
+
+	.cwc-cards-section__card--detailed {
+		min-height: 460px;
+	}
+
+	.cwc-cards-section__card--overlay {
+		height: 260px;
+	}
+}

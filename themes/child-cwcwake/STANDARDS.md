@@ -165,15 +165,42 @@ $wrapper_attrs = get_block_wrapper_attributes( [
 
 ## 6. JavaScript
 
-- Use IIFEs to avoid global scope pollution.
-- No build step — write vanilla ES5-compatible JS.
+- Write **modern, vanilla ES2017+ JS**. No build step is required, but all targeted browsers support modern syntax.
+- **Never use `var`.** Use `const` for bindings that don't reassign and `let` for those that do.
+- Prefer **arrow functions** for callbacks. Use named `function` declarations only when you need hoisting or a meaningful `name` for stack traces (e.g. recursive helpers, top-level helpers inside an IIFE).
+- Use **template literals** for string interpolation, not `+` concatenation.
+- Use modern array methods (`map`, `filter`, `find`, `forEach`, `Array.from`) and **destructuring** where it improves readability.
+- Use **early returns** and optional chaining (`?.`) / nullish coalescing (`??`) instead of nested guards.
+- Wrap module-level code in an IIFE (or `{ ... }` block) to avoid leaking into the global scope.
 - Register frontend scripts via `"viewScript": "file:./view.js"` in `block.json`.
-- Use `querySelectorAll` to support multiple instances of the same block on a page.
+- Use `querySelectorAll` and iterate so the same block can appear multiple times on a page.
 
 ```javascript
+( () => {
+    document.querySelectorAll( '.cwc-<block>' ).forEach( ( el ) => {
+        const button = el.querySelector( '.cwc-<block>__btn' );
+        if ( ! button ) return;
+
+        button.addEventListener( 'click', () => {
+            el.classList.toggle( 'is-active' );
+        } );
+    } );
+} )();
+```
+
+Avoid:
+
+```javascript
+/* WRONG — uses var, function expressions, and lacks early returns. */
 ( function () {
-    document.querySelectorAll( '.cwc-<block>' ).forEach( function ( el ) {
-        // block logic
+    var els = document.querySelectorAll( '.cwc-<block>' );
+    els.forEach( function ( el ) {
+        var btn = el.querySelector( '.cwc-<block>__btn' );
+        if ( btn ) {
+            btn.addEventListener( 'click', function () {
+                el.classList.toggle( 'is-active' );
+            } );
+        }
     } );
 } )();
 ```
@@ -185,6 +212,55 @@ $wrapper_attrs = get_block_wrapper_attributes( [
 - Use WordPress block markup: `<!-- wp:cwc/<block> { ...JSON attrs... } /-->`.
 - Always include `"align": "full"` for full-width sections.
 - Validate JSON attributes — a missing quote will silently break the block.
+
+#### Multi-line Block Attributes
+
+**Never put all block attributes on a single line.** Long attribute lists become unreadable, hard to diff, and easy to break. Format the JSON across multiple lines, one attribute per line, with a trailing `/-->` (or `-->`) on its own line.
+
+```html
+<!-- CORRECT -->
+<!-- wp:cwc/page-banner {
+    "title": "GALLERY",
+    "subtitle": "Discover the energy of CWC through moments of adventure...",
+    "size": "default",
+    "showCorners": true,
+    "useFeaturedImage": true,
+    "align": "full"
+} /-->
+
+<!-- WRONG -->
+<!-- wp:cwc/page-banner {"title":"GALLERY","subtitle":"Discover the energy of CWC through moments of adventure...","size":"default","showCorners":true,"useFeaturedImage":true,"align":"full"} /-->
+```
+
+Rules:
+
+- One attribute per line, indented with a tab.
+- The opening `<!-- wp:<block> {` stays on the first line; the closing `} /-->` (self-closing) or `} -->` (with inner content) sits on its own line.
+- Apply this to **all** block markup with more than two attributes — custom blocks (`wp:cwc/*`), core blocks (`wp:group`, `wp:cover`, `wp:heading`, etc.), and template parts when they carry config.
+- Single- or two-attribute blocks may stay on one line (e.g. `<!-- wp:template-part {"slug":"header"} /-->`).
+- For non-self-closing blocks, the rendered HTML/style block on the next line still mirrors WordPress's serialized output — do not reformat that line.
+
+```html
+<!-- wp:group {
+    "tagName": "main",
+    "style": {
+        "spacing": {
+            "margin": { "top": "0" },
+            "padding": {
+                "top": "var:preset|spacing|60",
+                "bottom": "var:preset|spacing|70",
+                "left": "var:preset|spacing|40",
+                "right": "var:preset|spacing|40"
+            }
+        }
+    },
+    "layout": { "type": "constrained" }
+} -->
+<main class="wp-block-group" style="margin-top:0;padding-top:var(--wp--preset--spacing--60);padding-right:var(--wp--preset--spacing--40);padding-bottom:var(--wp--preset--spacing--70);padding-left:var(--wp--preset--spacing--40)">
+    <!-- wp:post-content {"align":"full","layout":{"type":"constrained"}} /-->
+</main>
+<!-- /wp:group -->
+```
 
 ### Template Parts (`parts/*.html`)
 
