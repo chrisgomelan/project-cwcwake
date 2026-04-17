@@ -2,10 +2,6 @@
 
 WordPress project for CWC Wake — Camsur Watersports Complex. This repository tracks the `wp-content/` directory only — custom themes, custom plugins, and configuration. Everything reinstallable (core, third-party plugins, uploads) is excluded via `.gitignore`.
 
-## Design Resources
-
-- **Figma Design:** https://www.figma.com/design/KfRYTIN138ksBGZ26bTt2T/CWC---Camsur-Watersports-Complex?node-id=379-1379&t=gUUYdQm93ggGnmQ2-1
-
 ## Prerequisites
 
 - [Local by Flywheel](https://localwp.com/) installed
@@ -124,6 +120,7 @@ git push -u origin feature/your-feature
 ```
 wp-content/                          ← Git root
 ├── .cursor/rules/                   ← Cursor AI rules (auto-loaded)
+├── designs/                         ← Design assets (mockups, wireframes, exports)
 ├── themes/
 │   └── child-cwcwake/               ← Custom child theme (parent: Twenty Twenty-Five)
 │       ├── assets/
