@@ -58,3 +58,5 @@ wp-content-debug.log
 
 # --- WP language files (auto-downloaded per environment) ---
 languages/
+
+project-cwcwake/

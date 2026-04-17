@@ -1,6 +1,6 @@
 # CWC Wake
 
-WordPress project for CWC Wake. This repository tracks the `wp-content/` directory only — custom themes, custom plugins, and configuration. Everything reinstallable (core, third-party plugins, uploads) is excluded via `.gitignore`.
+WordPress project for CWC Wake — Camsur Watersports Complex. This repository tracks the `wp-content/` directory only — custom themes, custom plugins, and configuration. Everything reinstallable (core, third-party plugins, uploads) is excluded via `.gitignore`.
 
 ## Design Resources
 
@@ -17,7 +17,7 @@ WordPress project for CWC Wake. This repository tracks the `wp-content/` directo
 ### 1. Create a Local Site
 
 1. Open **Local** → click **+ Create a new site**.
-2. Name it `child-cwcwake` (or any name you prefer).
+2. Name it `project-cwcwake` (or any name you prefer).
 3. Choose **Custom** environment:
    - PHP: **8.1+**
    - Web server: **Nginx** (preferred)
@@ -29,13 +29,19 @@ WordPress project for CWC Wake. This repository tracks the `wp-content/` directo
 Open a terminal and navigate to the new site's `wp-content/` directory:
 
 ```bash
-cd ~/Local\ Sites/child-cwcwake/app/public/wp-content
+cd ~/Local\ Sites/project-cwcwake/app/public/wp-content
 ```
 
 Remove the default content that Local created (back up anything you need first):
 
+**macOS / Linux:**
 ```bash
 rm -rf themes plugins index.php
+```
+
+**Windows (PowerShell):**
+```powershell
+Remove-Item -Recurse -Force themes, plugins, index.php
 ```
 
 Clone this repo directly into the `wp-content/` folder:
@@ -46,33 +52,21 @@ git clone https://github.com/chrisgomelan/project-cwcwake.git .
 
 > **Important:** Note the `.` at the end — this clones into the current directory instead of creating a subfolder.
 
-### 3. Install Plugins
+### 3. Activate the Theme
 
-Plugins are **not tracked** in this repo (they're `.gitignore`-d). Install them manually:
+1. Log in to WordPress admin at `https://project-cwcwake.local/wp-admin/`.
+2. Go to **Appearance → Themes**.
+3. Activate the **CWC Wake** child theme.
 
-1. Log in to WordPress admin at `https://child-cwcwake.local/wp-admin/`.
-2. Go to **Plugins → Add New** and install any required plugins.
+> The parent theme **Twenty Twenty-Five** must be installed. It ships with WordPress by default.
 
-<!-- If using Composer, uncomment:
-```bash
-cd themes/your-child-theme
-composer install
-```
--->
+### 4. Install Plugins
 
-### 4. Install Dependencies (if applicable)
+Plugins are **not tracked** in this repo (they're `.gitignore`-d). Install any required plugins manually via **Plugins → Add New** in wp-admin.
 
-If the theme uses npm for build tools:
+### 5. Configure wp-config.php (Optional)
 
-```bash
-cd themes/your-child-theme
-npm install
-npm run build
-```
-
-### 5. Configure wp-config.php
-
-Add these constants to your `wp-config.php` (located at `~/Local Sites/child-cwcwake/app/public/wp-config.php`) for local development:
+Add these constants to your `wp-config.php` for local development:
 
 ```php
 define('WP_DEBUG', true);
@@ -87,7 +81,7 @@ define('WP_ENVIRONMENT_TYPE', 'local');
 When other developers push changes:
 
 ```bash
-cd ~/Local\ Sites/child-cwcwake/app/public/wp-content
+cd ~/Local\ Sites/project-cwcwake/app/public/wp-content
 git pull origin main
 ```
 
@@ -117,26 +111,41 @@ git push -u origin feature/your-feature
 
 ## What's Tracked vs Ignored
 
-| Tracked (in repo) | Ignored (install locally) |
-|---|---|
-| Custom child theme(s) | WordPress core |
-| Custom plugins you build | Third-party plugins |
-| `.gitignore`, `README.md` | `uploads/` (media files) |
-| `index.php` safety files | `node_modules/`, `vendor/` |
-| `.cursor/rules/` (AI conventions) | Cache, logs, backups |
+| Tracked (in repo)                | Ignored (install locally)   |
+| -------------------------------- | --------------------------- |
+| `themes/child-cwcwake/`          | WordPress core              |
+| Custom plugins you build         | Third-party plugins         |
+| `.gitignore`, `README.md`        | `uploads/` (media files)    |
+| `index.php` safety files         | Default/bundled themes      |
+| `.cursor/rules/` (AI conventions)| Cache, logs, backups        |
 
 ## Project Structure
 
 ```
-wp-content/                ← Git root
-├── .cursor/rules/         ← Cursor AI rules (auto-loaded)
+wp-content/                          ← Git root
+├── .cursor/rules/                   ← Cursor AI rules (auto-loaded)
 ├── themes/
-│   └── your-child-theme/  ← Custom child theme
+│   └── child-cwcwake/               ← Custom child theme (parent: Twenty Twenty-Five)
+│       ├── assets/
+│       │   ├── css/                  ← Global & component stylesheets
+│       │   ├── images/               ← SVG icons & logos
+│       │   └── js/                   ← Frontend scripts
+│       ├── blocks/                   ← Custom dynamic blocks
+│       │   ├── accommodations-section/
+│       │   ├── hero-section/
+│       │   ├── intro-section/
+│       │   ├── reviews-section/
+│       │   └── showcase-section/
+│       ├── parts/                    ← Template parts (header, footer)
+│       ├── templates/                ← Page templates (front-page, about, etc.)
+│       ├── functions.php             ← Theme logic & block registration
+│       ├── style.css                 ← Theme metadata
+│       └── theme.json                ← Design tokens & settings
 ├── plugins/
-│   └── .gitkeep           ← Keeps directory in repo
+│   └── .gitkeep                      ← Keeps directory in repo
 ├── .gitignore
 ├── index.php
-└── README.md              ← You are here
+└── README.md                         ← You are here
 ```
 
 ## Troubleshooting
@@ -147,11 +156,11 @@ git checkout main
 ```
 
 **Local site can't find theme after cloning:**
-Go to WP Admin → Appearance → Themes and activate the child theme.
+Go to WP Admin → Appearance → Themes and activate the CWC Wake child theme.
 
 **Permission errors on Linux:**
 ```bash
-sudo chown -R $USER:$USER ~/Local\ Sites/child-cwcwake/app/public/wp-content
+sudo chown -R $USER:$USER ~/Local\ Sites/project-cwcwake/app/public/wp-content
 ```
 
 **Plugin dependency missing:**

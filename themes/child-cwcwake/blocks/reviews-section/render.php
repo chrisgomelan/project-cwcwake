@@ -44,13 +44,6 @@ $wrapper_attrs = get_block_wrapper_attributes( [
 <section <?php echo $wrapper_attrs; ?>>
 	<div class="cwc-reviews__inner">
 
-		<h2 class="cwc-reviews__heading">
-			<?php echo esc_html( $heading_start ); ?>
-			<em style="color:var(--wp--preset--color--<?php echo esc_attr( $emphasis_color ); ?>)">
-				<?php echo esc_html( $heading_emp ); ?>
-			</em>
-		</h2>
-
 		<div class="cwc-reviews__slider" data-total="<?php echo esc_attr( $total ); ?>">
 
 			<!-- Slides -->
@@ -66,11 +59,20 @@ $wrapper_attrs = get_block_wrapper_attributes( [
 
 					<!-- Left: quote -->
 					<div class="cwc-reviews__quote-col">
-						<img class="cwc-reviews__quote-mark" src="/wp-content/uploads/2026/04/quote.svg" alt="" aria-hidden="true">
+						<h2 class="cwc-reviews__heading">
+							<?php echo esc_html( $heading_start ); ?>
+							<em style="color:var(--wp--preset--color--<?php echo esc_attr( $emphasis_color ); ?>)">
+								<?php echo esc_html( $heading_emp ); ?>
+							</em>
+						</h2>
 
-						<blockquote class="cwc-reviews__quote">
-							<?php echo esc_html( $quote ); ?>
-						</blockquote>
+						<div class="cwc-reviews__quote-wrap">
+							<img class="cwc-reviews__quote-mark" src="/wp-content/uploads/2026/04/quote.svg" alt="" aria-hidden="true">
+
+							<blockquote class="cwc-reviews__quote">
+								<?php echo esc_html( $quote ); ?>
+							</blockquote>
+						</div>
 
 						<div class="cwc-reviews__reviewer">
 							<span class="cwc-reviews__reviewer-name">
@@ -93,21 +95,23 @@ $wrapper_attrs = get_block_wrapper_attributes( [
 								<div class="cwc-reviews__image-placeholder"></div>
 							<?php endif; ?>
 
-							<!-- Arrows inside the image -->
+							<!-- Arrows & Counter -->
 							<?php if ( $total > 1 ) : ?>
-								<button class="cwc-reviews__arrow cwc-reviews__arrow--next" aria-label="Next review" data-dir="next">
-									<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
-								</button>
-								<button class="cwc-reviews__arrow cwc-reviews__arrow--prev" aria-label="Previous review" data-dir="prev">
-									<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
-								</button>
-							<?php endif; ?>
-
-							<!-- Counter -->
-							<?php if ( $total > 1 ) : ?>
-								<span class="cwc-reviews__counter">
-									<span class="cwc-reviews__counter-current"><?php echo str_pad( $index + 1, 2, '0', STR_PAD_LEFT ); ?></span>/<span class="cwc-reviews__counter-total"><?php echo str_pad( $total, 2, '0', STR_PAD_LEFT ); ?></span>
-								</span>
+								<div class="cwc-reviews__nav-wrap">
+									<div class="cwc-reviews__arrows">
+										<button class="cwc-reviews__arrow cwc-reviews__arrow--next" aria-label="Next review" data-dir="next">
+											<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+										</button>
+										<button class="cwc-reviews__arrow cwc-reviews__arrow--prev" aria-label="Previous review" data-dir="prev">
+											<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+										</button>
+									</div>
+									<div class="cwc-reviews__counter-container">
+										<span class="cwc-reviews__counter">
+											<span class="cwc-reviews__counter-current"><?php echo str_pad( $index + 1, 2, '0', STR_PAD_LEFT ); ?></span>/<span class="cwc-reviews__counter-total"><?php echo str_pad( $total, 2, '0', STR_PAD_LEFT ); ?></span>
+										</span>
+									</div>
+								</div>
 							<?php endif; ?>
 						</div>
 					</div>

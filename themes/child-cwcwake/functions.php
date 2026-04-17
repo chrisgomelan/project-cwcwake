@@ -6,16 +6,17 @@
  * @since   0.1.0
  */
 
-if ( ! defined( 'ABSPATH' ) ) {
+if (!defined('ABSPATH')) {
 	exit;
 }
 
-define( 'CWC_VERSION', wp_get_theme()->get( 'Version' ) );
+define('CWC_VERSION', wp_get_theme()->get('Version'));
 
 /**
  * Enqueue parent and child theme stylesheets.
  */
-function cwc_enqueue_styles() {
+function cwc_enqueue_styles()
+{
 	wp_enqueue_style(
 		'cwc-google-fonts',
 		'https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=Archivo:wght@400;500;600;700&display=swap',
@@ -26,28 +27,35 @@ function cwc_enqueue_styles() {
 	wp_enqueue_style(
 		'twentytwentyfive-style',
 		get_template_directory_uri() . '/style.css',
-		[ 'cwc-google-fonts' ],
-		wp_get_theme( 'twentytwentyfive' )->get( 'Version' )
+		['cwc-google-fonts'],
+		wp_get_theme('twentytwentyfive')->get('Version')
 	);
 
 	wp_enqueue_style(
 		'cwc-global',
 		get_stylesheet_directory_uri() . '/assets/css/global.css',
-		[ 'twentytwentyfive-style' ],
+		['twentytwentyfive-style'],
 		CWC_VERSION
 	);
 
 	wp_enqueue_style(
 		'cwc-header',
 		get_stylesheet_directory_uri() . '/assets/css/header.css',
-		[ 'cwc-global' ],
+		['cwc-global'],
+		CWC_VERSION
+	);
+
+	wp_enqueue_style(
+		'cwc-footer',
+		get_stylesheet_directory_uri() . '/assets/css/footer.css',
+		['cwc-global'],
 		CWC_VERSION
 	);
 
 	wp_enqueue_style(
 		'cwc-style',
 		get_stylesheet_uri(),
-		[ 'cwc-header' ],
+		['cwc-header'],
 		CWC_VERSION
 	);
 
@@ -59,24 +67,26 @@ function cwc_enqueue_styles() {
 		true
 	);
 }
-add_action( 'wp_enqueue_scripts', 'cwc_enqueue_styles' );
+add_action('wp_enqueue_scripts', 'cwc_enqueue_styles');
 
 /**
  * Load Google Fonts in the block editor to match frontend.
  */
-function cwc_enqueue_editor_styles() {
-	add_editor_style( 'https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=Archivo:wght@400;500;600;700&display=swap' );
-	add_editor_style( 'assets/css/global.css' );
+function cwc_enqueue_editor_styles()
+{
+	add_editor_style('https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=Archivo:wght@400;500;600;700&display=swap');
+	add_editor_style('assets/css/global.css');
 }
-add_action( 'after_setup_theme', 'cwc_enqueue_editor_styles' );
+add_action('after_setup_theme', 'cwc_enqueue_editor_styles');
 
 /**
  * Theme setup: register supports, menus, image sizes.
  */
-function cwc_theme_setup() {
-	add_theme_support( 'title-tag' );
-	add_theme_support( 'post-thumbnails' );
-	add_theme_support( 'html5', [
+function cwc_theme_setup()
+{
+	add_theme_support('title-tag');
+	add_theme_support('post-thumbnails');
+	add_theme_support('html5', [
 		'search-form',
 		'comment-form',
 		'comment-list',
@@ -84,17 +94,17 @@ function cwc_theme_setup() {
 		'caption',
 		'style',
 		'script',
-	] );
-	add_theme_support( 'editor-styles' );
-	add_theme_support( 'wp-block-styles' );
-	add_theme_support( 'responsive-embeds' );
+	]);
+	add_theme_support('editor-styles');
+	add_theme_support('wp-block-styles');
+	add_theme_support('responsive-embeds');
 
-	register_nav_menus( [
-		'primary'   => __( 'Primary Navigation', 'child-cwcwake' ),
-		'footer'    => __( 'Footer Navigation', 'child-cwcwake' ),
-	] );
+	register_nav_menus([
+		'primary' => __('Primary Navigation', 'child-cwcwake'),
+		'footer' => __('Footer Navigation', 'child-cwcwake'),
+	]);
 }
-add_action( 'after_setup_theme', 'cwc_theme_setup' );
+add_action('after_setup_theme', 'cwc_theme_setup');
 
 /**
  * Create initial page structure on theme activation.
@@ -102,80 +112,81 @@ add_action( 'after_setup_theme', 'cwc_theme_setup' );
  * Builds the full site hierarchy: top-level pages and their children.
  * Only runs once — guarded by the 'cwc_pages_created' option.
  */
-function cwc_create_initial_pages() {
-	if ( get_option( 'cwc_pages_created' ) ) {
+function cwc_create_initial_pages()
+{
+	if (get_option('cwc_pages_created')) {
 		return;
 	}
 
 	$pages = [
-		'Home'           => [ 'order' => 1, 'template' => '' ],
-		'Activities'     => [
-			'order'    => 2,
+		'Home' => ['order' => 1, 'template' => ''],
+		'Activities' => [
+			'order' => 2,
 			'template' => 'page-activities',
-			'children' => [ 'Water Sports', 'Land Activities', 'Elite Facilities' ],
+			'children' => ['Water Sports', 'Land Activities', 'Elite Facilities'],
 		],
 		'Accommodations' => [
-			'order'    => 3,
+			'order' => 3,
 			'template' => 'page-accommodations',
-			'children' => [ 'Villas', 'Cabanas', 'Dwell', 'Cabin' ],
+			'children' => ['Villas', 'Cabanas', 'Dwell', 'Cabin'],
 		],
 		'Plan Your Trip' => [
-			'order'    => 4,
+			'order' => 4,
 			'template' => 'page-plan-your-trip',
-			'children' => [ 'Rates', 'FAQs', 'Blogs', 'Gallery' ],
+			'children' => ['Rates', 'FAQs', 'Blogs', 'Gallery'],
 		],
-		'About'          => [ 'order' => 5, 'template' => 'page-about' ],
+		'About' => ['order' => 5, 'template' => 'page-about'],
 	];
 
-	foreach ( $pages as $title => $config ) {
+	foreach ($pages as $title => $config) {
 		$post_data = [
-			'post_title'  => $title,
+			'post_title' => $title,
 			'post_status' => 'publish',
-			'post_type'   => 'page',
-			'menu_order'  => $config['order'],
+			'post_type' => 'page',
+			'menu_order' => $config['order'],
 		];
 
-		if ( ! empty( $config['template'] ) ) {
+		if (!empty($config['template'])) {
 			$post_data['page_template'] = $config['template'];
 		}
 
-		$parent_id = wp_insert_post( $post_data );
+		$parent_id = wp_insert_post($post_data);
 
-		if ( is_wp_error( $parent_id ) ) {
+		if (is_wp_error($parent_id)) {
 			continue;
 		}
 
-		if ( ! empty( $config['template'] ) ) {
-			update_post_meta( $parent_id, '_wp_page_template', $config['template'] );
+		if (!empty($config['template'])) {
+			update_post_meta($parent_id, '_wp_page_template', $config['template']);
 		}
 
-		if ( ! empty( $config['children'] ) ) {
+		if (!empty($config['children'])) {
 			$child_order = 1;
-			foreach ( $config['children'] as $child_title ) {
-				$child_id = wp_insert_post( [
-					'post_title'  => $child_title,
+			foreach ($config['children'] as $child_title) {
+				$child_id = wp_insert_post([
+					'post_title' => $child_title,
 					'post_status' => 'publish',
-					'post_type'   => 'page',
+					'post_type' => 'page',
 					'post_parent' => $parent_id,
-					'menu_order'  => $child_order++,
-				] );
+					'menu_order' => $child_order++,
+				]);
 
-				if ( ! is_wp_error( $child_id ) ) {
-					update_post_meta( $child_id, '_wp_page_template', 'page-child' );
+				if (!is_wp_error($child_id)) {
+					update_post_meta($child_id, '_wp_page_template', 'page-child');
 				}
 			}
 		}
 	}
 
-	$home = get_page_by_title( 'Home' );
-	if ( $home ) {
-		update_option( 'show_on_front', 'page' );
-		update_option( 'page_on_front', $home->ID );
+	$home = get_page_by_title('Home');
+	if ($home) {
+		update_option('show_on_front', 'page');
+		update_option('page_on_front', $home->ID);
 	}
 
-	update_option( 'cwc_pages_created', true );
+	update_option('cwc_pages_created', true);
 }
-add_action( 'after_switch_theme', 'cwc_create_initial_pages' );
+add_action('after_switch_theme', 'cwc_create_initial_pages');
 
 /**
  * Build the primary navigation menu matching the site structure.
@@ -183,103 +194,107 @@ add_action( 'after_switch_theme', 'cwc_create_initial_pages' );
  * Creates the menu and assigns it to the 'primary' location.
  * Only runs once — guarded by the 'cwc_menu_created' option.
  */
-function cwc_create_primary_menu() {
-	if ( get_option( 'cwc_menu_created' ) ) {
+function cwc_create_primary_menu()
+{
+	if (get_option('cwc_menu_created')) {
 		return;
 	}
 
 	$menu_name = 'Primary Navigation';
-	$menu_id   = wp_create_nav_menu( $menu_name );
+	$menu_id = wp_create_nav_menu($menu_name);
 
-	if ( is_wp_error( $menu_id ) ) {
+	if (is_wp_error($menu_id)) {
 		return;
 	}
 
 	$menu_order = 1;
-	$pages      = get_pages( [ 'sort_column' => 'menu_order', 'hierarchical' => false ] );
-	$page_map   = [];
+	$pages = get_pages(['sort_column' => 'menu_order', 'hierarchical' => false]);
+	$page_map = [];
 
-	foreach ( $pages as $page ) {
-		$page_map[ $page->post_title ] = $page->ID;
+	foreach ($pages as $page) {
+		$page_map[$page->post_title] = $page->ID;
 	}
 
 	$structure = [
-		'Home'           => [],
-		'Activities'     => [ 'Water Sports', 'Land Activities', 'Elite Facilities' ],
-		'Accommodations' => [ 'Villas', 'Cabanas', 'Dwell', 'Cabin' ],
-		'Plan Your Trip' => [ 'Rates', 'FAQs', 'Blogs', 'Gallery' ],
-		'About'          => [],
+		'Home' => [],
+		'Activities' => ['Water Sports', 'Land Activities', 'Elite Facilities'],
+		'Accommodations' => ['Villas', 'Cabanas', 'Dwell', 'Cabin'],
+		'Plan Your Trip' => ['Rates', 'FAQs', 'Blogs', 'Gallery'],
+		'About' => [],
 	];
 
-	foreach ( $structure as $parent_title => $children ) {
-		if ( ! isset( $page_map[ $parent_title ] ) ) {
+	foreach ($structure as $parent_title => $children) {
+		if (!isset($page_map[$parent_title])) {
 			continue;
 		}
 
-		$parent_menu_item_id = wp_update_nav_menu_item( $menu_id, 0, [
-			'menu-item-title'     => $parent_title,
-			'menu-item-object'    => 'page',
-			'menu-item-object-id' => $page_map[ $parent_title ],
-			'menu-item-type'      => 'post_type',
-			'menu-item-status'    => 'publish',
-			'menu-item-position'  => $menu_order++,
-		] );
+		$parent_menu_item_id = wp_update_nav_menu_item($menu_id, 0, [
+			'menu-item-title' => $parent_title,
+			'menu-item-object' => 'page',
+			'menu-item-object-id' => $page_map[$parent_title],
+			'menu-item-type' => 'post_type',
+			'menu-item-status' => 'publish',
+			'menu-item-position' => $menu_order++,
+		]);
 
-		foreach ( $children as $child_title ) {
-			if ( ! isset( $page_map[ $child_title ] ) ) {
+		foreach ($children as $child_title) {
+			if (!isset($page_map[$child_title])) {
 				continue;
 			}
 
-			wp_update_nav_menu_item( $menu_id, 0, [
-				'menu-item-title'     => $child_title,
-				'menu-item-object'    => 'page',
-				'menu-item-object-id' => $page_map[ $child_title ],
-				'menu-item-type'      => 'post_type',
-				'menu-item-status'    => 'publish',
+			wp_update_nav_menu_item($menu_id, 0, [
+				'menu-item-title' => $child_title,
+				'menu-item-object' => 'page',
+				'menu-item-object-id' => $page_map[$child_title],
+				'menu-item-type' => 'post_type',
+				'menu-item-status' => 'publish',
 				'menu-item-parent-id' => $parent_menu_item_id,
-				'menu-item-position'  => $menu_order++,
-			] );
+				'menu-item-position' => $menu_order++,
+			]);
 		}
 	}
 
-	$locations              = get_theme_mod( 'nav_menu_locations', [] );
-	$locations['primary']   = $menu_id;
-	set_theme_mod( 'nav_menu_locations', $locations );
+	$locations = get_theme_mod('nav_menu_locations', []);
+	$locations['primary'] = $menu_id;
+	set_theme_mod('nav_menu_locations', $locations);
 
-	update_option( 'cwc_menu_created', true );
+	update_option('cwc_menu_created', true);
 }
-add_action( 'after_switch_theme', 'cwc_create_primary_menu', 20 );
+add_action('after_switch_theme', 'cwc_create_primary_menu', 20);
 
 /**
  * Register custom blocks.
  */
-function cwc_register_blocks() {
-	register_block_type( get_stylesheet_directory() . '/blocks/hero-section' );
-	register_block_type( get_stylesheet_directory() . '/blocks/intro-section' );
-	register_block_type( get_stylesheet_directory() . '/blocks/showcase-section' );
-	register_block_type( get_stylesheet_directory() . '/blocks/accommodations-section' );
-	register_block_type( get_stylesheet_directory() . '/blocks/reviews-section' );
+function cwc_register_blocks()
+{
+	register_block_type(get_stylesheet_directory() . '/blocks/hero-section');
+	register_block_type(get_stylesheet_directory() . '/blocks/intro-section');
+	register_block_type(get_stylesheet_directory() . '/blocks/showcase-section');
+	register_block_type(get_stylesheet_directory() . '/blocks/accommodations-section');
+	register_block_type(get_stylesheet_directory() . '/blocks/reviews-section');
 }
-add_action( 'init', 'cwc_register_blocks' );
+add_action('init', 'cwc_register_blocks');
 
 /**
  * Allow SVG uploads in the Media Library.
  */
-function cwc_allow_svg_uploads( $mimes ) {
+function cwc_allow_svg_uploads($mimes)
+{
 	$mimes['svg'] = 'image/svg+xml';
 	return $mimes;
 }
-add_filter( 'upload_mimes', 'cwc_allow_svg_uploads' );
+add_filter('upload_mimes', 'cwc_allow_svg_uploads');
 
 /**
  * Fix WordPress rejecting SVGs even when the MIME type is allowed.
  */
-function cwc_fix_svg_filetype( $data, $file, $filename, $mimes ) {
-	$ext = pathinfo( $filename, PATHINFO_EXTENSION );
-	if ( 'svg' === strtolower( $ext ) ) {
+function cwc_fix_svg_filetype($data, $file, $filename, $mimes)
+{
+	$ext = pathinfo($filename, PATHINFO_EXTENSION);
+	if ('svg' === strtolower($ext)) {
 		$data['type'] = 'image/svg+xml';
-		$data['ext']  = 'svg';
+		$data['ext'] = 'svg';
 	}
 	return $data;
 }
-add_filter( 'wp_check_filetype_and_ext', 'cwc_fix_svg_filetype', 10, 4 );
+add_filter('wp_check_filetype_and_ext', 'cwc_fix_svg_filetype', 10, 4);

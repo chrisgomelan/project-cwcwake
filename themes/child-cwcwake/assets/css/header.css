@@ -47,18 +47,23 @@
 	0% {
 		clip-path: ellipse(60% 0% at 50% 100%);
 	}
+
 	20% {
 		clip-path: ellipse(70% 35% at 50% 100%);
 	}
+
 	40% {
 		clip-path: ellipse(80% 60% at 45% 100%);
 	}
+
 	60% {
 		clip-path: ellipse(90% 80% at 55% 100%);
 	}
+
 	80% {
 		clip-path: ellipse(100% 95% at 50% 100%);
 	}
+
 	100% {
 		clip-path: ellipse(150% 100% at 50% 100%);
 	}
@@ -97,7 +102,7 @@ body.admin-bar {
 	gap: 0;
 }
 
-.cwc-header__inner > * {
+.cwc-header__inner>* {
 	grid-row: 1;
 	grid-column: 1;
 }
@@ -144,9 +149,9 @@ body.admin-bar {
 	gap: 48px;
 }
 
-.cwc-header .wp-block-navigation .wp-block-navigation-item {
+/* .cwc-header .wp-block-navigation .wp-block-navigation-item {
 	gap: 10px;
-}
+} */
 
 .cwc-header .wp-block-navigation a,
 .cwc-header .wp-block-navigation-item__content {
@@ -318,7 +323,7 @@ body.admin-bar {
 	color: var(--wp--preset--color--primary) !important;
 }
 
-.cwc-header .wp-block-navigation__submenu-container .wp-block-navigation-item.has-child > a::after {
+.cwc-header .wp-block-navigation__submenu-container .wp-block-navigation-item.has-child>a::after {
 	content: "\203A";
 	font-size: 1.5em;
 	line-height: 1;

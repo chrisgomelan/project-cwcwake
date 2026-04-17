@@ -9,6 +9,11 @@
  */
 
 /* ----------------------------------------
+   Custom Fonts
+   ---------------------------------------- */
+
+
+/* ----------------------------------------
    Base
    ---------------------------------------- */
 
@@ -220,10 +225,21 @@ img {
    Utility classes
    ---------------------------------------- */
 
-.u-text-center { text-align: center; }
-.u-text-uppercase { text-transform: uppercase; }
-.u-font-heading { font-family: var(--wp--preset--font-family--heading); }
-.u-font-body { font-family: var(--wp--preset--font-family--body); }
+.u-text-center {
+	text-align: center;
+}
+
+.u-text-uppercase {
+	text-transform: uppercase;
+}
+
+.u-font-heading {
+	font-family: var(--wp--preset--font-family--heading);
+}
+
+.u-font-body {
+	font-family: var(--wp--preset--font-family--body);
+}
 
 /* ----------------------------------------
    Responsive adjustments
