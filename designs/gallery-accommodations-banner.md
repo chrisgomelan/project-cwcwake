@@ -71,3 +71,4 @@ The breadcrumbs (and all other elements on this section) are nested inside a **c
 - The active breadcrumb item uses a different font family (`Sora`) compared to the inactive items (`Inter`).
 - The chevron color matches the inactive text color (`#1A1A1A`).
 - All other page-specific elements (page title, subtitle, etc.) are also children of this same constrained container.
+
