@@ -18,6 +18,36 @@ Applies to: **Gallery** page, **Accommodations** page
 
 ---
 
+## Banner H1
+
+| Property       | Value     |
+| -------------- | --------- |
+| Font Family    | `Sora`    |
+| Font Weight    | `700`     |
+| Font Style     | Bold      |
+| Font Size      | `72px`    |
+| Line Height    | `100%`    |
+| Letter Spacing | `0%`      |
+| Text Align     | `center`  |
+| Color          | `#F5F1EB` |
+
+---
+
+## Banner Description
+
+| Property       | Value     |
+| -------------- | --------- |
+| Font Family    | `Archivo` |
+| Font Weight    | `500`     |
+| Font Style     | Medium    |
+| Font Size      | `20px`    |
+| Line Height    | `100%`    |
+| Letter Spacing | `0%`      |
+| Text Align     | `center`  |
+| Color          | `#FFFFFF` |
+
+---
+
 ## Breadcrumbs Container
 
 The breadcrumbs (and all other elements on this section) are nested inside a **constrained layout container** that uses `tropical-bg` as its background image. All inner elements are positioned relative to this container.
