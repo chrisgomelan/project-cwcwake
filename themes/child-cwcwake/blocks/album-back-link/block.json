@@ -1,0 +1,19 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "cwc/album-back-link",
+	"version": "1.0.0",
+	"title": "Album Back Link",
+	"category": "theme",
+	"icon": "arrow-left-alt",
+	"description": "On a single album page, renders a 'Back to {parent or Gallery}' link with a left arrow.",
+	"textdomain": "child-cwcwake",
+	"supports": {
+		"align": ["full"],
+		"html": false,
+		"anchor": true
+	},
+	"attributes": {},
+	"render": "file:./render.php",
+	"style": "file:./style.css"
+}

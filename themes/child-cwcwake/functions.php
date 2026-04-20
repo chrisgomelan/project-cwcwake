@@ -128,7 +128,12 @@ function cwc_create_initial_pages()
 		'Accommodations' => [
 			'order' => 3,
 			'template' => 'page-accommodations',
-			'children' => ['Villas', 'Cabanas', 'Dwell', 'Cabin'],
+			'children' => [
+				'Villas'  => 'page-room-detail',
+				'Cabanas' => 'page-room-detail',
+				'Dwell'   => 'page-room-detail',
+				'Cabin'   => 'page-room-detail',
+			],
 		],
 		'Plan Your Trip' => [
 			'order' => 4,
@@ -148,7 +153,7 @@ function cwc_create_initial_pages()
 			],
 		],
 		'About' => ['order' => 5, 'template' => 'page-about'],
-		'Contact Us' => ['order' => 6, 'template' => 'page-contact-us'],
+		'Contact Us' => ['order' => 6, 'template' => 'page-contact'],
 		'Terms & Conditions' => ['order' => 7, 'template' => 'page-terms-and-conditions'],
 		'Privacy Policy' => ['order' => 8, 'template' => 'page-privacy-policy'],
 	];
@@ -243,6 +248,61 @@ function cwc_seed_child_pages(array $children, $parent_id)
 		}
 	}
 }
+
+/*
+ * Room detail pages — per-room catalogue, block-markup renderer,
+ * and one-shot content seeder. Lives in `inc/` to keep functions.php
+ * focused on theme bootstrapping.
+ */
+require_once get_stylesheet_directory() . '/inc/room-detail-pages.php';
+
+/*
+ * Contact form (`cwc/contact-form`) and footer newsletter form
+ * server-side handlers. Both submit to `admin-post.php`, validate +
+ * dispatch through `wp_mail()` (so WP Mail SMTP routes them), and
+ * round-trip status via the Post/Redirect/Get pattern.
+ */
+require_once get_stylesheet_directory() . '/inc/contact-form-handler.php';
+require_once get_stylesheet_directory() . '/inc/newsletter-subscribe.php';
+
+/*
+ * One-shot Contact page seeder — assigns the `page-contact` template
+ * and populates the page with the two contact blocks if it is still
+ * empty. Idempotent (option-guarded).
+ */
+require_once get_stylesheet_directory() . '/inc/contact-page-seed.php';
+
+/*
+ * One-shot Privacy Policy + Terms & Conditions seeder. Forces the
+ * matching `page-privacy-policy` / `page-terms-and-conditions`
+ * templates and seeds the shared `cwc/policy-content` block with the
+ * clauses copied from the Figma mockups. Idempotent.
+ */
+require_once get_stylesheet_directory() . '/inc/policy-pages-seed.php';
+
+/*
+ * Albums (Gallery) custom post type. Registers a hierarchical
+ * `cwc_album` CPT mounted at `/gallery/<slug>/` with helpers used
+ * by the `cwc/albums-grid` and `cwc/album-back-link` blocks and
+ * the `single-cwc_album` template.
+ */
+require_once get_stylesheet_directory() . '/inc/albums-cpt.php';
+
+/*
+ * Self-healing seeder for the three top-level Album categories
+ * (Events / Lifestyle / Explore CamSur). Recreates / restores from
+ * trash on every request (throttled to once per minute), and wires
+ * each one's cover webp as the featured image so the single-album
+ * banner + landing page card share the same hero asset.
+ */
+require_once get_stylesheet_directory() . '/inc/albums-seed.php';
+
+/*
+ * Editorial guard-rails for the cwc_album CPT: restricts the
+ * Parent dropdown to the three canonical categories, and demotes
+ * orphan top-level publishes to draft with an admin notice.
+ */
+require_once get_stylesheet_directory() . '/inc/albums-parent-enforcement.php';
 
 /**
  * Build the primary navigation menu matching the site structure.
@@ -441,6 +501,14 @@ function cwc_register_blocks()
 	register_block_type(get_stylesheet_directory() . '/blocks/breadcrumbs');
 	register_block_type(get_stylesheet_directory() . '/blocks/gallery-grid');
 	register_block_type(get_stylesheet_directory() . '/blocks/cards-section');
+	register_block_type(get_stylesheet_directory() . '/blocks/room-gallery');
+	register_block_type(get_stylesheet_directory() . '/blocks/room-info');
+	register_block_type(get_stylesheet_directory() . '/blocks/other-rooms');
+	register_block_type(get_stylesheet_directory() . '/blocks/contact-info');
+	register_block_type(get_stylesheet_directory() . '/blocks/contact-form');
+	register_block_type(get_stylesheet_directory() . '/blocks/policy-content');
+	register_block_type(get_stylesheet_directory() . '/blocks/albums-grid');
+	register_block_type(get_stylesheet_directory() . '/blocks/album-back-link');
 }
 add_action('init', 'cwc_register_blocks');
 
@@ -525,6 +593,108 @@ function cwc_filter_get_pages($pages)
 	}));
 }
 add_filter('get_pages', 'cwc_filter_get_pages');
+
+/**
+ * Resolve the Accommodations page ID (cached per request).
+ *
+ * Used by the nav-collapsing filters below to find children of the
+ * Accommodations page so the header dropdown can be flattened.
+ *
+ * @since 1.0.0
+ *
+ * @return int Page ID, or 0 when the page is missing.
+ */
+function cwc_accommodations_page_id()
+{
+	static $cache = null;
+	if ($cache !== null) {
+		return $cache;
+	}
+
+	$page  = get_page_by_path('accommodations');
+	$cache = $page instanceof WP_Post ? (int) $page->ID : 0;
+	return $cache;
+}
+
+/**
+ * Hide the Accommodations submenu in the header navigation.
+ *
+ * The four room detail pages (Villas, Cabanas, Dwell, Cabin) are
+ * children of `accommodations` and would otherwise render as a
+ * dropdown under the Accommodations menu item. The room cards on the
+ * Accommodations landing page already act as the entry point, so the
+ * dropdown is redundant.
+ *
+ * Filtering is intentionally scoped to nav rendering only — the pages
+ * remain published, indexable, and reachable from the room cards and
+ * the "Other Rooms" block.
+ *
+ * @since 1.0.0
+ *
+ * @param array $items Nav menu objects.
+ * @return array Filtered list with Accommodations children removed.
+ */
+function cwc_filter_nav_remove_accommodations_children($items)
+{
+	$accommodations_id = cwc_accommodations_page_id();
+	if (!$accommodations_id) {
+		return $items;
+	}
+
+	/*
+	 * Find the menu item that links to the Accommodations page so we
+	 * can drop any item whose `menu_item_parent` matches its ID.
+	 */
+	$accommodations_item_id = 0;
+	foreach ($items as $item) {
+		if ('page' === $item->object && (int) $item->object_id === $accommodations_id) {
+			$accommodations_item_id = (int) $item->ID;
+			break;
+		}
+	}
+
+	if (!$accommodations_item_id) {
+		return $items;
+	}
+
+	return array_values(array_filter($items, function ($item) use ($accommodations_item_id) {
+		return (int) $item->menu_item_parent !== $accommodations_item_id;
+	}));
+}
+add_filter('wp_nav_menu_objects', 'cwc_filter_nav_remove_accommodations_children');
+
+/**
+ * Hide Accommodations child pages from the page-list nav fallback.
+ *
+ * When `wp:navigation` falls back to `core/page-list` (no menu
+ * assigned), it walks the page tree from `get_pages()`. Drop pages
+ * whose `post_parent` is the Accommodations page so the same
+ * dropdown-collapsing behavior applies in that path.
+ *
+ * Admin and REST contexts are left untouched so editors and the
+ * page-picker still see every page.
+ *
+ * @since 1.0.0
+ *
+ * @param WP_Post[] $pages Pages array from `get_pages()`.
+ * @return WP_Post[] Filtered pages.
+ */
+function cwc_filter_get_pages_remove_accommodations_children($pages)
+{
+	if (is_admin() || (defined('REST_REQUEST') && REST_REQUEST)) {
+		return $pages;
+	}
+
+	$accommodations_id = cwc_accommodations_page_id();
+	if (!$accommodations_id) {
+		return $pages;
+	}
+
+	return array_values(array_filter($pages, function ($p) use ($accommodations_id) {
+		return (int) $p->post_parent !== $accommodations_id;
+	}));
+}
+add_filter('get_pages', 'cwc_filter_get_pages_remove_accommodations_children');
 
 /**
  * Allow SVG uploads in the Media Library.

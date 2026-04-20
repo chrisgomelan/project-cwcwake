@@ -1,0 +1,54 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "cwc/albums-grid",
+	"version": "1.0.0",
+	"title": "Albums Grid",
+	"category": "theme",
+	"icon": "format-gallery",
+	"description": "Dynamic grid of Album posts with optional MORE ALBUMS featured section. Powers the Gallery landing page and album browsing.",
+	"textdomain": "child-cwcwake",
+	"supports": {
+		"align": ["full"],
+		"html": false,
+		"anchor": true
+	},
+	"attributes": {
+		"parentId": {
+			"type": "number",
+			"default": 0
+		},
+		"showStandardGrid": {
+			"type": "boolean",
+			"default": true
+		},
+		"standardLimit": {
+			"type": "number",
+			"default": 0
+		},
+		"countMode": {
+			"type": "string",
+			"enum": ["auto", "photos", "albums"],
+			"default": "auto"
+		},
+		"showMoreSection": {
+			"type": "boolean",
+			"default": true
+		},
+		"moreTitle": {
+			"type": "string",
+			"default": "MORE ALBUMS"
+		},
+		"moreLimit": {
+			"type": "number",
+			"default": 2
+		},
+		"moreOrderBy": {
+			"type": "string",
+			"enum": ["latest", "menu_order", "random"],
+			"default": "latest"
+		}
+	},
+	"render": "file:./render.php",
+	"style": "file:./style.css"
+}

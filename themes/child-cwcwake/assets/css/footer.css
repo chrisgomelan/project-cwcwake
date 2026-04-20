@@ -73,6 +73,58 @@
 	align-items: center;
 }
 
+/*
+ * Honeypot — visible to dumb bots reading the DOM, hidden from
+ * sighted/keyboard users. Submissions that fill it are silently
+ * dropped server-side.
+ */
+.cwc-site-footer__honeypot {
+	position: absolute;
+	left: -9999px;
+	width: 1px;
+	height: 1px;
+	overflow: hidden;
+}
+
+.cwc-site-footer__banner {
+	display: block;
+	margin: 0 0 12px;
+	padding: 10px 14px;
+	border-radius: 8px;
+	font-family: "Sora", sans-serif;
+	font-weight: 500;
+	font-size: 14px;
+	line-height: 1.4;
+	border: 1px solid transparent;
+}
+
+.cwc-site-footer__banner:focus {
+	outline: 2px solid currentColor;
+	outline-offset: 2px;
+}
+
+.cwc-site-footer__banner--success {
+	background: #e6f6ec;
+	color: #155724;
+	border-color: rgba(22, 163, 74, 0.3);
+}
+
+.cwc-site-footer__banner--info {
+	background: #e6f3fa;
+	color: #064b6a;
+	border-color: rgba(0, 150, 199, 0.3);
+}
+
+.cwc-site-footer__banner--error {
+	background: #fdecec;
+	color: #8a1f23;
+	border-color: rgba(220, 38, 38, 0.3);
+}
+
+.cwc-site-footer__form input:invalid:not(:placeholder-shown) {
+	outline: 2px solid #DC2626;
+}
+
 .cwc-site-footer__form input {
 	flex: 1;
 	background: #C7C7C7;

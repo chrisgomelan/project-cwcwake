@@ -391,6 +391,11 @@
 			"postTypes": ["page"]
 		},
 		{
+			"name": "page-room-detail",
+			"title": "Room Detail",
+			"postTypes": ["page"]
+		},
+		{
 			"name": "page-plan-your-trip",
 			"title": "Plan Your Trip",
 			"postTypes": ["page"]

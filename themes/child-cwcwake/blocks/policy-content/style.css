@@ -1,0 +1,107 @@
+/*
+ * CWC Wake — cwc/policy-content block styles.
+ *
+ * Implements the design tokens from `designs/privacy-terms-design.md`:
+ *   - Section labels: Sora 700 / 48px / line-height 100% / #0096C7
+ *   - Body copy:     Archivo 500 / 20px / line-height 150% / #1A1A1A
+ *   - Decorative card: #F8F9FA bg, 1px solid rgba(0,0,0,0.2), 30px radius
+ *
+ * Used by /privacy-policy/ and /terms-and-conditions/ pages.
+ */
+
+.cwc-policy {
+	display: block;
+	width: 100%;
+	margin-block-start: var(--wp--preset--spacing--40);
+	margin-block-end: var(--wp--preset--spacing--40);
+}
+
+/*
+ * Intro and panel inherit their left/right edges from the
+ * surrounding `.cwc-tropical-section > main` wrapper (max-width
+ * 1921px + clamp horizontal padding), which is the same wrapper the
+ * breadcrumbs and header logo live in. No `max-width` or auto
+ * margins here — that would re-center the content and break the
+ * shared left edge. Width simply fills whatever main allows.
+ */
+.cwc-policy__intro,
+.cwc-policy__panel {
+	width: 100%;
+	box-sizing: border-box;
+}
+
+.cwc-policy__intro {
+	padding: 3rem 0;
+}
+
+.cwc-policy__intro p,
+.cwc-policy__body {
+	margin: 0;
+	font-family: 'Archivo', system-ui, sans-serif;
+	font-weight: 500;
+	font-size: clamp(16px, 1.25vw, 20px);
+	line-height: 1.5;
+	letter-spacing: 0;
+	color: #1a1a1a;
+}
+
+.cwc-policy__intro p + p {
+	margin-top: 1em;
+}
+
+.cwc-policy__panel {
+	background: #f8f9fa;
+	border: 1px solid rgba(0, 0, 0, 0.2);
+	border-radius: 30px;
+	display: flex;
+	flex-direction: column;
+}
+
+/*
+ * Each clause gets its own padding so the label + body sit clearly
+ * inside the card frame and have breathing room above and below.
+ * Horizontal padding matches the intro so labels align with the
+ * intro paragraph's left edge.
+ */
+.cwc-policy__section {
+	display: flex;
+	flex-direction: column;
+	gap: clamp(12px, 1.25vw, 18px);
+	padding-block: clamp(24px, 3vw, 40px);
+	padding-inline: clamp(20px, 4vw, 48px);
+
+	scroll-margin-top: 120px;
+}
+
+.cwc-policy__label {
+	margin: 0;
+	font-family: 'Sora', system-ui, sans-serif;
+	font-weight: 700;
+	font-size: clamp(28px, 3.5vw, 48px);
+	line-height: 1;
+	letter-spacing: 0;
+	color: #0096c7;
+}
+
+.cwc-policy__body-wrap {
+	display: flex;
+	flex-direction: column;
+	gap: 1em;
+}
+
+.cwc-policy__body a {
+	color: inherit;
+	text-decoration: underline;
+	text-underline-offset: 2px;
+}
+
+.cwc-policy__body a:hover,
+.cwc-policy__body a:focus-visible {
+	color: var(--wp--preset--color--primary, #0096c7);
+}
+
+@media (max-width: 600px) {
+	.cwc-policy__panel {
+		border-radius: 18px;
+	}
+}

@@ -1,0 +1,64 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "cwc/contact-info",
+	"version": "1.0.0",
+	"title": "Contact Info",
+	"category": "theme",
+	"icon": "phone",
+	"description": "Get In Touch and Visit Us information panel with side image and embedded map. Used on the Contact page.",
+	"textdomain": "child-cwcwake",
+	"supports": {
+		"align": ["full"],
+		"html": false,
+		"anchor": true
+	},
+	"attributes": {
+		"getInTouchTitle": {
+			"type": "string",
+			"default": "Get In Touch"
+		},
+		"getInTouchDescription": {
+			"type": "string",
+			"default": "Our team is ready to assist you with your reservations, activity details, and general concerns. Feel free to contact us through any of the following:"
+		},
+		"emailLabel": {
+			"type": "string",
+			"default": "Email"
+		},
+		"email": {
+			"type": "string",
+			"default": "support@camsurwatersports.com"
+		},
+		"phoneLabel": {
+			"type": "string",
+			"default": "Phone (Main Support)"
+		},
+		"phone": {
+			"type": "string",
+			"default": "(+63) 63 912 345 6789"
+		},
+		"visitUsTitle": {
+			"type": "string",
+			"default": "Visit Us"
+		},
+		"address": {
+			"type": "string",
+			"default": "Camarines Sur Watersports Complex (CWC)\nProvincial Capitol Complex, Cadlan, Pili, Camarines Sur, Philippines"
+		},
+		"mapEmbedUrl": {
+			"type": "string",
+			"default": "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3878.0851875327253!2d123.25333569999998!3d13.591607399999997!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x33a18d64927aa34d%3A0x95b7bb178a917dab!2sCamSur%20Watersports%20Complex!5e0!3m2!1sfil!2ssg!4v1776668912816!5m2!1sfil!2ssg"
+		},
+		"sideImageUrl": {
+			"type": "string",
+			"default": ""
+		},
+		"sideImageAlt": {
+			"type": "string",
+			"default": "CamSur Watersports Complex accommodations exterior"
+		}
+	},
+	"render": "file:./render.php",
+	"style": "file:./style.css"
+}

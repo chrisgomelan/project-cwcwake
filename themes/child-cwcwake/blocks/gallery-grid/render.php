@@ -13,7 +13,16 @@
  * Each item:
  *   - title       (string) Category name displayed under the image.
  *   - image       (string) Image URL.
- *   - albumCount  (string) Free-form label, e.g. "6 ALBUMS".
+ *   - albumCount  (string) Free-form label override, e.g. "6 ALBUMS".
+ *                          Leave empty when `albumSlug`/`albumId` is
+ *                          set so the count is resolved live.
+ *   - albumSlug   (string) Optional `cwc_album` slug. When provided
+ *                          (and `albumCount` is empty) the count is
+ *                          read live from the CPT via
+ *                          `cwc_album_child_count()` so the landing
+ *                          card stays in sync with the editor.
+ *   - albumId     (int)    Same as `albumSlug` but by ID. Wins over
+ *                          `albumSlug` when both are present.
  *   - url         (string) Optional link target. When empty, the card
  *                          is rendered as a non-clickable <div>.
  *   - width       (string) "half" (default) or "full".
@@ -45,12 +54,62 @@ $wrapper_attrs = get_block_wrapper_attributes( [
 			$title       = $item['title']       ?? '';
 			$image       = $item['image']       ?? '';
 			$album_count = $item['albumCount']  ?? '';
+			$album_slug  = $item['albumSlug']   ?? '';
+			$album_id    = isset( $item['albumId'] ) ? (int) $item['albumId'] : 0;
 			$url         = $item['url']         ?? '';
 			$width       = ( ( $item['width'] ?? 'half' ) === 'full' ) ? 'full' : 'half';
 			$item_class  = 'cwc-gallery-grid__item cwc-gallery-grid__item--' . $width;
 			$is_link     = ! empty( $url );
 			$tag         = $is_link ? 'a' : 'div';
 			$href_attr   = $is_link ? sprintf( ' href="%s"', esc_url( $url ) ) : '';
+
+			/*
+			 * Resolve the count live from the cwc_album CPT when the
+			 * editor wired the card to a real album. Falls back to
+			 * the literal `albumCount` string so existing usage that
+			 * isn't backed by a CPT entry still works.
+			 *
+			 * The lookup is restricted to `post_status = publish` so
+			 * trashed / draft / deleted categories never contribute a
+			 * misleading "0 ALBUMS" label — they simply render no
+			 * count, which is a clearer signal that something is off.
+			 */
+			if ( '' === $album_count && function_exists( 'cwc_album_child_count' ) ) {
+				$resolved_id = 0;
+
+				if ( $album_id > 0 ) {
+					$candidate = get_post( $album_id );
+					if ( $candidate instanceof WP_Post && 'cwc_album' === $candidate->post_type && 'publish' === $candidate->post_status ) {
+						$resolved_id = (int) $candidate->ID;
+					}
+				}
+
+				if ( 0 === $resolved_id && '' !== $album_slug ) {
+					$matches = get_posts(
+						[
+							'name'             => $album_slug,
+							'post_type'        => 'cwc_album',
+							'post_status'      => 'publish',
+							'posts_per_page'   => 1,
+							'fields'           => 'ids',
+							'no_found_rows'    => true,
+							'suppress_filters' => false,
+						]
+					);
+					if ( ! empty( $matches ) ) {
+						$resolved_id = (int) $matches[0];
+					}
+				}
+
+				if ( $resolved_id > 0 ) {
+					$child_count = cwc_album_child_count( $resolved_id );
+					$album_count = sprintf(
+						/* translators: %d: Number of albums inside a category. */
+						_n( '%d Album', '%d Albums', $child_count, 'child-cwcwake' ),
+						$child_count
+					);
+				}
+			}
 		?>
 			<li class="<?php echo esc_attr( $item_class ); ?>">
 				<<?php echo $tag; ?> class="cwc-gallery-grid__card"<?php echo $href_attr; ?>>

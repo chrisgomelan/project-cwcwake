@@ -7,10 +7,12 @@
             
             <!-- Left Column: Newsletter + Giant Logo -->
             <div class="cwc-site-footer__col-left">
-                <div class="cwc-site-footer__newsletter-contact">
+                <div class="cwc-site-footer__newsletter-contact" id="newsletter">
                     <h3 class="cwc-site-footer__heading">Subscribe to our newsletter</h3>
-                    <form class="cwc-site-footer__form" action="#" method="POST" onsubmit="event.preventDefault();">
-                        <input type="email" placeholder="Enter e-mail address" required>
+                    <!-- CWC_NEWSLETTER_BANNER -->
+                    <form class="cwc-site-footer__form" action="CWC_NEWSLETTER_FORM_ACTION" method="POST" data-cwc-newsletter-form>
+                        <!-- CWC_NEWSLETTER_FORM_FIELDS -->
+                        <input type="email" name="cwc_newsletter_email" placeholder="Enter e-mail address" autocomplete="email" required>
                         <button type="submit">Subscribe</button>
                     </form>
 

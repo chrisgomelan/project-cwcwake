@@ -1,0 +1,180 @@
+/**
+ * cwc/room-gallery block styles.
+ *
+ * Three-column asymmetric gallery used at the top of a single room
+ * landing page. Mirrors the Figma spec: large left tile, narrow tall
+ * center tile, and two stacked tiles in the right column.
+ */
+
+.cwc-room-gallery {
+	margin-block-start: 0 !important;
+}
+
+/* ---------- Back to Rooms link ---------- */
+
+.cwc-room-gallery__back {
+	display: flex;
+	justify-content: flex-end;
+	/*
+	 * Top padding gives the link daylight from the breadcrumbs above
+	 * (the gallery's own `margin-block-start` is forced to 0 to play
+	 * nicely with the constrained post-content layout). Bottom margin
+	 * pushes the image grid clear of the link.
+	 */
+	padding-block-start: var(--wp--preset--spacing--40);
+	margin-block-end: var(--wp--preset--spacing--50);
+}
+
+.cwc-room-gallery__back-link {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.4em;
+	font-family: var(--wp--preset--font-family--heading);
+	font-weight: 400;
+	font-size: clamp(1rem, 1.2vw, 1.25rem);
+	line-height: 1.5;
+	color: rgba(0, 0, 0, 0.8);
+	text-decoration: none;
+	transition: color 0.2s ease;
+}
+
+.cwc-room-gallery__back-link:hover,
+.cwc-room-gallery__back-link:focus-visible {
+	color: var(--wp--preset--color--primary, #0096c7);
+}
+
+/* ---------- Image grid ---------- */
+
+.cwc-room-gallery__grid {
+	display: grid;
+	grid-template-columns: minmax(0, 805fr) minmax(0, 390fr) minmax(0, 463fr);
+	grid-template-rows: minmax(0, 330fr) minmax(0, 312fr);
+	gap: clamp(0.75rem, 1.4vw, 1.25rem);
+}
+
+.cwc-room-gallery__tile {
+	position: relative;
+	margin: 0;
+	overflow: hidden;
+	border-radius: 15px;
+	background: #e9ecef;
+}
+
+/*
+ * Aspect ratios are baked into each slot so the grid keeps its proportions
+ * even when one column is empty. Values come straight from the Figma spec
+ * (805x680, 390x680, 463x330, 463x312).
+ */
+.cwc-room-gallery__tile--main {
+	grid-column: 1;
+	grid-row: 1 / span 2;
+	aspect-ratio: 805 / 680;
+}
+
+.cwc-room-gallery__tile--center {
+	grid-column: 2;
+	grid-row: 1 / span 2;
+	aspect-ratio: 390 / 680;
+}
+
+.cwc-room-gallery__tile--top {
+	grid-column: 3;
+	grid-row: 1;
+	aspect-ratio: 463 / 330;
+}
+
+.cwc-room-gallery__tile--bottom {
+	grid-column: 3;
+	grid-row: 2;
+	aspect-ratio: 463 / 312;
+}
+
+.cwc-room-gallery__image {
+	display: block;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	transition: transform 0.4s ease;
+}
+
+a.cwc-room-gallery__see-all:hover ~ .cwc-room-gallery__image,
+.cwc-room-gallery__tile:hover .cwc-room-gallery__image {
+	transform: scale(1.02);
+}
+
+/* ---------- "See All Images" pill ---------- */
+
+.cwc-room-gallery__see-all {
+	position: absolute;
+	left: clamp(0.75rem, 1.5vw, 1.25rem);
+	bottom: clamp(0.75rem, 1.5vw, 1.25rem);
+	display: inline-flex;
+	align-items: center;
+	gap: 0.5em;
+	padding: 0.55em 1em;
+	border-radius: 999px;
+	background: rgba(255, 255, 255, 0.92);
+	color: #1a1a1a;
+	font-family: var(--wp--preset--font-family--body);
+	font-weight: 500;
+	font-size: clamp(0.85rem, 1vw, 1rem);
+	line-height: 1;
+	text-decoration: none;
+	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+	transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.cwc-room-gallery__see-all:hover,
+.cwc-room-gallery__see-all:focus-visible {
+	background: #ffffff;
+	transform: translateY(-1px);
+}
+
+.cwc-room-gallery__see-all-icon {
+	flex-shrink: 0;
+	width: 1.05em;
+	height: 1.05em;
+}
+
+/* ---------- Responsive collapse ---------- */
+
+@media (max-width: 900px) {
+	.cwc-room-gallery__grid {
+		grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+		grid-template-rows: auto;
+		gap: 0.75rem;
+	}
+
+	.cwc-room-gallery__tile--main {
+		grid-column: 1 / span 2;
+		grid-row: auto;
+		aspect-ratio: 16 / 10;
+	}
+
+	.cwc-room-gallery__tile--center {
+		grid-column: 1;
+		grid-row: auto;
+		aspect-ratio: 4 / 5;
+	}
+
+	.cwc-room-gallery__tile--top,
+	.cwc-room-gallery__tile--bottom {
+		grid-column: 2;
+		grid-row: auto;
+		aspect-ratio: 4 / 3;
+	}
+}
+
+@media (max-width: 540px) {
+	.cwc-room-gallery__grid {
+		grid-template-columns: minmax(0, 1fr);
+	}
+
+	.cwc-room-gallery__tile--main,
+	.cwc-room-gallery__tile--center,
+	.cwc-room-gallery__tile--top,
+	.cwc-room-gallery__tile--bottom {
+		grid-column: 1;
+		aspect-ratio: 16 / 10;
+	}
+}
