@@ -19,7 +19,7 @@ function cwc_enqueue_styles()
 {
 	wp_enqueue_style(
 		'cwc-google-fonts',
-		'https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=Archivo:wght@400;500;600;700&display=swap',
+		'https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=Archivo:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap',
 		[],
 		null
 	);
@@ -74,7 +74,7 @@ add_action('wp_enqueue_scripts', 'cwc_enqueue_styles');
  */
 function cwc_enqueue_editor_styles()
 {
-	add_editor_style('https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=Archivo:wght@400;500;600;700&display=swap');
+	add_editor_style('https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=Archivo:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap');
 	add_editor_style('assets/css/global.css');
 }
 add_action('after_setup_theme', 'cwc_enqueue_editor_styles');
@@ -133,9 +133,24 @@ function cwc_create_initial_pages()
 		'Plan Your Trip' => [
 			'order' => 4,
 			'template' => 'page-plan-your-trip',
-			'children' => ['Rates', 'FAQs', 'Blogs', 'Gallery'],
+			'children' => [
+				'Rates' => 'page-child',
+				'FAQs'  => 'page-child',
+				'Blogs' => 'page-child',
+				'Gallery' => [
+					'template' => 'page-gallery',
+					'children' => [
+						'Events'         => 'page-child',
+						'Lifestyle'      => 'page-child',
+						'Explore CamSur' => 'page-child',
+					],
+				],
+			],
 		],
 		'About' => ['order' => 5, 'template' => 'page-about'],
+		'Contact Us' => ['order' => 6, 'template' => 'page-contact-us'],
+		'Terms & Conditions' => ['order' => 7, 'template' => 'page-terms-and-conditions'],
+		'Privacy Policy' => ['order' => 8, 'template' => 'page-privacy-policy'],
 	];
 
 	foreach ($pages as $title => $config) {
@@ -161,20 +176,7 @@ function cwc_create_initial_pages()
 		}
 
 		if (!empty($config['children'])) {
-			$child_order = 1;
-			foreach ($config['children'] as $child_title) {
-				$child_id = wp_insert_post([
-					'post_title' => $child_title,
-					'post_status' => 'publish',
-					'post_type' => 'page',
-					'post_parent' => $parent_id,
-					'menu_order' => $child_order++,
-				]);
-
-				if (!is_wp_error($child_id)) {
-					update_post_meta($child_id, '_wp_page_template', 'page-child');
-				}
-			}
+			cwc_seed_child_pages($config['children'], $parent_id);
 		}
 	}
 
@@ -187,6 +189,60 @@ function cwc_create_initial_pages()
 	update_option('cwc_pages_created', true);
 }
 add_action('after_switch_theme', 'cwc_create_initial_pages');
+
+/**
+ * Recursively create child pages under a given parent.
+ *
+ * Each entry in $children may be expressed in one of three forms:
+ *
+ *   1. `'Title'`                              — numeric key, defaults to `page-child` template, no grandchildren.
+ *   2. `'Title' => 'template-slug'`           — assoc form, custom template, no grandchildren.
+ *   3. `'Title' => ['template' => 'tpl',
+ *                   'children' => [ ... ]]`  — assoc form with grandchildren (recursed).
+ *
+ * @param array $children  Children definitions.
+ * @param int   $parent_id Parent post ID to attach the new pages to.
+ */
+function cwc_seed_child_pages(array $children, $parent_id)
+{
+	$order = 1;
+
+	foreach ($children as $key => $value) {
+		if (is_int($key)) {
+			$title         = $value;
+			$template      = 'page-child';
+			$grandchildren = [];
+		} elseif (is_array($value)) {
+			$title         = $key;
+			$template      = $value['template'] ?? 'page-child';
+			$grandchildren = $value['children'] ?? [];
+		} else {
+			$title         = $key;
+			$template      = $value;
+			$grandchildren = [];
+		}
+
+		$child_id = wp_insert_post([
+			'post_title'  => $title,
+			'post_status' => 'publish',
+			'post_type'   => 'page',
+			'post_parent' => $parent_id,
+			'menu_order'  => $order++,
+		]);
+
+		if (is_wp_error($child_id)) {
+			continue;
+		}
+
+		if (!empty($template)) {
+			update_post_meta($child_id, '_wp_page_template', $template);
+		}
+
+		if (!empty($grandchildren)) {
+			cwc_seed_child_pages($grandchildren, $child_id);
+		}
+	}
+}
 
 /**
  * Build the primary navigation menu matching the site structure.
@@ -219,7 +275,8 @@ function cwc_create_primary_menu()
 		'Home' => [],
 		'Activities' => ['Water Sports', 'Land Activities', 'Elite Facilities'],
 		'Accommodations' => ['Villas', 'Cabanas', 'Dwell', 'Cabin'],
-		'Plan Your Trip' => ['Rates', 'FAQs', 'Blogs', 'Gallery'],
+		'Gallery' => ['Events', 'Lifestyle', 'Explore CamSur'],
+		'Plan Your Trip' => ['Rates', 'FAQs', 'Blogs'],
 		'About' => [],
 	];
 
@@ -263,6 +320,114 @@ function cwc_create_primary_menu()
 add_action('after_switch_theme', 'cwc_create_primary_menu', 20);
 
 /**
+ * Build the breadcrumb trail for the current request.
+ *
+ * Shared by the `cwc/breadcrumbs` block and by `cwc/page-banner`
+ * when it renders breadcrumbs inside the banner area.
+ *
+ * Each crumb is `[ 'label' => string, 'url' => string|null ]`.
+ * A null URL marks the current (non-link) item.
+ */
+function cwc_build_breadcrumbs($home_label = 'Home')
+{
+	$crumbs = [
+		['label' => $home_label, 'url' => home_url('/')],
+	];
+
+	if (is_front_page()) {
+		$crumbs[count($crumbs) - 1]['url'] = null;
+	} elseif (is_page()) {
+		$ancestors = array_reverse(get_post_ancestors(get_the_ID()));
+		foreach ($ancestors as $ancestor_id) {
+			$crumbs[] = [
+				'label' => get_the_title($ancestor_id),
+				'url'   => get_permalink($ancestor_id),
+			];
+		}
+		$crumbs[] = ['label' => get_the_title(), 'url' => null];
+	} elseif (is_singular()) {
+		$crumbs[] = ['label' => get_the_title(), 'url' => null];
+	} elseif (is_category() || is_tag() || is_tax() || is_post_type_archive() || is_archive()) {
+		$crumbs[] = [
+			'label' => wp_strip_all_tags(get_the_archive_title()),
+			'url'   => null,
+		];
+	} elseif (is_search()) {
+		/* translators: %s: Search query. */
+		$crumbs[] = [
+			'label' => sprintf(__('Search: %s', 'child-cwcwake'), get_search_query()),
+			'url'   => null,
+		];
+	} elseif (is_404()) {
+		$crumbs[] = ['label' => __('Not Found', 'child-cwcwake'), 'url' => null];
+	}
+
+	/** This filter is documented in blocks/breadcrumbs/render.php */
+	return apply_filters('cwc_breadcrumbs_items', $crumbs);
+}
+
+/**
+ * Render the breadcrumb trail HTML.
+ *
+ * @param array $args {
+ *     @type string $home_label     Label for the first crumb. Default 'Home'.
+ *     @type bool   $show_home_icon Whether to show the home icon. Default true.
+ *     @type string $extra_class    Optional extra class appended to the <nav> element.
+ * }
+ * @return string Rendered <nav> markup, or empty string if there's nothing to render.
+ */
+function cwc_render_breadcrumbs($args = [])
+{
+	$args = wp_parse_args($args, [
+		'home_label'     => 'Home',
+		'show_home_icon' => true,
+		'extra_class'    => '',
+	]);
+
+	$crumbs = cwc_build_breadcrumbs($args['home_label']);
+	if (count($crumbs) < 2) {
+		return '';
+	}
+
+	$class = trim('cwc-breadcrumbs ' . $args['extra_class']);
+	$last  = count($crumbs) - 1;
+
+	ob_start();
+	?>
+	<nav class="<?php echo esc_attr($class); ?>" role="navigation" aria-label="<?php esc_attr_e('Breadcrumb', 'child-cwcwake'); ?>">
+		<ol class="cwc-breadcrumbs__list">
+			<?php foreach ($crumbs as $i => $crumb) :
+				$is_first = (0 === $i);
+				$is_last  = ($last === $i);
+			?>
+				<li class="cwc-breadcrumbs__item<?php echo $is_last ? ' cwc-breadcrumbs__item--current' : ''; ?>">
+					<?php if (!empty($crumb['url'])) : ?>
+						<a class="cwc-breadcrumbs__link" href="<?php echo esc_url($crumb['url']); ?>">
+							<?php if ($is_first && $args['show_home_icon']) : ?>
+								<svg class="cwc-breadcrumbs__home-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+									<path d="M12 3 2 12h3v8h6v-6h2v6h6v-8h3z" />
+								</svg>
+							<?php endif; ?>
+							<span><?php echo esc_html($crumb['label']); ?></span>
+						</a>
+					<?php else : ?>
+						<span class="cwc-breadcrumbs__current" aria-current="page">
+							<?php echo esc_html($crumb['label']); ?>
+						</span>
+					<?php endif; ?>
+
+					<?php if (!$is_last) : ?>
+						<span class="cwc-breadcrumbs__separator" aria-hidden="true">&rsaquo;</span>
+					<?php endif; ?>
+				</li>
+			<?php endforeach; ?>
+		</ol>
+	</nav>
+<?php
+	return ob_get_clean();
+}
+
+/**
  * Register custom blocks.
  */
 function cwc_register_blocks()
@@ -272,8 +437,94 @@ function cwc_register_blocks()
 	register_block_type(get_stylesheet_directory() . '/blocks/showcase-section');
 	register_block_type(get_stylesheet_directory() . '/blocks/accommodations-section');
 	register_block_type(get_stylesheet_directory() . '/blocks/reviews-section');
+	register_block_type(get_stylesheet_directory() . '/blocks/page-banner');
+	register_block_type(get_stylesheet_directory() . '/blocks/breadcrumbs');
+	register_block_type(get_stylesheet_directory() . '/blocks/gallery-grid');
+	register_block_type(get_stylesheet_directory() . '/blocks/cards-section');
 }
 add_action('init', 'cwc_register_blocks');
+
+/**
+ * Add a body class to mark the front page.
+ *
+ * Used by the header CSS/JS so the transparent-on-top behavior only
+ * applies on the home page; all other pages get an opaque header.
+ */
+function cwc_body_class_front_page($classes)
+{
+	if (is_front_page()) {
+		$classes[] = 'cwc-home';
+	}
+	return $classes;
+}
+add_filter('body_class', 'cwc_body_class_front_page');
+
+/**
+ * Pages that must never appear in the header navigation.
+ *
+ * Looked up by slug and cached per request. Terms & Conditions and
+ * Privacy Policy live in the footer only; they're filtered out of
+ * both classic nav menus and the page-list fallback that the
+ * `wp:navigation` block uses when no menu is explicitly assigned.
+ */
+function cwc_header_excluded_page_ids()
+{
+	static $cache = null;
+	if ($cache !== null) {
+		return $cache;
+	}
+
+	$cache = [];
+	foreach (['contact-us', 'terms-and-conditions', 'privacy-policy'] as $slug) {
+		$page = get_page_by_path($slug);
+		if ($page) {
+			$cache[] = (int) $page->ID;
+		}
+	}
+	return $cache;
+}
+
+/**
+ * Strip excluded pages from any classic nav menu (covers a menu
+ * assigned to the `primary` location and rendered by `wp:navigation`).
+ */
+function cwc_filter_nav_menu_items($items)
+{
+	$excluded = cwc_header_excluded_page_ids();
+	if (empty($excluded)) {
+		return $items;
+	}
+
+	return array_values(array_filter($items, function ($item) use ($excluded) {
+		return 'page' !== $item->object || ! in_array((int) $item->object_id, $excluded, true);
+	}));
+}
+add_filter('wp_nav_menu_objects', 'cwc_filter_nav_menu_items');
+
+/**
+ * Strip excluded pages from `get_pages()` on the public frontend.
+ *
+ * The `core/page-list` block (the fallback used by `wp:navigation`
+ * when no menu is set) calls `get_pages()` to build its tree. The
+ * admin and REST contexts are left untouched so editors and page
+ * pickers still see every page.
+ */
+function cwc_filter_get_pages($pages)
+{
+	if (is_admin() || (defined('REST_REQUEST') && REST_REQUEST)) {
+		return $pages;
+	}
+
+	$excluded = cwc_header_excluded_page_ids();
+	if (empty($excluded)) {
+		return $pages;
+	}
+
+	return array_values(array_filter($pages, function ($p) use ($excluded) {
+		return ! in_array((int) $p->ID, $excluded, true);
+	}));
+}
+add_filter('get_pages', 'cwc_filter_get_pages');
 
 /**
  * Allow SVG uploads in the Media Library.

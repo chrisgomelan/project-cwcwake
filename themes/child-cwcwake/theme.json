@@ -89,6 +89,11 @@
 					"slug": "body",
 					"name": "Archivo",
 					"fontFamily": "'Archivo', system-ui, sans-serif"
+				},
+				{
+					"slug": "ui",
+					"name": "Inter",
+					"fontFamily": "'Inter', system-ui, sans-serif"
 				}
 			],
 			"fontSizes": [
@@ -391,6 +396,11 @@
 			"postTypes": ["page"]
 		},
 		{
+			"name": "page-gallery",
+			"title": "Gallery",
+			"postTypes": ["page"]
+		},
+		{
 			"name": "page-about",
 			"title": "About",
 			"postTypes": ["page"]
@@ -398,6 +408,21 @@
 		{
 			"name": "page-child",
 			"title": "Child Page (with breadcrumb)",
+			"postTypes": ["page"]
+		},
+		{
+			"name": "page-contact",
+			"title": "Contact",
+			"postTypes": ["page"]
+		},
+		{
+			"name": "page-terms-and-conditions",
+			"title": "Terms & Conditions",
+			"postTypes": ["page"]
+		},
+		{
+			"name": "page-privacy-policy",
+			"title": "Privacy Policy",
 			"postTypes": ["page"]
 		}
 	],

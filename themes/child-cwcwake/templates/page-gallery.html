@@ -1,0 +1,71 @@
+<!-- wp:template-part {"slug":"header"} /-->
+
+<!-- wp:cwc/page-banner {
+	"title": "GALLERY",
+	"subtitle": "Discover the energy of CWC through moments of adventure, scenic views, and laid-back lifestyle experiences. Browse our gallery and see what awaits at CamSur Watersports Complex.",
+	"backgroundImage": "/wp-content/uploads/2026/04/gallery-banner-bg.webp",
+	"overlayOpacity": 40,
+	"size": "default",
+	"showCorners": true,
+	"useFeaturedImage": true,
+	"align": "full"
+} /-->
+
+<!-- wp:group {
+	"align": "full",
+	"className": "cwc-tropical-section",
+	"style": {
+		"spacing": {
+			"margin": { "top": "0" },
+			"padding": {
+				"top": "var:preset|spacing|40",
+				"bottom": "var:preset|spacing|70"
+			},
+			"blockGap": "var:preset|spacing|40"
+		}
+	},
+	"layout": { "type": "constrained" }
+} -->
+<div class="wp-block-group alignfull cwc-tropical-section" style="margin-top:0;padding-top:var(--wp--preset--spacing--40);padding-bottom:var(--wp--preset--spacing--70)">
+	<!-- wp:cwc/breadcrumbs /-->
+
+	<!-- wp:group {
+		"tagName": "main",
+		"style": { "spacing": { "margin": { "top": "0" } } },
+		"layout": { "type": "constrained" }
+	} -->
+	<main class="wp-block-group" style="margin-top:0">
+		<!-- wp:post-content {"align":"full","layout":{"type":"constrained"}} /-->
+	</main>
+	<!-- /wp:group -->
+
+	<!-- wp:cwc/gallery-grid {
+		"items": [
+			{
+				"title": "EVENTS",
+				"image": "/wp-content/uploads/2026/04/events.webp",
+				"albumCount": "6 ALBUMS",
+				"url": "/plan-your-trip/gallery/events/",
+				"width": "half"
+			},
+			{
+				"title": "LIFESTYLE",
+				"image": "/wp-content/uploads/2026/04/lifestyle.webp",
+				"albumCount": "6 ALBUMS",
+				"url": "/plan-your-trip/gallery/lifestyle/",
+				"width": "half"
+			},
+			{
+				"title": "EXPLORE CAMSUR",
+				"image": "/wp-content/uploads/2026/04/explore-camsur.webp",
+				"albumCount": "6 ALBUMS",
+				"url": "/plan-your-trip/gallery/explore-camsur/",
+				"width": "full"
+			}
+		],
+		"align": "full"
+	} /-->
+</div>
+<!-- /wp:group -->
+
+<!-- wp:template-part {"slug":"footer"} /-->

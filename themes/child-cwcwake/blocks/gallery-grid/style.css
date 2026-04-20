@@ -1,0 +1,211 @@
+/*
+ * CWC Wake — Gallery Grid Block
+ *
+ * 12-column responsive grid of category cards. Each card pairs a
+ * rounded image (with overlay + decorative corner brackets) and a
+ * meta row (category name on the left, album count on the right).
+ *
+ * Typography per `designs/gallery-design.md`:
+ *   - Title:  Sora  / 700 / 48px / #0096C7  (uppercase)
+ *   - Count:  Inter / 600 / 24px / rgba(0, 0, 0, 0.7)
+ */
+
+/* ----------------------------------------
+   Container
+   ---------------------------------------- */
+
+.cwc-gallery-grid {
+	margin-block-start: 0 !important;
+	padding-top: var(--wp--preset--spacing--50);
+	padding-bottom: var(--wp--preset--spacing--50);
+}
+
+/* ----------------------------------------
+   Grid
+   ---------------------------------------- */
+
+.cwc-gallery-grid__list {
+	display: grid;
+	grid-template-columns: repeat(12, 1fr);
+	gap: var(--wp--preset--spacing--40);
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.cwc-gallery-grid__item {
+	margin: 0;
+}
+
+.cwc-gallery-grid__item--half {
+	grid-column: span 6;
+}
+
+.cwc-gallery-grid__item--full {
+	grid-column: span 12;
+}
+
+/* ----------------------------------------
+   Card (link or static)
+   ---------------------------------------- */
+
+.cwc-gallery-grid__card {
+	display: block;
+	color: inherit;
+	text-decoration: none;
+	transition: transform 0.3s ease;
+}
+
+a.cwc-gallery-grid__card:focus {
+	outline: none;
+}
+
+a.cwc-gallery-grid__card:focus-visible {
+	outline: 2px solid var(--wp--preset--color--primary);
+	outline-offset: 4px;
+	border-radius: 32px;
+}
+
+a.cwc-gallery-grid__card:hover .cwc-gallery-grid__media {
+	transform: translateY(-4px);
+}
+
+a.cwc-gallery-grid__card:hover .cwc-gallery-grid__overlay {
+	background: rgba(0, 0, 0, 0.2);
+}
+
+a.cwc-gallery-grid__card:hover .cwc-gallery-grid__title {
+	color: var(--wp--preset--color--primary-dark, #0078A8);
+}
+
+/* ----------------------------------------
+   Media (image + overlay + corners)
+   ---------------------------------------- */
+
+.cwc-gallery-grid__media {
+	position: relative;
+	width: 100%;
+	aspect-ratio: 796 / 494;
+	overflow: hidden;
+	border-radius: 30px;
+	background: var(--wp--preset--color--surface);
+	transition: transform 0.3s ease;
+}
+
+.cwc-gallery-grid__item--full .cwc-gallery-grid__media {
+	/* Wider full-row card stays the same height as a half card row. */
+	aspect-ratio: 1622 / 494;
+}
+
+.cwc-gallery-grid__img {
+	display: block;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+
+.cwc-gallery-grid__overlay {
+	position: absolute;
+	inset: 0;
+	background: rgba(0, 0, 0, 0.1);
+	pointer-events: none;
+	transition: background 0.3s ease;
+}
+
+/* ----------------------------------------
+   Corner brackets — match the page banner
+   ---------------------------------------- */
+
+.cwc-gallery-grid__corner {
+	position: absolute;
+	width: clamp(20px, 2vw, 32px);
+	height: clamp(20px, 2vw, 32px);
+	border-color: rgba(255, 255, 255, 0.85);
+	border-style: solid;
+	border-width: 0;
+	pointer-events: none;
+	z-index: 1;
+}
+
+.cwc-gallery-grid__corner--tl {
+	top: clamp(0.75rem, 1.5vw, 1.25rem);
+	left: clamp(0.75rem, 1.5vw, 1.25rem);
+	border-top-width: 2px;
+	border-left-width: 2px;
+}
+
+.cwc-gallery-grid__corner--tr {
+	top: clamp(0.75rem, 1.5vw, 1.25rem);
+	right: clamp(0.75rem, 1.5vw, 1.25rem);
+	border-top-width: 2px;
+	border-right-width: 2px;
+}
+
+.cwc-gallery-grid__corner--bl {
+	bottom: clamp(0.75rem, 1.5vw, 1.25rem);
+	left: clamp(0.75rem, 1.5vw, 1.25rem);
+	border-bottom-width: 2px;
+	border-left-width: 2px;
+}
+
+.cwc-gallery-grid__corner--br {
+	bottom: clamp(0.75rem, 1.5vw, 1.25rem);
+	right: clamp(0.75rem, 1.5vw, 1.25rem);
+	border-bottom-width: 2px;
+	border-right-width: 2px;
+}
+
+/* ----------------------------------------
+   Meta row (title + album count)
+   ---------------------------------------- */
+
+.cwc-gallery-grid__meta {
+	display: flex;
+	align-items: baseline;
+	justify-content: space-between;
+	gap: var(--wp--preset--spacing--30);
+	margin-top: var(--wp--preset--spacing--30);
+}
+
+.cwc-gallery-grid__title {
+	margin: 0;
+	font-family: 'Sora', system-ui, sans-serif;
+	font-weight: 700;
+	font-size: clamp(1.75rem, 3.2vw, 3rem);
+	line-height: 1;
+	letter-spacing: 0;
+	text-transform: uppercase;
+	color: #0096C7;
+	transition: color 0.2s ease;
+}
+
+.cwc-gallery-grid__count {
+	font-family: 'Inter', system-ui, sans-serif;
+	font-weight: 600;
+	font-size: clamp(1rem, 1.4vw, 1.5rem);
+	line-height: 1;
+	letter-spacing: 0;
+	text-transform: uppercase;
+	color: rgba(0, 0, 0, 0.7);
+	white-space: nowrap;
+}
+
+/* ----------------------------------------
+   Responsive — collapse to single column
+   ---------------------------------------- */
+
+@media (max-width: 768px) {
+	.cwc-gallery-grid__item--half,
+	.cwc-gallery-grid__item--full {
+		grid-column: span 12;
+	}
+
+	.cwc-gallery-grid__media,
+	.cwc-gallery-grid__item--full .cwc-gallery-grid__media {
+		aspect-ratio: 16 / 10;
+	}
+
+	.cwc-gallery-grid__meta {
+		flex-wrap: wrap;
+	}
+}

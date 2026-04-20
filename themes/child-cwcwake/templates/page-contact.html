@@ -1,0 +1,44 @@
+<!-- wp:template-part {"slug":"header"} /-->
+
+<!-- wp:cwc/page-banner {
+	"title": "CONTACT US",
+	"subtitle": "Get in touch with the CWC team — we're happy to help with bookings, inquiries, and anything in between.",
+	"backgroundImage": "/wp-content/uploads/2026/04/contact-banner-bg.webp",
+	"overlayOpacity": 40,
+	"size": "compact",
+	"showCorners": false,
+	"useFeaturedImage": true,
+	"align": "full"
+} /-->
+
+<!-- wp:group {
+	"align": "full",
+	"className": "cwc-tropical-section",
+	"style": {
+		"spacing": {
+			"margin": { "top": "0" },
+			"padding": {
+				"top": "var:preset|spacing|40",
+				"bottom": "var:preset|spacing|70"
+			},
+			"blockGap": "var:preset|spacing|40"
+		}
+	},
+	"layout": { "type": "constrained" }
+} -->
+<div class="wp-block-group alignfull cwc-tropical-section" style="margin-top:0;padding-top:var(--wp--preset--spacing--40);padding-bottom:var(--wp--preset--spacing--70)">
+	<!-- wp:cwc/breadcrumbs /-->
+
+	<!-- wp:group {
+		"tagName": "main",
+		"style": { "spacing": { "margin": { "top": "0" } } },
+		"layout": { "type": "constrained" }
+	} -->
+	<main class="wp-block-group" style="margin-top:0">
+		<!-- wp:post-content {"align":"full","layout":{"type":"constrained"}} /-->
+	</main>
+	<!-- /wp:group -->
+</div>
+<!-- /wp:group -->
+
+<!-- wp:template-part {"slug":"footer"} /-->

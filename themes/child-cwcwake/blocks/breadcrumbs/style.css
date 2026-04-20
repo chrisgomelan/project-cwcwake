@@ -1,0 +1,104 @@
+/*
+ * CWC Wake — Breadcrumbs Block
+ *
+ * Per `designs/gallery-accommodations-banner.md`:
+ *   - Default state: Inter / 600 / 20px / #1A1A1A
+ *   - Active state:  Sora  / 600 / 20px / #0096C7
+ *   - Chevron:       #1A1A1A
+ *
+ * Renders transparent so the underlying section background (e.g.
+ * `cwc-tropical-section`) shows through.
+ */
+
+/* ----------------------------------------
+   Container
+   ---------------------------------------- */
+
+.cwc-breadcrumbs__wrap {
+	width: 100%;
+	margin-block-start: 0 !important;
+	background: transparent;
+}
+
+.cwc-breadcrumbs {
+	margin: 0;
+}
+
+/* ----------------------------------------
+   Crumb list
+   ---------------------------------------- */
+
+.cwc-breadcrumbs__list {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: var(--wp--preset--spacing--20);
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	font-family: 'Inter', system-ui, sans-serif;
+	font-weight: 600;
+	font-size: 20px;
+	line-height: 1;
+	letter-spacing: 0;
+	color: #1A1A1A;
+}
+
+.cwc-breadcrumbs__item {
+	display: inline-flex;
+	align-items: center;
+	gap: var(--wp--preset--spacing--20);
+}
+
+/* ----------------------------------------
+   Links
+   ---------------------------------------- */
+
+.cwc-breadcrumbs__link {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.35rem;
+	color: #1A1A1A;
+	text-decoration: none;
+	transition: var(--wp--custom--transition--default);
+}
+
+.cwc-breadcrumbs__link:hover {
+	color: var(--wp--preset--color--primary);
+}
+
+.cwc-breadcrumbs__home-icon {
+	display: inline-block;
+	flex-shrink: 0;
+	color: currentColor;
+}
+
+/* ----------------------------------------
+   Separator
+   ---------------------------------------- */
+
+.cwc-breadcrumbs__separator {
+	display: inline-block;
+	color: #1A1A1A;
+	font-weight: 600;
+}
+
+/* ----------------------------------------
+   Current page (last crumb)
+   ---------------------------------------- */
+
+.cwc-breadcrumbs__current {
+	font-family: 'Sora', system-ui, sans-serif;
+	font-weight: 600;
+	color: #0096C7;
+}
+
+/* ----------------------------------------
+   Responsive
+   ---------------------------------------- */
+
+@media (max-width: 600px) {
+	.cwc-breadcrumbs__list {
+		font-size: 16px;
+	}
+}

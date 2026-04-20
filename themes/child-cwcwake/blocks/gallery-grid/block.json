@@ -1,0 +1,27 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "cwc/gallery-grid",
+	"version": "1.0.0",
+	"title": "Gallery Grid",
+	"category": "theme",
+	"icon": "format-gallery",
+	"description": "Responsive grid of gallery category cards. Each card pairs a rounded image with decorative corner brackets, a category name, and an album count.",
+	"textdomain": "child-cwcwake",
+	"supports": {
+		"align": ["full"],
+		"html": false,
+		"anchor": true
+	},
+	"attributes": {
+		"items": {
+			"type": "array",
+			"default": [],
+			"items": {
+				"type": "object"
+			}
+		}
+	},
+	"render": "file:./render.php",
+	"style": "file:./style.css"
+}

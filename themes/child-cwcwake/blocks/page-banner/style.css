@@ -1,0 +1,170 @@
+/*
+ * CWC Wake — Page Banner Block
+ *
+ * Inner-page hero banner with two height variants (default / compact).
+ * Background image, overlay, title, optional subtitle, and decorative
+ * L-shaped corner brackets.
+ */
+
+/* ----------------------------------------
+   Container
+   ---------------------------------------- */
+
+.cwc-page-banner {
+	position: relative;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 100%;
+	margin-block-start: 0 !important;
+	padding: var(--wp--preset--spacing--40) clamp(1.5rem, 4vw, 4rem);
+	background-image: var(--cwc-banner-bg);
+	background-position: center;
+	background-size: cover;
+	background-repeat: no-repeat;
+	overflow: hidden;
+}
+
+.cwc-page-banner--default {
+	/* Per design spec: 561px target at 1920px viewport. */
+	min-height: clamp(360px, 29.2vw, 561px);
+}
+
+.cwc-page-banner--compact {
+	min-height: clamp(220px, 22vw, 300px);
+	padding-block: var(--wp--preset--spacing--30);
+}
+
+/* ----------------------------------------
+   Dark overlay
+   ---------------------------------------- */
+
+.cwc-page-banner__overlay {
+	position: absolute;
+	inset: 0;
+	background: var(--wp--preset--color--text);
+	opacity: var(--cwc-banner-overlay, 0.4);
+	pointer-events: none;
+}
+
+/* ----------------------------------------
+   Decorative corner brackets
+   ---------------------------------------- */
+
+.cwc-page-banner__corner {
+	position: absolute;
+	width: clamp(24px, 3vw, 40px);
+	height: clamp(24px, 3vw, 40px);
+	border-color: rgba(255, 255, 255, 0.6);
+	border-style: solid;
+	border-width: 0;
+	pointer-events: none;
+	z-index: 1;
+}
+
+.cwc-page-banner__corner--tl {
+	top: clamp(1rem, 2vw, 1.75rem);
+	left: clamp(1rem, 2vw, 1.75rem);
+	border-top-width: 2px;
+	border-left-width: 2px;
+}
+
+.cwc-page-banner__corner--tr {
+	top: clamp(1rem, 2vw, 1.75rem);
+	right: clamp(1rem, 2vw, 1.75rem);
+	border-top-width: 2px;
+	border-right-width: 2px;
+}
+
+.cwc-page-banner__corner--bl {
+	bottom: clamp(1rem, 2vw, 1.75rem);
+	left: clamp(1rem, 2vw, 1.75rem);
+	border-bottom-width: 2px;
+	border-left-width: 2px;
+}
+
+.cwc-page-banner__corner--br {
+	bottom: clamp(1rem, 2vw, 1.75rem);
+	right: clamp(1rem, 2vw, 1.75rem);
+	border-bottom-width: 2px;
+	border-right-width: 2px;
+}
+
+/* ----------------------------------------
+   Content
+   ---------------------------------------- */
+
+.cwc-page-banner__content {
+	position: relative;
+	z-index: 1;
+	width: 100%;
+	max-width: 1280px;
+	margin: 0 auto;
+	text-align: center;
+	color: var(--wp--preset--color--background);
+}
+
+/* Title (H1) per `designs/gallery-accommodations-banner.md`:
+   Sora / 700 / 72px / line-height 100% / #F5F1EB / centered. */
+.cwc-page-banner__title {
+	margin: 0;
+	font-family: var(--wp--preset--font-family--heading);
+	font-weight: 700;
+	font-size: clamp(2.5rem, 5vw, 4.5rem);
+	line-height: 1;
+	letter-spacing: 0;
+	text-transform: uppercase;
+	color: #F5F1EB;
+}
+
+.cwc-page-banner--compact .cwc-page-banner__title {
+	font-size: clamp(2rem, 4vw, 3rem);
+}
+
+/* Description per `designs/gallery-accommodations-banner.md`:
+   Archivo / 500 / 20px / line-height 100% / #FFFFFF / centered.
+   Width inherits from `.cwc-page-banner__content` so the description
+   can breathe without being shrunk by an extra cap. */
+.cwc-page-banner__subtitle {
+	margin: var(--wp--preset--spacing--30) auto 0;
+	max-width: 100%;
+	font-family: var(--wp--preset--font-family--body);
+	font-weight: 500;
+	font-size: clamp(0.95rem, 1.4vw, 1.25rem);
+	line-height: 1.4;
+	letter-spacing: 0;
+	color: #FFFFFF;
+}
+
+/* ----------------------------------------
+   Responsive
+   ---------------------------------------- */
+
+@media (max-width: 900px) {
+	.cwc-page-banner {
+		padding-top: 100px;
+	}
+
+	.cwc-page-banner--default {
+		min-height: 300px;
+	}
+
+	.cwc-page-banner--compact {
+		min-height: 180px;
+	}
+}
+
+@media (max-width: 600px) {
+	.cwc-page-banner__corner {
+		width: 20px;
+		height: 20px;
+	}
+
+	.cwc-page-banner--default {
+		min-height: 240px;
+	}
+
+	.cwc-page-banner--compact {
+		min-height: 150px;
+	}
+}
