@@ -85,7 +85,41 @@ A three-column asymmetric image grid placed below the breadcrumbs/back link.
 | Rotation      | `0deg`   |
 | Opacity       | `1`      |
 
-> **Note:** A **"See All Images"** button/link is overlaid on Image 1 (bottom-left corner).
+### "See All Images" Overlay Button
+
+Positioned at the **bottom-left corner of Image 1** (large left image).
+
+#### Background Container
+
+| Property      | Value      |
+| ------------- | ---------- |
+| Width         | `188px`    |
+| Height        | `51px`     |
+| Border Radius | `30px`     |
+| Rotation      | `0deg`     |
+| Opacity       | `1`        |
+| Background    | `#FFFFFF`  |
+
+#### Icon
+
+| Property  | Value                   |
+| --------- | ----------------------- |
+| Asset     | `see-all-images.svg`    |
+| Size      | `25 × 25px`             |
+| Placement | Left of label text      |
+
+#### Label Text
+
+| Property       | Value        |
+| -------------- | ------------ |
+| Font Family    | `Sora`       |
+| Font Weight    | `700`        |
+| Font Style     | Bold         |
+| Font Size      | `16px`       |
+| Line Height    | `100%`       |
+| Letter Spacing | `0%`         |
+| Text Transform | `capitalize` |
+| Color          | `#000000`    |
 
 ---
 
