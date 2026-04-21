@@ -320,16 +320,23 @@ function cwc_accommodation_normalize_slug_csv( $value, array $allowed ) {
  * @return array<string,array{label:string,icon:string}>
  */
 function cwc_amenity_catalogue() {
-	$catalogue = [
-		'wifi'       => [ 'label' => 'Free Wi-Fi',        'icon' => 'free-wifi.svg' ],
-		'parking'    => [ 'label' => 'Free Parking',      'icon' => 'free-parking.svg' ],
-		'pool'       => [ 'label' => 'Pool Access',       'icon' => 'swimming-pool.svg' ],
-		'air'        => [ 'label' => 'Air Conditioning',  'icon' => 'air-conditioning.svg' ],
-		'garden'     => [ 'label' => 'Garden View',       'icon' => 'garden&terrace.svg' ],
-		'bar'        => [ 'label' => 'Mini Bar',          'icon' => 'bar.svg' ],
-		'coffee'     => [ 'label' => 'Coffee Maker',      'icon' => 'coffee-shop.svg' ],
-		'smoke-free' => [ 'label' => 'Non-Smoking',       'icon' => 'smoke-free.svg' ],
-	];
+	$dynamic = get_option( 'cwc_dynamic_amenities', [] );
+	
+	// Default starting list (if nothing is saved in DB yet)
+	if ( empty( $dynamic ) ) {
+		$catalogue = [
+			'wifi'       => [ 'label' => 'Free Wi-Fi',        'icon' => 'wifi' ],
+			'parking'    => [ 'label' => 'Free Parking',      'icon' => 'parking' ],
+			'pool'       => [ 'label' => 'Pool Access',       'icon' => 'pool' ],
+			'air'        => [ 'label' => 'Air Conditioning',  'icon' => 'air' ],
+			'garden'     => [ 'label' => 'Garden View',       'icon' => 'garden' ],
+			'bar'        => [ 'label' => 'Mini Bar',          'icon' => 'bar' ],
+			'coffee'     => [ 'label' => 'Coffee Maker',      'icon' => 'coffee' ],
+			'smoke-free' => [ 'label' => 'Non-Smoking',       'icon' => 'smoke-free' ],
+		];
+	} else {
+		$catalogue = $dynamic;
+	}
 
 	/**
 	 * Filter the room amenity catalogue.
@@ -354,19 +361,29 @@ function cwc_amenity_catalogue() {
  * @return array<string,array{label:string,icon:string}>
  */
 function cwc_policy_icon_catalogue() {
-	$catalogue = [
-		'check-in'   => [ 'label' => 'Check-in',        'icon' => 'check-in.svg' ],
-		'check-out'  => [ 'label' => 'Check-out',       'icon' => 'checkout.svg' ],
-		'breakfast'  => [ 'label' => 'Breakfast',       'icon' => 'breakfast.svg' ],
-		'reception'  => [ 'label' => 'Reception Hours', 'icon' => 'reception-hours.svg' ],
-		'children'   => [ 'label' => 'Children & Beds', 'icon' => 'children-beds.svg' ],
-		'no-age'     => [ 'label' => 'Age Restriction', 'icon' => 'age-restriction.svg' ],
-		'smoking'    => [ 'label' => 'Smoking',         'icon' => 'no-smoking.svg' ],
-		'smoke-free' => [ 'label' => 'Non-Smoking',     'icon' => 'smoke-free.svg' ],
-		'wifi'       => [ 'label' => 'Wi-Fi',           'icon' => 'free-wifi.svg' ],
-		'parking'    => [ 'label' => 'Parking',         'icon' => 'free-parking.svg' ],
-		'pool'       => [ 'label' => 'Pool',            'icon' => 'swimming-pool.svg' ],
-	];
+	$pool = get_option( 'cwc_icon_pool', [] );
+	
+	// If pool is empty, provide the legacy slugs as the starting point
+	if ( empty( $pool ) ) {
+		$catalogue = [
+			'check-in'   => [ 'label' => 'Check-in',        'icon' => 'check-in' ],
+			'check-out'  => [ 'label' => 'Check-out',       'icon' => 'check-out' ],
+			'breakfast'  => [ 'label' => 'Breakfast',       'icon' => 'breakfast' ],
+			'reception'  => [ 'label' => 'Reception Hours', 'icon' => 'reception' ],
+			'children'   => [ 'label' => 'Children & Beds', 'icon' => 'children' ],
+			'no-age'     => [ 'label' => 'Age Restriction', 'icon' => 'no-age' ],
+			'smoking'    => [ 'label' => 'Smoking',         'icon' => 'smoking' ],
+			'smoke-free' => [ 'label' => 'Non-Smoking',     'icon' => 'smoke-free' ],
+			'wifi'       => [ 'label' => 'Wi-Fi',           'icon' => 'wifi' ],
+			'parking'    => [ 'label' => 'Parking',         'icon' => 'parking' ],
+			'pool'       => [ 'label' => 'Pool',            'icon' => 'pool' ],
+		];
+	} else {
+		$catalogue = [];
+		foreach ( $pool as $slug => $val ) {
+			$catalogue[ $slug ] = [ 'label' => ucfirst( str_replace( '-', ' ', $slug ) ), 'icon' => $slug ];
+		}
+	}
 
 	/**
 	 * Filter the policy icon catalogue.
@@ -402,10 +419,38 @@ function cwc_icon_url_for_slug( $slug ) {
 		return '';
 	}
 
-	$amenities = cwc_amenity_catalogue();
-	$policies  = cwc_policy_icon_catalogue();
+	// 1. Check Dynamic Icon Pool
+	$pool = get_option( 'cwc_icon_pool', [] );
+	if ( isset( $pool[ $slug ] ) ) {
+		$val = $pool[ $slug ];
+		// Case A: Media ID (Numeric)
+		if ( is_numeric( $val ) ) {
+			return wp_get_attachment_url( (int) $val );
+		}
+		// Case B: Filename (String)
+		return get_stylesheet_directory_uri() . '/assets/images/' . rawurlencode( $val );
+	}
 
-	$file = $amenities[ $slug ]['icon'] ?? ( $policies[ $slug ]['icon'] ?? '' );
+	// 2. Fallback to hardcoded legacy filenames for backward compatibility
+	$legacy_map = [
+		'wifi'       => 'free-wifi.svg',
+		'parking'    => 'free-parking.svg',
+		'pool'       => 'swimming-pool.svg',
+		'air'        => 'air-conditioning.svg',
+		'garden'     => 'garden&terrace.svg',
+		'bar'        => 'bar.svg',
+		'coffee'     => 'coffee-shop.svg',
+		'smoke-free' => 'smoke-free.svg',
+		'check-in'   => 'check-in.svg',
+		'check-out'  => 'checkout.svg',
+		'breakfast'  => 'breakfast.svg',
+		'reception'  => 'reception-hours.svg',
+		'children'   => 'children-beds.svg',
+		'no-age'     => 'age-restriction.svg',
+		'smoking'    => 'no-smoking.svg',
+	];
+
+	$file = $legacy_map[ $slug ] ?? '';
 	if ( '' === $file ) {
 		return '';
 	}
@@ -475,7 +520,7 @@ function cwc_accommodation_amenities( $post_id ) {
 	foreach ( $slugs as $slug ) {
 		if ( isset( $catalogue[ $slug ] ) ) {
 			$out[] = [
-				'icon'  => $slug,
+				'icon'  => $catalogue[ $slug ]['icon'] ?? '',
 				'label' => $catalogue[ $slug ]['label'],
 			];
 		}

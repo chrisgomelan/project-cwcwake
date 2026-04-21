@@ -1,0 +1,254 @@
+<?php
+/**
+ * CWC Wake — Accommodations Settings Hub.
+ *
+ * Manages the shared Icon Library and the Dynamic Amenities list.
+ *
+ * @package CWC_Accommodations
+ * @since   1.1.0
+ */
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
+/**
+ * Register the Settings Hub submenu.
+ */
+function cwc_register_accommodations_settings_menu() {
+	add_submenu_page(
+		'edit.php?post_type=accommodation',
+		__( 'Amenities & Icons', 'cwc-accommodations' ),
+		__( 'Amenities & Icons', 'cwc-accommodations' ),
+		'manage_options',
+		'cwc-amenity-settings',
+		'cwc_render_accommodations_settings_page'
+	);
+}
+add_action( 'admin_menu', 'cwc_register_accommodations_settings_menu' );
+
+/**
+ * Handle saving of Amenities and Icon Pool.
+ */
+function cwc_handle_accommodations_settings_save() {
+	if ( ! current_user_can( 'manage_options' ) ) {
+		wp_die( esc_html__( 'Unauthorized.', 'cwc-accommodations' ) );
+	}
+
+	check_admin_referer( 'cwc_acc_settings_save', 'cwc_acc_settings_nonce' );
+
+	// 1. Save Icon Pool
+	$pool = [];
+	if ( isset( $_POST['icon_pool'] ) && is_array( $_POST['icon_pool'] ) ) {
+		foreach ( $_POST['icon_pool'] as $row ) {
+			$slug = sanitize_key( $row['slug'] ?? '' );
+			$val  = sanitize_text_field( $row['value'] ?? '' );
+			if ( $slug && $val ) {
+				$pool[ $slug ] = $val;
+			}
+		}
+	}
+	update_option( 'cwc_icon_pool', $pool );
+
+	// 2. Save Amenities
+	$amenities = [];
+	if ( isset( $_POST['amenities'] ) && is_array( $_POST['amenities'] ) ) {
+		foreach ( $_POST['amenities'] as $row ) {
+			$slug  = sanitize_key( $row['slug'] ?? '' );
+			$label = sanitize_text_field( $row['label'] ?? '' );
+			$icon  = sanitize_key( $row['icon'] ?? '' );
+			if ( $slug && $label ) {
+				$amenities[ $slug ] = [ 'label' => $label, 'icon' => $icon ];
+			}
+		}
+	}
+	update_option( 'cwc_dynamic_amenities', $amenities );
+
+	wp_safe_redirect( add_query_arg( [ 'post_type' => 'accommodation', 'page' => 'cwc-amenity-settings', 'updated' => '1' ], admin_url( 'edit.php' ) ) );
+	exit;
+}
+add_action( 'admin_post_cwc_acc_settings_save', 'cwc_handle_accommodations_settings_save' );
+
+/**
+ * Render the settings page.
+ */
+function cwc_render_accommodations_settings_page() {
+	wp_enqueue_media();
+	$pool      = get_option( 'cwc_icon_pool', [] );
+	$amenities = get_option( 'cwc_dynamic_amenities', [] );
+	$updated   = isset( $_GET['updated'] );
+
+	// Ensure legacy icons are visible in the pool if it's empty
+	if ( empty( $pool ) ) {
+		$pool = [
+			'wifi' => 'free-wifi.svg', 'parking' => 'free-parking.svg', 'pool' => 'swimming-pool.svg',
+			'air' => 'air-conditioning.svg', 'garden' => 'garden&terrace.svg', 'bar' => 'bar.svg',
+			'coffee' => 'coffee-shop.svg', 'smoke-free' => 'smoke-free.svg'
+		];
+	}
+	?>
+	<div class="wrap">
+		<h1><?php esc_html_e( 'Amenities & Icon Library', 'cwc-accommodations' ); ?></h1>
+
+		<?php if ( $updated ) : ?>
+			<div class="notice notice-success is-dismissible"><p><?php esc_html_e( 'Settings saved.', 'cwc-accommodations' ); ?></p></div>
+		<?php endif; ?>
+
+		<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
+			<input type="hidden" name="action" value="cwc_acc_settings_save" />
+			<?php wp_nonce_field( 'cwc_acc_settings_save', 'cwc_acc_settings_nonce' ); ?>
+
+			<h2><?php esc_html_e( '1. Icon Library (The Pool)', 'cwc-accommodations' ); ?></h2>
+			<p class="description"><?php esc_html_e( 'Define slugs and upload SVGs here. These icons can then be used for both Amenities and Policies.', 'cwc-accommodations' ); ?></p>
+			
+			<div id="cwc-icon-pool-rows" style="display:flex;flex-direction:column;gap:.5rem;margin:1rem 0;">
+				<?php $i = 0; foreach ( $pool as $slug => $val ) : 
+					$icon_url = is_numeric($val) ? wp_get_attachment_url($val) : (get_stylesheet_directory_uri() . '/assets/images/' . $val);
+				?>
+					<div class="cwc-row" style="display:grid;grid-template-columns:150px 60px 1fr 100px 50px;gap:1rem;background:#fff;padding:.5rem;border:1px solid #ccd0d4;align-items:center;">
+						<input type="text" name="icon_pool[<?php echo $i; ?>][slug]" value="<?php echo esc_attr( $slug ); ?>" placeholder="slug" class="widefat" />
+						<div class="cwc-preview-box" style="width:40px;height:40px;background:#f0f0f1;display:flex;align-items:center;justify-content:center;border:1px solid #dcdcde;border-radius:4px;">
+							<img src="<?php echo esc_url($icon_url); ?>" style="max-width:24px;max-height:24px;display:block;" />
+						</div>
+						<span class="description" style="font-family:monospace;"><?php echo esc_html( is_numeric($val) ? "ID: $val" : $val ); ?></span>
+						<input type="hidden" name="icon_pool[<?php echo $i; ?>][value]" value="<?php echo esc_attr( $val ); ?>" class="cwc-icon-val" />
+						<button type="button" class="button cwc-icon-pick"><?php esc_html_e( 'Change', 'cwc-accommodations' ); ?></button>
+						<button type="button" class="button-link-delete cwc-remove-row">×</button>
+					</div>
+				<?php $i++; endforeach; ?>
+			</div>
+			<button type="button" class="button" id="cwc-add-icon"><?php esc_html_e( '+ Add Icon to Pool', 'cwc-accommodations' ); ?></button>
+
+			<hr style="margin:2rem 0;" />
+
+			<h2><?php esc_html_e( '2. Amenities Catalogue', 'cwc-accommodations' ); ?></h2>
+			<p class="description"><?php esc_html_e( 'Manage the list of amenities that appear as checkboxes on the Room editor.', 'cwc-accommodations' ); ?></p>
+
+			<div id="cwc-amenity-rows" style="display:flex;flex-direction:column;gap:.5rem;margin:1rem 0;">
+				<?php $j = 0; foreach ( $amenities as $slug => $data ) : ?>
+					<div class="cwc-row" style="display:grid;grid-template-columns:150px 1fr 150px 50px;gap:1rem;background:#fff;padding:.5rem;border:1px solid #ccd0d4;align-items:center;">
+						<input type="text" name="amenities[<?php echo $j; ?>][slug]" value="<?php echo esc_attr( $slug ); ?>" placeholder="slug" class="widefat" />
+						<input type="text" name="amenities[<?php echo $j; ?>][label]" value="<?php echo esc_attr( $data['label'] ); ?>" placeholder="Label (e.g. Free WiFi)" class="widefat" />
+						<select name="amenities[<?php echo $j; ?>][icon]" class="widefat">
+							<?php foreach ( $pool as $p_slug => $p_val ) : ?>
+								<option value="<?php echo esc_attr( $p_slug ); ?>" <?php selected( $data['icon'], $p_slug ); ?>><?php echo esc_html( $p_slug ); ?></option>
+							<?php endforeach; ?>
+						</select>
+						<button type="button" class="button-link-delete cwc-remove-row">×</button>
+					</div>
+				<?php $j++; endforeach; ?>
+			</div>
+			<button type="button" class="button" id="cwc-add-amenity"><?php esc_html_e( '+ Add Amenity', 'cwc-accommodations' ); ?></button>
+
+			<div style="margin-top:2rem;">
+				<?php submit_button(); ?>
+			</div>
+		</form>
+
+		<script>
+		( function () {
+			let frame;
+			let activeBtn;
+
+			// Event delegation for "Change" / "Pick Icon" buttons
+			document.addEventListener( 'click', ( event ) => {
+				const target = event.target;
+				if ( ! target.matches( '.cwc-icon-pick' ) ) {
+					return;
+				}
+
+				event.preventDefault();
+				activeBtn = target;
+
+				if ( frame ) {
+					frame.open();
+					return;
+				}
+
+				frame = wp.media( {
+					title: <?php echo wp_json_encode( __( 'Select Icon', 'cwc-accommodations' ) ); ?>,
+					button: { text: <?php echo wp_json_encode( __( 'Use Icon', 'cwc-accommodations' ) ); ?> },
+					multiple: false,
+				} );
+
+				frame.on( 'select', () => {
+					const attachment = frame.state().get( 'selection' ).first().toJSON();
+					const $row      = activeBtn.closest( '.cwc-row' );
+					const $input    = $row.querySelector( '.cwc-icon-val' );
+					const $preview  = $row.querySelector( '.cwc-preview-box' );
+					const $desc     = $row.querySelector( 'span.description' );
+
+					if ( $input ) {
+						$input.value = attachment.id;
+					}
+					if ( $preview ) {
+						$preview.innerHTML = `<img src="${attachment.url}" style="max-width:24px;max-height:24px;display:block;" />`;
+					}
+					if ( $desc ) {
+						$desc.textContent = `ID: ${attachment.id}`;
+					}
+				} );
+
+				frame.open();
+			} );
+
+			// Add Icon to Pool
+			const addIconBtn = document.getElementById( 'cwc-add-icon' );
+			if ( addIconBtn ) {
+				addIconBtn.addEventListener( 'click', () => {
+					const list    = document.getElementById( 'cwc-icon-pool-rows' );
+					const counter = list.querySelectorAll( '.cwc-row' ).length;
+					const wrapper = document.createElement( 'div' );
+					
+					wrapper.className = 'cwc-row';
+					wrapper.style.cssText = 'display:grid;grid-template-columns:150px 60px 1fr 100px 50px;gap:1rem;background:#fff;padding:.5rem;border:1px solid #ccd0d4;align-items:center;';
+					wrapper.innerHTML = `
+						<input type="text" name="icon_pool[${counter}][slug]" placeholder="slug" class="widefat" />
+						<div class="cwc-preview-box" style="width:40px;height:40px;background:#f0f0f1;display:flex;align-items:center;justify-content:center;border:1px solid #dcdcde;border-radius:4px;"></div>
+						<span class="description" style="font-family:monospace;">New Icon</span>
+						<input type="hidden" name="icon_pool[${counter}][value]" class="cwc-icon-val" />
+						<button type="button" class="button cwc-icon-pick">Pick Icon</button>
+						<button type="button" class="button-link-delete cwc-remove-row">×</button>
+					`;
+					list.appendChild( wrapper );
+				} );
+			}
+
+			// Add Amenity
+			const addAmenityBtn = document.getElementById( 'cwc-add-amenity' );
+			if ( addAmenityBtn ) {
+				addAmenityBtn.addEventListener( 'click', () => {
+					const list    = document.getElementById( 'cwc-amenity-rows' );
+					const counter = list.querySelectorAll( '.cwc-row' ).length;
+					const pool    = document.querySelectorAll( '#cwc-icon-pool-rows input[name*="[slug]"]' );
+					
+					let options = '';
+					pool.forEach( ( input ) => {
+						const slug = input.value;
+						if ( slug ) options += `<option value="${slug}">${slug}</option>`;
+					} );
+
+					const wrapper = document.createElement( 'div' );
+					wrapper.className = 'cwc-row';
+					wrapper.style.cssText = 'display:grid;grid-template-columns:150px 1fr 150px 50px;gap:1rem;background:#fff;padding:.5rem;border:1px solid #ccd0d4;align-items:center;';
+					wrapper.innerHTML = `
+						<input type="text" name="amenities[${counter}][slug]" placeholder="slug" class="widefat" />
+						<input type="text" name="amenities[${counter}][label]" placeholder="Label" class="widefat" />
+						<select name="amenities[${counter}][icon]" class="widefat">${options}</select>
+						<button type="button" class="button-link-delete cwc-remove-row">×</button>
+					`;
+					list.appendChild( wrapper );
+				} );
+			}
+
+			// Remove Row
+			document.addEventListener( 'click', ( event ) => {
+				if ( event.target.matches( '.cwc-remove-row' ) ) {
+					event.target.closest( '.cwc-row' )?.remove();
+				}
+			} );
+		} )();
+		</script>
+	</div>
+	<?php
+}
