@@ -34,7 +34,7 @@ $show_standard_grid = ! isset( $attributes['showStandardGrid'] ) || (bool) $attr
 $standard_limit     = isset( $attributes['standardLimit'] ) ? (int) $attributes['standardLimit'] : 0;
 $count_mode         = isset( $attributes['countMode'] ) ? (string) $attributes['countMode'] : 'auto';
 $show_more_section  = ! empty( $attributes['showMoreSection'] );
-$more_title         = isset( $attributes['moreTitle'] ) ? (string) $attributes['moreTitle'] : 'MORE ALBUMS';
+$more_title         = isset( $attributes['moreTitle'] ) ? (string) $attributes['moreTitle'] : '';
 $more_limit         = isset( $attributes['moreLimit'] ) ? (int) $attributes['moreLimit'] : 2;
 $more_order_by      = isset( $attributes['moreOrderBy'] ) ? (string) $attributes['moreOrderBy'] : 'latest';
 
@@ -49,7 +49,12 @@ if ( -1 === $parent_id && is_singular( 'cwc_album' ) ) {
 
 $albums = cwc_album_get_children( $parent_id );
 
-if ( empty( $albums ) ) {
+/*
+ * We only return early if we have no albums at all to show in either section.
+ * However, we want to allow the "More Section" to fetch from elsewhere if
+ * it's meant to be global.
+ */
+if ( empty( $albums ) && ! $show_more_section ) {
 	return;
 }
 
@@ -136,26 +141,26 @@ $more_ids = [];
 if ( $show_more_section && $more_limit > 0 ) {
 	switch ( $more_order_by ) {
 		case 'random':
-			$pool = $albums;
+			$pool = ! empty( $albums ) ? $albums : cwc_album_get_children( 0 );
 			shuffle( $pool );
 			$more_ids = array_slice( wp_list_pluck( $pool, 'ID' ), 0, $more_limit );
 			break;
 
 		case 'menu_order':
-			// Already ordered by menu_order in cwc_album_get_children().
-			$more_ids = array_slice( wp_list_pluck( $albums, 'ID' ), 0, $more_limit );
+			$pool = ! empty( $albums ) ? $albums : cwc_album_get_children( 0 );
+			$more_ids = array_slice( wp_list_pluck( $pool, 'ID' ), 0, $more_limit );
 			break;
 
 		case 'latest':
 		default:
-			$by_date = $albums;
+			$pool = ! empty( $albums ) ? $albums : cwc_album_get_children( 0 );
 			usort(
-				$by_date,
+				$pool,
 				static function ( $a, $b ) {
 					return strtotime( $b->post_date ) <=> strtotime( $a->post_date );
 				}
 			);
-			$more_ids = array_slice( wp_list_pluck( $by_date, 'ID' ), 0, $more_limit );
+			$more_ids = array_slice( wp_list_pluck( $pool, 'ID' ), 0, $more_limit );
 			break;
 	}
 }
@@ -175,10 +180,24 @@ if ( $standard_limit > 0 ) {
 
 $more_pool = [];
 if ( ! empty( $more_ids ) ) {
+	$current_root_id = 0;
+	if ( is_singular( 'cwc_album' ) ) {
+		$ancestors = get_post_ancestors( get_the_ID() );
+		if ( ! empty( $ancestors ) ) {
+			$current_root_id = (int) end( $ancestors );
+		} else {
+			$current_root_id = (int) get_the_ID();
+		}
+	}
+
+	$all_possible = ! empty( $albums ) ? $albums : cwc_album_get_children( 0 );
 	$more_pool = array_values(
 		array_filter(
-			$albums,
-			static function ( $album ) use ( $more_ids ) {
+			$all_possible,
+			static function ( $album ) use ( $more_ids, $current_root_id ) {
+				if ( (int) $album->ID === $current_root_id ) {
+					return false;
+				}
 				return in_array( (int) $album->ID, $more_ids, true );
 			}
 		)
@@ -198,8 +217,9 @@ $wrapper_attrs = get_block_wrapper_attributes( [ 'class' => 'cwc-albums' ] );
 	<?php if ( $show_standard_grid && ! empty( $standard_pool ) ) : ?>
 		<ul class="cwc-albums__grid">
 			<?php foreach ( $standard_pool as $album ) :
-				$cover = cwc_album_cover_url( $album, 'large' );
-				$label = cwc_album_card_count_label( $album, $count_mode );
+				$is_single = ( 1 === count( $standard_pool ) );
+				$cover     = cwc_album_cover_url( $album, $is_single ? 'full' : 'large' );
+				$label     = cwc_album_card_count_label( $album, $count_mode );
 				$href  = get_permalink( $album );
 				$title = get_the_title( $album );
 			?>

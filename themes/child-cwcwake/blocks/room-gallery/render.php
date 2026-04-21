@@ -14,17 +14,17 @@
  * @since   1.0.0
  */
 
-if ( ! defined( 'ABSPATH' ) ) {
+if (!defined('ABSPATH')) {
 	exit;
 }
 
-$images          = isset( $attributes['images'] ) && is_array( $attributes['images'] ) ? $attributes['images'] : [];
-$back_link_label = isset( $attributes['backLinkLabel'] ) ? (string) $attributes['backLinkLabel'] : '';
-$back_link_url   = isset( $attributes['backLinkUrl'] ) ? (string) $attributes['backLinkUrl'] : '';
-$see_all_label   = isset( $attributes['seeAllLabel'] ) ? (string) $attributes['seeAllLabel'] : '';
-$see_all_url     = isset( $attributes['seeAllUrl'] ) ? (string) $attributes['seeAllUrl'] : '';
+$images = isset($attributes['images']) && is_array($attributes['images']) ? $attributes['images'] : [];
+$back_link_label = isset($attributes['backLinkLabel']) ? (string) $attributes['backLinkLabel'] : '';
+$back_link_url = isset($attributes['backLinkUrl']) ? (string) $attributes['backLinkUrl'] : '';
+$see_all_label = isset($attributes['seeAllLabel']) ? (string) $attributes['seeAllLabel'] : '';
+$see_all_url = isset($attributes['seeAllUrl']) ? (string) $attributes['seeAllUrl'] : '';
 
-if ( empty( $images ) ) {
+if (empty($images)) {
 	return;
 }
 
@@ -32,9 +32,9 @@ if ( empty( $images ) ) {
  * The grid expects exactly 4 image slots; pad with empty entries so the
  * skeleton still renders if the editor supplies fewer images.
  */
-$slots = array_pad( array_slice( $images, 0, 4 ), 4, '' );
+$slots = array_pad(array_slice($images, 0, 4), 4, '');
 
-$wrapper_attrs = get_block_wrapper_attributes( [ 'class' => 'cwc-room-gallery' ] );
+$wrapper_attrs = get_block_wrapper_attributes(['class' => 'cwc-room-gallery']);
 
 $see_all_icon_src = get_stylesheet_directory_uri() . '/assets/images/see-all-images.svg';
 
@@ -49,11 +49,11 @@ $see_all_icon_src = get_stylesheet_directory_uri() . '/assets/images/see-all-ima
  * @param mixed $slot Image slot value.
  * @return array{url:string,alt:string}
  */
-$resolve_slot = static function ( $slot ): array {
-	if ( is_array( $slot ) ) {
+$resolve_slot = static function ($slot): array {
+	if (is_array($slot)) {
 		return [
-			'url' => isset( $slot['url'] ) ? (string) $slot['url'] : '',
-			'alt' => isset( $slot['alt'] ) ? (string) $slot['alt'] : '',
+			'url' => isset($slot['url']) ? (string) $slot['url'] : '',
+			'alt' => isset($slot['alt']) ? (string) $slot['alt'] : '',
 		];
 	}
 
@@ -64,43 +64,41 @@ $resolve_slot = static function ( $slot ): array {
 };
 ?>
 <section <?php echo $wrapper_attrs; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
-	<?php if ( $back_link_label !== '' && $back_link_url !== '' ) : ?>
+	<?php if ($back_link_label !== '' && $back_link_url !== ''): ?>
 		<div class="cwc-room-gallery__back">
-			<a class="cwc-room-gallery__back-link" href="<?php echo esc_url( $back_link_url ); ?>">
+			<a class="cwc-room-gallery__back-link" href="<?php echo esc_url($back_link_url); ?>">
 				<span aria-hidden="true">&larr;</span>
-				<span><?php echo esc_html( $back_link_label ); ?></span>
+				<span><?php echo esc_html($back_link_label); ?></span>
 			</a>
 		</div>
 	<?php endif; ?>
 
 	<div class="cwc-room-gallery__grid">
 		<?php
-		$positions = [ 'main', 'center', 'top', 'bottom' ];
-		foreach ( $positions as $index => $position ) :
-			$slot = $resolve_slot( $slots[ $index ] );
-			if ( $slot['url'] === '' ) {
+		$positions = ['main', 'center', 'top', 'bottom'];
+		foreach ($positions as $index => $position):
+			$slot = $resolve_slot($slots[$index]);
+			if ($slot['url'] === '') {
 				continue;
 			}
 			$tile_class = 'cwc-room-gallery__tile cwc-room-gallery__tile--' . $position;
 			?>
-			<figure class="<?php echo esc_attr( $tile_class ); ?>">
-				<img
-					class="cwc-room-gallery__image"
-					src="<?php echo esc_url( $slot['url'] ); ?>"
-					alt="<?php echo esc_attr( $slot['alt'] ); ?>"
-					loading="lazy"
-				/>
+			<figure class="<?php echo esc_attr($tile_class); ?>">
+				<img class="cwc-room-gallery__image" src="<?php echo esc_url($slot['url']); ?>"
+					alt="<?php echo esc_attr($slot['alt']); ?>" loading="lazy" />
 
-				<?php if ( $position === 'main' && $see_all_label !== '' ) : ?>
-					<?php if ( $see_all_url !== '' ) : ?>
-						<a class="cwc-room-gallery__see-all" href="<?php echo esc_url( $see_all_url ); ?>">
-							<img class="cwc-room-gallery__see-all-icon" src="<?php echo esc_url( $see_all_icon_src ); ?>" alt="" width="18" height="18" loading="lazy" decoding="async" aria-hidden="true" />
-							<span><?php echo esc_html( $see_all_label ); ?></span>
+				<?php if ($position === 'main' && $see_all_label !== ''): ?>
+					<?php if ($see_all_url !== ''): ?>
+						<a class="cwc-room-gallery__see-all" href="<?php echo esc_url($see_all_url); ?>">
+							<img class="cwc-room-gallery__see-all-icon" src="<?php echo esc_url($see_all_icon_src); ?>" alt=""
+								width="18" height="18" loading="lazy" decoding="async" aria-hidden="true" />
+							<span><?php echo esc_html($see_all_label); ?></span>
 						</a>
-					<?php else : ?>
+					<?php else: ?>
 						<span class="cwc-room-gallery__see-all" aria-hidden="true">
-							<img class="cwc-room-gallery__see-all-icon" src="<?php echo esc_url( $see_all_icon_src ); ?>" alt="" width="18" height="18" loading="lazy" decoding="async" />
-							<span><?php echo esc_html( $see_all_label ); ?></span>
+							<img class="cwc-room-gallery__see-all-icon" src="<?php echo esc_url($see_all_icon_src); ?>" alt=""
+								width="18" height="18" loading="lazy" decoding="async" />
+							<span><?php echo esc_html($see_all_label); ?></span>
 						</span>
 					<?php endif; ?>
 				<?php endif; ?>

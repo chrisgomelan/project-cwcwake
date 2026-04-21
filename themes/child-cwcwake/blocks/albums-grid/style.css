@@ -18,12 +18,17 @@
  * that has child albums.
  */
 
+:root {
+	--album-card-height: 494px;
+	--album-card-width: 796px;
+}
+
 .cwc-albums {
-	width: 100%;
 	display: flex;
 	flex-direction: column;
 	gap: clamp(2.5rem, 5vw, 5rem);
 	margin-block-start: var(--wp--preset--spacing--40);
+	width: 100%;
 }
 
 /* ----------------------------------------
@@ -32,16 +37,50 @@
 
 .cwc-albums__grid {
 	display: grid;
-	grid-template-columns: repeat(2, 1fr);
 	gap: clamp(1.5rem, 2.5vw, 2.5rem);
+	grid-template-columns: 1fr;
+	list-style: none;
 	margin: 0;
 	padding: 0;
-	list-style: none;
+}
+
+@media (min-width: 1200px) {
+	.cwc-albums__grid {
+		grid-template-columns: repeat(2, 1fr);
+		justify-content: center;
+		width: 100%;
+		max-width: 100%;
+		margin-inline: auto;
+		gap: clamp(1.5rem, 2.5vw, 2.5rem);
+	}
 }
 
 .cwc-albums__item {
 	margin: 0;
+	width: 100%;
 }
+
+@media (min-width: 1200px) {
+	.cwc-albums__item {
+		max-width: var(--album-card-width);
+		width: 100%;
+	}
+
+	.cwc-albums__grid>.cwc-albums__item:only-child {
+		grid-column: 1 / -1;
+		max-width: none;
+		width: 100%;
+	}
+
+	.cwc-albums__grid>.cwc-albums__item:only-child .cwc-albums__media {
+		aspect-ratio: 1622 / 540;
+		height: auto;
+	}
+}
+
+/* ----------------------------------------
+   Single Album Title
+   ---------------------------------------- */
 
 .cwc-albums__card {
 	display: flex;
@@ -82,6 +121,12 @@
 	border-radius: 30px;
 	background: var(--wp--preset--color--surface);
 	transition: transform 0.3s ease;
+}
+
+@media (min-width: 769px) {
+	.cwc-albums__media {
+		height: var(--album-card-height);
+	}
 }
 
 .cwc-albums__img {
@@ -177,15 +222,25 @@
    MORE ALBUMS — featured wide cards
    ---------------------------------------- */
 
+.cwc-albums,
 .cwc-albums__more {
 	display: flex;
 	flex-direction: column;
 	gap: clamp(1.5rem, 3vw, 3rem);
-	width: 100%;
+	width: 100% !important;
+	max-width: none !important;
+	margin-top: 0 !important;
+}
+
+.cwc-albums__more-section {
+	margin: 0 !important;
+	padding: 0 !important;
+	width: 100% !important;
+	max-width: none !important;
 }
 
 .cwc-albums__more-title {
-	margin: 0;
+	margin: 0 !important;
 	font-family: 'Sora', system-ui, sans-serif;
 	font-weight: 700;
 	font-size: clamp(2.25rem, 5vw, 4rem);
@@ -196,12 +251,14 @@
 }
 
 .cwc-albums__featured-list {
-	margin: 0;
+	margin: 0 !important;
 	padding: 0;
 	list-style: none;
 	display: flex;
 	flex-direction: column;
 	gap: clamp(1.5rem, 2.5vw, 2.5rem);
+	width: 100% !important;
+	max-width: none !important;
 }
 
 .cwc-albums__featured-item {
@@ -291,10 +348,6 @@
    ---------------------------------------- */
 
 @media (max-width: 768px) {
-	.cwc-albums__grid {
-		grid-template-columns: 1fr;
-	}
-
 	.cwc-albums__featured-card {
 		aspect-ratio: 16 / 10;
 	}
@@ -302,4 +355,94 @@
 	.cwc-albums__meta {
 		flex-wrap: wrap;
 	}
+}
+
+/* ----------------------------------------
+   Block Gallery Overrides — make editor galleries match the grid design
+   ---------------------------------------- */
+
+.cwc-tropical-section .wp-block-gallery.has-nested-images {
+	display: grid !important;
+	gap: clamp(1.5rem, 2.5vw, 2.5rem) !important;
+	grid-template-columns: 1fr !important;
+	margin-block: var(--wp--preset--spacing--40) !important;
+}
+
+@media (min-width: 1200px) {
+	.cwc-tropical-section .wp-block-gallery.has-nested-images {
+		grid-template-columns: repeat(2, 1fr) !important;
+		justify-content: center !important;
+		max-width: 1717px !important;
+		margin-inline: auto !important;
+	}
+
+	.cwc-tropical-section .wp-block-gallery.has-nested-images .wp-block-image {
+		max-width: var(--album-card-width) !important;
+		width: 100% !important;
+	}
+}
+
+.cwc-tropical-section .wp-block-gallery .wp-block-image {
+	margin: 0 !important;
+	width: 100% !important;
+}
+
+.cwc-tropical-section .wp-block-gallery .wp-block-image img {
+	aspect-ratio: 796 / 494;
+	border-radius: 0 !important;
+	height: auto;
+	object-fit: cover;
+	width: 100%;
+}
+
+/* Specific override for individual album photos to match the 828x536 landing spec */
+.single-cwc_album .wp-block-gallery .wp-block-image img {
+	aspect-ratio: 828 / 536 !important;
+	border-radius: 0 !important;
+}
+
+@media (min-width: 769px) {
+	.cwc-tropical-section .wp-block-gallery .wp-block-image img {
+		height: var(--album-card-height);
+	}
+}
+
+/* Add the 10% black overlay and corner brackets to gallery images */
+.cwc-tropical-section .wp-block-gallery .wp-block-image {
+	position: relative;
+	--corner-size: clamp(20px, 2.5vw, 30px);
+	--corner-thickness: 2px;
+	--corner-color: rgba(255, 255, 255, 0.8);
+}
+
+.cwc-tropical-section .wp-block-gallery .wp-block-image::after {
+	background: rgba(0, 0, 0, 0.1);
+	border-radius: 0 !important;
+	content: "";
+	inset: 0;
+	pointer-events: none;
+	position: absolute;
+	z-index: 1;
+}
+
+.cwc-tropical-section .wp-block-gallery .wp-block-image::before {
+	content: "";
+	inset: clamp(0.75rem, 1.5vw, 1.25rem);
+	pointer-events: none;
+	position: absolute;
+	z-index: 2;
+	/* Draw 4 corners using multiple linear gradients */
+	background:
+		/* Top Left */
+		linear-gradient(to right, var(--corner-color) var(--corner-thickness), transparent var(--corner-thickness)) 0 0 / var(--corner-size) var(--corner-thickness) no-repeat,
+		linear-gradient(to bottom, var(--corner-color) var(--corner-thickness), transparent var(--corner-thickness)) 0 0 / var(--corner-thickness) var(--corner-size) no-repeat,
+		/* Top Right */
+		linear-gradient(to left, var(--corner-color) var(--corner-thickness), transparent var(--corner-thickness)) 100% 0 / var(--corner-size) var(--corner-thickness) no-repeat,
+		linear-gradient(to bottom, var(--corner-color) var(--corner-thickness), transparent var(--corner-thickness)) 100% 0 / var(--corner-thickness) var(--corner-size) no-repeat,
+		/* Bottom Left */
+		linear-gradient(to right, var(--corner-color) var(--corner-thickness), transparent var(--corner-thickness)) 0 100% / var(--corner-size) var(--corner-thickness) no-repeat,
+		linear-gradient(to top, var(--corner-color) var(--corner-thickness), transparent var(--corner-thickness)) 0 100% / var(--corner-thickness) var(--corner-size) no-repeat,
+		/* Bottom Right */
+		linear-gradient(to left, var(--corner-color) var(--corner-thickness), transparent var(--corner-thickness)) 100% 100% / var(--corner-size) var(--corner-thickness) no-repeat,
+		linear-gradient(to top, var(--corner-color) var(--corner-thickness), transparent var(--corner-thickness)) 100% 100% / var(--corner-thickness) var(--corner-size) no-repeat;
 }

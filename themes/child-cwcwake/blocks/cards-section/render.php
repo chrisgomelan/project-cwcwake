@@ -20,10 +20,10 @@ if (!defined('ABSPATH')) {
 	exit;
 }
 
-$variant           = (isset($attributes['variant']) && $attributes['variant'] === 'overlay') ? 'overlay' : 'detailed';
-$heading_primary   = isset($attributes['headingPrimary']) ? trim((string) $attributes['headingPrimary']) : '';
+$variant = (isset($attributes['variant']) && $attributes['variant'] === 'overlay') ? 'overlay' : 'detailed';
+$heading_primary = isset($attributes['headingPrimary']) ? trim((string) $attributes['headingPrimary']) : '';
 $heading_secondary = isset($attributes['headingSecondary']) ? trim((string) $attributes['headingSecondary']) : '';
-$items             = isset($attributes['items']) && is_array($attributes['items']) ? $attributes['items'] : [];
+$items = isset($attributes['items']) && is_array($attributes['items']) ? $attributes['items'] : [];
 
 if (empty($items)) {
 	return;
@@ -36,12 +36,12 @@ $wrapper_attrs = get_block_wrapper_attributes([
 $person_icon = '<svg class="cwc-cards-section__icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg>';
 ?>
 <section <?php echo $wrapper_attrs; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
-	<?php if ($heading_primary !== '' || $heading_secondary !== '') : ?>
+	<?php if ($heading_primary !== '' || $heading_secondary !== ''): ?>
 		<h2 class="cwc-cards-section__heading">
-			<?php if ($heading_primary !== '') : ?>
+			<?php if ($heading_primary !== ''): ?>
 				<em class="cwc-cards-section__heading-primary"><?php echo esc_html($heading_primary); ?></em>
 			<?php endif; ?>
-			<?php if ($heading_secondary !== '') : ?>
+			<?php if ($heading_secondary !== ''): ?>
 				<em class="cwc-cards-section__heading-secondary"> <?php echo esc_html($heading_secondary); ?></em>
 			<?php endif; ?>
 		</h2>
@@ -54,33 +54,34 @@ $person_icon = '<svg class="cwc-cards-section__icon" xmlns="http://www.w3.org/20
 				continue;
 			}
 
-			$title       = isset($item['title']) ? (string) $item['title'] : '';
-			$image       = isset($item['image']) ? (string) $item['image'] : '';
+			$title = isset($item['title']) ? (string) $item['title'] : '';
+			$image = isset($item['image']) ? (string) $item['image'] : '';
 			$default_span = ($variant === 'detailed') ? 3 : 6;
-			$span_raw    = isset($item['span']) ? (int) $item['span'] : $default_span;
-			$span        = max(1, min(12, $span_raw));
-			$url         = isset($item['url']) ? (string) $item['url'] : '';
-			$price       = isset($item['price']) ? (string) $item['price'] : '';
-			$capacity    = isset($item['capacity']) ? (string) $item['capacity'] : '';
-			$btn_label   = isset($item['buttonLabel']) ? (string) $item['buttonLabel'] : '';
-			$btn_url     = isset($item['buttonUrl']) ? (string) $item['buttonUrl'] : '';
+			$span_raw = isset($item['span']) ? (int) $item['span'] : $default_span;
+			$span = max(1, min(12, $span_raw));
+			$url = isset($item['url']) ? (string) $item['url'] : '';
+			$price = isset($item['price']) ? (string) $item['price'] : '';
+			$capacity = isset($item['capacity']) ? (string) $item['capacity'] : '';
+			$btn_label = isset($item['buttonLabel']) ? (string) $item['buttonLabel'] : '';
+			$btn_url = isset($item['buttonUrl']) ? (string) $item['buttonUrl'] : '';
 
 			$item_style = sprintf('--cwc-card-span:%d', $span);
 			?>
 			<li class="cwc-cards-section__item" style="<?php echo esc_attr($item_style); ?>">
-				<?php if ($variant === 'detailed') : ?>
+				<?php if ($variant === 'detailed'): ?>
 					<article class="cwc-cards-section__card cwc-cards-section__card--detailed">
-						<?php if ($image !== '') : ?>
-							<div class="cwc-cards-section__card-media" role="img"<?php echo $title !== '' ? ' aria-label="' . esc_attr($title) . '"' : ''; ?> style="background-image:url('<?php echo esc_url($image); ?>');"></div>
+						<?php if ($image !== ''): ?>
+							<div class="cwc-cards-section__card-media" role="img" <?php echo $title !== '' ? ' aria-label="' . esc_attr($title) . '"' : ''; ?> style="background-image:url('<?php echo esc_url($image); ?>');">
+							</div>
 						<?php endif; ?>
 						<div class="cwc-cards-section__card-body">
-							<?php if ($title !== '') : ?>
+							<?php if ($title !== ''): ?>
 								<h3 class="cwc-cards-section__card-title"><?php echo esc_html($title); ?></h3>
 							<?php endif; ?>
-							<?php if ($price !== '') : ?>
+							<?php if ($price !== ''): ?>
 								<p class="cwc-cards-section__card-price"><?php echo esc_html($price); ?></p>
 							<?php endif; ?>
-							<?php if ($capacity !== '') : ?>
+							<?php if ($capacity !== ''): ?>
 								<p class="cwc-cards-section__card-capacity">
 									<?php echo $person_icon; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 									<span><?php echo esc_html($capacity); ?></span>
@@ -104,22 +105,23 @@ $person_icon = '<svg class="cwc-cards-section__icon" xmlns="http://www.w3.org/20
 							?>
 						</div>
 					</article>
-				<?php else : ?>
-					<?php if ($url !== '') : ?>
+				<?php else: ?>
+					<?php if ($url !== ''): ?>
 						<a class="cwc-cards-section__card cwc-cards-section__card--overlay" href="<?php echo esc_url($url); ?>">
-					<?php else : ?>
-						<div class="cwc-cards-section__card cwc-cards-section__card--overlay">
-					<?php endif; ?>
-						<?php if ($image !== '') : ?>
-							<div class="cwc-cards-section__card-media" role="img"<?php echo $title !== '' ? ' aria-label="' . esc_attr($title) . '"' : ''; ?> style="background-image:url('<?php echo esc_url($image); ?>');"></div>
-						<?php endif; ?>
-						<span class="cwc-cards-section__card-dim" aria-hidden="true"></span>
-						<?php if ($title !== '') : ?>
-							<h3 class="cwc-cards-section__card-title"><?php echo esc_html($title); ?></h3>
-						<?php endif; ?>
-					<?php if ($url !== '') : ?>
+						<?php else: ?>
+							<div class="cwc-cards-section__card cwc-cards-section__card--overlay">
+							<?php endif; ?>
+							<?php if ($image !== ''): ?>
+								<div class="cwc-cards-section__card-media" role="img" <?php echo $title !== '' ? ' aria-label="' . esc_attr($title) . '"' : ''; ?> style="background-image:url('<?php echo esc_url($image); ?>');">
+								</div>
+							<?php endif; ?>
+							<span class="cwc-cards-section__card-dim" aria-hidden="true"></span>
+							<?php if ($title !== ''): ?>
+								<h3 class="cwc-cards-section__card-title"><?php echo esc_html($title); ?></h3>
+							<?php endif; ?>
+							<?php if ($url !== ''): ?>
 						</a>
-					<?php else : ?>
+					<?php else: ?>
 						</div>
 					<?php endif; ?>
 				<?php endif; ?>

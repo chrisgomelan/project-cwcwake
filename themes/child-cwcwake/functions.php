@@ -66,6 +66,15 @@ function cwc_enqueue_styles()
 		CWC_VERSION,
 		true
 	);
+
+	// Custom Image Modal — Lightweight native popup slider.
+	wp_enqueue_script(
+		'cwc-image-modal',
+		get_stylesheet_directory_uri() . '/assets/js/image-modal.js',
+		[],
+		CWC_VERSION,
+		true
+	);
 }
 add_action('wp_enqueue_scripts', 'cwc_enqueue_styles');
 
@@ -129,10 +138,10 @@ function cwc_create_initial_pages()
 			'order' => 3,
 			'template' => 'page-accommodations',
 			'children' => [
-				'Villas'  => 'page-room-detail',
-				'Cabanas' => 'page-room-detail',
-				'Dwell'   => 'page-room-detail',
-				'Cabin'   => 'page-room-detail',
+				'Villas' => 'room-detail',
+				'Cabanas' => 'room-detail',
+				'Dwell' => 'room-detail',
+				'Cabin' => 'room-detail',
 			],
 		],
 		'Plan Your Trip' => [
@@ -140,13 +149,13 @@ function cwc_create_initial_pages()
 			'template' => 'page-plan-your-trip',
 			'children' => [
 				'Rates' => 'page-child',
-				'FAQs'  => 'page-child',
+				'FAQs' => 'page-child',
 				'Blogs' => 'page-child',
 				'Gallery' => [
 					'template' => 'page-gallery',
 					'children' => [
-						'Events'         => 'page-child',
-						'Lifestyle'      => 'page-child',
+						'Events' => 'page-child',
+						'Lifestyle' => 'page-child',
 						'Explore CamSur' => 'page-child',
 					],
 				],
@@ -214,25 +223,25 @@ function cwc_seed_child_pages(array $children, $parent_id)
 
 	foreach ($children as $key => $value) {
 		if (is_int($key)) {
-			$title         = $value;
-			$template      = 'page-child';
+			$title = $value;
+			$template = 'page-child';
 			$grandchildren = [];
 		} elseif (is_array($value)) {
-			$title         = $key;
-			$template      = $value['template'] ?? 'page-child';
+			$title = $key;
+			$template = $value['template'] ?? 'page-child';
 			$grandchildren = $value['children'] ?? [];
 		} else {
-			$title         = $key;
-			$template      = $value;
+			$title = $key;
+			$template = $value;
 			$grandchildren = [];
 		}
 
 		$child_id = wp_insert_post([
-			'post_title'  => $title,
+			'post_title' => $title,
 			'post_status' => 'publish',
-			'post_type'   => 'page',
+			'post_type' => 'page',
 			'post_parent' => $parent_id,
-			'menu_order'  => $order++,
+			'menu_order' => $order++,
 		]);
 
 		if (is_wp_error($child_id)) {
@@ -401,7 +410,7 @@ function cwc_build_breadcrumbs($home_label = 'Home')
 		foreach ($ancestors as $ancestor_id) {
 			$crumbs[] = [
 				'label' => get_the_title($ancestor_id),
-				'url'   => get_permalink($ancestor_id),
+				'url' => get_permalink($ancestor_id),
 			];
 		}
 		$crumbs[] = ['label' => get_the_title(), 'url' => null];
@@ -410,13 +419,13 @@ function cwc_build_breadcrumbs($home_label = 'Home')
 	} elseif (is_category() || is_tag() || is_tax() || is_post_type_archive() || is_archive()) {
 		$crumbs[] = [
 			'label' => wp_strip_all_tags(get_the_archive_title()),
-			'url'   => null,
+			'url' => null,
 		];
 	} elseif (is_search()) {
 		/* translators: %s: Search query. */
 		$crumbs[] = [
 			'label' => sprintf(__('Search: %s', 'child-cwcwake'), get_search_query()),
-			'url'   => null,
+			'url' => null,
 		];
 	} elseif (is_404()) {
 		$crumbs[] = ['label' => __('Not Found', 'child-cwcwake'), 'url' => null];
@@ -439,9 +448,9 @@ function cwc_build_breadcrumbs($home_label = 'Home')
 function cwc_render_breadcrumbs($args = [])
 {
 	$args = wp_parse_args($args, [
-		'home_label'     => 'Home',
+		'home_label' => 'Home',
 		'show_home_icon' => true,
-		'extra_class'    => '',
+		'extra_class' => '',
 	]);
 
 	$crumbs = cwc_build_breadcrumbs($args['home_label']);
@@ -450,40 +459,42 @@ function cwc_render_breadcrumbs($args = [])
 	}
 
 	$class = trim('cwc-breadcrumbs ' . $args['extra_class']);
-	$last  = count($crumbs) - 1;
+	$last = count($crumbs) - 1;
 
 	ob_start();
 	?>
-	<nav class="<?php echo esc_attr($class); ?>" role="navigation" aria-label="<?php esc_attr_e('Breadcrumb', 'child-cwcwake'); ?>">
+	<nav class="<?php echo esc_attr($class); ?>" role="navigation"
+		aria-label="<?php esc_attr_e('Breadcrumb', 'child-cwcwake'); ?>">
 		<ol class="cwc-breadcrumbs__list">
-			<?php foreach ($crumbs as $i => $crumb) :
+			<?php foreach ($crumbs as $i => $crumb):
 				$is_first = (0 === $i);
-				$is_last  = ($last === $i);
-			?>
+				$is_last = ($last === $i);
+				?>
 				<li class="cwc-breadcrumbs__item<?php echo $is_last ? ' cwc-breadcrumbs__item--current' : ''; ?>">
-					<?php if (!empty($crumb['url'])) : ?>
+					<?php if (!empty($crumb['url'])): ?>
 						<a class="cwc-breadcrumbs__link" href="<?php echo esc_url($crumb['url']); ?>">
-							<?php if ($is_first && $args['show_home_icon']) : ?>
-								<svg class="cwc-breadcrumbs__home-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+							<?php if ($is_first && $args['show_home_icon']): ?>
+								<svg class="cwc-breadcrumbs__home-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14"
+									viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
 									<path d="M12 3 2 12h3v8h6v-6h2v6h6v-8h3z" />
 								</svg>
 							<?php endif; ?>
 							<span><?php echo esc_html($crumb['label']); ?></span>
 						</a>
-					<?php else : ?>
+					<?php else: ?>
 						<span class="cwc-breadcrumbs__current" aria-current="page">
 							<?php echo esc_html($crumb['label']); ?>
 						</span>
 					<?php endif; ?>
 
-					<?php if (!$is_last) : ?>
+					<?php if (!$is_last): ?>
 						<span class="cwc-breadcrumbs__separator" aria-hidden="true">&rsaquo;</span>
 					<?php endif; ?>
 				</li>
 			<?php endforeach; ?>
 		</ol>
 	</nav>
-<?php
+	<?php
 	return ob_get_clean();
 }
 
@@ -564,7 +575,7 @@ function cwc_filter_nav_menu_items($items)
 	}
 
 	return array_values(array_filter($items, function ($item) use ($excluded) {
-		return 'page' !== $item->object || ! in_array((int) $item->object_id, $excluded, true);
+		return 'page' !== $item->object || !in_array((int) $item->object_id, $excluded, true);
 	}));
 }
 add_filter('wp_nav_menu_objects', 'cwc_filter_nav_menu_items');
@@ -589,7 +600,7 @@ function cwc_filter_get_pages($pages)
 	}
 
 	return array_values(array_filter($pages, function ($p) use ($excluded) {
-		return ! in_array((int) $p->ID, $excluded, true);
+		return !in_array((int) $p->ID, $excluded, true);
 	}));
 }
 add_filter('get_pages', 'cwc_filter_get_pages');
@@ -611,7 +622,7 @@ function cwc_accommodations_page_id()
 		return $cache;
 	}
 
-	$page  = get_page_by_path('accommodations');
+	$page = get_page_by_path('accommodations');
 	$cache = $page instanceof WP_Post ? (int) $page->ID : 0;
 	return $cache;
 }
@@ -719,3 +730,30 @@ function cwc_fix_svg_filetype($data, $file, $filename, $mimes)
 	return $data;
 }
 add_filter('wp_check_filetype_and_ext', 'cwc_fix_svg_filetype', 10, 4);
+
+/**
+ * Switch the block template for cwc_album based on whether it's a category or album.
+ *
+ * Uses 'single-cwc_album-category.html' for top-level categories and
+ * 'single-cwc_album.html' for individual photo albums.
+ */
+function cwc_album_template_switcher($template)
+{
+	if (!is_singular('cwc_album')) {
+		return $template;
+	}
+
+	$post = get_queried_object();
+	if (!$post || $post->post_parent !== 0) {
+		return $template;
+	}
+
+	// It's a top-level category album. Try to load the category template.
+	$category_template = locate_block_template('single-cwc_album-category', 'single-cwc_album-category', []);
+	if ($category_template) {
+		return $category_template;
+	}
+
+	return $template;
+}
+add_filter('single_template', 'cwc_album_template_switcher', 20);

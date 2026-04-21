@@ -24,7 +24,7 @@
 		},
 		"title": {
 			"type": "string",
-			"default": "Page Title"
+			"default": ""
 		},
 		"subtitle": {
 			"type": "string",

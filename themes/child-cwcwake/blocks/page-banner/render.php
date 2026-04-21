@@ -31,7 +31,7 @@ $use_featured_image = ! empty( $attributes['useFeaturedImage'] );
 /*
  * Resolve the background image. Priority:
  *   1. The current post's featured image, when `useFeaturedImage` is on.
- *      This lets shared templates (e.g. page-room-detail) opt into a
+ *      This lets shared templates (e.g. room-detail) opt into a
  *      per-page hero without each page overriding the block attributes.
  *   2. Explicit `backgroundImage` attribute (template author's fallback).
  *   3. The bundled fallback image inside the theme.
@@ -51,6 +51,10 @@ if ( empty( $bg_image ) ) {
  */
 if ( '' === $title && is_singular() ) {
 	$title = get_the_title();
+}
+
+if ( '' === $subtitle && is_singular() ) {
+	$subtitle = get_the_excerpt();
 }
 
 $size_class = 'cwc-page-banner--' . ( 'compact' === $size ? 'compact' : 'default' );

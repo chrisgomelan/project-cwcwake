@@ -263,7 +263,7 @@ function cwc_render_room_detail_blocks( string $slug ): string
  * `init` after this code is deployed. For each known room slug it:
  *
  *   1. Locates the page under `accommodations/<slug>` (skip if missing).
- *   2. Forces `_wp_page_template` to `page-room-detail` so the shared
+ *   2. Forces `_wp_page_template` to `room-detail` so the shared
  *      template renders the page chrome.
  *   3. Replaces `post_content` with freshly rendered block markup
  *      *only* when the page is currently empty — never clobbers
@@ -275,22 +275,32 @@ function cwc_render_room_detail_blocks( string $slug ): string
  */
 function cwc_seed_room_detail_pages()
 {
-	if ( get_option( 'cwc_room_detail_seeded' ) ) {
-		return;
-	}
-
 	$catalogue = cwc_room_detail_catalogue();
+	$seeded    = (bool) get_option( 'cwc_room_detail_seeded', false );
 
 	foreach ( $catalogue as $slug => $_room ) {
 		$page = get_page_by_path( 'accommodations/' . $slug );
+
+		// Fallback check if it was moved to root
+		if ( ! $page instanceof WP_Post ) {
+			$page = get_page_by_path( $slug );
+		}
 
 		if ( ! $page instanceof WP_Post ) {
 			continue;
 		}
 
-		update_post_meta( (int) $page->ID, '_wp_page_template', 'page-room-detail' );
+		/*
+		 * Always ensure the template is correct. This fixes issues where the
+		 * template was renamed or lost, even on already-seeded sites.
+		 */
+		update_post_meta( (int) $page->ID, '_wp_page_template', 'room-detail' );
 
-		if ( '' === trim( (string) $page->post_content ) ) {
+		/*
+		 * Only inject the blocks if the page is empty and we haven't
+		 * successfully seeded it yet.
+		 */
+		if ( ! $seeded && '' === trim( (string) $page->post_content ) ) {
 			wp_update_post(
 				[
 					'ID'           => (int) $page->ID,
@@ -300,7 +310,9 @@ function cwc_seed_room_detail_pages()
 		}
 	}
 
-	update_option( 'cwc_room_detail_seeded', true );
+	if ( ! $seeded ) {
+		update_option( 'cwc_room_detail_seeded', true );
+	}
 }
 add_action( 'init', 'cwc_seed_room_detail_pages', 30 );
 

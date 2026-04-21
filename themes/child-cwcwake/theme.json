@@ -391,7 +391,7 @@
 			"postTypes": ["page"]
 		},
 		{
-			"name": "page-room-detail",
+			"name": "room-detail",
 			"title": "Room Detail",
 			"postTypes": ["page"]
 		},

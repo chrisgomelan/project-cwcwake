@@ -145,6 +145,137 @@ img {
 }
 
 /* ----------------------------------------
+   Custom Image Modal
+   ---------------------------------------- */
+
+.cwc-modal {
+	position: fixed;
+	inset: 0;
+	z-index: 9999;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	opacity: 0;
+	pointer-events: none;
+	transition: opacity 0.3s ease;
+	font-family: var(--wp--preset--font-family--ui);
+}
+
+.cwc-modal.is-open {
+	opacity: 1;
+	pointer-events: auto;
+}
+
+.cwc-modal__overlay {
+	position: absolute;
+	inset: 0;
+	background: rgba(0, 0, 0, 0.9);
+	backdrop-filter: blur(4px);
+}
+
+.cwc-modal__content {
+	position: relative;
+	width: 90vw;
+	max-width: 1400px;
+	height: 80vh;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	z-index: 1;
+}
+
+.cwc-modal__image {
+	max-width: 100%;
+	max-height: 100%;
+	object-fit: contain;
+	border-radius: 10px;
+	box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+}
+
+.cwc-modal__caption {
+	color: #fff;
+	margin-top: 20px;
+	font-size: 18px;
+	text-align: center;
+}
+
+.cwc-modal__close {
+	position: absolute;
+	top: 30px;
+	right: 30px;
+	background: none;
+	border: none;
+	color: #fff;
+	font-size: 48px;
+	cursor: pointer;
+	z-index: 2;
+	line-height: 1;
+	opacity: 0.7;
+	transition: opacity 0.2s ease;
+}
+
+.cwc-modal__close:hover {
+	opacity: 1;
+}
+
+.cwc-modal__prev,
+.cwc-modal__next {
+	position: absolute;
+	top: 50%;
+	transform: translateY(-50%);
+	background: rgba(255, 255, 255, 0.1);
+	border: none;
+	color: #fff;
+	width: 60px;
+	height: 60px;
+	border-radius: 50%;
+	font-size: 24px;
+	cursor: pointer;
+	z-index: 2;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	transition: background 0.2s ease;
+}
+
+.cwc-modal__prev:hover,
+.cwc-modal__next:hover {
+	background: rgba(255, 255, 255, 0.25);
+}
+
+.cwc-modal__prev {
+	left: 30px;
+}
+
+.cwc-modal__next {
+	right: 30px;
+}
+
+.cwc-modal__counter {
+	position: absolute;
+	bottom: 30px;
+	left: 50%;
+	transform: translateX(-50%);
+	color: #fff;
+	font-size: 14px;
+	opacity: 0.6;
+}
+
+.wp-block-gallery img,
+.wp-block-image img,
+.cwc-room-gallery__image {
+	cursor: zoom-in;
+}
+
+.wp-block-gallery img:hover,
+.wp-block-image img:hover,
+.cwc-room-gallery__image:hover {
+	opacity: 0.9;
+	transition: opacity 0.3s ease;
+}
+
+/* ----------------------------------------
    With arrow icon  (add class "cwc-btn-arrow")
    Appends the uploaded arrow-up SVG after the label.
    ---------------------------------------- */
@@ -199,11 +330,11 @@ img {
 	padding-right: 0 !important;
 }
 
-.cwc-tropical-section > .cwc-breadcrumbs__wrap,
-.cwc-tropical-section > main,
-.cwc-tropical-section > .wp-block-group,
-.cwc-tropical-section > .wp-block-cwc-gallery-grid,
-.cwc-tropical-section > .wp-block-cwc-cards-section {
+.cwc-tropical-section>.cwc-breadcrumbs__wrap,
+.cwc-tropical-section>main,
+.cwc-tropical-section>.wp-block-group,
+.cwc-tropical-section>.wp-block-cwc-gallery-grid,
+.cwc-tropical-section>.wp-block-cwc-cards-section {
 	width: 100%;
 	max-width: 1921px;
 	margin-inline: auto;
@@ -257,6 +388,14 @@ img {
 }
 
 /* ----------------------------------------
+   Album Topbar
+   ---------------------------------------- */
+
+.cwc-album-topbar {
+	padding-block: var(--wp--preset--spacing--30);
+}
+
+/* ----------------------------------------
    Utility classes
    ---------------------------------------- */
 
@@ -284,4 +423,9 @@ img {
 	.wp-block-columns {
 		gap: var(--wp--preset--spacing--40);
 	}
+}
+
+/* Hide the first paragraph in the album content area (it's now in the banner) */
+.single-cwc_album .wp-block-post-content>p:first-of-type {
+	display: none !important;
 }
