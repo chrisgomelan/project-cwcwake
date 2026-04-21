@@ -167,18 +167,25 @@ function cwc_default_global_policies() {
  * --------------------------------------------------------- */
 
 /**
- * Add the Global Policies item under the Settings menu.
+ * Add the Global Policies item as a submenu of the Accommodations
+ * post-type menu.
  *
- * Settings is the right home: it's a site-wide configuration that
- * affects every room, not a per-room edit. Cap is `manage_options`
- * to match the rest of Settings.
+ * Co-locating it with All Rooms / Add New means an editor only has
+ * to learn one place in the sidebar to manage the entire room
+ * system — `Accommodations → All Rooms / Add New / Global Policies`.
+ *
+ * Parent slug for a CPT submenu is the `edit.php?post_type=<slug>`
+ * URL — that's the URL of the CPT's "All Rooms" screen and the
+ * thing WP_List_Table uses internally to anchor child menus. Cap
+ * stays `manage_options` because policies affect the whole site.
  *
  * @since 1.0.0
  *
  * @return void
  */
 function cwc_register_global_policies_menu() {
-	add_options_page(
+	add_submenu_page(
+		'edit.php?post_type=accommodation',
 		__( 'Global Policies', 'cwc-accommodations' ),
 		__( 'Global Policies', 'cwc-accommodations' ),
 		'manage_options',
@@ -226,10 +233,20 @@ function cwc_handle_global_policies_save() {
 
 	update_option( 'cwc_global_policies', wp_json_encode( $rows, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE ) );
 
+	/*
+	 * Redirect back to the page where the form lives — now a child
+	 * of the Accommodations CPT menu, not Settings. The sub-page
+	 * registered with `add_submenu_page` is reachable at
+	 * `edit.php?post_type=accommodation&page=cwc-global-policies`.
+	 */
 	wp_safe_redirect(
 		add_query_arg(
-			[ 'page' => 'cwc-global-policies', 'updated' => '1' ],
-			admin_url( 'options-general.php' )
+			[
+				'post_type' => 'accommodation',
+				'page'      => 'cwc-global-policies',
+				'updated'   => '1',
+			],
+			admin_url( 'edit.php' )
 		)
 	);
 	exit;

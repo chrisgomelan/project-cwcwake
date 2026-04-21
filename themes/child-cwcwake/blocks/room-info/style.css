@@ -90,30 +90,76 @@
 	color: #1a1a1a;
 }
 
-/* ---------- Amenity chips ---------- */
+/* ---------- Amenity chips ----------
+ *
+ * Strict 4-column grid at desktop (per design + editor request).
+ * Steps down to 3 / 2 / 1 columns as viewport narrows so chips
+ * never get cramped or text-clipped at smaller breakpoints.
+ *
+ * `minmax(0, 1fr)` is the safety net: without it a long amenity
+ * label could overflow its grid track and blow out the row width.
+ */
 
 .cwc-room-info__amenities {
-	display: flex;
-	flex-wrap: wrap;
-	gap: 0.65rem;
+	display: grid;
+	grid-template-columns: repeat(4, minmax(0, 1fr));
+	gap: 0.75rem;
 	margin: 0;
 	padding: 0;
 	list-style: none;
 }
 
+@media (max-width: 1280px) {
+	.cwc-room-info__amenities {
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+	}
+}
+
+@media (max-width: 768px) {
+	.cwc-room-info__amenities {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+}
+
+@media (max-width: 480px) {
+	.cwc-room-info__amenities {
+		grid-template-columns: minmax(0, 1fr);
+	}
+}
+
+/*
+ * Chip uses `flex` (not `inline-flex`) so it stretches to fill its
+ * grid cell — that's what gives the 4-up row its consistent column
+ * widths. Centered content + uniform padding keeps each chip
+ * visually balanced even when labels vary in length.
+ */
 .cwc-room-info__chip {
-	display: inline-flex;
+	display: flex;
 	align-items: center;
+	justify-content: flex-start;
 	gap: 0.5em;
-	padding: 0.55em 1.1em;
+	padding: 0.7em 1.1em;
 	border: 1px solid rgba(0, 0, 0, 0.15);
 	border-radius: 999px;
 	background: #f4f1f8;
 	font-family: var(--wp--preset--font-family--heading);
 	font-weight: 600;
 	font-size: clamp(0.9rem, 1.1vw, 1.125rem);
-	line-height: 1;
+	line-height: 1.2;
 	color: #2b3037;
+	min-width: 0;
+}
+
+/*
+ * Long amenity labels (e.g. "Air Conditioning") shouldn't wrap to
+ * two lines and break the grid row's vertical rhythm — let them
+ * truncate with ellipsis instead while keeping the icon visible.
+ */
+.cwc-room-info__chip > span {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	min-width: 0;
 }
 
 /*
