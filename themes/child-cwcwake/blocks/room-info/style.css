@@ -284,3 +284,56 @@
 		padding-top: 0;
 	}
 }
+
+/* ---------------------------------------------------------
+ * Availability states
+ *
+ * Pill / notice styling for the three availability behaviors
+ * spec'd in room-management-transition.md § 3:
+ *
+ *   - .cwc-room-info--available    → no extras (default Book Now button).
+ *   - .cwc-room-info--fully-booked → red "Fully Booked" notice over the
+ *                                    Inquire CTA (same pricing layout).
+ *   - .cwc-room-info--maintenance  → amber "Coming Soon" badge next to
+ *                                    the title; pricing aside hidden by
+ *                                    the render template (no CSS needed).
+ *
+ * Colors lean on existing theme presets where possible to stay on
+ * brand and inherit the dark-mode story for free.
+ * --------------------------------------------------------- */
+
+.cwc-room-info__badge {
+	display: inline-block;
+	margin-inline-start: 0.75rem;
+	padding: 0.2rem 0.65rem;
+	border-radius: 999px;
+	background: #f59f00;
+	color: #fff;
+	font-size: 0.7rem;
+	font-weight: 700;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	vertical-align: middle;
+}
+
+.cwc-room-info__notice {
+	margin: 0 0 0.5rem;
+	padding: 0.35rem 0.6rem;
+	border-radius: 6px;
+	background: #ffe3e3;
+	color: #c92a2a;
+	font-weight: 700;
+	font-size: 0.85rem;
+	letter-spacing: 0.04em;
+	text-transform: uppercase;
+	text-align: center;
+}
+
+.cwc-room-info--fully-booked .cwc-room-info__book-button {
+	background: #adb5bd;
+}
+
+.cwc-room-info--fully-booked .cwc-room-info__book-button:hover,
+.cwc-room-info--fully-booked .cwc-room-info__book-button:focus {
+	background: #868e96;
+}

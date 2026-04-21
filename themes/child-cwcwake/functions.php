@@ -313,6 +313,27 @@ require_once get_stylesheet_directory() . '/inc/albums-seed.php';
  */
 require_once get_stylesheet_directory() . '/inc/albums-parent-enforcement.php';
 
+/*
+ * Accommodations (Rooms) data layer.
+ *
+ * The `accommodation` CPT, its meta fields, the admin meta boxes,
+ * the Global Policies settings page, and the legacy migration all
+ * live in the `cwc-accommodations` plugin under
+ * `wp-content/plugins/cwc-accommodations/`. The plugin must be
+ * active for room pages to render — when it isn't, it surfaces an
+ * admin notice telling editors what's missing.
+ *
+ * Theme-side responsibilities for rooms are limited to:
+ *   - The visual blocks (`cwc/room-info`, `cwc/room-gallery`,
+ *     `cwc/other-rooms`) under `themes/child-cwcwake/blocks/`.
+ *   - The `single-accommodation.html` template.
+ *   - The amenity / policy icon SVGs under
+ *     `themes/child-cwcwake/assets/images/`, resolved by the
+ *     plugin via `get_stylesheet_directory_uri()`.
+ *
+ * See `room-management-transition.md` for the full architecture.
+ */
+
 /**
  * Build the primary navigation menu matching the site structure.
  *

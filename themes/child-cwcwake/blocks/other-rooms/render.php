@@ -21,6 +21,51 @@ if (!defined('ABSPATH')) {
 $heading = isset($attributes['heading']) ? (string) $attributes['heading'] : '';
 $items = isset($attributes['items']) && is_array($attributes['items']) ? $attributes['items'] : [];
 
+/*
+ * Meta fallback (room-management-transition.md § 4):
+ *
+ *   - When no items were entered into the block UI and we're on a
+ *     single accommodation post, query the other published rooms
+ *     and render a card per result.
+ *   - The current room is excluded so the rail doesn't link back
+ *     to itself; results are sorted by `menu_order` then title for
+ *     a deterministic order an editor can shuffle from the post
+ *     attributes panel.
+ *
+ * Limit of 6 keeps the rail scannable on wide screens and matches
+ * the four-card design baseline plus a little headroom for sites
+ * with more rooms.
+ */
+if ( empty( $items ) && function_exists( 'cwc_is_accommodation_context' ) && cwc_is_accommodation_context() ) {
+	$current = get_post();
+	$current_id = $current instanceof WP_Post ? (int) $current->ID : 0;
+
+	$siblings = get_posts(
+		[
+			'post_type'      => 'accommodation',
+			'post_status'    => 'publish',
+			'posts_per_page' => 6,
+			'post__not_in'   => $current_id > 0 ? [ $current_id ] : [],
+			'orderby'        => [ 'menu_order' => 'ASC', 'title' => 'ASC' ],
+			'no_found_rows'  => true,
+		]
+	);
+
+	foreach ( $siblings as $sibling ) {
+		$thumb_id = (int) get_post_thumbnail_id( $sibling );
+		$image    = $thumb_id > 0 ? (string) wp_get_attachment_image_url( $thumb_id, 'large' ) : '';
+		$items[]  = [
+			'label' => get_the_title( $sibling ),
+			'image' => $image,
+			'url'   => (string) get_permalink( $sibling ),
+		];
+	}
+
+	if ( '' === $heading ) {
+		$heading = __( 'Other Rooms', 'child-cwcwake' );
+	}
+}
+
 if (empty($items)) {
 	return;
 }

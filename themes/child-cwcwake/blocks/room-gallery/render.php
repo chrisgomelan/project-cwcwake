@@ -24,6 +24,32 @@ $back_link_url = isset($attributes['backLinkUrl']) ? (string) $attributes['backL
 $see_all_label = isset($attributes['seeAllLabel']) ? (string) $attributes['seeAllLabel'] : '';
 $see_all_url = isset($attributes['seeAllUrl']) ? (string) $attributes['seeAllUrl'] : '';
 
+/*
+ * Meta fallback (room-management-transition.md § 4):
+ *
+ *   - When the editor hasn't supplied images directly on the
+ *     block, and we're rendering on a single accommodation post,
+ *     pull `_cwc_gallery_ids` and resolve each ID to a URL via
+ *     `wp_get_attachment_image_url()`.
+ *   - The "Back to Accommodations" link similarly defaults to the
+ *     archive when no override was set, so editors never have to
+ *     touch the block once the room post has its meta filled.
+ */
+if ( function_exists( 'cwc_is_accommodation_context' ) && cwc_is_accommodation_context() ) {
+	$post = get_post();
+	if ( $post instanceof WP_Post ) {
+		if ( empty( $images ) && function_exists( 'cwc_accommodation_gallery_images' ) ) {
+			$images = cwc_accommodation_gallery_images( (int) $post->ID );
+		}
+		if ( '' === $back_link_label ) {
+			$back_link_label = __( 'Back to Accommodations', 'child-cwcwake' );
+		}
+		if ( '' === $back_link_url ) {
+			$back_link_url = '/accommodations/';
+		}
+	}
+}
+
 if (empty($images)) {
 	return;
 }

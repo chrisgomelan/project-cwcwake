@@ -1,0 +1,73 @@
+<!-- wp:template-part {"slug":"header"} /-->
+
+<!-- wp:cwc/page-banner {
+	"overlayOpacity": 40,
+	"size": "default",
+	"showCorners": true,
+	"useFeaturedImage": true,
+	"align": "full"
+} /-->
+
+<!-- wp:group {
+	"align": "full",
+	"className": "cwc-tropical-section cwc-room-detail",
+	"style": {
+		"spacing": {
+			"margin": { "top": "0" },
+			"padding": {
+				"top": "var:preset|spacing|60",
+				"bottom": "var:preset|spacing|70"
+			},
+			"blockGap": "var:preset|spacing|60"
+		}
+	},
+	"layout": { "type": "constrained" }
+} -->
+<div class="wp-block-group alignfull cwc-tropical-section cwc-room-detail" style="margin-top:0;padding-top:var(--wp--preset--spacing--60);padding-bottom:var(--wp--preset--spacing--70)">
+
+	<!-- wp:cwc/breadcrumbs /-->
+
+	<!--
+		Room layout (designs/room-landing-page-design.md):
+
+		- cwc/room-gallery → § 1 back link + § 2 image grid + "See All Images" pill.
+		- cwc/room-info    → § 3 title/description/amenities/pricing + § 4 policies.
+		- cwc/other-rooms  → § 5 sibling rooms strip.
+
+		All three blocks are rendered with NO attributes. On a singular
+		`accommodation` post each block detects the context via
+		`cwc_is_accommodation_context()` and pulls its data from the CPT
+		meta + global policies (the plugin's data layer). That keeps the
+		page rigidly on-design across every room without editors having
+		to wire up blocks per post — they only fill in meta fields.
+	-->
+	<!-- wp:group {
+		"tagName": "main",
+		"style": {
+			"spacing": {
+				"margin": { "top": "0" },
+				"blockGap": "var:preset|spacing|60"
+			}
+		},
+		"layout": { "type": "constrained" }
+	} -->
+	<main class="wp-block-group" style="margin-top:0">
+		<!-- wp:cwc/room-gallery /-->
+
+		<!-- wp:cwc/room-info /-->
+
+		<!-- wp:cwc/other-rooms /-->
+
+		<!--
+			Optional editor extension point: anything an editor adds to
+			the post body still renders below the standard layout.
+			Useful for one-off promos, video embeds, etc., without
+			cluttering the canonical structure above.
+		-->
+		<!-- wp:post-content {"align":"full","layout":{"type":"constrained"}} /-->
+	</main>
+	<!-- /wp:group -->
+</div>
+<!-- /wp:group -->
+
+<!-- wp:template-part {"slug":"footer"} /-->
