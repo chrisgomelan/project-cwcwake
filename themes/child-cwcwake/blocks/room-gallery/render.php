@@ -115,13 +115,13 @@ $resolve_slot = static function ($slot): array {
 
 				<?php if ($position === 'main' && $see_all_label !== ''): ?>
 					<?php if ($see_all_url !== ''): ?>
-						<a class="cwc-room-gallery__see-all" href="<?php echo esc_url($see_all_url); ?>">
+						<a class="cwc-room-gallery__see-all js-cwc-open-gallery-modal" href="<?php echo esc_url($see_all_url); ?>">
 							<img class="cwc-room-gallery__see-all-icon" src="<?php echo esc_url($see_all_icon_src); ?>" alt=""
 								width="18" height="18" loading="lazy" decoding="async" aria-hidden="true" />
 							<span><?php echo esc_html($see_all_label); ?></span>
 						</a>
 					<?php else: ?>
-						<span class="cwc-room-gallery__see-all" aria-hidden="true">
+						<span class="cwc-room-gallery__see-all js-cwc-open-gallery-modal" style="cursor: pointer;" aria-hidden="true">
 							<img class="cwc-room-gallery__see-all-icon" src="<?php echo esc_url($see_all_icon_src); ?>" alt=""
 								width="18" height="18" loading="lazy" decoding="async" />
 							<span><?php echo esc_html($see_all_label); ?></span>
@@ -130,5 +130,29 @@ $resolve_slot = static function ($slot): array {
 				<?php endif; ?>
 			</figure>
 		<?php endforeach; ?>
+	</div>
+
+	<!-- Modal for See All Images -->
+	<div id="cwc-gallery-grid-modal" class="cwc-gallery-modal" aria-hidden="true">
+		<div class="cwc-gallery-modal__overlay"></div>
+		<div class="cwc-gallery-modal__container">
+			<div class="cwc-gallery-modal__header">
+				<button class="cwc-gallery-modal__close" aria-label="Close gallery">
+					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+				</button>
+			</div>
+			<div class="cwc-gallery-modal__content">
+				<div class="cwc-gallery-modal__grid">
+					<?php foreach ($images as $img):
+						$img_data = $resolve_slot($img);
+						if (empty($img_data['url'])) continue;
+					?>
+						<div class="cwc-gallery-modal__item">
+							<img class="cwc-gallery-modal__img" src="<?php echo esc_url($img_data['url']); ?>" alt="<?php echo esc_attr($img_data['alt']); ?>" loading="lazy">
+						</div>
+					<?php endforeach; ?>
+				</div>
+			</div>
+		</div>
 	</div>
 </section>

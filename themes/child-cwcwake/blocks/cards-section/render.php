@@ -65,6 +65,7 @@ $person_icon = '<svg class="cwc-cards-section__icon" xmlns="http://www.w3.org/20
 			$btn_label = isset($item['buttonLabel']) ? (string) $item['buttonLabel'] : '';
 			$btn_url = isset($item['buttonUrl']) ? (string) $item['buttonUrl'] : '';
 
+			$description = isset($item['description']) ? (string) $item['description'] : '';
 			$item_style = sprintf('--cwc-card-span:%d', $span);
 			?>
 			<li class="cwc-cards-section__item" style="<?php echo esc_attr($item_style); ?>">
@@ -106,24 +107,21 @@ $person_icon = '<svg class="cwc-cards-section__icon" xmlns="http://www.w3.org/20
 						</div>
 					</article>
 				<?php else: ?>
-					<?php if ($url !== ''): ?>
-						<a class="cwc-cards-section__card cwc-cards-section__card--overlay" href="<?php echo esc_url($url); ?>">
-						<?php else: ?>
-							<div class="cwc-cards-section__card cwc-cards-section__card--overlay">
-							<?php endif; ?>
-							<?php if ($image !== ''): ?>
-								<div class="cwc-cards-section__card-media" role="img" <?php echo $title !== '' ? ' aria-label="' . esc_attr($title) . '"' : ''; ?> style="background-image:url('<?php echo esc_url($image); ?>');">
-								</div>
-							<?php endif; ?>
-							<span class="cwc-cards-section__card-dim" aria-hidden="true"></span>
+					<div class="cwc-cards-section__card cwc-cards-section__card--overlay">
+						<?php if ($image !== ''): ?>
+							<div class="cwc-cards-section__card-media" role="img" <?php echo $title !== '' ? ' aria-label="' . esc_attr($title) . '"' : ''; ?> style="background-image:url('<?php echo esc_url($image); ?>');">
+							</div>
+						<?php endif; ?>
+						<span class="cwc-cards-section__card-dim" aria-hidden="true"></span>
+						<div class="cwc-cards-section__card-content">
 							<?php if ($title !== ''): ?>
 								<h3 class="cwc-cards-section__card-title"><?php echo esc_html($title); ?></h3>
 							<?php endif; ?>
-							<?php if ($url !== ''): ?>
-						</a>
-					<?php else: ?>
+							<?php if ($description !== ''): ?>
+								<p class="cwc-cards-section__card-description"><?php echo esc_html($description); ?></p>
+							<?php endif; ?>
 						</div>
-					<?php endif; ?>
+					</div>
 				<?php endif; ?>
 			</li>
 			<?php

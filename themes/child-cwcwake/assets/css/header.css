@@ -156,9 +156,17 @@ body.admin-bar {
 	gap: 48px;
 }
 
-/* .cwc-header .wp-block-navigation .wp-block-navigation-item {
-	gap: 10px;
-} */
+.cwc-header .wp-block-navigation .wp-block-navigation-item {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	padding: 10px 16px;
+	transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.cwc-header .wp-block-navigation .wp-block-navigation-item:hover {
+	background-color: var(--wp--preset--color--accent);
+}
 
 .cwc-header .wp-block-navigation a,
 .cwc-header .wp-block-navigation-item__content {
@@ -168,8 +176,9 @@ body.admin-bar {
 	line-height: 1;
 	color: #F5F1EB !important;
 	text-decoration: none;
-	padding: 8px 16px;
-	transition: color 0.3s ease, background-color 0.3s ease;
+	padding: 0;
+	/* Padding moved to parent item for uniform background */
+	transition: color 0.3s ease;
 }
 
 .cwc-header--scrolled .wp-block-navigation a,
@@ -181,8 +190,10 @@ body.admin-bar {
 	outline: none;
 }
 
-.cwc-header .wp-block-navigation a:hover {
-	background-color: #FF6B3D;
+/* Ensure hover colors are consistent across all page states for navigation items */
+.cwc-header .wp-block-navigation .wp-block-navigation-item:hover > .wp-block-navigation-item__content,
+.cwc-header .wp-block-navigation .wp-block-navigation-item:hover > .wp-block-navigation-item__content .wp-block-navigation__submenu-icon svg,
+.cwc-header .wp-block-navigation .wp-block-navigation-item:hover > .wp-block-navigation__submenu-icon svg {
 	color: #FFFFFF !important;
 }
 
@@ -194,6 +205,7 @@ body.admin-bar {
 	color: #F5F1EB;
 	width: 20px;
 	height: 20px;
+	margin-left: 5px;
 	transition: color 0.3s ease;
 }
 
@@ -300,7 +312,9 @@ body.admin-bar {
 
 .cwc-header .wp-block-navigation__submenu-container .wp-block-navigation-item {
 	border-bottom: 1px solid var(--wp--preset--color--border);
-	padding-bottom: 5px;
+	padding: 5px;
+	margin: 0;
+	background-color: transparent !important; /* Ensure submenu items don't inherit orange background */
 }
 
 .cwc-header .wp-block-navigation__submenu-container .wp-block-navigation-item:last-child {
@@ -326,9 +340,11 @@ body.admin-bar {
 	outline: none;
 }
 
-.cwc-header .wp-block-navigation__submenu-container a:hover {
-	background-color: var(--wp--preset--color--surface);
-	color: var(--wp--preset--color--primary) !important;
+.cwc-header .wp-block-navigation .wp-block-navigation__submenu-container .wp-block-navigation-item:hover > .wp-block-navigation-item__content,
+.cwc-header .wp-block-navigation .wp-block-navigation__submenu-container a:hover {
+	background-color: rgba(0, 0, 0, 0.05);
+	/* Darken factor */
+	color: #000000 !important;
 }
 
 /* Inside a submenu container, suppress WordPress's built-in chevron SVG

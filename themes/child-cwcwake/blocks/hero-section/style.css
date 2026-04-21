@@ -122,7 +122,8 @@
 }
 
 .cwc-hero__btn--primary:hover {
-	opacity: 0.9;
+	filter: brightness(0.85);
+	color: #FFFFFF !important;
 }
 
 .cwc-hero__btn--secondary {
@@ -132,7 +133,9 @@
 }
 
 .cwc-hero__btn--secondary:hover {
-	background: rgba(255, 255, 255, 0.1);
+	background-color: var(--wp--preset--color--accent);
+	border-color: var(--wp--preset--color--accent);
+	color: #FFFFFF !important;
 }
 
 /* ----------------------------------------

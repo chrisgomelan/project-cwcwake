@@ -87,6 +87,7 @@
 
 .cwc-accommodations__cta:hover {
 	background: var(--wp--preset--color--primary-dark);
+	color: #F5F1EB !important;
 }
 
 .cwc-accommodations__cta-icon {
@@ -255,8 +256,7 @@
 }
 
 .cwc-accommodations__card:hover .cwc-accommodations__card-btn {
-	background: #395144;
-	color: #F5F1EB;
+	background: #D6D6D6;
 }
 
 /* ----------------------------------------

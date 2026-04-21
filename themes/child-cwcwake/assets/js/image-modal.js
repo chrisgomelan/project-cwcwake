@@ -37,7 +37,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const closeModal = () => {
         modal.classList.remove('is-open');
-        document.body.style.overflow = '';
+        // Only reset overflow if no other modal (like the gallery grid) is still open
+        if (!document.querySelector('.cwc-gallery-modal.is-open')) {
+            document.body.style.overflow = '';
+        }
     };
 
     const updateModal = () => {
@@ -66,7 +69,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // 2. Click Handler
     document.body.addEventListener('click', (e) => {
         // Target images inside typical WP gallery/image structures
-        const clickedImg = e.target.closest('.wp-block-gallery img, .wp-block-image img, .cwc-albums__img, .cwc-room-gallery__image');
+        const clickedImg = e.target.closest('.wp-block-gallery img, .wp-block-image img, .cwc-albums__img, .cwc-room-gallery__image, .cwc-gallery-modal__img');
 
         if (!clickedImg) return;
 
@@ -79,7 +82,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         e.preventDefault();
 
-        const container = clickedImg.closest('.wp-block-gallery, .cwc-albums__grid, .cwc-room-gallery__grid, .wp-block-post-content') || document.body;
+        const container = clickedImg.closest('.wp-block-gallery, .cwc-albums__grid, .cwc-room-gallery__grid, .cwc-gallery-modal__grid, .wp-block-post-content') || document.body;
         const allImgs = Array.from(container.querySelectorAll('img')).filter(img => img.offsetWidth > 100 && !img.closest('.cwc-header, .cwc-footer'));
 
         const set = allImgs.map(img => ({ src: img.src, alt: img.alt }));

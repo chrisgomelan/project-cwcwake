@@ -156,8 +156,9 @@
 }
 
 .cwc-showcase__card--image:hover .cwc-showcase__card-btn {
-	border-color: var(--wp--preset--color--background);
-	background: rgba(255, 255, 255, 0.1);
+	border-color: var(--wp--preset--color--accent);
+	background: var(--wp--preset--color--accent);
+	color: var(--wp--preset--color--background) !important;
 }
 
 /* ----------------------------------------
@@ -375,6 +376,7 @@
 
 .cwc-showcase__social-btn:hover {
 	background: var(--wp--preset--color--primary-dark);
+	color: var(--wp--preset--color--background) !important;
 }
 
 .cwc-showcase__card--social {

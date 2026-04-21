@@ -541,6 +541,7 @@ function cwc_register_blocks()
 	register_block_type(get_stylesheet_directory() . '/blocks/policy-content');
 	register_block_type(get_stylesheet_directory() . '/blocks/albums-grid');
 	register_block_type(get_stylesheet_directory() . '/blocks/album-back-link');
+	register_block_type(get_stylesheet_directory() . '/blocks/why-stay');
 }
 add_action('init', 'cwc_register_blocks');
 
