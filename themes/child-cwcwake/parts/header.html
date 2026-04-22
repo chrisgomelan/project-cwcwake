@@ -13,9 +13,20 @@
 		</a>
 		<!-- /wp:html -->
 
-		<!-- wp:group {"className":"cwc-header__nav-center","layout":{"type":"flex","justifyContent":"center","flexWrap":"nowrap"}} -->
-		<div class="wp-block-group cwc-header__nav-center">
-			<!-- wp:navigation {"overlayMenu":"mobile","layout":{"type":"flex","justifyContent":"center"}} -->
+		<!-- wp:group {"anchor":"cwc-header-nav-center","className":"cwc-header__nav-center","layout":{"type":"flex","justifyContent":"center","flexWrap":"nowrap"}} -->
+		<div id="cwc-header-nav-center" class="wp-block-group cwc-header__nav-center">
+			<!-- wp:html -->
+			<button class="cwc-header__nav-close" type="button" aria-label="Close menu">
+				<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+					stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"
+					aria-hidden="true">
+					<line x1="18" y1="6" x2="6" y2="18" />
+					<line x1="6" y1="6" x2="18" y2="18" />
+				</svg>
+			</button>
+			<!-- /wp:html -->
+
+			<!-- wp:navigation {"overlayMenu":"never","layout":{"type":"flex","justifyContent":"center"}} -->
 			<!-- wp:navigation-link {"label":"Home","url":"/"} /-->
 			<!-- wp:navigation-submenu {"label":"Activities","url":"#"} -->
 			<!-- wp:navigation-link {"label":"Water Sports","url":"/activities/water-sports/"} /-->
@@ -50,10 +61,23 @@
 			<!-- wp:html -->
 			<a href="#book" class="cwc-header__book-btn">BOOK NOW</a>
 			<!-- /wp:html -->
+
+			<!-- wp:html -->
+			<button class="cwc-header__burger" type="button" aria-label="Open menu" aria-expanded="false"
+				aria-controls="cwc-header-nav-center">
+				<span class="cwc-header__burger-bar"></span>
+				<span class="cwc-header__burger-bar"></span>
+				<span class="cwc-header__burger-bar"></span>
+			</button>
+			<!-- /wp:html -->
 		</div>
 		<!-- /wp:group -->
 
 	</div>
 	<!-- /wp:group -->
+
+	<!-- wp:html -->
+	<div class="cwc-header__backdrop" data-cwc-nav-backdrop hidden></div>
+	<!-- /wp:html -->
 </header>
 <!-- /wp:group -->
