@@ -45,7 +45,7 @@
 	max-width: 600px;
 	display: flex;
 	gap: clamp(20px, 2vw, 30px);
-	flex-direction: column-reverse;
+	flex-direction: column;
 	justify-content: flex-start;
 }
 
@@ -381,13 +381,19 @@
 		text-align: center;
 	}
 
+	.cwc-site-footer__col-left {
+		flex-direction: column-reverse;
+	}
+
 	.cwc-site-footer__form {
 		flex-direction: column;
 		align-items: stretch;
 	}
 
+	.cwc-site-footer__form input,
 	.cwc-site-footer__form button {
 		width: 100%;
+		flex: none;
 	}
 
 	.cwc-site-footer__contact-list li {
