@@ -452,6 +452,14 @@ require_once get_stylesheet_directory() . '/inc/blog-helpers.php';
 require_once get_stylesheet_directory() . '/inc/blogs-page-seed.php';
 
 /*
+ * One-shot FAQs page seeder — assigns the `page-faqs` template
+ * to the existing `/plan-your-trip/faqs/` page so the template
+ * hierarchy renders the FAQ accordion without editors having to
+ * manually re-pick the template. Idempotent (option-guarded).
+ */
+require_once get_stylesheet_directory() . '/inc/faqs-page-seed.php';
+
+/*
  * Accommodations (Rooms) data layer.
  *
  * The `accommodation` CPT, its meta fields, the admin meta boxes,
@@ -685,6 +693,7 @@ function cwc_register_blocks()
 	register_block_type(get_stylesheet_directory() . '/blocks/all-blogs');
 	register_block_type(get_stylesheet_directory() . '/blocks/table-of-contents');
 	register_block_type(get_stylesheet_directory() . '/blocks/rates-manager');
+	register_block_type(get_stylesheet_directory() . '/blocks/faq-section');
 }
 add_action('init', 'cwc_register_blocks');
 

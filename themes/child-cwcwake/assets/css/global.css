@@ -348,7 +348,8 @@ img {
 .cwc-tropical-section>.wp-block-cwc-cards-section,
 .cwc-tropical-section>.wp-block-cwc-featured-blogs,
 .cwc-tropical-section>.wp-block-cwc-upcoming-events,
-.cwc-tropical-section>.wp-block-cwc-all-blogs {
+.cwc-tropical-section>.wp-block-cwc-all-blogs,
+.cwc-tropical-section>.wp-block-cwc-faq-section {
 	width: 100%;
 	max-width: 1921px;
 	margin-inline: auto;

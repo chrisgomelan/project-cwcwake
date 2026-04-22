@@ -1,0 +1,328 @@
+/*
+ * CWC Wake — FAQ Section block
+ *
+ * Two-column layout: left sidebar (search + tabs) | divider | right content
+ * (category title + accordion). Matches faq-design.md & faq-page-design.png.
+ */
+
+/* ----------------------------------------
+   Root layout
+   ---------------------------------------- */
+
+.cwc-faq {
+	display: grid;
+	grid-template-columns: clamp(240px, 22%, 346px) 1px 1fr;
+	gap: clamp(24px, 3vw, 48px);
+	align-items: start;
+}
+
+/* ----------------------------------------
+   Left sidebar
+   ---------------------------------------- */
+
+.cwc-faq__sidebar {
+	display: flex;
+	flex-direction: column;
+	gap: 16px;
+	position: sticky;
+	top: clamp(88px, 6vw + 48px, 130px);
+}
+
+/* Search input */
+.cwc-faq__search-wrap {
+	position: relative;
+}
+
+.cwc-faq__search-icon {
+	position: absolute;
+	left: 16px;
+	top: 50%;
+	transform: translateY(-50%);
+	color: rgba(0, 0, 0, 0.5);
+	pointer-events: none;
+}
+
+.cwc-faq__search {
+	width: 100%;
+	height: 52px;
+	background: #F5F1EB;
+	border: 2px solid rgba(0, 0, 0, 0.3);
+	border-radius: 100px;
+	padding: 0 20px 0 44px;
+	font-family: 'Archivo', var(--wp--preset--font-family--body);
+	font-weight: 500;
+	font-size: 16px;
+	line-height: 100%;
+	color: #000000;
+	transition: border-color 0.2s ease;
+}
+
+.cwc-faq__search::placeholder {
+	color: rgba(0, 0, 0, 0.7);
+}
+
+.cwc-faq__search:focus {
+	outline: none;
+	border-color: var(--wp--preset--color--primary);
+}
+
+/* Category tabs */
+.cwc-faq__tabs {
+	display: flex;
+	flex-direction: column;
+	gap: 0;
+}
+
+.cwc-faq__tab {
+	display: flex;
+	align-items: center;
+	width: 100%;
+	min-height: 62px;
+	padding: 10px 16px;
+	background: transparent;
+	border: none;
+	border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+	cursor: pointer;
+	font-family: 'Sora', var(--wp--preset--font-family--heading);
+	font-weight: 600;
+	font-size: clamp(14px, 0.6vw + 10px, 18px);
+	line-height: 120%;
+	color: var(--wp--preset--color--text);
+	text-align: left;
+	border-radius: 0;
+	transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+.cwc-faq__tab:first-child {
+	border-top: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.cwc-faq__tab:hover {
+	background: rgba(0, 150, 199, 0.08);
+	color: var(--wp--preset--color--primary);
+}
+
+.cwc-faq__tab.is-active {
+	background: var(--wp--preset--color--primary);
+	color: #FFFFFF;
+	border-radius: 8px;
+	border-color: transparent;
+}
+
+.cwc-faq__tab.is-active + .cwc-faq__tab {
+	border-top-color: transparent;
+}
+
+/* ----------------------------------------
+   Vertical divider
+   ---------------------------------------- */
+
+.cwc-faq__divider {
+	width: 1px;
+	align-self: stretch;
+	background: rgba(0, 0, 0, 0.2);
+}
+
+/* ----------------------------------------
+   Right content — category sections
+   ---------------------------------------- */
+
+.cwc-faq__content {
+	min-width: 0;
+}
+
+/* Category panels — only active one is visible */
+.cwc-faq__category {
+	display: none;
+}
+
+.cwc-faq__category.is-active {
+	display: block;
+}
+
+/* Section title */
+.cwc-faq__category-title {
+	font-family: 'Sora', var(--wp--preset--font-family--heading);
+	font-weight: 600;
+	font-size: clamp(28px, 2.2vw + 10px, 48px);
+	line-height: 42px;
+	letter-spacing: -0.3px;
+	color: #0096C7;
+	margin: 0 0 clamp(20px, 2.5vw, 36px);
+}
+
+/* ----------------------------------------
+   Accordion items
+   ---------------------------------------- */
+
+.cwc-faq__item {
+	margin-bottom: 12px;
+}
+
+/* Question row */
+.cwc-faq__question {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	width: 100%;
+	min-height: 73px;
+	background: #F8F9FA;
+	border: none;
+	border-radius: 30px;
+	padding: 16px clamp(20px, 2vw, 32px);
+	gap: 16px;
+	cursor: pointer;
+	transition: background-color 0.2s ease;
+	position: relative;
+	z-index: 1;
+}
+
+.cwc-faq__question:focus-visible {
+	outline: 2px solid var(--wp--preset--color--primary);
+	outline-offset: 2px;
+}
+
+.cwc-faq__question-text {
+	font-family: 'Sora', var(--wp--preset--font-family--heading);
+	font-weight: 600;
+	font-size: clamp(16px, 0.8vw + 10px, 24px);
+	line-height: 42px;
+	letter-spacing: -0.3px;
+	color: #1A1A1A;
+	text-align: left;
+	transition: color 0.25s ease;
+}
+
+/* Icons */
+.cwc-faq__icon {
+	flex-shrink: 0;
+	width: 30px;
+	transition: opacity 0.2s ease;
+}
+
+.cwc-faq__icon--minus {
+	display: none;
+}
+
+/* Open state — on the item parent */
+.cwc-faq__item.is-open .cwc-faq__question-text {
+	color: #0096C7;
+}
+
+.cwc-faq__item.is-open .cwc-faq__icon--plus {
+	display: none;
+}
+
+.cwc-faq__item.is-open .cwc-faq__icon--minus {
+	display: block;
+}
+
+/* Answer panel */
+.cwc-faq__answer {
+	max-height: 0;
+	overflow: hidden;
+	transition: max-height 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+	margin-top: -16px;
+	position: relative;
+	z-index: 0;
+}
+
+.cwc-faq__answer-inner {
+	background: var(--wp--preset--color--primary);
+	border-radius: 30px;
+	padding: 32px clamp(20px, 2vw, 32px) clamp(20px, 2vw, 28px);
+}
+
+.cwc-faq__answer-inner p {
+	font-family: 'Archivo', var(--wp--preset--font-family--body);
+	font-weight: 500;
+	font-size: clamp(16px, 0.6vw + 12px, 22px);
+	line-height: 150%;
+	letter-spacing: -0.3px;
+	color: #F8F9FA;
+	margin: 0;
+}
+
+.cwc-faq__item.is-open .cwc-faq__answer {
+	max-height: 600px;
+}
+
+/* ----------------------------------------
+   Search filtering: matching highlight
+   ---------------------------------------- */
+
+.cwc-faq__item[hidden] {
+	display: none !important;
+}
+
+.cwc-faq__no-results {
+	text-align: center;
+	padding: 60px 20px;
+}
+
+.cwc-faq__no-results p {
+	font-family: 'Archivo', var(--wp--preset--font-family--body);
+	font-weight: 500;
+	font-size: 18px;
+	color: rgba(0, 0, 0, 0.5);
+}
+
+/* ----------------------------------------
+   Responsive
+   ---------------------------------------- */
+
+@media (max-width: 991px) {
+	.cwc-faq {
+		grid-template-columns: 1fr;
+		gap: clamp(20px, 4vw, 32px);
+	}
+
+	.cwc-faq__sidebar {
+		position: static;
+	}
+
+	.cwc-faq__tabs {
+		flex-direction: row;
+		flex-wrap: wrap;
+		gap: 8px;
+	}
+
+	.cwc-faq__tab {
+		width: auto;
+		min-height: 0;
+		padding: 10px 18px;
+		border: 1px solid rgba(0, 0, 0, 0.12);
+		border-radius: 100px;
+		font-size: 14px;
+	}
+
+	.cwc-faq__tab:first-child {
+		border-top: 1px solid rgba(0, 0, 0, 0.12);
+	}
+
+	.cwc-faq__tab.is-active {
+		border-color: var(--wp--preset--color--primary);
+	}
+
+	.cwc-faq__divider {
+		display: none;
+	}
+}
+
+@media (max-width: 600px) {
+	.cwc-faq__question {
+		min-height: 56px;
+		border-radius: 20px;
+		padding: 14px 18px;
+	}
+
+	.cwc-faq__answer-inner {
+		border-radius: 20px;
+		padding: 24px 18px 18px;
+	}
+
+	.cwc-faq__category-title {
+		font-size: 24px;
+		line-height: 120%;
+	}
+}
