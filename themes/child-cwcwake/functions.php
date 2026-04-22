@@ -710,7 +710,7 @@ add_action('init', 'cwc_register_blocks');
  */
 function cwc_body_class_front_page($classes)
 {
-	if (is_front_page()) {
+	if (is_front_page() || is_page('about')) {
 		$classes[] = 'cwc-home';
 	}
 	return $classes;

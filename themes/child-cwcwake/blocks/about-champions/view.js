@@ -9,54 +9,81 @@
 	'use strict';
 
 	document.addEventListener( 'DOMContentLoaded', function () {
-		var root = document.querySelector( '[data-cwc-champions]' );
+		const root = document.querySelector( '[data-cwc-champions]' );
 		if ( ! root ) return;
 
-		var slides  = Array.from( root.querySelectorAll( '.cwc-champions__slide' ) );
-		var phrases = Array.from( root.querySelectorAll( '[data-cwc-phrase]' ) );
-		var total   = slides.length;
-		if ( total === 0 ) return;
+		const track   = root.querySelector( '.cwc-champions__track' );
+		let slides    = Array.from( root.querySelectorAll( '.cwc-champions__slide' ) );
+		const phrases = Array.from( root.querySelectorAll( '[data-cwc-phrase]' ) );
+		const originalTotal = slides.length;
+		if ( originalTotal === 0 ) return;
 
-		var current = 0;
-		var INTERVAL = 3000;
+		// We need a smooth, wide curve. So we'll fill a large cylinder
+		// with cloned slides. Let's aim for ~16-18 slots on the cylinder.
+		const TARGET_SLOTS = 15;
+		
+		// Clone slides so we have enough to form a smooth cylinder
+		if ( slides.length < TARGET_SLOTS ) {
+			const clonesNeeded = TARGET_SLOTS - slides.length;
+			for ( let i = 0; i < clonesNeeded; i++ ) {
+				const clone = slides[ i % originalTotal ].cloneNode( true );
+				track.appendChild( clone );
+			}
+			// Update slides array
+			slides = Array.from( root.querySelectorAll( '.cwc-champions__slide' ) );
+		}
 
-		function layout() {
-			var angleStep = 360 / total;
-			var radius    = Math.min( 360, window.innerWidth * 0.35 );
+		const total = slides.length;
+		const angleStep = 360 / total;
+		
+		let radius = 0;
+		let currentAngle = 0;
+		let currentItem = 0;
 
-			slides.forEach( function ( slide, i ) {
-				var offset = ( ( i - current ) % total + total ) % total;
-				var angle  = offset * angleStep;
-				var rad    = ( angle * Math.PI ) / 180;
+		function initializeCarousel() {
+			const slideWidth = slides[0].offsetWidth; 
+			// Trigonometry to define depth. Adding gap to make it look flush but distinct
+			radius = Math.round( ( slideWidth / 2 ) / Math.tan( (Math.PI / total) ) ) + 20;
 
-				var x     = Math.sin( rad ) * radius;
-				var z     = Math.cos( rad ) * radius - radius;
-				var scale = 0.6 + 0.4 * ( ( z + radius ) / radius );
-				scale = Math.max( 0.5, Math.min( 1, scale ) );
+			slides.forEach( ( slide, i ) => {
+				const angle = i * angleStep;
+				// Placing items on the inside curve (concave)
+				slide.style.transform = `rotateY(${-angle}deg) translateZ(-${radius}px)`;
+			});
 
-				slide.style.transform =
-					'translate(-50%, -50%) translateX(' + x + 'px) translateZ(' + z + 'px) scale(' + scale + ')';
-				slide.style.zIndex    = Math.round( scale * 10 );
-				slide.style.opacity   = scale < 0.65 ? 0.35 : scale;
+			updateView();
+		}
 
-				slide.classList.toggle( 'is-active', i === current );
-			} );
+		function updateView() {
+			// Rotate the track based on concave direction and pull it forward so the active slide is flush
+			track.style.transform = `translate(-50%, -50%) translateZ(${radius}px) rotateY(${-currentAngle}deg)`;
+			
+			slides.forEach( ( slide, i ) => {
+				slide.classList.toggle('is-active', i === currentItem);
+			});
 
-			/* Cycle phrase */
 			if ( phrases.length > 0 ) {
-				var phraseIdx = current % phrases.length;
-				phrases.forEach( function ( p, pi ) {
+				const phraseIdx = currentItem % originalTotal;
+				phrases.forEach( ( p, pi ) => {
 					p.classList.toggle( 'is-active', pi === phraseIdx );
 				} );
 			}
 		}
 
+		let resizeTimer;
+		window.addEventListener('resize', () => {
+			clearTimeout(resizeTimer);
+			resizeTimer = setTimeout(initializeCarousel, 250);
+		});
+
 		function next() {
-			current = ( current + 1 ) % total;
-			layout();
+			currentAngle -= angleStep;
+			currentItem = (currentItem + 1) % total;
+			updateView();
 		}
 
-		layout();
-		setInterval( next, INTERVAL );
+		// Initial setup
+		setTimeout(initializeCarousel, 100);
+		setInterval( next, 3000 );
 	} );
 } )();

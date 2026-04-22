@@ -34,7 +34,7 @@
 	font-weight: 700;
 	font-size: clamp(2rem, 4vw, 4rem);
 	line-height: 110%;
-	color: #1A1A1A;
+	color: #F5F1EB;
 	margin: 0 0 clamp(12px, 1.5vw, 20px);
 	text-transform: uppercase;
 }

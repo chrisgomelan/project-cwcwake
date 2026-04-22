@@ -16,6 +16,7 @@ $secondary_url    = $attributes['secondaryBtnUrl'] ?? '#explore';
 $bg_video         = $attributes['backgroundVideo'] ?? '';
 $video_url        = $attributes['videoUrl'] ?? '';
 $min_height       = $attributes['minHeight'] ?? '100vh';
+$show_scroll      = $attributes['showScrollToDive'] ?? false;
 
 $fallback_image = get_stylesheet_directory_uri() . '/assets/images/hero-fallback.jpg';
 $bg_src         = ! empty( $bg_image ) ? esc_url( $bg_image ) : esc_url( $fallback_image );
@@ -73,5 +74,14 @@ $wrapper_attrs = get_block_wrapper_attributes( [
 		<a href="<?php echo esc_url( $video_url ); ?>" class="cwc-hero__play" aria-label="Play video" target="_blank" rel="noopener noreferrer">
 			<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg>
 		</a>
+	<?php endif; ?>
+
+	<?php if ( $show_scroll ) : ?>
+		<div class="cwc-hero__scroll-dive">
+			<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#F5F1EB" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+				<path d="M12 5v14M19 12l-7 7-7-7"/>
+			</svg>
+			<span>SCROLL TO DIVE</span>
+		</div>
 	<?php endif; ?>
 </section>
