@@ -1,0 +1,73 @@
+/*
+ * CWC Wake — Before Footer CTA
+ */
+
+.cwc-cta-footer {
+	position: relative;
+	width: 100%;
+	min-height: clamp(360px, 40vw, 616px);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: url('/wp-content/uploads/2026/04/before-footer-bg.webp') center / cover no-repeat;
+	overflow: hidden;
+	margin-block-start: 0 !important;
+}
+
+.cwc-cta-footer__overlay {
+	position: absolute;
+	inset: 0;
+	background: linear-gradient(135deg, rgba(43, 76, 242, 0.65) 0%, rgba(56, 189, 248, 0.55) 50%, rgba(224, 242, 254, 0.4) 100%);
+	pointer-events: none;
+}
+
+.cwc-cta-footer__content {
+	position: relative;
+	z-index: 1;
+	text-align: center;
+	padding: clamp(32px, 5vw, 64px) clamp(1.5rem, 4vw, 4rem);
+	max-width: 900px;
+}
+
+.cwc-cta-footer__title {
+	font-family: 'Sora', var(--wp--preset--font-family--heading);
+	font-weight: 700;
+	font-size: clamp(2rem, 4vw, 4rem);
+	line-height: 110%;
+	color: #1A1A1A;
+	margin: 0 0 clamp(12px, 1.5vw, 20px);
+	text-transform: uppercase;
+}
+
+.cwc-cta-footer__desc {
+	font-family: 'Archivo', var(--wp--preset--font-family--body);
+	font-weight: 500;
+	font-size: clamp(16px, 1.5vw + 6px, 30px);
+	line-height: 140%;
+	color: #FFFFFF;
+	margin: 0 0 clamp(20px, 3vw, 36px);
+}
+
+.cwc-cta-footer__btn {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: clamp(160px, 14vw + 40px, 212px);
+	height: clamp(48px, 4vw + 16px, 64px);
+	padding: 20px;
+	gap: 10px;
+	border-radius: 30px;
+	background: var(--wp--preset--color--accent, #FF6B35);
+	font-family: 'Archivo', var(--wp--preset--font-family--body);
+	font-weight: 700;
+	font-size: clamp(16px, 0.8vw + 10px, 22px);
+	line-height: 100%;
+	color: #1A1A1A;
+	text-decoration: none;
+	transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.cwc-cta-footer__btn:hover {
+	transform: translateY(-3px);
+	box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}

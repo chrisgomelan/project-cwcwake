@@ -349,7 +349,10 @@ img {
 .cwc-tropical-section>.wp-block-cwc-featured-blogs,
 .cwc-tropical-section>.wp-block-cwc-upcoming-events,
 .cwc-tropical-section>.wp-block-cwc-all-blogs,
-.cwc-tropical-section>.wp-block-cwc-faq-section {
+.cwc-tropical-section>.wp-block-cwc-faq-section,
+.cwc-tropical-section>.wp-block-cwc-about-timeline,
+.cwc-tropical-section>.wp-block-cwc-about-champions,
+.cwc-tropical-section>.wp-block-cwc-about-empowering {
 	width: 100%;
 	max-width: 1921px;
 	margin-inline: auto;

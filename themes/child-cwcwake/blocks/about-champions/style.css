@@ -1,0 +1,131 @@
+/*
+ * CWC Wake — About: Home of World Champions
+ */
+
+.cwc-champions {
+	padding: var(--wp--preset--spacing--60) 0;
+	overflow: hidden;
+}
+
+.cwc-champions__header {
+	text-align: center;
+	margin-bottom: clamp(32px, 4vw, 56px);
+}
+
+.cwc-champions__title {
+	font-family: 'Sora', var(--wp--preset--font-family--heading);
+	font-weight: 700;
+	font-size: clamp(2rem, 4vw, 4rem);
+	line-height: 1.1;
+	text-transform: uppercase;
+	color: var(--wp--preset--color--text);
+	margin: 0 0 var(--wp--preset--spacing--10);
+}
+
+.cwc-champions__accent {
+	color: var(--wp--preset--color--primary);
+	font-style: italic;
+}
+
+.cwc-champions__desc {
+	font-family: 'Archivo', var(--wp--preset--font-family--body);
+	font-weight: 500;
+	font-size: clamp(16px, 0.5vw + 14px, 20px);
+	line-height: 1.5;
+	color: #1A1A1A;
+	margin: 0 auto;
+	max-width: 700px;
+}
+
+/* ── Carousel ── */
+
+.cwc-champions__carousel {
+	position: relative;
+	width: 100%;
+	height: clamp(300px, 32vw, 480px);
+	perspective: 1200px;
+}
+
+.cwc-champions__track {
+	position: relative;
+	width: 100%;
+	height: 100%;
+	transform-style: preserve-3d;
+}
+
+.cwc-champions__slide {
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	width: clamp(240px, 30vw, 420px);
+	height: clamp(180px, 22vw, 320px);
+	border-radius: 16px;
+	overflow: hidden;
+	box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+	transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+				opacity 0.7s ease,
+				z-index 0s;
+	transform: translate(-50%, -50%);
+	opacity: 0.4;
+}
+
+.cwc-champions__slide img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	display: block;
+}
+
+.cwc-champions__slide.is-active {
+	opacity: 1;
+	z-index: 5;
+}
+
+/* ── Phrase overlay ── */
+
+.cwc-champions__phrase-overlay {
+	position: absolute;
+	bottom: clamp(16px, 3vw, 32px);
+	left: 50%;
+	transform: translateX(-50%);
+	z-index: 10;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.cwc-champions__phrase {
+	display: none;
+	background: var(--wp--preset--color--primary);
+	color: #FFFFFF;
+	font-family: 'Sora', var(--wp--preset--font-family--heading);
+	font-weight: 700;
+	font-size: clamp(18px, 2vw + 6px, 48px);
+	line-height: 100%;
+	text-align: center;
+	padding: clamp(10px, 1.5vw, 18px) clamp(18px, 3vw, 40px);
+	white-space: nowrap;
+	animation: cwc-phrase-in 0.5s ease forwards;
+}
+
+.cwc-champions__phrase.is-active {
+	display: inline-block;
+}
+
+@keyframes cwc-phrase-in {
+	from { opacity: 0; transform: translateY(10px); }
+	to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Responsive ── */
+
+@media (max-width: 600px) {
+	.cwc-champions__carousel {
+		height: 260px;
+	}
+
+	.cwc-champions__phrase {
+		white-space: normal;
+		max-width: 90vw;
+	}
+}

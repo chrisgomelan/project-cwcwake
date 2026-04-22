@@ -1,0 +1,13 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "cwc/about-champions",
+  "title": "About — Home of Champions",
+  "category": "theme",
+  "description": "Curved 3D image carousel with auto-cycling champion phrases.",
+  "supports": { "html": false },
+  "textdomain": "child-cwcwake",
+  "style": "file:./style.css",
+  "viewScript": "file:./view.js",
+  "render": "file:./render.php"
+}

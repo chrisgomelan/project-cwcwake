@@ -694,6 +694,11 @@ function cwc_register_blocks()
 	register_block_type(get_stylesheet_directory() . '/blocks/table-of-contents');
 	register_block_type(get_stylesheet_directory() . '/blocks/rates-manager');
 	register_block_type(get_stylesheet_directory() . '/blocks/faq-section');
+	register_block_type(get_stylesheet_directory() . '/blocks/about-timeline');
+	register_block_type(get_stylesheet_directory() . '/blocks/about-champions');
+	register_block_type(get_stylesheet_directory() . '/blocks/about-certified');
+	register_block_type(get_stylesheet_directory() . '/blocks/about-empowering');
+	register_block_type(get_stylesheet_directory() . '/blocks/before-footer-cta');
 }
 add_action('init', 'cwc_register_blocks');
 

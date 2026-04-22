@@ -1,0 +1,12 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "cwc/before-footer-cta",
+  "title": "Before Footer CTA",
+  "category": "theme",
+  "description": "Full-width call-to-action section with background image, gradient overlay, and Book Now button.",
+  "supports": { "html": false, "align": ["full"] },
+  "textdomain": "child-cwcwake",
+  "style": "file:./style.css",
+  "render": "file:./render.php"
+}

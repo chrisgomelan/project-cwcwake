@@ -1,0 +1,186 @@
+/*
+ * CWC Wake — About: Legacy Timeline
+ */
+
+.cwc-timeline {
+	padding: var(--wp--preset--spacing--60) 0;
+}
+
+/* Header — reuses why-stay title/desc pattern */
+.cwc-timeline__header {
+	margin-bottom: clamp(32px, 4vw, 56px);
+}
+
+.cwc-timeline__title {
+	font-family: 'Sora', var(--wp--preset--font-family--heading);
+	font-weight: 700;
+	font-size: clamp(2.25rem, 4vw, 4.5rem);
+	line-height: 1.1;
+	text-transform: uppercase;
+	color: var(--wp--preset--color--text);
+	margin: 0 0 var(--wp--preset--spacing--10);
+}
+
+.cwc-timeline__accent {
+	color: var(--wp--preset--color--primary);
+	font-style: italic;
+}
+
+.cwc-timeline__desc {
+	font-family: 'Archivo', var(--wp--preset--font-family--body);
+	font-weight: 500;
+	font-size: clamp(16px, 0.5vw + 14px, 20px);
+	line-height: 1.5;
+	color: #1A1A1A;
+	margin: 0;
+	max-width: 740px;
+}
+
+/* Track — vertical line + rows */
+.cwc-timeline__track {
+	position: relative;
+}
+
+.cwc-timeline__line {
+	position: absolute;
+	left: 50%;
+	top: 0;
+	bottom: 0;
+	width: 1px;
+	background: rgba(0, 0, 0, 0.2);
+	transform: translateX(-50%);
+}
+
+/* Each row */
+.cwc-timeline__row {
+	position: relative;
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: clamp(24px, 4vw, 60px);
+	align-items: start;
+	margin-bottom: clamp(40px, 5vw, 72px);
+}
+
+.cwc-timeline__row:last-child {
+	margin-bottom: 0;
+}
+
+/* Dot on the center line */
+.cwc-timeline__dot {
+	position: absolute;
+	left: 50%;
+	top: 24px;
+	width: 69px;
+	height: 69px;
+	border-radius: 50%;
+	background: linear-gradient(180deg, #0096C7 0%, #395144 100%);
+	transform: translateX(-50%);
+	z-index: 2;
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Alternating: left text / right image (default) */
+.cwc-timeline__row--left .cwc-timeline__card {
+	grid-column: 1;
+	grid-row: 1;
+}
+.cwc-timeline__row--left .cwc-timeline__image {
+	grid-column: 2;
+	grid-row: 1;
+}
+
+/* Alternating: right text / left image */
+.cwc-timeline__row--right .cwc-timeline__card {
+	grid-column: 2;
+	grid-row: 1;
+}
+.cwc-timeline__row--right .cwc-timeline__image {
+	grid-column: 1;
+	grid-row: 1;
+}
+
+/* Card */
+.cwc-timeline__card {
+	position: relative;
+	background: #F8F9FA;
+	border-radius: 4px;
+	padding: clamp(20px, 2.5vw, 32px);
+	padding-left: clamp(36px, 3vw, 48px);
+}
+
+.cwc-timeline__card-bar {
+	position: absolute;
+	left: 0;
+	top: -6px;
+	width: 19px;
+	height: calc(100% + 12px);
+	background: var(--wp--preset--color--primary);
+	border-radius: 2px;
+}
+
+.cwc-timeline__year {
+	font-family: 'Sora', var(--wp--preset--font-family--heading);
+	font-weight: 700;
+	font-size: clamp(28px, 2.5vw + 8px, 48px);
+	line-height: 100%;
+	color: #395144;
+}
+
+.cwc-timeline__milestone {
+	font-family: 'Sora', var(--wp--preset--font-family--heading);
+	font-weight: 700;
+	font-size: clamp(28px, 2.5vw + 8px, 48px);
+	line-height: 100%;
+	color: #0096C7;
+}
+
+.cwc-timeline__card-body {
+	font-family: 'Archivo', var(--wp--preset--font-family--body);
+	font-weight: 500;
+	font-size: clamp(14px, 0.4vw + 12px, 20px);
+	line-height: 160%;
+	color: #000000;
+	margin-top: 16px;
+}
+
+/* Image */
+.cwc-timeline__image {
+	overflow: hidden;
+	border-radius: 8px;
+}
+
+.cwc-timeline__image img {
+	width: 100%;
+	height: 291px;
+	object-fit: cover;
+	display: block;
+	border-radius: 8px;
+}
+
+/* ── Responsive ── */
+
+@media (max-width: 991px) {
+	.cwc-timeline__line,
+	.cwc-timeline__dot {
+		display: none;
+	}
+
+	.cwc-timeline__row,
+	.cwc-timeline__row--left,
+	.cwc-timeline__row--right {
+		grid-template-columns: 1fr;
+	}
+
+	.cwc-timeline__row--left .cwc-timeline__card,
+	.cwc-timeline__row--right .cwc-timeline__card,
+	.cwc-timeline__row--left .cwc-timeline__image,
+	.cwc-timeline__row--right .cwc-timeline__image {
+		grid-column: 1;
+		grid-row: auto;
+	}
+
+	.cwc-timeline__image img {
+		height: auto;
+		max-height: 280px;
+	}
+}

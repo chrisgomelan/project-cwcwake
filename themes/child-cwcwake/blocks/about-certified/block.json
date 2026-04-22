@@ -1,0 +1,12 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "cwc/about-certified",
+  "title": "About — Certified Safe",
+  "category": "theme",
+  "description": "Dark section with 3-column certification cards and doodle background.",
+  "supports": { "html": false },
+  "textdomain": "child-cwcwake",
+  "style": "file:./style.css",
+  "render": "file:./render.php"
+}
