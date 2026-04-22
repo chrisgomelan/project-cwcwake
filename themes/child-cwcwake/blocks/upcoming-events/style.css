@@ -1,0 +1,284 @@
+/**
+ * Upcoming Events block — frontend + editor styles.
+ *
+ * Implements the timeline rail + active event card from
+ * `designs/blogs-design.md` § 2:
+ *
+ *   - Vertical month / day rail on the left (~200px).
+ *   - Large active event card on the right (image header + body).
+ *   - Active circle: 110×110, primary blue.
+ *   - Other circles: 73×73, dark text color.
+ *
+ * The rail uses `.cwc-upcoming-events__day--active` to mark the
+ * primary item; non-active items are clickable links to their
+ * respective posts.
+ */
+
+.cwc-upcoming-events {
+	width: 100%;
+	max-width: 1488px;
+	margin: 0 auto;
+	padding: 0 var(--wp--preset--spacing--40);
+	box-sizing: border-box;
+}
+
+.cwc-upcoming-events__header {
+	margin-bottom: 2rem;
+}
+
+.cwc-upcoming-events__title {
+	font-family: var(--wp--preset--font-family--heading);
+	font-weight: 700;
+	font-size: clamp(2rem, 4vw, 3rem);
+	line-height: 1;
+	letter-spacing: 0;
+	color: #000000;
+	margin: 0 0 0.75rem;
+}
+
+.cwc-upcoming-events__title-text {
+	color: #000000;
+}
+
+.cwc-upcoming-events__title-highlight {
+	font-style: italic;
+	color: var(--wp--preset--color--primary);
+	margin-left: 0.25em;
+}
+
+.cwc-upcoming-events__description {
+	font-family: var(--wp--preset--font-family--body);
+	font-weight: 500;
+	font-size: clamp(1rem, 1.4vw, 1.25rem);
+	line-height: 1.5;
+	color: var(--wp--preset--color--text);
+	margin: 0;
+	max-width: 70ch;
+}
+
+.cwc-upcoming-events__layout {
+	display: grid;
+	grid-template-columns: 200px 1fr;
+	gap: 2rem;
+	align-items: start;
+}
+
+/* ---------------------------------------------------------
+ * Timeline rail
+ * --------------------------------------------------------- */
+
+.cwc-upcoming-events__timeline {
+	list-style: none;
+	margin: 0;
+	padding: 1rem 0;
+	display: flex;
+	flex-direction: column;
+	gap: 1.25rem;
+	position: relative;
+}
+
+/* Vertical connector line drawn behind the day circles. */
+.cwc-upcoming-events__timeline::before {
+	content: "";
+	position: absolute;
+	top: 1.5rem;
+	bottom: 1.5rem;
+	left: calc(60% - 1px);
+	width: 2px;
+	background-color: rgba(0, 0, 0, 0.15);
+	z-index: 0;
+}
+
+.cwc-upcoming-events__rail-item {
+	display: grid;
+	grid-template-columns: 1fr auto;
+	align-items: center;
+	gap: 1rem;
+	position: relative;
+	z-index: 1;
+}
+
+.cwc-upcoming-events__month {
+	font-family: var(--wp--preset--font-family--heading);
+	font-weight: 600;
+	font-size: 1.25rem;
+	color: rgba(0, 0, 0, 0.7);
+	text-align: right;
+}
+
+.cwc-upcoming-events__rail-item--active .cwc-upcoming-events__month {
+	color: #000000;
+}
+
+.cwc-upcoming-events__day {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 73px;
+	height: 73px;
+	border-radius: 50%;
+	background-color: #1a1a1a;
+	color: #f8f9fa;
+	font-family: var(--wp--preset--font-family--heading);
+	font-weight: 700;
+	font-size: 1.5rem;
+	text-decoration: none;
+	transition: transform 150ms ease, background-color 150ms ease;
+}
+
+a.cwc-upcoming-events__day:hover,
+a.cwc-upcoming-events__day:focus-visible {
+	background-color: var(--wp--preset--color--primary-dark);
+	transform: scale(1.05);
+}
+
+.cwc-upcoming-events__day--active {
+	width: 110px;
+	height: 110px;
+	background-color: var(--wp--preset--color--primary);
+	font-size: 2.25rem;
+}
+
+/* ---------------------------------------------------------
+ * Active event card
+ * --------------------------------------------------------- */
+
+.cwc-upcoming-events__card {
+	background-color: #f8f9fa;
+	border-radius: 30px;
+	overflow: hidden;
+	max-width: 1459px;
+}
+
+.cwc-upcoming-events__card-image-link {
+	display: block;
+	margin: 1.5rem;
+	border-radius: 30px;
+	overflow: hidden;
+	aspect-ratio: 1408 / 306;
+}
+
+.cwc-upcoming-events__card-image {
+	display: block;
+	width: 100%;
+	height: 100%;
+	background-position: center;
+	background-size: cover;
+	background-repeat: no-repeat;
+}
+
+.cwc-upcoming-events__card-body {
+	padding: 0 2rem 2rem;
+}
+
+.cwc-upcoming-events__card-title {
+	font-family: var(--wp--preset--font-family--heading);
+	font-weight: 700;
+	font-size: clamp(1.5rem, 2.4vw, 2rem);
+	color: var(--wp--preset--color--secondary);
+	margin: 0 0 0.75rem;
+}
+
+.cwc-upcoming-events__card-title a {
+	color: inherit;
+	text-decoration: none;
+}
+
+.cwc-upcoming-events__card-title a:hover,
+.cwc-upcoming-events__card-title a:focus-visible {
+	text-decoration: underline;
+}
+
+.cwc-upcoming-events__card-excerpt {
+	font-family: var(--wp--preset--font-family--body);
+	font-weight: 500;
+	font-size: clamp(0.9rem, 1.2vw, 1.25rem);
+	line-height: 1.5;
+	color: rgba(0, 0, 0, 0.6);
+	margin: 0;
+}
+
+/* ---------------------------------------------------------
+ * Screen-reader-only utility (matches Twenty Twenty-Five)
+ * --------------------------------------------------------- */
+
+.screen-reader-text {
+	border: 0;
+	clip: rect(1px, 1px, 1px, 1px);
+	clip-path: inset(50%);
+	height: 1px;
+	margin: -1px;
+	overflow: hidden;
+	padding: 0;
+	position: absolute !important;
+	width: 1px;
+	word-wrap: normal !important;
+}
+
+/* ---------------------------------------------------------
+ * Responsive: tablet
+ * --------------------------------------------------------- */
+
+@media (max-width: 1024px) {
+	.cwc-upcoming-events__layout {
+		grid-template-columns: 160px 1fr;
+		gap: 1.5rem;
+	}
+
+	.cwc-upcoming-events__day--active {
+		width: 88px;
+		height: 88px;
+		font-size: 1.75rem;
+	}
+
+	.cwc-upcoming-events__day {
+		width: 60px;
+		height: 60px;
+		font-size: 1.25rem;
+	}
+}
+
+/* ---------------------------------------------------------
+ * Responsive: mobile — stack timeline above card.
+ * --------------------------------------------------------- */
+
+@media (max-width: 720px) {
+	.cwc-upcoming-events {
+		padding: 0 var(--wp--preset--spacing--30);
+	}
+
+	.cwc-upcoming-events__layout {
+		grid-template-columns: 1fr;
+	}
+
+	.cwc-upcoming-events__timeline {
+		flex-direction: row;
+		justify-content: center;
+		flex-wrap: wrap;
+		padding: 0;
+	}
+
+	.cwc-upcoming-events__timeline::before {
+		display: none;
+	}
+
+	.cwc-upcoming-events__rail-item {
+		grid-template-columns: auto;
+		justify-items: center;
+		text-align: center;
+		gap: 0.5rem;
+	}
+
+	.cwc-upcoming-events__month {
+		text-align: center;
+		font-size: 0.95rem;
+	}
+
+	.cwc-upcoming-events__card-image-link {
+		margin: 1rem;
+	}
+
+	.cwc-upcoming-events__card-body {
+		padding: 0 1rem 1.25rem;
+	}
+}

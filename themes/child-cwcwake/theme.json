@@ -429,6 +429,11 @@
 			"name": "page-privacy-policy",
 			"title": "Privacy Policy",
 			"postTypes": ["page"]
+		},
+		{
+			"name": "page-blogs",
+			"title": "Blogs",
+			"postTypes": ["page"]
 		}
 	],
 	"templateParts": [

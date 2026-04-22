@@ -314,6 +314,27 @@ require_once get_stylesheet_directory() . '/inc/albums-seed.php';
 require_once get_stylesheet_directory() . '/inc/albums-parent-enforcement.php';
 
 /*
+ * Blogs page support.
+ *
+ * Two pieces:
+ *   - `blog-helpers.php` defines the shared utilities consumed by
+ *     the three Blogs page blocks (image URL resolution, excerpt
+ *     building, blog landing URL). Loaded outside of any block's
+ *     render.php so the helpers exist exactly once per request.
+ *   - `blogs-page-seed.php` forces `page-blogs` on the existing
+ *     /plan-your-trip/blogs/ page so the template hierarchy renders
+ *     the new sections without an editor having to manually
+ *     re-pick the template. Idempotent (option-guarded).
+ *
+ * The actual blog *content* (sample posts + categories) is seeded
+ * by the `cwc-accommodations` plugin
+ * (`includes/blog-seeder.php`) so a theme swap doesn't take the
+ * sample data with it.
+ */
+require_once get_stylesheet_directory() . '/inc/blog-helpers.php';
+require_once get_stylesheet_directory() . '/inc/blogs-page-seed.php';
+
+/*
  * Accommodations (Rooms) data layer.
  *
  * The `accommodation` CPT, its meta fields, the admin meta boxes,
@@ -542,6 +563,9 @@ function cwc_register_blocks()
 	register_block_type(get_stylesheet_directory() . '/blocks/albums-grid');
 	register_block_type(get_stylesheet_directory() . '/blocks/album-back-link');
 	register_block_type(get_stylesheet_directory() . '/blocks/why-stay');
+	register_block_type(get_stylesheet_directory() . '/blocks/featured-blogs');
+	register_block_type(get_stylesheet_directory() . '/blocks/upcoming-events');
+	register_block_type(get_stylesheet_directory() . '/blocks/all-blogs');
 }
 add_action('init', 'cwc_register_blocks');
 

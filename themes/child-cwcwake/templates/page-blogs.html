@@ -1,0 +1,57 @@
+<!-- wp:template-part {"slug":"header"} /-->
+
+<!-- wp:cwc/page-banner {
+	"title": "BLOGS",
+	"backgroundImage": "/wp-content/uploads/2026/04/blogs-banner-bg.webp",
+	"overlayOpacity": 40,
+	"size": "default",
+	"showCorners": true,
+	"useFeaturedImage": true,
+	"align": "full"
+} /-->
+
+<!-- wp:group {
+	"align": "full",
+	"className": "cwc-tropical-section",
+	"style": {
+		"spacing": {
+			"margin": { "top": "0" },
+			"padding": {
+				"top": "var:preset|spacing|40",
+				"bottom": "var:preset|spacing|70"
+			},
+			"blockGap": "var:preset|spacing|60"
+		}
+	},
+	"layout": { "type": "default" }
+} -->
+<div class="wp-block-group alignfull cwc-tropical-section" style="margin-top:0;padding-top:var(--wp--preset--spacing--40);padding-bottom:var(--wp--preset--spacing--70)">
+
+	<!-- wp:cwc/breadcrumbs /-->
+
+	<!--
+		Blogs page sections (designs/blogs-design.md):
+		  - § 1 Featured Blogs (asymmetric 5-card hero grid).
+		  - § 2 Upcoming Events (timeline + active card).
+		  - § 3 All Blogs (paginated 3-col grid + category filter).
+		Each block self-resolves its data — no attributes are
+		required here, so editors swapping the page template don't
+		have to keep query args in sync.
+	-->
+	<!-- wp:cwc/featured-blogs /-->
+
+	<!-- wp:cwc/upcoming-events /-->
+
+	<!-- wp:cwc/all-blogs /-->
+
+	<!--
+		Optional editor extension point: anything an editor adds to
+		the Gutenberg post body still renders below the standard
+		layout — useful for one-off promos, embeds, or seasonal
+		callouts without forking the template.
+	-->
+	<!-- wp:post-content {"layout":{"type":"default"}} /-->
+</div>
+<!-- /wp:group -->
+
+<!-- wp:template-part {"slug":"footer"} /-->
