@@ -64,7 +64,17 @@ function cwc_handle_accommodations_settings_save() {
 	}
 	update_option( 'cwc_dynamic_amenities', $amenities );
 
-	wp_safe_redirect( add_query_arg( [ 'post_type' => 'accommodation', 'page' => 'cwc-amenity-settings', 'updated' => '1' ], admin_url( 'edit.php' ) ) );
+	$seeded = 0;
+	if ( isset( $_POST['cwc_seed_blogs'] ) ) {
+		$seeded = cwc_seed_blog_posts();
+	}
+
+	wp_safe_redirect( add_query_arg( [ 
+		'post_type' => 'accommodation', 
+		'page'      => 'cwc-amenity-settings', 
+		'updated'   => '1',
+		'seeded'    => $seeded
+	], admin_url( 'edit.php' ) ) );
 	exit;
 }
 add_action( 'admin_post_cwc_acc_settings_save', 'cwc_handle_accommodations_settings_save' );
@@ -75,15 +85,10 @@ add_action( 'admin_post_cwc_acc_settings_save', 'cwc_handle_accommodations_setti
 function cwc_render_accommodations_settings_page() {
 	wp_enqueue_media();
 	// Handle Seeding
-	if ( isset( $_POST['cwc_seed_blogs'] ) ) {
-		check_admin_referer( 'cwc_acc_settings_save', 'cwc_acc_settings_nonce' );
-		$created = cwc_seed_blog_posts();
-		add_settings_error( 'cwc_acc_messages', 'cwc_seeded', sprintf( __( '%d sample blog posts created/checked.', 'cwc-accommodations' ), $created ), 'updated' );
-	}
-
 	$pool      = get_option( 'cwc_icon_pool', [] );
 	$amenities = get_option( 'cwc_dynamic_amenities', [] );
 	$updated   = isset( $_GET['updated'] );
+	$seeded    = isset( $_GET['seeded'] ) ? intval( $_GET['seeded'] ) : -1;
 
 	// Ensure legacy icons are visible in the pool if it's empty
 	if ( empty( $pool ) ) {
@@ -99,6 +104,10 @@ function cwc_render_accommodations_settings_page() {
 
 		<?php if ( $updated ) : ?>
 			<div class="notice notice-success is-dismissible"><p><?php esc_html_e( 'Settings saved.', 'cwc-accommodations' ); ?></p></div>
+		<?php endif; ?>
+
+		<?php if ( $seeded >= 0 ) : ?>
+			<div class="notice notice-info is-dismissible"><p><?php printf( esc_html__( '%d sample blog posts created/checked.', 'cwc-accommodations' ), $seeded ); ?></p></div>
 		<?php endif; ?>
 
 		<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
