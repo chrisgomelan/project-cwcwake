@@ -1,0 +1,61 @@
+{
+    "$schema": "https://schemas.wp.org/trunk/block.json",
+    "apiVersion": 3,
+    "name": "cwc/rates-manager",
+    "version": "1.0.0",
+    "title": "Rates Manager",
+    "category": "cwc-blocks",
+    "icon": "calendar-alt",
+    "description": "Tabbed Rates and Schedule manager with tropical background.",
+    "supports": {
+        "html": false,
+        "align": ["full"]
+    },
+    "attributes": {
+        "align": {
+            "type": "string",
+            "default": "full"
+        },
+        "categories": {
+            "type": "array",
+            "default": [
+                {
+                    "id": "park-hours",
+                    "title": "PARK HOURS",
+                    "description": "Our facilities open daily to ensure you get the most out of your stay at CWC. Note that schedules may shift slightly during special events or competitions.",
+                    "table": [
+                        ["Facility", "Weekdays", "Weekends"],
+                        ["Cable Park", "8:00 AM - 6:00 PM", "8:00 AM - 6:00 PM"],
+                        ["Swimming Pool", "8:30 AM - 6:00 PM", "8:30 AM - 9:00 PM"],
+                        ["Restaurant", "6:00 AM - 11:00 PM", "6:00 AM - 11:00 PM"]
+                    ]
+                },
+                {
+                    "id": "day-pass",
+                    "title": "DAY PASS",
+                    "description": "Perfect for short visits and adrenaline seekers. Access our world-class cable park and swimming facilities for a full day of adventure.",
+                    "table": [
+                        ["Duration", "Rate (PHP)", "Inclusions"],
+                        ["1 Hour", "250.00", "Cable & Life Vest"],
+                        ["Half Day", "650.00", "4 Hours Use"],
+                        ["Full Day", "1,200.00", "Unlimited Cable"]
+                    ]
+                },
+                {
+                    "id": "rentals",
+                    "title": "EQUIPMENT RENTALS",
+                    "description": "Don't have your own gear? We provide top-of-the-line equipment from our partners like Slingshot and Liquid Force.",
+                    "table": [
+                        ["Item", "Rate (PHP)", "Type"],
+                        ["Beginner Board", "FREE", "Standard"],
+                        ["Pro Board", "500.00", "Performance"],
+                        ["Helmet", "150.00", "Safety Gear"]
+                    ]
+                }
+            ]
+        }
+    },
+    "style": "file:./style.css",
+    "viewScript": "file:./view.js",
+    "render": "file:./render.php"
+}

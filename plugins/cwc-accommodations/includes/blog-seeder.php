@@ -129,6 +129,44 @@ function cwc_blog_seed_dataset(): array {
 			'excerpt'  => 'From travel essentials to insider tips and everything you need to plan a smooth and stress-free visit to CWC.',
 			'image'    => 'plan-your-trip.webp',
 			'featured' => true,
+			'content'  => '
+<h2>Introduction</h2>
+<p>Planning a trip to CamSur Watersports Complex (CWC)? Whether you\'re chasing adrenaline on the water or looking for a relaxing getaway, this guide covers everything you need to know before you go. From travel tips to must-try activities, get ready for a smooth and unforgettable experience.</p>
+
+<h2>Getting There</h2>
+<p>CWC is located in Camarines Sur and is accessible by land or air. If you\'re coming from Manila, you can take a short flight to Naga City or enjoy a scenic road trip. From there, it\'s just a quick ride to the park.</p>
+
+<!-- wp:image {"sizeSlug":"full","linkDestination":"none"} -->
+<figure class="wp-block-image size-full"><img src="/wp-content/uploads/2026/04/landing-activities.webp" alt="getting there"/></figure>
+<!-- /wp:image -->
+
+<h2>Best Time to Visit</h2>
+<p>CWC is located in Camarines Sur and is accessible by land or air. If you\'re coming from Manila, you can take a short flight to Naga City or enjoy a scenic road trip. From there, it\'s just a quick ride to the park.</p>
+
+<h3>Weekday vs Weekend</h3>
+<p>Weekdays are ideal if you want to avoid crowds, while weekends offer a more lively atmosphere with more activities and events.</p>
+
+<h2>What to Bring</h2>
+<p>CWC is located in Camarines Sur and is accessible by land or air. If you\'re coming from Manila, you can take a short flight to Naga City or enjoy a scenic road trip. From there, it\'s just a quick ride to the park.</p>
+
+<h3>Essentials</h3>
+<ul>
+	<li>Swimwear and extra clothes</li>
+	<li>Sunscreen and sunglasses</li>
+	<li>Waterproof bag for valuables</li>
+	<li>Slippers or comfortable footwear</li>
+</ul>
+
+<!-- wp:image {"sizeSlug":"full","linkDestination":"none"} -->
+<figure class="wp-block-image size-full"><img src="/wp-content/uploads/2026/04/cabana-rentals.webp" alt="what to bring"/></figure>
+<!-- /wp:image -->
+
+<h2>Accommodation Options</h2>
+<p>Stay close to the action with cozy, air-conditioned rooms within the complex. Booking in advance is highly recommended, especially during peak seasons and holidays.</p>
+
+<h2>Final Thoughts</h2>
+<p>A trip to CWC is all about balance—thrill and relaxation, activity and downtime. With the right planning, you can make the most out of your visit and create an unforgettable experience.</p>
+',
 		],
 		[
 			'title'    => 'Ride the Waves: Wakeboarding Experiences at CWC',
@@ -136,6 +174,17 @@ function cwc_blog_seed_dataset(): array {
 			'excerpt'  => 'Feel the thrill of riding across the cable wakes. Discover why CWC is a must-visit for water sports lovers.',
 			'image'    => 'ride-the-waves-2.webp',
 			'featured' => true,
+			'content'  => '
+<h2>Introduction to Wakeboarding</h2>
+<p>Whether you are a seasoned pro or a complete beginner, wakeboarding at CWC is an experience like no other. Our cable systems are designed to cater to all levels, providing the perfect environment for learning or perfecting new tricks.</p>
+
+<!-- wp:image {"sizeSlug":"full","linkDestination":"none"} -->
+<figure class="wp-block-image size-full"><img src="/wp-content/uploads/2026/04/water-sports.webp" alt="wakeboarding"/></figure>
+<!-- /wp:image -->
+
+<h2>What to Expect</h2>
+<p>Expect vibrant energy and a supportive community. Our instructors are always on hand to help you get started, and you will find plenty of gear available for rent at the pro shop.</p>
+',
 		],
 		[
 			'title'    => 'Experience the Energy: Events and Nightlife at CWC',
@@ -143,6 +192,14 @@ function cwc_blog_seed_dataset(): array {
 			'excerpt'  => 'Discover after-dark events, music nights, and live performances that turn CWC into a non-stop lifestyle destination.',
 			'image'    => 'experiece-the-energy-2.webp',
 			'featured' => true,
+			'content'  => '
+<h2>The Nightlife Scene</h2>
+<p>After the cables stop spinning, the party begins. CWC is home to some of the Most exciting events in Camarines Sur, from acoustic sessions to full-blown DJ sets that keep the energy high long after the sun goes down.</p>
+
+<!-- wp:image {"sizeSlug":"full","linkDestination":"none"} -->
+<figure class="wp-block-image size-full"><img src="/wp-content/uploads/2026/04/clubhouse-resto-bar.webp" alt="nightlife"/></figure>
+<!-- /wp:image -->
+',
 		],
 		[
 			'title'    => 'Top 5 Hidden Spots in CamSur',
@@ -150,6 +207,10 @@ function cwc_blog_seed_dataset(): array {
 			'excerpt'  => 'Explore the natural beauty of Camarines Sur beyond the wakeboarding park — beaches, trails, and food finds.',
 			'image'    => 'explore-camsur.webp',
 			'featured' => true,
+			'content'  => '
+<h2>Beyond the Park</h2>
+<p>Camarines Sur is a treasure trove of natural wonders. While CWC is the heart of the action, taking a day trip to explore nearby beaches and hiking trails is highly recommended for those who love the great outdoors.</p>
+',
 		],
 		[
 			'title'    => 'A Beginner\'s Guide to Cable Parks',
@@ -157,6 +218,10 @@ function cwc_blog_seed_dataset(): array {
 			'excerpt'  => 'First time at a cable park? Here is everything you need to know before you hit the water.',
 			'image'    => 'cabana-rentals.webp',
 			'featured' => true,
+			'content'  => '
+<h2>Getting Started</h2>
+<p>If its your first time at a cable park, dont worry. We have dedicated beginner cables that travel at a slower speed, making it much easier to find your balance and get the feel of the board before moving to the main lake.</p>
+',
 		],
 
 		// Upcoming Events (3 posts)
@@ -245,11 +310,12 @@ function cwc_blog_seed_insert_row( array $row, array $cat_ids ): bool {
 	}
 
 	$excerpt = (string) ( $row['excerpt'] ?? '' );
+	$content = (string) ( $row['content'] ?? ( $excerpt . ' Lorem ipsum dolor sit amet, consectetur adipiscing elit.' ) );
 
 	$post_id = wp_insert_post( [
 		'post_title'    => $title,
 		'post_name'     => $slug,
-		'post_content'  => $excerpt . ' Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+		'post_content'  => $content,
 		'post_excerpt'  => $excerpt,
 		'post_status'   => 'publish',
 		'post_type'     => 'post',

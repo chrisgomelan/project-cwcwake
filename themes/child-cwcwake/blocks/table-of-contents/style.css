@@ -31,7 +31,7 @@
 
 .cwc-toc__list-wrap {
 	position: relative;
-	padding-left: 24px;
+	padding-left: 40px;
 }
 
 /* Vertical rail (background track) */
@@ -40,8 +40,8 @@
 	left: 0;
 	top: 6px;
 	bottom: 6px;
-	width: 2px;
-	background-color: rgba(255, 255, 255, 0.2);
+	width: 5px;
+	background-color: #D9D9D9;
 }
 
 /* Filled progress portion */
@@ -51,8 +51,8 @@
 	top: 0;
 	width: 100%;
 	height: 0%;
-	background-color: #96E5FF;
-	box-shadow: 0 0 8px rgba(150, 229, 255, 0.45);
+	background-color: #0096C7;
+	box-shadow: 0 0 10px rgba(0, 150, 199, 0.3);
 	transition: height 0.12s ease-out;
 }
 
@@ -61,16 +61,15 @@
 	position: absolute;
 	left: 1px;
 	top: 0;
-	width: 16px;
-	height: 16px;
-	background-color: #96E5FF;
-	border: 3px solid #FFFFFF;
+	width: 48px;
+	height: 48px;
+	background-color: #0096C7;
 	border-radius: 50%;
 	transform: translate(-50%, -50%);
 	z-index: 2;
 	transition: top 0.3s cubic-bezier(0.17, 0.67, 0.83, 0.67), opacity 0.3s ease;
 	opacity: 0;
-	box-shadow: 0 0 10px rgba(150, 229, 255, 0.5);
+	box-shadow: 0 0 15px rgba(0, 150, 199, 0.4);
 }
 
 /* List */

@@ -14,25 +14,37 @@
    Back link
    ---------------------------------------- */
 
-.cwc-single-post__back-link {
-	margin-bottom: 12px;
+.cwc-single-post__inner {
+	width: 100%;
+	max-width: 1921px;
+	margin-inline: auto;
+	padding-inline: clamp(1.5rem, 4vw, 4rem);
+	padding-top: clamp(32px, 5vw, 64px);
+	overflow: visible !important; /* Required for sticky TOC */
 }
 
-.cwc-single-post__back {
+.cwc-single-post__back-link {
+	display: flex;
+	justify-content: flex-end;
+	margin-bottom: clamp(12px, 2vw, 24px);
+}
+
+.cwc-single-post__back-btn {
 	display: inline-flex;
 	align-items: center;
-	gap: 6px;
-	font-family: 'Archivo', var(--wp--preset--font-family--body);
-	font-weight: 500;
-	font-size: 16px;
-	color: var(--wp--preset--color--primary);
+	gap: 10px;
+	font-family: 'Sora', var(--wp--preset--font-family--heading);
+	font-weight: 400;
+	font-size: 20px;
+	line-height: 150%;
+	color: #000000CC;
 	text-decoration: none;
-	transition: color 0.2s ease, gap 0.2s ease;
+	transition: color 0.3s ease, gap 0.3s ease;
 }
 
-.cwc-single-post__back:hover {
-	color: var(--wp--preset--color--text);
-	gap: 10px;
+.cwc-single-post__back-btn:hover {
+	color: #000000;
+	gap: 14px;
 }
 
 /* ----------------------------------------
@@ -96,7 +108,7 @@
    ---------------------------------------- */
 
 .cwc-single-post__columns {
-	align-items: flex-start !important;
+	align-items: stretch !important;
 	gap: clamp(24px, 3vw, 48px) !important;
 }
 

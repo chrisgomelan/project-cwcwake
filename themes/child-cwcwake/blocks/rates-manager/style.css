@@ -1,0 +1,217 @@
+/*
+ * CWC Wake — Rates Manager block
+ */
+
+.cwc-rates-manager__inner {
+	width: 100%;
+	max-width: 1921px;
+	margin-inline: auto;
+	padding-inline: var(--cwc-header-pad-x, clamp(1rem, 4vw, 4rem));
+}
+
+.cwc-rates-manager__columns {
+	display: flex;
+	align-items: stretch;
+	gap: clamp(40px, 5vw, 100px);
+}
+
+.cwc-rates-manager__sidebar {
+	flex: 0 0 clamp(300px, 25vw, 425px);
+	position: sticky;
+	top: calc(var(--cwc-header-h) + 40px);
+}
+
+.cwc-rates-manager__content-area {
+	flex: 1;
+	min-width: 0;
+}
+
+/* ----------------------------------------
+   Tabs
+   ---------------------------------------- */
+
+.cwc-rates-manager__tabs {
+	display: flex;
+	flex-direction: column;
+	gap: 15px;
+}
+
+.cwc-rates-manager__tab {
+	/* Dimensions */
+	width: 100%;
+	height: 55px;
+	padding: 10px 20px;
+
+	/* Visual */
+	background: #1A1A1A;
+	color: #F5F1EB;
+	border: none;
+	border-radius: 30px;
+	cursor: pointer;
+
+	/* Typography */
+	font-family: 'Sora', var(--wp--preset--font-family--heading);
+	font-weight: 600;
+	font-size: 24px;
+	line-height: 100%;
+	text-align: left;
+
+	/* Transitions */
+	transition: background-color 0.3s ease, transform 0.2s ease;
+	outline: none !important;
+}
+
+.cwc-rates-manager__tab:hover {
+	background: #333;
+}
+
+.cwc-rates-manager__tab.is-active {
+	background: var(--wp--preset--color--primary, #0096C7);
+}
+
+/* ----------------------------------------
+   Panels
+   ---------------------------------------- */
+
+.cwc-rates-manager__panel {
+	display: none;
+	background: #FFFFFF;
+	border: 1px solid rgba(0, 0, 0, 0.3);
+	border-radius: 30px;
+	position: relative;
+	overflow: hidden;
+	animation: fadeIn 0.4s ease-out;
+}
+
+.cwc-rates-manager__panel.is-active {
+	display: flex;
+	flex-direction: column;
+}
+
+@keyframes fadeIn {
+	from {
+		opacity: 0;
+		transform: translateY(10px);
+	}
+
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+.cwc-rates-manager__accent-bar {
+	width: 100%;
+	height: 16px;
+	background: #0096C7;
+}
+
+.cwc-rates-manager__panel-body {
+	padding: clamp(32px, 5vw, 64px);
+}
+
+.cwc-rates-manager__title {
+	font-family: 'Sora', var(--wp--preset--font-family--heading) !important;
+	font-weight: 700 !important;
+	font-size: clamp(32px, 4vw, 64px) !important;
+	line-height: 100% !important;
+	color: #0096C7 !important;
+	margin-bottom: 24px !important;
+}
+
+.cwc-rates-manager__description {
+	font-family: 'Archivo', var(--wp--preset--font-family--body) !important;
+	font-weight: 500 !important;
+	font-size: 20px !important;
+	line-height: 130% !important;
+	color: #000000 !important;
+	margin-bottom: 48px !important;
+	max-width: 900px;
+}
+
+/* ----------------------------------------
+   Table
+   ---------------------------------------- */
+
+.cwc-rates-manager__table-wrap {
+	width: 100%;
+	background: #363636;
+	border: 1px solid #5B5B5B;
+	border-radius: 4px;
+	overflow: hidden;
+}
+
+.cwc-rates-manager__table {
+	width: 100%;
+	border-collapse: collapse;
+	border-right: 1px solid #5B5B5B;
+	border-bottom: 1px solid #5B5B5B;
+}
+
+.cwc-rates-manager__cell {
+	height: 72px;
+	padding: 0 24px;
+	border-top: 1px solid #5B5B5B;
+	border-left: 1px solid #5B5B5B;
+
+	/* Typography */
+	font-family: 'Inter', sans-serif;
+	font-weight: 600;
+	font-size: 24px;
+	line-height: 130%;
+	color: #FFFFFF;
+	text-align: left;
+}
+
+th.cwc-rates-manager__cell {
+	background: rgba(255, 255, 255, 0.05);
+	color: #FFFFFF;
+	/* Brand blue for headers */
+}
+
+/* ----------------------------------------
+   Responsive
+   ---------------------------------------- */
+
+@media (max-width: 1024px) {
+	.cwc-rates-manager__columns {
+		flex-direction: column;
+	}
+
+	.cwc-rates-manager__sidebar {
+		flex: none;
+		width: 100%;
+		position: static;
+	}
+
+	.cwc-rates-manager__tabs {
+		flex-direction: row;
+		overflow-x: auto;
+		padding-bottom: 15px;
+	}
+
+	.cwc-rates-manager__tab {
+		width: auto;
+		white-space: nowrap;
+	}
+
+	.cwc-rates-manager__accent-bar {
+		width: 100%;
+		left: 0;
+		transform: none;
+		top: 0;
+		border-radius: 30px 30px 0 0;
+	}
+}
+
+@media (max-width: 600px) {
+	.cwc-rates-manager__panel-body {
+		padding: 24px;
+	}
+
+	.cwc-rates-manager__cell {
+		font-size: 16px;
+		height: 60px;
+		padding: 0 12px;
+	}
+}

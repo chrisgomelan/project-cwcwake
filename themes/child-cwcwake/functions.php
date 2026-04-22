@@ -12,6 +12,9 @@ if (!defined('ABSPATH')) {
 
 define('CWC_VERSION', wp_get_theme()->get('Version'));
 
+// Remove the admin bar for a cleaner frontend experience
+add_filter('show_admin_bar', '__return_false');
+
 /**
  * Enqueue parent and child theme stylesheets.
  */
@@ -681,6 +684,7 @@ function cwc_register_blocks()
 	register_block_type(get_stylesheet_directory() . '/blocks/upcoming-events');
 	register_block_type(get_stylesheet_directory() . '/blocks/all-blogs');
 	register_block_type(get_stylesheet_directory() . '/blocks/table-of-contents');
+	register_block_type(get_stylesheet_directory() . '/blocks/rates-manager');
 }
 add_action('init', 'cwc_register_blocks');
 
