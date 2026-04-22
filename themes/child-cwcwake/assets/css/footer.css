@@ -45,7 +45,7 @@
 	max-width: 600px;
 	display: flex;
 	gap: clamp(20px, 2vw, 30px);
-	flex-direction: column;
+	flex-direction: column-reverse;
 	justify-content: flex-start;
 }
 
@@ -137,7 +137,7 @@
 	min-width: 0;
 	background: #C7C7C7;
 	border: none;
-	height: clamp(48px, 4vw + 16px, 60px);
+	height: clamp(40px, 3vw + 12px, 52px);
 	padding: 0 clamp(14px, 1.5vw + 6px, 24px);
 	font-family: "Sora", sans-serif;
 	font-weight: 400;
@@ -161,7 +161,7 @@
 	font-size: clamp(16px, 0.6vw + 12px, 20px);
 	border: none;
 	border-radius: var(--wp--custom--radius--full);
-	height: clamp(48px, 4vw + 16px, 60px);
+	height: clamp(40px, 3vw + 12px, 52px);
 	padding: 0 clamp(24px, 2vw + 8px, 40px);
 	cursor: pointer;
 	transition: background 0.3s ease;
@@ -321,6 +321,10 @@
    ---------------------------------------- */
 
 @media (max-width: 1200px) {
+	.cwc-site-footer__main {
+		justify-content: center;
+	}
+
 	.cwc-site-footer__links-grid {
 		grid-template-columns: repeat(2, 1fr);
 		gap: clamp(24px, 3vw, 40px);
