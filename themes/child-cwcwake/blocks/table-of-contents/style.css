@@ -1,0 +1,128 @@
+/*
+ * CWC Wake — Table of Contents block
+ *
+ * Dark panel with a left-rail scrollspy indicator (progress line + dot).
+ * Sticky-positioned inside the sidebar column; collapses on mobile.
+ */
+
+.cwc-toc {
+	background: #353535;
+	border-radius: 24px;
+	border: 1.29px solid rgba(0, 0, 0, 0.1);
+	box-shadow:
+		inset 0 -4.93px 5.15px 0 rgba(255, 255, 255, 0.25),
+		inset 0 4.49px 5.15px 0 rgba(0, 0, 0, 0.36);
+	padding: clamp(24px, 3vw, 40px);
+	width: 100%;
+	position: sticky;
+	top: clamp(88px, 6vw + 48px, 130px);
+}
+
+.cwc-toc__title {
+	font-family: 'Archivo', var(--wp--preset--font-family--body);
+	font-weight: 700;
+	font-size: clamp(22px, 1.6vw + 10px, 32px);
+	line-height: 110%;
+	color: #FFFFFF;
+	margin: 0 0 clamp(18px, 2vw, 30px);
+	padding-left: 20px;
+	transition: color 0.3s ease;
+}
+
+.cwc-toc__list-wrap {
+	position: relative;
+	padding-left: 24px;
+}
+
+/* Vertical rail (background track) */
+.cwc-toc__rail {
+	position: absolute;
+	left: 0;
+	top: 6px;
+	bottom: 6px;
+	width: 2px;
+	background-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Filled progress portion */
+.cwc-toc__rail-progress {
+	position: absolute;
+	left: 0;
+	top: 0;
+	width: 100%;
+	height: 0%;
+	background-color: #96E5FF;
+	box-shadow: 0 0 8px rgba(150, 229, 255, 0.45);
+	transition: height 0.12s ease-out;
+}
+
+/* Dot indicator */
+.cwc-toc__dot {
+	position: absolute;
+	left: 1px;
+	top: 0;
+	width: 16px;
+	height: 16px;
+	background-color: #96E5FF;
+	border: 3px solid #FFFFFF;
+	border-radius: 50%;
+	transform: translate(-50%, -50%);
+	z-index: 2;
+	transition: top 0.3s cubic-bezier(0.17, 0.67, 0.83, 0.67), opacity 0.3s ease;
+	opacity: 0;
+	box-shadow: 0 0 10px rgba(150, 229, 255, 0.5);
+}
+
+/* List */
+.cwc-toc__list {
+	list-style: none;
+	padding: 0;
+	margin: 0;
+}
+
+.cwc-toc__item {
+	margin-bottom: clamp(14px, 1.5vw, 20px);
+}
+
+/* H2 items */
+.cwc-toc__item--h2 {
+	font-family: 'Archivo', var(--wp--preset--font-family--body);
+	font-weight: 600;
+	font-size: clamp(18px, 1.2vw + 8px, 32px);
+	line-height: 120%;
+	color: #F8F9FA;
+}
+
+/* H3 items — indented, smaller */
+.cwc-toc__item--h3 {
+	font-family: 'Archivo', var(--wp--preset--font-family--body);
+	font-weight: 500;
+	font-size: clamp(15px, 0.8vw + 8px, 24px);
+	line-height: 120%;
+	color: #FFFFFF;
+	padding-left: 16px;
+}
+
+.cwc-toc__link {
+	color: inherit;
+	text-decoration: none;
+	transition: color 0.3s ease;
+	display: block;
+}
+
+.cwc-toc__link:hover,
+.cwc-toc__link.active,
+.cwc-toc__link.passed {
+	color: #96E5FF;
+}
+
+.cwc-toc__link:focus {
+	outline: none;
+}
+
+/* Hide on tablet and below — content stacks full-width */
+@media (max-width: 991px) {
+	.cwc-toc {
+		display: none !important;
+	}
+}

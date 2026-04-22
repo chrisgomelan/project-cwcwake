@@ -88,6 +88,94 @@ function cwc_enqueue_styles()
 add_action('wp_enqueue_scripts', 'cwc_enqueue_styles');
 
 /**
+ * Enqueue styles and scripts for single blog posts.
+ *
+ * Loads:
+ * - single-post.css — post title, hero, content-box, two-column layout.
+ * - single-post.js  — populates the hero section from localised data and
+ *                      drives the Table of Contents scrollspy / dot indicator.
+ *
+ * Also passes a `cwcSinglePost` object to JS with the featured image URL,
+ * human-readable publish date, estimated read time, and the theme URI for
+ * resolving icon paths.
+ */
+function cwc_enqueue_single_post_assets()
+{
+	if ( ! is_singular( 'post' ) ) {
+		return;
+	}
+
+	wp_enqueue_style(
+		'cwc-single-post',
+		get_stylesheet_directory_uri() . '/assets/css/single-post.css',
+		['cwc-global'],
+		CWC_VERSION
+	);
+
+	wp_enqueue_script(
+		'cwc-single-post',
+		get_stylesheet_directory_uri() . '/assets/js/single-post.js',
+		[],
+		CWC_VERSION,
+		true
+	);
+
+	$post_id   = get_the_ID();
+	$thumb_url = '';
+	$thumb_id  = (int) get_post_thumbnail_id( $post_id );
+	if ( $thumb_id > 0 ) {
+		$src = wp_get_attachment_image_url( $thumb_id, 'full' );
+		if ( is_string( $src ) && '' !== $src ) {
+			$thumb_url = $src;
+		}
+	}
+
+	$word_count = str_word_count( wp_strip_all_tags( get_post_field( 'post_content', $post_id ) ) );
+	$read_min   = max( 1, (int) ceil( $word_count / 200 ) );
+
+	wp_localize_script( 'cwc-single-post', 'cwcSinglePost', [
+		'image'    => esc_url( $thumb_url ),
+		'date'     => get_the_date( 'F j, Y', $post_id ),
+		'readTime' => $read_min . ' minute' . ( $read_min > 1 ? 's' : '' ) . ' read',
+		'themeUri' => get_stylesheet_directory_uri(),
+	] );
+}
+add_action( 'wp_enqueue_scripts', 'cwc_enqueue_single_post_assets' );
+
+/**
+ * Automatically add IDs to H2 and H3 headings on single posts.
+ *
+ * The Table of Contents block generates anchors from heading text via
+ * `sanitize_title()`. This filter applies the same transform to the
+ * actual `<h2>` / `<h3>` tags so the scrollspy JS can match them up.
+ * Existing IDs are left untouched.
+ */
+function cwc_add_heading_ids( $content )
+{
+	if ( ! is_singular( 'post' ) ) {
+		return $content;
+	}
+
+	return preg_replace_callback(
+		'/<(h[23])(.*?)>(.*?)<\/h\1>/i',
+		function ( $matches ) {
+			$tag   = $matches[1];
+			$attrs = $matches[2];
+			$text  = $matches[3];
+
+			if ( strpos( $attrs, 'id=' ) !== false ) {
+				return $matches[0];
+			}
+
+			$id = sanitize_title( strip_tags( $text ) );
+			return "<$tag $attrs id=\"$id\">$text</$tag>";
+		},
+		$content
+	);
+}
+add_filter( 'the_content', 'cwc_add_heading_ids' );
+
+/**
  * Inject the Scroll to Top button markup into the footer.
  */
 function cwc_inject_scroll_top_html()
@@ -592,6 +680,7 @@ function cwc_register_blocks()
 	register_block_type(get_stylesheet_directory() . '/blocks/featured-blogs');
 	register_block_type(get_stylesheet_directory() . '/blocks/upcoming-events');
 	register_block_type(get_stylesheet_directory() . '/blocks/all-blogs');
+	register_block_type(get_stylesheet_directory() . '/blocks/table-of-contents');
 }
 add_action('init', 'cwc_register_blocks');
 

@@ -1,0 +1,73 @@
+<!-- wp:template-part {"slug":"header"} /-->
+
+<!-- wp:cwc/page-banner {
+	"title": "",
+	"backgroundImage": "/wp-content/uploads/2026/04/blogs-banner-bg-e1776821235201.webp",
+	"overlayOpacity": 40,
+	"size": "default",
+	"minHeight": 397,
+	"paddingTop": 115,
+	"backgroundPosition": "center",
+	"showCorners": false,
+	"useFeaturedImage": true,
+	"align": "full"
+} /-->
+
+<!-- wp:group {
+	"tagName": "main",
+	"align": "full",
+	"className": "cwc-tropical-section cwc-single-post",
+	"style": {
+		"spacing": {
+			"margin": { "top": "0" },
+			"padding": {
+				"top": "var:preset|spacing|40",
+				"bottom": "var:preset|spacing|70"
+			}
+		}
+	},
+	"layout": { "type": "default" }
+} -->
+<main class="wp-block-group alignfull cwc-tropical-section cwc-single-post"
+	style="margin-top:0;padding-top:var(--wp--preset--spacing--40);padding-bottom:var(--wp--preset--spacing--70)">
+
+	<!-- wp:cwc/breadcrumbs /-->
+
+	<!-- wp:html -->
+	<div class="cwc-single-post__back-link">
+		<a href="/plan-your-trip/blogs/" class="cwc-single-post__back">&larr; Back to Blogs</a>
+	</div>
+	<!-- /wp:html -->
+
+	<!-- wp:post-title {"level":1,"className":"cwc-single-post__title"} /-->
+
+	<!-- wp:html -->
+	<div class="cwc-single-post__hero">
+		<!-- Rendered via PHP: featured image, metadata -->
+	</div>
+	<!-- /wp:html -->
+
+	<!-- wp:columns {"className":"cwc-single-post__columns"} -->
+	<div class="wp-block-columns cwc-single-post__columns">
+
+		<!-- wp:column {"width":"62%","className":"cwc-single-post__content-col"} -->
+		<div class="wp-block-column cwc-single-post__content-col" style="flex-basis:62%">
+			<div class="cwc-single-post__content-box">
+				<!-- wp:post-content /-->
+			</div>
+		</div>
+		<!-- /wp:column -->
+
+		<!-- wp:column {"width":"38%","className":"cwc-single-post__sidebar-col"} -->
+		<div class="wp-block-column cwc-single-post__sidebar-col" style="flex-basis:38%">
+			<!-- wp:cwc/table-of-contents /-->
+		</div>
+		<!-- /wp:column -->
+
+	</div>
+	<!-- /wp:columns -->
+
+</main>
+<!-- /wp:group -->
+
+<!-- wp:template-part {"slug":"footer"} /-->
