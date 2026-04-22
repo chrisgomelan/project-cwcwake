@@ -66,7 +66,7 @@ if ( ! function_exists( 'cwc_featured_blogs_query' ) ) :
 				'post_status'            => 'publish',
 				'posts_per_page'         => $limit,
 				'orderby'                => 'date',
-				'order'                  => 'DESC',
+				'order'                  => 'ASC',
 				'meta_key'               => $meta_key, // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
 				'meta_value'             => '1',
 				'no_found_rows'          => true,

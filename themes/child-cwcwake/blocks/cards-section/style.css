@@ -65,6 +65,12 @@
 	border-radius: 24px;
 	overflow: hidden;
 	isolation: isolate;
+	transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1), box-shadow 0.4s ease;
+}
+
+.cwc-cards-section__card--detailed:hover {
+	transform: translateY(-8px);
+	box-shadow: var(--wp--custom--shadow--lg);
 }
 
 .cwc-cards-section__card--detailed .cwc-cards-section__card-media {
@@ -74,6 +80,19 @@
 	background-size: cover;
 	background-repeat: no-repeat;
 	z-index: 0;
+	transition: transform 0.8s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+.cwc-cards-section__card--detailed:hover .cwc-cards-section__card-media {
+	transform: scale(1.1);
+}
+
+.cwc-cards-section__card--detailed .cwc-cards-section__card-media::after {
+	content: '';
+	position: absolute;
+	inset: 0;
+	background-color: #00000080;
+	z-index: 1;
 }
 
 .cwc-cards-section__card--detailed .cwc-cards-section__card-body {
@@ -199,22 +218,22 @@
 .cwc-cards-section__card--overlay .cwc-cards-section__card-content {
 	position: absolute;
 	left: 1.5rem;
-	bottom: 1.5rem;
 	right: 1.5rem;
+	bottom: 1.5rem;
 	z-index: 2;
 	display: flex;
 	flex-direction: column;
 	justify-content: flex-end;
 	align-items: flex-start;
-	transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+	transition:
+		bottom 0.6s cubic-bezier(0.4, 0, 0.2, 1),
+		opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 	pointer-events: none;
 }
 
 .cwc-cards-section__card--overlay:hover .cwc-cards-section__card-content {
 	bottom: 50%;
 	transform: translateY(50%);
-	align-items: center;
-	text-align: center;
 }
 
 .cwc-cards-section__card--overlay::after {
@@ -232,6 +251,8 @@
 
 .cwc-cards-section__card--overlay .cwc-cards-section__card-title {
 	margin: 0;
+	width: max-content;
+	max-width: 100%;
 	font-family: var(--wp--preset--font-family--heading);
 	font-weight: 700;
 	font-size: 1.4rem;
@@ -239,7 +260,17 @@
 	letter-spacing: 0;
 	text-transform: uppercase;
 	color: #f5f1eb;
-	transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+	text-align: center;
+	transition: 
+		font-size 0.6s cubic-bezier(0.4, 0, 0.2, 1),
+		color 0.6s cubic-bezier(0.4, 0, 0.2, 1),
+		margin-left 0.6s cubic-bezier(0.4, 0, 0.2, 1),
+		transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.cwc-cards-section__card--overlay:hover .cwc-cards-section__card-title {
+	margin-left: 50%;
+	transform: translateX(-50%);
 }
 
 .cwc-cards-section__card--overlay:hover .cwc-cards-section__card-title {
@@ -248,22 +279,31 @@
 
 .cwc-cards-section__card-description {
 	margin: 0;
+	width: 100%;
+	min-width: 480px;
+	margin-right: -300px;
 	font-family: var(--wp--preset--font-family--body);
 	font-weight: 500;
 	font-size: 20px;
-	line-height: 100%;
+	line-height: 1.4;
 	letter-spacing: 0;
 	text-align: center;
+	/* Always centered internally for a broad look */
 	color: #FFFFFF;
-	
+
 	/* Reveal effect */
 	max-height: 0;
 	opacity: 0;
 	overflow: hidden;
-	transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+	transition:
+		all 0.6s cubic-bezier(0.4, 0, 0.2, 1),
+		margin-left 0.6s cubic-bezier(0.4, 0, 0.2, 1),
+		transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .cwc-cards-section__card--overlay:hover .cwc-cards-section__card-description {
+	margin-left: 50%;
+	transform: translateX(-50%);
 	max-height: 400px;
 	opacity: 1;
 	margin-top: 1.5rem;

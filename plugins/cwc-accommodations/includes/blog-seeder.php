@@ -14,26 +14,6 @@
  *   - 6 filler posts so the All Blogs grid + pagination has enough
  *     records to demo with.
  *
- * Why a separate seeder lives in this plugin:
- *
- *   - The Blogs page is functionally tied to the room booking flow
- *     (it surfaces resort news / events). Keeping the seed alongside
- *     the rest of the plugin's content seeding (`migrate.php`) means
- *     a single activation lights up every customer-facing surface.
- *   - The blog blocks themselves stay theme-side because they're
- *     presentational, but the plugin owns the *data shape* (meta
- *     keys + which posts are featured) so it survives a theme swap.
- *
- * Idempotency:
- *
- *   - Guarded by the `cwc_blog_posts_seeded` option so it never
- *     runs twice. Delete the option (`wp option delete
- *     cwc_blog_posts_seeded`) on a dev environment to re-seed.
- *   - Per-post duplicate detection uses a slug-keyed `WP_Query`
- *     (replacing the deprecated-since-6.2 `get_page_by_title()`)
- *     so editors can rename posts after seeding without breaking
- *     idempotency on a re-run.
- *
  * @package CWC_Accommodations
  * @since   1.0.0
  */
@@ -44,10 +24,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 /* ---------------------------------------------------------
  * Public meta key constants
- *
- * Exported so the theme-side blocks can read the same key names
- * without hard-coding magic strings — and so a future migration
- * can rename the keys in one place.
  * --------------------------------------------------------- */
 
 if ( ! defined( 'CWC_BLOG_META_FEATURED' ) ) {
@@ -60,21 +36,10 @@ if ( ! defined( 'CWC_BLOG_META_EVENT_DATE' ) ) {
 
 /* ---------------------------------------------------------
  * Seeder hook
- *
- * Runs once on `init` priority `40` (after the CPT + migration
- * hooks at priorities 10–34) and is option-guarded so production
- * never pays for the work twice. Front-end requests are skipped
- * entirely — no seeding outside of an admin / WP-CLI context.
  * --------------------------------------------------------- */
 
 /**
  * Run the blog seeder once per environment.
- *
- * Front-end requests skip the seeder entirely so a cold visitor
- * never pays the lookup cost. We explicitly allow `wp-cron.php`
- * and WP-CLI so a fresh dev install can be re-seeded headlessly.
- *
- * @since 1.0.0
  *
  * @return void
  */
@@ -88,24 +53,8 @@ function cwc_maybe_seed_blog_posts(): void {
 	}
 
 	$created = cwc_seed_blog_posts();
-
-	/*
-	 * Marking the option as the timestamp (not just `true`) gives
-	 * us forensic value later — `wp option get cwc_blog_posts_seeded`
-	 * shows when the dataset landed.
-	 */
 	update_option( 'cwc_blog_posts_seeded', time() );
 
-	/**
-	 * Fires once after the blog seeder finishes.
-	 *
-	 * Other plugins / themes can hook this to e.g. attach default
-	 * featured images or send a "site ready" notification.
-	 *
-	 * @since 1.0.0
-	 *
-	 * @param int $created Number of new posts created during the run.
-	 */
 	do_action( 'cwc_blog_posts_seeded', $created );
 }
 add_action( 'init', 'cwc_maybe_seed_blog_posts', 40 );
@@ -117,25 +66,7 @@ add_action( 'init', 'cwc_maybe_seed_blog_posts', 40 );
 /**
  * Seed sample blog posts and the four default categories.
  *
- * Splits the dataset into three buckets that mirror the Blogs page
- * layout (`designs/blogs-design.md`):
- *
- *   - Featured (`featured = true`) — the 5 cards in the asymmetric
- *     hero grid.
- *   - Events (`event_offset_days = N`) — gets `_cwc_event_date` meta
- *     N days in the future so the timeline renders a believable
- *     near-term schedule on first paint.
- *   - Filler — populates the All Blogs grid + pagination so editors
- *     can preview the layout before adding real content.
- *
- * Existing posts are detected by slug (NOT title) because slugs are
- * the actual unique key WordPress enforces — two seeds with the
- * same title would otherwise both succeed and quietly create
- * `the-history-of-cwc-wake-park-2`.
- *
- * @since 1.0.0
- *
- * @return int Number of new posts created (existing matches are skipped).
+ * @return int Number of new posts created.
  */
 function cwc_seed_blog_posts(): int {
 	$cat_ids = cwc_seed_blog_categories();
@@ -143,10 +74,10 @@ function cwc_seed_blog_posts(): int {
 		return 0;
 	}
 
-	$posts_to_seed = cwc_blog_seed_dataset();
+	$dataset = cwc_blog_seed_dataset();
 
 	$count = 0;
-	foreach ( $posts_to_seed as $row ) {
+	foreach ( $dataset as $row ) {
 		if ( cwc_blog_seed_insert_row( $row, $cat_ids ) ) {
 			$count++;
 		}
@@ -158,13 +89,7 @@ function cwc_seed_blog_posts(): int {
 /**
  * Ensure the four default blog categories exist.
  *
- * Returns a `name => term_id` map so the per-post insert loop can
- * resolve each post's category in O(1) without re-querying the
- * taxonomy table per row.
- *
- * @since 1.0.0
- *
- * @return array<string,int> Category name → term ID. Empty when taxonomy is unavailable.
+ * @return array<string,int> Category name → term ID.
  */
 function cwc_seed_blog_categories(): array {
 	if ( ! taxonomy_exists( 'category' ) ) {
@@ -172,8 +97,8 @@ function cwc_seed_blog_categories(): array {
 	}
 
 	$names = [ 'Events', 'Resort News', 'Pro Tips', 'Local Guide' ];
+	$ids   = [];
 
-	$ids = [];
 	foreach ( $names as $name ) {
 		$existing = get_term_by( 'name', $name, 'category' );
 		if ( $existing instanceof WP_Term ) {
@@ -182,11 +107,9 @@ function cwc_seed_blog_categories(): array {
 		}
 
 		$inserted = wp_insert_term( $name, 'category' );
-		if ( is_wp_error( $inserted ) ) {
-			continue;
+		if ( ! is_wp_error( $inserted ) ) {
+			$ids[ $name ] = (int) $inserted['term_id'];
 		}
-
-		$ids[ $name ] = (int) $inserted['term_id'];
 	}
 
 	return $ids;
@@ -195,137 +118,122 @@ function cwc_seed_blog_categories(): array {
 /**
  * Canonical seed dataset for the Blogs page.
  *
- * Each row is a flat associative array — no objects — so it
- * round-trips cleanly through `apply_filters()`. `featured` flips
- * the `_cwc_blog_featured` meta on; `event_offset_days` (when set)
- * stamps `_cwc_event_date` to that many days in the future so the
- * Upcoming Events timeline shows a believable near-term schedule.
- *
- * Filterable so a host site can extend the seed (e.g. a launch
- * checklist's "Add CEO welcome post") without forking the plugin.
- *
- * @since 1.0.0
- *
  * @return array<int,array<string,mixed>>
  */
 function cwc_blog_seed_dataset(): array {
 	$dataset = [
+		// Featured Blogs (5 posts)
 		[
 			'title'    => 'Plan Your Trip: What to Know Before Visiting CWC',
 			'cat'      => 'Local Guide',
-			'excerpt'  => 'From travel essentials to insider tips and everything you need to plan a smooth and stress-free visit to CWC. Perfect for first-time visitors who want to make the most of every minute.',
+			'excerpt'  => 'From travel essentials to insider tips and everything you need to plan a smooth and stress-free visit to CWC.',
+			'image'    => 'plan-your-trip.webp',
 			'featured' => true,
 		],
 		[
-			'title'    => 'Ride the Waves: Wakeboarding Experiences You Shouldn\'t Miss',
+			'title'    => 'Ride the Waves: Wakeboarding Experiences at CWC',
 			'cat'      => 'Pro Tips',
-			'excerpt'  => 'Feel the thrill of riding across the cable wakes. Discover the best wakeboarding venues, ideal times to ride, and why CWC is a must-visit for water sports lovers.',
+			'excerpt'  => 'Feel the thrill of riding across the cable wakes. Discover why CWC is a must-visit for water sports lovers.',
+			'image'    => 'ride-the-waves-2.webp',
 			'featured' => true,
 		],
 		[
 			'title'    => 'Experience the Energy: Events and Nightlife at CWC',
 			'cat'      => 'Events',
-			'excerpt'  => 'Discover after-dark events, music nights, and live performances that turn CWC from a daytime adventure into a non-stop lifestyle destination.',
+			'excerpt'  => 'Discover after-dark events, music nights, and live performances that turn CWC into a non-stop lifestyle destination.',
+			'image'    => 'experiece-the-energy-2.webp',
 			'featured' => true,
 		],
 		[
 			'title'    => 'Top 5 Hidden Spots in CamSur',
 			'cat'      => 'Local Guide',
-			'excerpt'  => 'Explore the natural beauty of Camarines Sur beyond the wakeboarding park — quiet beaches, mountain trails, and food finds locals love.',
+			'excerpt'  => 'Explore the natural beauty of Camarines Sur beyond the wakeboarding park — beaches, trails, and food finds.',
+			'image'    => 'explore-camsur.webp',
 			'featured' => true,
 		],
 		[
 			'title'    => 'A Beginner\'s Guide to Cable Parks',
 			'cat'      => 'Pro Tips',
-			'excerpt'  => 'First time at a cable park? Here is everything you need to know before you hit the water — from gear to etiquette.',
+			'excerpt'  => 'First time at a cable park? Here is everything you need to know before you hit the water.',
+			'image'    => 'cabana-rentals.webp',
 			'featured' => true,
 		],
 
+		// Upcoming Events (3 posts)
 		[
 			'title'             => 'Sunset Ride Sessions',
 			'cat'               => 'Events',
-			'excerpt'           => 'Ride into golden hour and experience one of the most relaxing yet visually stunning moments at CWC. As the sun begins to set, the lake transforms into a warm, glowing backdrop — perfect for smooth cable runs and effortless tricks. Whether you\'re a beginner enjoying a calm ride or an experienced rider chasing that perfect silhouette shot, the atmosphere is unmatched. With laid-back music playing and a chill lakeside vibe, it\'s not just about the ride — it\'s about slowing down, soaking in the view, and ending your day on a high note.',
+			'excerpt'           => 'Ride into golden hour and experience one of the most relaxing yet visually stunning moments at CWCLake.',
+			'image'             => 'sunset-ride-sessions-events.webp',
 			'event_offset_days' => 7,
 		],
 		[
 			'title'             => 'Summer Wake Championship 2026',
 			'cat'               => 'Events',
-			'excerpt'           => 'The biggest competition of the year is coming back. Register now to compete or come cheer on your favorite riders.',
+			'excerpt'           => 'The biggest competition of the year is coming back. Register now to compete or cheer on your riders.',
+			'image'             => 'cwc-wakeboarding-showdown.webp',
 			'event_offset_days' => 14,
 		],
 		[
 			'title'             => 'Evening Acoustic Sessions at the Bar',
 			'cat'               => 'Events',
 			'excerpt'           => 'Unwind after a day on the water with live acoustic performances every Friday at the resort bar.',
+			'image'             => 'clubhouse-resto-bar.webp',
 			'event_offset_days' => 21,
 		],
 
+		// Filler Blogs (6+ posts)
 		[
 			'title'   => 'New Luxury Villas Now Open for Booking',
 			'cat'     => 'Resort News',
 			'excerpt' => 'Experience a new level of comfort with our newly launched premium villas overlooking the park.',
+			'image'   => 'VILLAS.webp',
 		],
 		[
 			'title'   => 'Sustainable Tourism at CWC',
 			'cat'     => 'Resort News',
 			'excerpt' => 'How we are working to protect the local environment while welcoming guests from around the world.',
+			'image'   => 'doodle-bg.webp',
 		],
 		[
 			'title'   => 'CWC Gear Guide: Choosing Your First Board',
 			'cat'     => 'Pro Tips',
 			'excerpt' => 'Choosing the right board for your style — a quick walk-through of shapes, sizes, and skill levels.',
+			'image'   => 'ride-the-waves.webp',
 		],
 		[
 			'title'   => 'Traveling to CamSur: Tips & Tricks',
 			'cat'     => 'Local Guide',
 			'excerpt' => 'The easiest ways to get to CWC from Manila — flights, vans, and the scenic road option.',
+			'image'   => 'contact-banner-bg.webp',
 		],
 		[
 			'title'   => 'The History of CWC Wake Park',
 			'cat'     => 'Resort News',
 			'excerpt' => 'From a dream to a world-class destination — the story behind CWC.',
+			'image'   => 'blogs-banner-bg.webp',
 		],
 		[
 			'title'   => 'Resort Wellness Month',
 			'cat'     => 'Resort News',
 			'excerpt' => 'Focus on your health with our special yoga sessions and healthy meal plans all through May.',
+			'image'   => 'lifestyle.webp',
 		],
 	];
 
-	/**
-	 * Filter the blog seeder dataset.
-	 *
-	 * Lets sites add or rewrite seed rows without forking the
-	 * plugin. Each row must be an array containing at least `title`
-	 * and `cat`; supported optional keys are `excerpt`, `featured`,
-	 * and `event_offset_days`.
-	 *
-	 * @since 1.0.0
-	 *
-	 * @param array<int,array<string,mixed>> $dataset Default seed rows.
-	 */
 	return apply_filters( 'cwc_blog_seed_dataset', $dataset );
 }
 
 /**
  * Insert a single seed row, skipping if a post with the same slug exists.
  *
- * Resolves the desired slug via `sanitize_title()` and looks for an
- * existing post by that slug across **any** status (so a draft from
- * a previous run still counts as "already seeded"). When a row
- * declares `event_offset_days`, the future event date is stored in
- * `_cwc_event_date` (Y-m-d) so the timeline block can sort + group
- * by month without parsing freeform text.
- *
- * @since 1.0.0
- *
- * @param array<string,mixed> $row     Seed row.
- * @param array<string,int>   $cat_ids Category name → term ID map from `cwc_seed_blog_categories()`.
- * @return bool True when a post was inserted, false on skip / failure.
+ * @param array<string,mixed> $row     Seed row data.
+ * @param array<string,int>   $cat_ids Category map.
+ * @return bool True on success, false on skip.
  */
 function cwc_blog_seed_insert_row( array $row, array $cat_ids ): bool {
-	$title = isset( $row['title'] ) ? (string) $row['title'] : '';
-	$cat   = isset( $row['cat'] ) ? (string) $row['cat'] : '';
+	$title = (string) ( $row['title'] ?? '' );
+	$cat   = (string) ( $row['cat'] ?? '' );
 
 	if ( '' === $title || ! isset( $cat_ids[ $cat ] ) ) {
 		return false;
@@ -336,68 +244,109 @@ function cwc_blog_seed_insert_row( array $row, array $cat_ids ): bool {
 		return false;
 	}
 
-	$excerpt = isset( $row['excerpt'] ) ? (string) $row['excerpt'] : '';
+	$excerpt = (string) ( $row['excerpt'] ?? '' );
 
-	$post_id = wp_insert_post(
-		[
-			'post_title'    => $title,
-			'post_name'     => $slug,
-			'post_content'  => $excerpt . ' Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
-			'post_excerpt'  => $excerpt,
-			'post_status'   => 'publish',
-			'post_type'     => 'post',
-			'post_category' => [ $cat_ids[ $cat ] ],
-		],
-		true
-	);
+	$post_id = wp_insert_post( [
+		'post_title'    => $title,
+		'post_name'     => $slug,
+		'post_content'  => $excerpt . ' Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+		'post_excerpt'  => $excerpt,
+		'post_status'   => 'publish',
+		'post_type'     => 'post',
+		'post_category' => [ $cat_ids[ $cat ] ],
+	] );
 
-	if ( is_wp_error( $post_id ) || 0 === (int) $post_id ) {
+	if ( is_wp_error( $post_id ) || 0 === $post_id ) {
 		return false;
 	}
 
 	if ( ! empty( $row['featured'] ) ) {
-		update_post_meta( (int) $post_id, CWC_BLOG_META_FEATURED, '1' );
+		update_post_meta( $post_id, CWC_BLOG_META_FEATURED, '1' );
 	}
 
-	if ( isset( $row['event_offset_days'] ) ) {
+	if ( ! empty( $row['event_offset_days'] ) ) {
 		$offset = max( 1, (int) $row['event_offset_days'] );
 		$date   = gmdate( 'Y-m-d', strtotime( "+{$offset} days" ) );
-		update_post_meta( (int) $post_id, CWC_BLOG_META_EVENT_DATE, $date );
+		update_post_meta( $post_id, CWC_BLOG_META_EVENT_DATE, $date );
+	}
+
+	// Attach featured image
+	$filename = (string) ( $row['image'] ?? '' );
+	if ( $filename ) {
+		$attach_id = cwc_get_attachment_id_by_filename( $filename );
+		if ( $attach_id ) {
+			set_post_thumbnail( $post_id, $attach_id );
+		}
 	}
 
 	return true;
 }
 
 /**
- * Check whether a `post` already exists with the given slug.
+ * Check if a post exists by slug.
  *
- * `WP_Query` instead of `get_page_by_title()` because the latter
- * is deprecated since WordPress 6.2 and only matched by title
- * anyway — slug-based detection is what we actually want for
- * idempotency.
- *
- * @since 1.0.0
- *
- * @param string $slug Post slug to look for.
- * @return bool True when at least one post (any status) owns the slug.
+ * @param string $slug
+ * @return bool
  */
 function cwc_blog_post_exists_by_slug( string $slug ): bool {
 	if ( '' === $slug ) {
 		return false;
 	}
 
-	$query = new WP_Query(
-		[
-			'post_type'              => 'post',
-			'post_status'            => 'any',
-			'name'                   => $slug,
-			'posts_per_page'         => 1,
-			'fields'                 => 'ids',
-			'no_found_rows'          => true,
-			'update_post_meta_cache' => false,
-			'update_post_term_cache' => false,
-		]
-	);
+	$query = new WP_Query( [
+		'post_type'      => 'post',
+		'post_status'    => 'any',
+		'name'           => $slug,
+		'posts_per_page' => 1,
+		'fields'         => 'ids',
+	] );
 
 	return $query->have_posts();
+}
+
+/**
+ * Helper to get or create an attachment ID from a filename in the 2026/04 folder.
+ *
+ * @param string $filename
+ * @return int
+ */
+function cwc_get_attachment_id_by_filename( $filename ) {
+	global $wpdb;
+
+	// Check if already an attachment in DB
+	$target_path = '2026/04/' . ltrim( $filename, '/' );
+	$attachment_id = $wpdb->get_var( $wpdb->prepare(
+		"SELECT post_id FROM $wpdb->postmeta WHERE meta_key = '_wp_attached_file' AND meta_value = %s",
+		$target_path
+	) );
+
+	if ( $attachment_id ) {
+		return (int) $attachment_id;
+	}
+
+	// If not in DB, check if file exists on disk and sideload it
+	$upload_dir = wp_upload_dir();
+	$file_path  = $upload_dir['basedir'] . '/' . $target_path;
+
+	if ( ! file_exists( $file_path ) ) {
+		return 0;
+	}
+
+	$file_type = wp_check_filetype( $filename, null );
+	$attachment = [
+		'post_mime_type' => $file_type['type'],
+		'post_title'     => preg_replace( '/\.[^.]+$/', '', $filename ),
+		'post_content'   => '',
+		'post_status'    => 'inherit'
+	];
+
+	$attach_id = wp_insert_attachment( $attachment, $file_path );
+	if ( ! is_wp_error( $attach_id ) ) {
+		require_once( ABSPATH . 'wp-admin/includes/image.php' );
+		$attach_data = wp_generate_attachment_metadata( $attach_id, $file_path );
+		wp_update_attachment_metadata( $attach_id, $attach_data );
+		return $attach_id;
+	}
+
+	return 0;
 }

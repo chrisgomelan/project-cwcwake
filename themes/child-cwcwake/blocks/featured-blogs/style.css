@@ -27,7 +27,7 @@
 }
 
 .cwc-featured-blogs__header {
-	margin-bottom: 2rem;
+	margin-bottom: var(--wp--preset--spacing--40);
 }
 
 .cwc-featured-blogs__title {
@@ -57,7 +57,7 @@
 	line-height: 1.5;
 	color: var(--wp--preset--color--text);
 	margin: 0;
-	max-width: 70ch;
+	max-width: 70%;
 }
 
 .cwc-featured-blogs__grid {
@@ -73,6 +73,13 @@
 	overflow: hidden;
 	background-color: #1a1a1a;
 	min-height: 220px;
+	transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1), box-shadow 0.4s ease;
+}
+
+.cwc-featured-blogs__card:hover {
+	transform: translateY(-8px);
+	box-shadow: var(--wp--custom--shadow--lg);
+	z-index: 10;
 }
 
 .cwc-featured-blogs__card--slot-1 {
@@ -115,6 +122,11 @@
 	background-position: center;
 	background-size: cover;
 	background-repeat: no-repeat;
+	transition: transform 0.8s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+.cwc-featured-blogs__link:hover .cwc-featured-blogs__image {
+	transform: scale(1.1);
 }
 
 /* Overlay color from designs/blogs-design.md § 1: #00000066 (~40% black). */
@@ -161,9 +173,7 @@
  * (slot 2-5) cards in the design — only the large slot-1 card does.
  * Slots 2-5 show title only, so we hide the excerpt for them.
  */
-.cwc-featured-blogs__card:not(.cwc-featured-blogs__card--slot-1) .cwc-featured-blogs__card-excerpt {
-	display: none;
-}
+
 
 .cwc-featured-blogs__cta {
 	align-self: flex-start;

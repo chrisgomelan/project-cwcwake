@@ -9,7 +9,9 @@
 	"description": "Inner-page hero banner with background image, title, optional subtitle, and corner brackets. Supports default and compact heights.",
 	"textdomain": "child-cwcwake",
 	"supports": {
-		"align": ["full"],
+		"align": [
+			"full"
+		],
 		"html": false,
 		"anchor": true
 	},
@@ -33,7 +35,10 @@
 		"size": {
 			"type": "string",
 			"default": "default",
-			"enum": ["default", "compact"]
+			"enum": [
+				"default",
+				"compact"
+			]
 		},
 		"showCorners": {
 			"type": "boolean",
@@ -42,6 +47,10 @@
 		"useFeaturedImage": {
 			"type": "boolean",
 			"default": false
+		},
+		"minHeight": {
+			"type": "number",
+			"default": 0
 		}
 	},
 	"render": "file:./render.php",

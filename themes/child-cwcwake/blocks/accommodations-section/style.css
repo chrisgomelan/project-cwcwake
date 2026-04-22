@@ -144,11 +144,13 @@
    ---------------------------------------- */
 
 .cwc-accommodations__card-img {
+	position: relative;
 	padding: var(--wp--preset--spacing--20);
 	padding-bottom: 0;
 	overflow: hidden;
 	border-radius: var(--wp--custom--radius--md);
 }
+
 
 .cwc-accommodations__card-img img {
 	width: 100%;

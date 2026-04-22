@@ -36,5 +36,6 @@
 		}
 	},
 	"render": "file:./render.php",
-	"style": "file:./style.css"
+	"style": "file:./style.css",
+	"viewScript": "file:./view.js"
 }

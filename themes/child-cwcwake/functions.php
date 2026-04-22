@@ -75,8 +75,33 @@ function cwc_enqueue_styles()
 		CWC_VERSION,
 		true
 	);
+
+	// Scroll to Top — Premium navigation helper.
+	wp_enqueue_script(
+		'cwc-scroll-top',
+		get_stylesheet_directory_uri() . '/assets/js/scroll-to-top.js',
+		[],
+		CWC_VERSION,
+		true
+	);
 }
 add_action('wp_enqueue_scripts', 'cwc_enqueue_styles');
+
+/**
+ * Inject the Scroll to Top button markup into the footer.
+ */
+function cwc_inject_scroll_top_html()
+{
+?>
+	<button id="cwc-scroll-top" class="cwc-scroll-top" aria-label="Scroll to top">
+		<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+			stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+			<path d="m18 15-6-6-6 6" />
+		</svg>
+	</button>
+<?php
+}
+add_action('wp_footer', 'cwc_inject_scroll_top_html');
 
 /**
  * Load Google Fonts in the block editor to match frontend.
@@ -287,7 +312,8 @@ require_once get_stylesheet_directory() . '/inc/contact-page-seed.php';
  * templates and seeds the shared `cwc/policy-content` block with the
  * clauses copied from the Figma mockups. Idempotent.
  */
-require_once get_stylesheet_directory() . '/inc/policy-pages-seed.php';
+// Policy pages content is now managed directly in templates.
+// require_once get_stylesheet_directory() . '/inc/policy-pages-seed.php';
 
 /*
  * Albums (Gallery) custom post type. Registers a hierarchical

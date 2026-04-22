@@ -345,7 +345,10 @@ img {
 .cwc-tropical-section>main,
 .cwc-tropical-section>.wp-block-group,
 .cwc-tropical-section>.wp-block-cwc-gallery-grid,
-.cwc-tropical-section>.wp-block-cwc-cards-section {
+.cwc-tropical-section>.wp-block-cwc-cards-section,
+.cwc-tropical-section>.wp-block-cwc-featured-blogs,
+.cwc-tropical-section>.wp-block-cwc-upcoming-events,
+.cwc-tropical-section>.wp-block-cwc-all-blogs {
 	width: 100%;
 	max-width: 1921px;
 	margin-inline: auto;
@@ -439,4 +442,51 @@ img {
 /* Hide the first paragraph in the album content area (it's now in the banner) */
 .single-cwc_album .wp-block-post-content>p:first-of-type {
 	display: none !important;
+}
+
+/* ----------------------------------------
+   Scroll to Top
+   ---------------------------------------- */
+
+.cwc-scroll-top {
+	position: fixed;
+	bottom: 40px;
+	right: 40px;
+	width: 54px;
+	height: 54px;
+	background-color: var(--wp--preset--color--primary);
+	color: #ffffff;
+	border: none;
+	border-radius: 50%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	cursor: pointer;
+	z-index: 999;
+	opacity: 0;
+	visibility: hidden;
+	transform: translateY(20px);
+	transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+	box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+.cwc-scroll-top.is-visible {
+	opacity: 1;
+	visibility: visible;
+	transform: translateY(0);
+}
+
+.cwc-scroll-top:hover {
+	background-color: var(--wp--preset--color--primary-dark);
+	transform: translateY(-5px);
+	box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+}
+
+@media (max-width: 600px) {
+	.cwc-scroll-top {
+		bottom: 20px;
+		right: 20px;
+		width: 48px;
+		height: 48px;
+	}
 }

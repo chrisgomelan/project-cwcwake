@@ -53,14 +53,14 @@
 	line-height: 1.5;
 	color: var(--wp--preset--color--text);
 	margin: 0;
-	max-width: 70ch;
+	max-width: 70%;
 }
 
 .cwc-upcoming-events__layout {
 	display: grid;
 	grid-template-columns: 200px 1fr;
 	gap: 2rem;
-	align-items: start;
+	align-items: stretch;
 }
 
 /* ---------------------------------------------------------
@@ -70,10 +70,12 @@
 .cwc-upcoming-events__timeline {
 	list-style: none;
 	margin: 0;
-	padding: 1rem 0;
+	padding: 1.5rem 0;
 	display: flex;
 	flex-direction: column;
-	gap: 1.25rem;
+	justify-content: space-between;
+	height: 100%;
+	min-height: 400px;
 	position: relative;
 }
 
@@ -83,15 +85,17 @@
 	position: absolute;
 	top: 1.5rem;
 	bottom: 1.5rem;
-	left: calc(60% - 1px);
-	width: 2px;
-	background-color: rgba(0, 0, 0, 0.15);
+	left: calc(100% - 55px);
+	width: 6.23px;
+	background-color: #1A1A1A;
+	transform: translateX(-50%);
+	opacity: 1;
 	z-index: 0;
 }
 
 .cwc-upcoming-events__rail-item {
 	display: grid;
-	grid-template-columns: 1fr auto;
+	grid-template-columns: 1fr 110px;
 	align-items: center;
 	gap: 1rem;
 	position: relative;
@@ -114,6 +118,7 @@
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
+	justify-self: center;
 	width: 73px;
 	height: 73px;
 	border-radius: 50%;
@@ -124,10 +129,13 @@
 	font-size: 1.5rem;
 	text-decoration: none;
 	transition: transform 150ms ease, background-color 150ms ease;
+	cursor: pointer;
+	border: none;
+	padding: 0;
 }
 
-a.cwc-upcoming-events__day:hover,
-a.cwc-upcoming-events__day:focus-visible {
+.cwc-upcoming-events__day:hover,
+.cwc-upcoming-events__day:focus-visible {
 	background-color: var(--wp--preset--color--primary-dark);
 	transform: scale(1.05);
 }
@@ -143,11 +151,47 @@ a.cwc-upcoming-events__day:focus-visible {
  * Active event card
  * --------------------------------------------------------- */
 
+.cwc-upcoming-events__card-stack {
+	position: relative;
+	width: 100%;
+	height: 100%;
+	min-height: 400px;
+}
+
 .cwc-upcoming-events__card {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	min-height: 100%;
 	background-color: #f8f9fa;
 	border-radius: 30px;
 	overflow: hidden;
-	max-width: 1459px;
+	opacity: 0;
+	pointer-events: none;
+	transform: translateY(30px) scale(0.98);
+	transition: 
+		opacity 400ms cubic-bezier(0.4, 0, 0.2, 1),
+		transform 400ms cubic-bezier(0.4, 0, 0.2, 1),
+		box-shadow 400ms ease;
+	z-index: 1;
+}
+
+.cwc-upcoming-events__card.is-active:hover {
+	transform: translateY(-8px) scale(1.01);
+	box-shadow: var(--wp--custom--shadow--lg);
+}
+
+.cwc-upcoming-events__card.is-active {
+	position: relative; /* Keep first one in flow for height calculation if needed, JS will handle others */
+	opacity: 1;
+	pointer-events: auto;
+	transform: translateY(0) scale(1);
+	z-index: 2;
+}
+
+.cwc-upcoming-events__card-stack .cwc-upcoming-events__card:not(.is-active) {
+	position: absolute;
 }
 
 .cwc-upcoming-events__card-image-link {
@@ -165,6 +209,11 @@ a.cwc-upcoming-events__day:focus-visible {
 	background-position: center;
 	background-size: cover;
 	background-repeat: no-repeat;
+	transition: transform 0.8s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+.cwc-upcoming-events__card:hover .cwc-upcoming-events__card-image {
+	transform: scale(1.08);
 }
 
 .cwc-upcoming-events__card-body {
@@ -225,6 +274,14 @@ a.cwc-upcoming-events__day:focus-visible {
 		gap: 1.5rem;
 	}
 
+	.cwc-upcoming-events__rail-item {
+		grid-template-columns: 1fr 88px;
+	}
+
+	.cwc-upcoming-events__timeline::before {
+		left: calc(100% - 44px);
+	}
+
 	.cwc-upcoming-events__day--active {
 		width: 88px;
 		height: 88px;
@@ -256,6 +313,8 @@ a.cwc-upcoming-events__day:focus-visible {
 		justify-content: center;
 		flex-wrap: wrap;
 		padding: 0;
+		height: auto;
+		min-height: 0;
 	}
 
 	.cwc-upcoming-events__timeline::before {

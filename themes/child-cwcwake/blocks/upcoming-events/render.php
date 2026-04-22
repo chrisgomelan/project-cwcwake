@@ -136,13 +136,6 @@ if ( empty( $events ) ) {
 	return;
 }
 
-$active = array_shift( $events );
-$rest   = $events;
-
-$active_id   = (int) $active->ID;
-$active_meta = cwc_event_meta_for_post( $active );
-$active_img  = cwc_blog_card_image_url( $active_id, $placeholder );
-
 $wrapper_attrs = get_block_wrapper_attributes( [ 'class' => 'cwc-upcoming-events' ] );
 ?>
 <section <?php echo $wrapper_attrs; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
@@ -165,58 +158,74 @@ $wrapper_attrs = get_block_wrapper_attributes( [ 'class' => 'cwc-upcoming-events
 
 	<div class="cwc-upcoming-events__layout">
 		<ol class="cwc-upcoming-events__timeline" aria-label="<?php esc_attr_e( 'Upcoming events', 'child-cwcwake' ); ?>">
-			<li class="cwc-upcoming-events__rail-item cwc-upcoming-events__rail-item--active">
-				<span class="cwc-upcoming-events__month"><?php echo esc_html( $active_meta['month'] ); ?></span>
-				<span class="cwc-upcoming-events__day cwc-upcoming-events__day--active" aria-hidden="true">
-					<?php echo esc_html( $active_meta['day'] ); ?>
-				</span>
-				<span class="screen-reader-text">
-					<?php
-					/* translators: 1: Event title. 2: Event date. */
-					echo esc_html( sprintf( __( 'Active event: %1$s on %2$s.', 'child-cwcwake' ), get_the_title( $active_id ), $active_meta['readable'] ) );
-					?>
-				</span>
-			</li>
-
-			<?php foreach ( $rest as $event ) :
+			<?php
+			foreach ( $events as $index => $event ) :
 				$event_id   = (int) $event->ID;
 				$event_meta = cwc_event_meta_for_post( $event );
-				$event_url  = (string) get_permalink( $event_id );
+				$event_img  = cwc_blog_card_image_url( $event_id, $placeholder );
+				$is_active  = ( 0 === $index );
+
+				$item_data = [
+					'title'   => get_the_title( $event_id ),
+					'excerpt' => cwc_blog_card_excerpt( $event, 60 ),
+					'image'   => $event_img,
+					'url'     => get_permalink( $event_id ),
+				];
 				?>
-				<li class="cwc-upcoming-events__rail-item">
+				<li class="cwc-upcoming-events__rail-item <?php echo $is_active ? 'cwc-upcoming-events__rail-item--active' : ''; ?>"
+					data-event-index="<?php echo (int) $index; ?>"
+					data-event-data='<?php echo esc_attr( wp_json_encode( $item_data ) ); ?>'>
 					<span class="cwc-upcoming-events__month"><?php echo esc_html( $event_meta['month'] ); ?></span>
-					<a class="cwc-upcoming-events__day" href="<?php echo esc_url( $event_url ); ?>"
+					<button class="cwc-upcoming-events__day <?php echo $is_active ? 'cwc-upcoming-events__day--active' : ''; ?>"
 						aria-label="<?php
 						/* translators: 1: Event title. 2: Event date. */
 						echo esc_attr( sprintf( __( '%1$s on %2$s', 'child-cwcwake' ), get_the_title( $event_id ), $event_meta['readable'] ) );
-						?>">
+						?>"
+						aria-pressed="<?php echo $is_active ? 'true' : 'false'; ?>">
 						<?php echo esc_html( $event_meta['day'] ); ?>
-					</a>
+					</button>
 				</li>
 			<?php endforeach; ?>
 		</ol>
 
-		<article class="cwc-upcoming-events__card">
-			<?php if ( '' !== $active_img ) : ?>
-				<a class="cwc-upcoming-events__card-image-link" href="<?php echo esc_url( get_permalink( $active_id ) ); ?>"
-					aria-label="<?php echo esc_attr( get_the_title( $active_id ) ); ?>">
-					<span class="cwc-upcoming-events__card-image" role="img"
-						aria-label="<?php echo esc_attr( get_the_title( $active_id ) ); ?>"
-						style="background-image:url('<?php echo esc_url( $active_img ); ?>');"></span>
-				</a>
-			<?php endif; ?>
+		<?php
+		// Pre-render the first (active) event's card.
+		$initial_id    = (int) $events[0]->ID;
+		$initial_img   = cwc_blog_card_image_url( $initial_id, $placeholder );
+		$initial_title = get_the_title( $initial_id );
+		$initial_url   = get_permalink( $initial_id );
+		$initial_exc   = cwc_blog_card_excerpt( $events[0], 60 );
+		?>
+		<div class="cwc-upcoming-events__card-stack">
+			<?php
+			foreach ( $events as $index => $event ) :
+				$ev_id    = (int) $event->ID;
+				$ev_img   = cwc_blog_card_image_url( $ev_id, $placeholder );
+				$ev_title = get_the_title( $ev_id );
+				$ev_url   = get_permalink( $ev_id );
+				$ev_exc   = cwc_blog_card_excerpt( $event, 60 );
+				$is_active = ( 0 === $index );
+				?>
+				<article class="cwc-upcoming-events__card <?php echo $is_active ? 'is-active' : ''; ?>"
+					data-event-index="<?php echo (int) $index; ?>">
+					<a class="cwc-upcoming-events__card-image-link" href="<?php echo esc_url( $ev_url ); ?>"
+						aria-label="<?php echo esc_attr( $ev_title ); ?>">
+						<span class="cwc-upcoming-events__card-image" role="img"
+							aria-label="<?php echo esc_attr( $ev_title ); ?>"
+							style="background-image:url('<?php echo esc_url( $ev_img ); ?>');"></span>
+					</a>
 
-			<div class="cwc-upcoming-events__card-body">
-				<h3 class="cwc-upcoming-events__card-title">
-					<a href="<?php echo esc_url( get_permalink( $active_id ) ); ?>"><?php echo esc_html( get_the_title( $active_id ) ); ?></a>
-				</h3>
+					<div class="cwc-upcoming-events__card-body">
+						<h3 class="cwc-upcoming-events__card-title">
+							<a href="<?php echo esc_url( $ev_url ); ?>"><?php echo esc_html( $ev_title ); ?></a>
+						</h3>
 
-				<?php
-				$excerpt = cwc_blog_card_excerpt( $active, 60 );
-				if ( '' !== $excerpt ) : ?>
-					<p class="cwc-upcoming-events__card-excerpt"><?php echo esc_html( $excerpt ); ?></p>
-				<?php endif; ?>
-			</div>
-		</article>
+						<?php if ( '' !== $ev_exc ) : ?>
+							<p class="cwc-upcoming-events__card-excerpt"><?php echo esc_html( $ev_exc ); ?></p>
+						<?php endif; ?>
+					</div>
+				</article>
+			<?php endforeach; ?>
+		</div>
 	</div>
 </section>
