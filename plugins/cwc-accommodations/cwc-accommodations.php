@@ -55,7 +55,8 @@ define( 'CWC_ACC_URL', plugin_dir_url( __FILE__ ) );
  * --------------------------------------------------------- */
 
 require_once CWC_ACC_PATH . 'includes/cpt.php';
-require_once CWC_ACC_PATH . 'includes/settings.php';
+require_once plugin_dir_path( __FILE__ ) . 'includes/settings.php';
+require_once plugin_dir_path( __FILE__ ) . 'includes/blog-seeder.php';
 require_once CWC_ACC_PATH . 'includes/metabox.php';
 require_once CWC_ACC_PATH . 'includes/policies.php';
 require_once CWC_ACC_PATH . 'includes/migrate.php';

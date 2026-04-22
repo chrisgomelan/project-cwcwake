@@ -74,6 +74,13 @@ add_action( 'admin_post_cwc_acc_settings_save', 'cwc_handle_accommodations_setti
  */
 function cwc_render_accommodations_settings_page() {
 	wp_enqueue_media();
+	// Handle Seeding
+	if ( isset( $_POST['cwc_seed_blogs'] ) ) {
+		check_admin_referer( 'cwc_acc_settings_save', 'cwc_acc_settings_nonce' );
+		$created = cwc_seed_blog_posts();
+		add_settings_error( 'cwc_acc_messages', 'cwc_seeded', sprintf( __( '%d sample blog posts created/checked.', 'cwc-accommodations' ), $created ), 'updated' );
+	}
+
 	$pool      = get_option( 'cwc_icon_pool', [] );
 	$amenities = get_option( 'cwc_dynamic_amenities', [] );
 	$updated   = isset( $_GET['updated'] );
@@ -140,8 +147,9 @@ function cwc_render_accommodations_settings_page() {
 			</div>
 			<button type="button" class="button" id="cwc-add-amenity"><?php esc_html_e( '+ Add Amenity', 'cwc-accommodations' ); ?></button>
 
-			<div style="margin-top:2rem;">
-				<?php submit_button(); ?>
+			<div style="margin-top:2rem; display:flex; align-items:center; gap:10px;">
+				<?php submit_button( __( 'Save All Settings', 'cwc-accommodations' ), 'primary', 'submit', false ); ?>
+				<button type="submit" name="cwc_seed_blogs" class="button"><?php esc_html_e( 'Seed Sample Blog Posts', 'cwc-accommodations' ); ?></button>
 			</div>
 		</form>
 
