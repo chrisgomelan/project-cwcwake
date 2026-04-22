@@ -119,9 +119,28 @@ $wrapper_attrs = get_block_wrapper_attributes( [
 					<?php
 					$vid_url    = $item['videoUrl'] ?? '';
 					$vid_poster = $item['videoPoster'] ?? '';
+					$embed_url  = '';
+
+					if ( strpos( $vid_url, 'vimeo.com' ) !== false ) {
+						if ( preg_match( '/vimeo\.com\/(\d+)/', $vid_url, $matches ) ) {
+							$embed_url = "https://player.vimeo.com/video/" . $matches[1] . "?badge=0&autopause=1";
+						}
+					} elseif ( strpos( $vid_url, 'youtube.com' ) !== false || strpos( $vid_url, 'youtu.be' ) !== false ) {
+						if ( preg_match( '/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/', $vid_url, $matches ) ) {
+							$embed_url = "https://www.youtube.com/embed/" . $matches[1];
+						}
+					}
 					?>
 					<div class="cwc-showcase__card cwc-showcase__card--video">
-						<?php if ( ! empty( $vid_url ) ) : ?>
+						<?php if ( ! empty( $embed_url ) ) : ?>
+							<iframe
+								class="cwc-showcase__video cwc-showcase__video--iframe"
+								src="<?php echo esc_url( $embed_url ); ?>"
+								frameborder="0"
+								allow="autoplay; fullscreen; picture-in-picture"
+								allowfullscreen
+							></iframe>
+						<?php elseif ( ! empty( $vid_url ) ) : ?>
 							<video
 								class="cwc-showcase__video"
 								src="<?php echo esc_url( $vid_url ); ?>"
@@ -170,13 +189,16 @@ $wrapper_attrs = get_block_wrapper_attributes( [
 			<?php endforeach; ?>
 		</div>
 
-		<?php if ( 'videos' === $variant && count( $items ) > 1 ) : ?>
+		<?php if ( 'videos' === $variant && count( $items ) > 3 ) : ?>
 			<div class="cwc-showcase__carousel-nav">
 				<button class="cwc-showcase__arrow cwc-showcase__arrow--prev" aria-label="Previous">
 					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
 				</button>
 				<div class="cwc-showcase__dots">
-					<?php for ( $i = 0; $i < count( $items ); $i++ ) : ?>
+					<?php 
+					$dots_count = ceil( count( $items ) / 3 );
+					for ( $i = 0; $i < $dots_count; $i++ ) : 
+					?>
 						<span class="cwc-showcase__dot<?php echo 0 === $i ? ' cwc-showcase__dot--active' : ''; ?>"></span>
 					<?php endfor; ?>
 				</div>

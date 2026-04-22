@@ -6,32 +6,43 @@
 		const prev = section.querySelector( '.cwc-showcase__arrow--prev' );
 		const next = section.querySelector( '.cwc-showcase__arrow--next' );
 
-		if ( cards.length < 2 ) return;
+		if ( cards.length <= 3 ) return;
 
-		let current = 0;
+		let currentPage = 0;
+		const itemsPerPage = 3;
+		const totalPages = Math.ceil( cards.length / itemsPerPage );
 
-		const goTo = ( index ) => {
-			if ( index < 0 ) index = cards.length - 1;
-			if ( index >= cards.length ) index = 0;
+		const goToPage = ( pageIndex ) => {
+			if ( pageIndex < 0 ) pageIndex = totalPages - 1;
+			if ( pageIndex >= totalPages ) pageIndex = 0;
 
-			cards[ current ].querySelectorAll( 'video' ).forEach( ( v ) => v.pause() );
+			// Pause videos in previous slide
+			section.querySelectorAll( 'video' ).forEach( ( v ) => v.pause() );
+			section.querySelectorAll( 'iframe' ).forEach( ( f ) => {
+				const src = f.src;
+				f.src = src;
+			} );
 
-			const offset = cards[ index ].offsetLeft - grid.offsetLeft;
+			// Calculate card index to scroll to
+			let cardIndex = pageIndex * itemsPerPage;
+			if ( cardIndex >= cards.length ) cardIndex = cards.length - 1;
+
+			const offset = cards[ cardIndex ].offsetLeft - grid.offsetLeft;
 			grid.scrollTo( { left: offset, behavior: 'smooth' } );
 
 			dots.forEach( ( d, i ) => {
-				d.classList.toggle( 'cwc-showcase__dot--active', i === index );
+				d.classList.toggle( 'cwc-showcase__dot--active', i === pageIndex );
 			} );
 
-			current = index;
+			currentPage = pageIndex;
 		};
 
-		prev?.addEventListener( 'click', () => goTo( current - 1 ) );
-		next?.addEventListener( 'click', () => goTo( current + 1 ) );
+		prev?.addEventListener( 'click', () => goToPage( currentPage - 1 ) );
+		next?.addEventListener( 'click', () => goToPage( currentPage + 1 ) );
 
 		dots.forEach( ( dot, i ) => {
 			dot.style.cursor = 'pointer';
-			dot.addEventListener( 'click', () => goTo( i ) );
+			dot.addEventListener( 'click', () => goToPage( i ) );
 		} );
 	} );
 } )();
