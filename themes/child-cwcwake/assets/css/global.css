@@ -34,6 +34,27 @@ img {
 	display: block;
 }
 
+/* WordPress generates padding on the site-blocks wrapper from theme.json
+   layout settings. Reset it so full-width blocks own their own insets. */
+.wp-site-blocks {
+	padding-left: 0 !important;
+	padding-right: 0 !important;
+}
+
+/* Prevent WordPress core alignfull from using 100vw + negative margins,
+   which shifts content wider than the 100%-based header on viewports
+   with a visible scrollbar. All full-width blocks should use 100% instead.
+   The doubled class (.alignfull.alignfull) and the constrained-layout
+   selector both outweigh the WP-generated rules. */
+.alignfull.alignfull,
+.is-layout-constrained > .alignfull,
+.is-layout-flow > .alignfull {
+	width: 100% !important;
+	max-width: 100% !important;
+	margin-left: 0 !important;
+	margin-right: 0 !important;
+}
+
 /* ----------------------------------------
    Footer
    ---------------------------------------- */

@@ -15,14 +15,6 @@
 	overflow: hidden;
 }
 
-/* Prevent alignfull from applying 100vw and negative margins, which causes a shift matching scrollbar width vs the 100% header */
-.cwc-reviews.alignfull {
-	width: 100% !important;
-	max-width: 100% !important;
-	margin-left: 0 !important;
-	margin-right: 0 !important;
-}
-
 .cwc-reviews__inner {
 	width: 100%;
 	max-width: 1921px; /* Align with header max-width */
