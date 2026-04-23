@@ -1,0 +1,181 @@
+/*
+ * CWC Wake — Coaching Section
+ * Two-column: image | text + stacked info cards
+ */
+
+.cwc-coaching {
+	padding: clamp(48px, 6vw, 96px) clamp(2rem, 7vw, 7rem);
+	margin-block-start: 0 !important;
+}
+
+.cwc-coaching__inner {
+	max-width: 1921px;
+	margin: 0 auto;
+	display: flex;
+	align-items: center;
+	gap: clamp(32px, 4vw, 80px);
+}
+
+.cwc-coaching--reversed .cwc-coaching__inner {
+	flex-direction: row-reverse;
+}
+
+/* ── Image column ── */
+
+.cwc-coaching__media {
+	flex: 0 0 45%;
+	min-width: 0;
+	position: relative;
+	padding-bottom: 12%;
+	/* Space for the shift */
+}
+
+.cwc-coaching__img {
+	width: 55%; /* Reduced from 65% */
+	aspect-ratio: 1 / 1;
+	object-fit: cover;
+	display: block;
+	border-radius: 0 !important;
+	box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.cwc-coaching__img--1 {
+	position: relative;
+	z-index: 1;
+}
+
+.cwc-coaching__img--2 {
+	position: absolute;
+	top: 30%; /* Shifted down */
+	left: 35%; /* Shifted right */
+	z-index: 2;
+}
+
+/* Reverse support */
+.cwc-coaching--reversed .cwc-coaching__img--2 {
+	left: auto;
+	right: 35%;
+}
+
+.cwc-coaching__image-placeholder {
+	width: 55%;
+	aspect-ratio: 1 / 1;
+	background: #E5E7EB;
+	border-radius: 0;
+}
+
+/* ── Content column ── */
+
+.cwc-coaching__content {
+	flex: 1 1 0%;
+	min-width: 0;
+}
+
+.cwc-coaching__title {
+	font-family: 'Archivo', var(--wp--preset--font-family--body);
+	font-weight: 700;
+	font-size: clamp(2rem, 3.5vw, 4rem);
+	line-height: 100%;
+	text-transform: uppercase;
+	color: #1A1A1A;
+	text-align: center;
+	margin: 0 0 clamp(16px, 2vw, 24px);
+}
+
+.cwc-coaching__accent {
+	font-style: italic;
+	color: var(--wp--preset--color--primary, #0096C7);
+	display: block;
+}
+
+.cwc-coaching__title-main {
+	display: block;
+}
+
+.cwc-coaching__desc {
+	font-family: 'Archivo', var(--wp--preset--font-family--body);
+	font-weight: 500;
+	font-size: clamp(16px, 1vw + 8px, 20px);
+	line-height: 150%;
+	color: #1A1A1A;
+	margin: 0 0 clamp(20px, 2.5vw, 32px);
+	text-align: center;
+}
+
+.cwc-coaching__subheading {
+	font-family: 'Sora', var(--wp--preset--font-family--heading);
+	font-weight: 700;
+	font-size: clamp(1.25rem, 2vw, 2rem);
+	line-height: 100%;
+	text-transform: uppercase;
+	color: #395144;
+	margin: 0 0 clamp(16px, 2vw, 28px);
+	text-align: center;
+}
+
+/* ── Stacked info cards ── */
+
+.cwc-coaching__cards {
+	display: flex;
+	flex-direction: column;
+	gap: clamp(12px, 1.5vw, 20px);
+}
+
+.cwc-coaching__card {
+	background: #F9FFFF;
+	box-shadow: 0px 4px 6px 0px rgba(0, 0, 0, 0.25);
+	border-radius: 24px;
+	padding: 24px 32px;
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+.cwc-coaching__card-title {
+	font-family: 'Sora', var(--wp--preset--font-family--heading);
+	font-weight: 700;
+	font-size: clamp(16px, 1vw + 6px, 20px);
+	line-height: 100%;
+	color: var(--wp--preset--color--primary, #0096C7);
+	margin: 0;
+	text-underline-offset: 3px;
+}
+
+.cwc-coaching__card-desc {
+	font-family: 'Archivo', var(--wp--preset--font-family--body);
+	font-weight: 400;
+	font-size: clamp(14px, 0.5vw + 10px, 16px);
+	line-height: 150%;
+	color: #000000;
+	margin: 0;
+}
+
+/* ── Responsive ── */
+
+@media (max-width: 991px) {
+	.cwc-coaching__inner {
+		flex-direction: column;
+	}
+
+	.cwc-coaching--reversed .cwc-coaching__inner {
+		flex-direction: column;
+	}
+
+	.cwc-coaching__media {
+		flex: 0 1 auto;
+		width: 100%;
+	}
+
+	.cwc-coaching__image {
+		max-width: 100%;
+	}
+
+	.cwc-coaching__content {
+		width: 100%;
+	}
+
+	.cwc-coaching__desc,
+	.cwc-coaching__subheading {
+		text-align: left;
+	}
+}

@@ -16,6 +16,9 @@
 
 .cwc-breadcrumbs__wrap {
 	width: 100%;
+	max-width: 1921px;
+	margin: 0 auto !important;
+	padding: 0 clamp(2rem, 7vw, 7rem);
 	margin-block-start: 0 !important;
 	background: transparent;
 }

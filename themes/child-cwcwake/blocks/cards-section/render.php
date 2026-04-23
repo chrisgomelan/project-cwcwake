@@ -20,31 +20,43 @@ if (!defined('ABSPATH')) {
 	exit;
 }
 
-$variant = (isset($attributes['variant']) && $attributes['variant'] === 'overlay') ? 'overlay' : 'detailed';
+$variant = (isset($attributes['variant']) && in_array($attributes['variant'], ['overlay', 'static'])) ? $attributes['variant'] : 'detailed';
 $heading_primary = isset($attributes['headingPrimary']) ? trim((string) $attributes['headingPrimary']) : '';
 $heading_secondary = isset($attributes['headingSecondary']) ? trim((string) $attributes['headingSecondary']) : '';
+$section_description = isset($attributes['sectionDescription']) ? trim((string) $attributes['sectionDescription']) : '';
 $items = isset($attributes['items']) && is_array($attributes['items']) ? $attributes['items'] : [];
 
 if (empty($items)) {
 	return;
 }
 
+$variant_class = 'overlay' === $variant || 'static' === $variant ? 'overlay' : 'detailed';
+$static_class = 'static' === $variant ? ' cwc-cards-section--static' : '';
+
 $wrapper_attrs = get_block_wrapper_attributes([
-	'class' => 'cwc-cards-section cwc-cards-section--' . $variant,
+	'class' => 'cwc-cards-section cwc-cards-section--' . $variant_class . $static_class,
 ]);
 
 $person_icon = '<svg class="cwc-cards-section__icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg>';
 ?>
 <section <?php echo $wrapper_attrs; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
-	<?php if ($heading_primary !== '' || $heading_secondary !== ''): ?>
-		<h2 class="cwc-cards-section__heading">
-			<?php if ($heading_primary !== ''): ?>
-				<em class="cwc-cards-section__heading-primary"><?php echo esc_html($heading_primary); ?></em>
+	<?php if ($heading_primary !== '' || $heading_secondary !== '' || $section_description !== ''): ?>
+		<div class="cwc-cards-section__heading-wrap">
+			<?php if ($heading_primary !== '' || $heading_secondary !== ''): ?>
+				<h2 class="cwc-cards-section__heading">
+					<?php if ($heading_primary !== ''): ?>
+						<span class="cwc-cards-section__heading-primary"><?php echo esc_html($heading_primary); ?></span>
+					<?php endif; ?>
+					<?php if ($heading_secondary !== ''): ?>
+						<span class="cwc-cards-section__heading-secondary"> <?php echo esc_html($heading_secondary); ?></span>
+					<?php endif; ?>
+				</h2>
 			<?php endif; ?>
-			<?php if ($heading_secondary !== ''): ?>
-				<em class="cwc-cards-section__heading-secondary"> <?php echo esc_html($heading_secondary); ?></em>
+			
+			<?php if ($section_description !== ''): ?>
+				<p class="cwc-cards-section__section-desc"><?php echo esc_html($section_description); ?></p>
 			<?php endif; ?>
-		</h2>
+		</div>
 	<?php endif; ?>
 
 	<ul class="cwc-cards-section__list">

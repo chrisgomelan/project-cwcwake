@@ -17,13 +17,17 @@
 		"variant": {
 			"type": "string",
 			"default": "detailed",
-			"enum": ["detailed", "overlay"]
+			"enum": ["detailed", "overlay", "static"]
 		},
 		"headingPrimary": {
 			"type": "string",
 			"default": ""
 		},
 		"headingSecondary": {
+			"type": "string",
+			"default": ""
+		},
+		"sectionDescription": {
 			"type": "string",
 			"default": ""
 		},

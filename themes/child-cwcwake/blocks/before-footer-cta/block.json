@@ -7,6 +7,32 @@
   "description": "Full-width call-to-action section with background image, gradient overlay, and Book Now button.",
   "supports": { "html": false, "align": ["full"] },
   "textdomain": "child-cwcwake",
+  "attributes": {
+    "title": {
+      "type": "string",
+      "default": "START YOUR OWN"
+    },
+    "titleAccent": {
+      "type": "string",
+      "default": "STORY"
+    },
+    "accentFirst": {
+      "type": "boolean",
+      "default": false
+    },
+    "description": {
+      "type": "string",
+      "default": "Whether you're a first-timer or a pro, the water is waiting. Plan your visit to the world's premier cable park today."
+    },
+    "buttonLabel": {
+      "type": "string",
+      "default": "BOOK NOW"
+    },
+    "buttonUrl": {
+      "type": "string",
+      "default": "#book"
+    }
+  },
   "style": "file:./style.css",
   "render": "file:./render.php"
 }

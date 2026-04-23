@@ -1,52 +1,62 @@
 /*
- * CWC Wake — About: Certified Safe, Built for Performance
+ * CWC Wake — About: Certified Safe / Rental Equipment
  */
 
 .cwc-certified {
-	background: #1A1A1A url('/wp-content/uploads/2026/04/doodle-bg.webp') center / cover no-repeat;
-	padding: clamp(48px, 6vw, 96px) clamp(1.5rem, 4vw, 4rem);
+	background: linear-gradient(rgba(26, 26, 26, 0.8), rgba(26, 26, 26, 0.8)), url('/wp-content/uploads/2026/04/doodle-bg.webp') center / cover no-repeat;
+	padding: clamp(48px, 6vw, 96px) clamp(2rem, 7vw, 7rem);
 	margin-block-start: 0 !important;
 }
 
 .cwc-certified__inner {
 	max-width: 1921px;
 	margin: 0 auto;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: space-between;
+	gap: clamp(30px, 4vw, 60px);
 }
 
 .cwc-certified__header {
-	margin-bottom: clamp(32px, 4vw, 56px);
+	flex: 0 0 32%;
+	min-width: 0;
+	margin-bottom: 0;
 }
 
 .cwc-certified__title {
 	font-family: 'Sora', var(--wp--preset--font-family--heading);
 	font-weight: 700;
-	font-size: clamp(2rem, 4vw, 4rem);
-	line-height: 1.15;
+	font-size: clamp(1.6rem, 3vw, 3.5rem);
+	line-height: 1.1;
 	text-transform: uppercase;
 	color: #FFFFFF;
 	margin: 0 0 var(--wp--preset--spacing--20);
 }
 
 .cwc-certified__accent {
-	color: var(--wp--preset--color--primary);
+	color: var(--wp--preset--color--primary, #0096C7);
 	font-style: italic;
 }
 
 .cwc-certified__desc {
 	font-family: 'Archivo', var(--wp--preset--font-family--body);
 	font-weight: 500;
-	font-size: clamp(16px, 0.5vw + 14px, 20px);
+	font-size: clamp(15px, 0.4vw + 13px, 19px);
 	line-height: 1.5;
 	color: #F8F9FA;
 	margin: 0;
 	max-width: 680px;
 }
 
-/* 3-column card grid */
+/* ── Variant: Cards (Default) ── */
+
 .cwc-certified__grid {
 	display: grid;
 	grid-template-columns: repeat(3, 1fr);
-	gap: clamp(20px, 2.5vw, 32px);
+	gap: clamp(16px, 2vw, 32px);
+	flex: 0 0 65%;
+	min-width: 0;
 }
 
 .cwc-certified__card {
@@ -55,7 +65,7 @@
 	align-items: center;
 	text-align: center;
 	border: 1px solid rgba(255, 255, 255, 0.5);
-	border-radius: 16px;
+	border-radius: 0;
 	padding: clamp(28px, 3vw, 40px) clamp(20px, 2vw, 32px);
 	min-height: clamp(340px, 28vw, 462px);
 	transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -78,7 +88,7 @@
 .cwc-certified__card-title {
 	font-family: 'Sora', var(--wp--preset--font-family--heading);
 	font-weight: 700;
-	font-size: clamp(24px, 2.5vw + 4px, 48px);
+	font-size: clamp(20px, 2vw + 2px, 36px);
 	line-height: 110%;
 	color: #6EDBFF;
 	margin: 0 0 clamp(12px, 1.5vw, 20px);
@@ -88,13 +98,58 @@
 .cwc-certified__card-desc {
 	font-family: 'Archivo', var(--wp--preset--font-family--body);
 	font-weight: 500;
-	font-size: clamp(14px, 0.5vw + 12px, 20px);
+	font-size: clamp(14px, 0.3vw + 12px, 18px);
 	line-height: 150%;
 	color: #F8F9FA;
 	margin: 0;
 }
 
+/* ── Variant: Images (Rental) ── */
+
+.cwc-certified--images .cwc-certified__images {
+	flex: 0 0 65%;
+	display: flex;
+	gap: 20px;
+	position: relative;
+	min-height: 500px;
+}
+
+.cwc-certified__img-wrap {
+	flex: 1;
+	border-radius: 0;
+	overflow: hidden;
+}
+
+.cwc-certified__img-wrap img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+
+.cwc-certified__img-wrap--1 { margin-top: 60px; }
+.cwc-certified__img-wrap--2 { margin-top: 0; }
+.cwc-certified__img-wrap--3 { margin-top: 60px; }
+
 /* ── Responsive ── */
+
+@media (max-width: 1300px) {
+	.cwc-certified__inner {
+		flex-direction: column;
+		align-items: flex-start;
+		gap: clamp(32px, 4vw, 56px);
+	}
+
+	.cwc-certified__header {
+		flex: 0 1 auto;
+		width: 100%;
+		max-width: 800px;
+	}
+
+	.cwc-certified__grid,
+	.cwc-certified--images .cwc-certified__images {
+		width: 100%;
+	}
+}
 
 @media (max-width: 991px) {
 	.cwc-certified__grid {
@@ -105,5 +160,9 @@
 
 	.cwc-certified__card {
 		min-height: 0;
+	}
+
+	.cwc-certified--images .cwc-certified__images {
+		min-height: 400px;
 	}
 }

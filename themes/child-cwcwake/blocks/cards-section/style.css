@@ -6,32 +6,46 @@
  */
 
 .cwc-cards-section {
-	margin-block-start: 0 !important;
-	padding-top: var(--wp--preset--spacing--40);
-	padding-bottom: var(--wp--preset--spacing--40);
+	width: 100%;
+	max-width: 1921px;
+	margin: 0 auto !important;
+	padding: var(--wp--preset--spacing--40) clamp(1rem, 4vw, 4rem);
 }
 
 /* ---------- Heading ---------- */
 
+.cwc-cards-section__heading-wrap {
+	max-width: 700px;
+	margin: 0 auto var(--wp--preset--spacing--60);
+	text-align: center;
+}
+
 .cwc-cards-section__heading {
-	margin: 0 0 var(--wp--preset--spacing--30);
+	margin: 0 0 1rem;
 	font-family: var(--wp--preset--font-family--body);
 	font-style: italic;
 	font-weight: 700;
-	font-size: clamp(2rem, 5vw, 4rem);
+	font-size: clamp(2.5rem, 5vw, 4rem);
 	line-height: 1;
 	letter-spacing: 0;
+	text-transform: uppercase;
 }
 
 .cwc-cards-section__heading-primary {
-	font-style: italic;
-	text-transform: uppercase;
 	color: #0096c7;
 }
 
 .cwc-cards-section__heading-secondary {
-	font-style: italic;
 	color: #1a1a1a;
+}
+
+.cwc-cards-section__section-desc {
+	font-family: 'Archivo', var(--wp--preset--font-family--body);
+	font-weight: 500;
+	font-size: 20px;
+	line-height: 1;
+	color: #1A1A1A;
+	margin: 0;
 }
 
 /* ---------- Grid ---------- */
@@ -261,7 +275,7 @@
 	text-transform: uppercase;
 	color: #f5f1eb;
 	text-align: center;
-	transition: 
+	transition:
 		font-size 0.6s cubic-bezier(0.4, 0, 0.2, 1),
 		color 0.6s cubic-bezier(0.4, 0, 0.2, 1),
 		margin-left 0.6s cubic-bezier(0.4, 0, 0.2, 1),
@@ -412,6 +426,82 @@
 	.cwc-cards-section__card--overlay .cwc-cards-section__card-title {
 		font-size: clamp(2rem, 2.6vw, 3rem);
 	}
+}
+
+/* ---------- Variant: Static (No Hover) ---------- */
+
+.cwc-cards-section--static .cwc-cards-section__card--overlay {
+	pointer-events: none;
+	border-radius: 30px !important;
+	height: 300px;
+	/* Mobile base height */
+}
+
+/* Force content to be centered and visible without hover */
+.cwc-cards-section--static .cwc-cards-section__card-content {
+	position: absolute !important;
+	inset: 0 !important;
+	display: flex !important;
+	flex-direction: column !important;
+
+	padding: 2rem !important;
+	z-index: 5 !important;
+	opacity: 1 !important;
+	text-align: center !important;
+	transform: none !important;
+}
+
+.cwc-cards-section--static .cwc-cards-section__card--overlay::after {
+	background: rgba(0, 0, 0, 0.5) !important;
+	opacity: 1 !important;
+}
+
+.cwc-cards-section--static .cwc-cards-section__card-title {
+	margin: 0 0 1rem 0 !important;
+	font-family: var(--wp--preset--font-family--heading) !important;
+	font-weight: 700 !important;
+	font-size: clamp(48px, 24px, 48px) !important;
+	/* Larger headings as per screenshot */
+	line-height: 1.1 !important;
+	color: #F5F1EB !important;
+	text-transform: uppercase !important;
+	opacity: 1 !important;
+	transform: none !important;
+}
+
+.cwc-cards-section--static .cwc-cards-section__card-description {
+	display: block !important;
+	visibility: visible !important;
+	opacity: 1 !important;
+	max-height: none !important;
+	margin: 0 !important;
+	font-family: 'Archivo', var(--wp--preset--font-family--body) !important;
+	font-weight: 500 !important;
+	font-size: 20px !important;
+	line-height: 1.2 !important;
+	/* Slightly more than 100% for better legibility on multi-line */
+	color: #F5F1EB !important;
+	text-align: left !important;
+	transform: none !important;
+}
+
+@media (min-width: 1024px) {
+	.cwc-cards-section--static .cwc-cards-section__card--overlay {
+		height: 374px !important;
+		/* Exact design height */
+		max-width: 850px;
+		margin: 0 auto;
+	}
+}
+
+/* Disable scale on hover */
+.cwc-cards-section--static .cwc-cards-section__card--overlay:hover .cwc-cards-section__card-media {
+	transform: none !important;
+}
+
+/* Center Section Header */
+.cwc-cards-section--static .cwc-cards-section__heading {
+	text-align: center;
 }
 
 /* ---------- Wide (1280px+) ---------- */

@@ -1,0 +1,75 @@
+/*
+ * CWC Wake — Feature Banner
+ * Full-width card with background image, overlay, and text.
+ */
+
+.cwc-feature-banner {
+	position: relative;
+	width: calc(100% - (clamp(2rem, 7vw, 7rem) * 2));
+	max-width: 1921px;
+	margin: 0 auto var(--wp--preset--spacing--60) !important;
+	min-height: clamp(300px, 28vw, 476px);
+	border-radius: 30px;
+	background-position: center;
+	background-size: cover;
+	background-repeat: no-repeat;
+	display: flex;
+	align-items: flex-end;
+	overflow: hidden;
+}
+
+.cwc-feature-banner__overlay {
+	position: absolute;
+	inset: 0;
+	background: rgba(0, 0, 0, 0.4);
+	border-radius: 30px;
+	pointer-events: none;
+}
+
+.cwc-feature-banner__content {
+	position: relative;
+	z-index: 1;
+	padding: clamp(28px, 4vw, 56px) clamp(24px, 3vw, 48px);
+	max-width: 700px;
+}
+
+.cwc-feature-banner__title {
+	font-family: 'Sora', var(--wp--preset--font-family--heading);
+	font-weight: 700;
+	font-size: clamp(2rem, 3.5vw, 4rem);
+	line-height: 100%;
+	text-transform: uppercase;
+	color: #F5F1EB;
+	margin: 0 0 clamp(12px, 1.5vw, 20px);
+}
+
+.cwc-feature-banner__accent {
+	font-family: 'Archivo', var(--wp--preset--font-family--body);
+	font-weight: 800;
+	font-style: italic;
+	color: #F5F1EB;
+}
+
+.cwc-feature-banner__desc {
+	font-family: 'Archivo', var(--wp--preset--font-family--body);
+	font-weight: 500;
+	font-size: clamp(15px, 1vw + 8px, 20px);
+	line-height: 150%;
+	color: #F5F1EB;
+	margin: 0;
+	max-width: 520px;
+}
+
+/* ── Responsive ── */
+
+@media (max-width: 768px) {
+	.cwc-feature-banner {
+		margin-left: 1rem !important;
+		margin-right: 1rem !important;
+		border-radius: 16px;
+	}
+
+	.cwc-feature-banner__overlay {
+		border-radius: 16px;
+	}
+}

@@ -43,11 +43,11 @@ $wrapper = get_block_wrapper_attributes( [ 'class' => 'cwc-champions' ] );
 				</div>
 			<?php endforeach; ?>
 		</div>
+	</div>
 
-		<div class="cwc-champions__phrase-overlay" aria-live="polite">
-			<?php foreach ( $phrases as $p ) : ?>
-				<span class="cwc-champions__phrase" data-cwc-phrase><?php echo esc_html( $p ); ?></span>
-			<?php endforeach; ?>
-		</div>
+	<div class="cwc-champions__phrase-overlay" aria-live="polite">
+		<?php foreach ( $phrases as $p ) : ?>
+			<span class="cwc-champions__phrase" data-cwc-phrase><?php echo esc_html( $p ); ?></span>
+		<?php endforeach; ?>
 	</div>
 </section>

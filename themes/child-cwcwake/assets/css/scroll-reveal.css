@@ -1,0 +1,201 @@
+/*
+ * CWC Wake — Scroll Reveal Animations
+ *
+ * The section wrapper (`[data-reveal]`) is the IntersectionObserver
+ * trigger point but stays fully visible at all times — backgrounds,
+ * borders, and overlays are never hidden.
+ *
+ * Only the **direct children** of the wrapper receive the entrance
+ * animation. This keeps section backgrounds intact while inner
+ * headings, grids, cards, etc. animate in.
+ *
+ * Usage: add `data-reveal="<variant>"` to a section wrapper.
+ * Optional: `data-reveal-delay="200"` (ms), `data-reveal-duration="800"` (ms).
+ *
+ * Variants:
+ *   fade-up | fade-down | fade-left | fade-right
+ *   zoom-in | zoom-out
+ *   flip-up
+ *   stagger  — staggers direct children with incremental delays
+ */
+
+/* ----------------------------------------
+   Container — always visible (background safe)
+   ---------------------------------------- */
+
+[data-reveal] {
+	/* The section itself is never hidden. */
+}
+
+/* ----------------------------------------
+   Children — hidden state (pre-reveal)
+   ---------------------------------------- */
+
+[data-reveal] > *:not(.no-reveal) {
+	opacity: 0;
+	will-change: opacity, transform;
+	transition-property: opacity, transform;
+	transition-timing-function: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+	transition-duration: var(--cwc-reveal-duration, 0.8s);
+	transition-delay: var(--cwc-reveal-delay, 0s);
+}
+
+/* Revealed state — children become visible */
+[data-reveal].is-revealed > *:not(.no-reveal) {
+	opacity: 1;
+	transform: none;
+}
+
+/* Elements marked as no-reveal (e.g. absolute overlays) stay visible and static */
+[data-reveal] > *.no-reveal,
+[data-reveal="split"] > *:only-child > *.no-reveal {
+	opacity: 1 !important;
+	transform: none !important;
+	transition: none !important;
+	will-change: auto !important;
+}
+
+/* ----------------------------------------
+   Variant: fade-up (default)
+   ---------------------------------------- */
+
+[data-reveal="fade-up"] > *:not(.no-reveal) {
+	transform: translateY(60px);
+}
+
+/* ----------------------------------------
+   Variant: fade-down
+   ---------------------------------------- */
+
+[data-reveal="fade-down"] > *:not(.no-reveal) {
+	transform: translateY(-60px);
+}
+
+/* ----------------------------------------
+   Variant: fade-left
+   ---------------------------------------- */
+
+[data-reveal="fade-left"] > *:not(.no-reveal) {
+	transform: translateX(-60px);
+}
+
+/* ----------------------------------------
+   Variant: fade-right
+   ---------------------------------------- */
+
+[data-reveal="fade-right"] > *:not(.no-reveal) {
+	transform: translateX(60px);
+}
+
+/* ----------------------------------------
+   Variant: zoom-in
+   ---------------------------------------- */
+
+[data-reveal="zoom-in"] > *:not(.no-reveal) {
+	transform: scale(0.85);
+}
+
+/* ----------------------------------------
+   Variant: zoom-out
+   ---------------------------------------- */
+
+[data-reveal="zoom-out"] > *:not(.no-reveal) {
+	transform: scale(1.15);
+}
+
+/* ----------------------------------------
+   Variant: flip-up
+   ---------------------------------------- */
+
+[data-reveal="flip-up"] > *:not(.no-reveal) {
+	transform: perspective(1000px) rotateX(12deg) translateY(40px);
+}
+
+/* ----------------------------------------
+   Variant: stagger
+   Same as others but children get incremental delays.
+   ---------------------------------------- */
+
+[data-reveal="stagger"] > *:not(.no-reveal) {
+	transform: translateY(40px);
+	transition-duration: var(--cwc-reveal-duration, 0.6s);
+}
+
+/* Stagger delays — up to 12 children */
+[data-reveal="stagger"].is-revealed > *:nth-child(1) { transition-delay: 0s; }
+[data-reveal="stagger"].is-revealed > *:nth-child(2) { transition-delay: 0.1s; }
+[data-reveal="stagger"].is-revealed > *:nth-child(3) { transition-delay: 0.2s; }
+[data-reveal="stagger"].is-revealed > *:nth-child(4) { transition-delay: 0.3s; }
+[data-reveal="stagger"].is-revealed > *:nth-child(5) { transition-delay: 0.4s; }
+[data-reveal="stagger"].is-revealed > *:nth-child(6) { transition-delay: 0.5s; }
+[data-reveal="stagger"].is-revealed > *:nth-child(7) { transition-delay: 0.6s; }
+[data-reveal="stagger"].is-revealed > *:nth-child(8) { transition-delay: 0.7s; }
+[data-reveal="stagger"].is-revealed > *:nth-child(9) { transition-delay: 0.8s; }
+[data-reveal="stagger"].is-revealed > *:nth-child(10) { transition-delay: 0.9s; }
+[data-reveal="stagger"].is-revealed > *:nth-child(11) { transition-delay: 1.0s; }
+[data-reveal="stagger"].is-revealed > *:nth-child(12) { transition-delay: 1.1s; }
+
+/* ----------------------------------------
+   Variant: split
+   Odd columns slide from the left, even columns
+   slide from the right — ideal for two-column layouts.
+
+   Works at two depths:
+     Section > Column  (blocks without an __inner wrapper)
+     Section > Inner > Column  (blocks with a single __inner div)
+   ---------------------------------------- */
+
+/* Direct children (blocks with multiple top-level children) */
+[data-reveal="split"] > *:nth-child(odd):not(.no-reveal) {
+	transform: translateX(-60px);
+}
+
+[data-reveal="split"] > *:nth-child(even):not(.no-reveal) {
+	transform: translateX(60px);
+}
+
+/*
+ * Grandchildren (blocks with a single __inner wrapper).
+ * The __inner itself stays visible; its children animate.
+ */
+[data-reveal="split"] > *:only-child {
+	/* The lone wrapper child should not animate itself */
+	opacity: 1;
+	transform: none;
+	will-change: auto;
+}
+
+[data-reveal="split"] > *:only-child > *:not(.no-reveal) {
+	opacity: 0;
+	will-change: opacity, transform;
+	transition-property: opacity, transform;
+	transition-timing-function: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+	transition-duration: var(--cwc-reveal-duration, 0.8s);
+	transition-delay: var(--cwc-reveal-delay, 0s);
+}
+
+[data-reveal="split"] > *:only-child > *:nth-child(odd):not(.no-reveal) {
+	transform: translateX(-60px);
+}
+
+[data-reveal="split"] > *:only-child > *:nth-child(even):not(.no-reveal) {
+	transform: translateX(60px);
+}
+
+[data-reveal="split"].is-revealed > *:only-child > *:not(.no-reveal) {
+	opacity: 1;
+	transform: none;
+}
+
+/* ----------------------------------------
+   Accessibility — Respect reduced motion
+   ---------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+	[data-reveal] > *,
+	[data-reveal="split"] > *:only-child > * {
+		transition-duration: 0.01ms !important;
+		transform: none !important;
+		opacity: 1 !important;
+	}
+}

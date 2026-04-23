@@ -87,6 +87,22 @@ function cwc_enqueue_styles()
 		CWC_VERSION,
 		true
 	);
+
+	// Scroll Reveal — Global section entrance animations.
+	wp_enqueue_style(
+		'cwc-scroll-reveal',
+		get_stylesheet_directory_uri() . '/assets/css/scroll-reveal.css',
+		['cwc-global'],
+		CWC_VERSION
+	);
+
+	wp_enqueue_script(
+		'cwc-scroll-reveal',
+		get_stylesheet_directory_uri() . '/assets/js/scroll-reveal.js',
+		[],
+		CWC_VERSION,
+		true
+	);
 }
 add_action('wp_enqueue_scripts', 'cwc_enqueue_styles');
 
@@ -187,7 +203,7 @@ function cwc_inject_scroll_top_html()
 	<button id="cwc-scroll-top" class="cwc-scroll-top" aria-label="Scroll to top">
 		<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
 			stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-			<path d="m18 15-6-6-6 6" />
+			<path d="M12 19V5M5 12l7-7 7 7" />
 		</svg>
 	</button>
 <?php
@@ -460,6 +476,20 @@ require_once get_stylesheet_directory() . '/inc/blogs-page-seed.php';
 require_once get_stylesheet_directory() . '/inc/faqs-page-seed.php';
 
 /*
+ * Scroll Reveal — Centralized `render_block` filter that auto-injects
+ * `data-reveal` attributes into block output based on a class → animation
+ * mapping. No template or render.php changes are needed; edit the map
+ * inside `inc/scroll-reveal.php` to adjust per-section animations.
+ */
+require_once get_stylesheet_directory() . '/inc/scroll-reveal.php';
+
+/*
+ * Water Sports page seeder — assigns the `page-water-sports` template
+ * to the existing `/activities/water-sports/` page. Idempotent (option-guarded).
+ */
+require_once get_stylesheet_directory() . '/inc/water-sports-page-seed.php';
+
+/*
  * Accommodations (Rooms) data layer.
  *
  * The `accommodation` CPT, its meta fields, the admin meta boxes,
@@ -699,6 +729,11 @@ function cwc_register_blocks()
 	register_block_type(get_stylesheet_directory() . '/blocks/about-certified');
 	register_block_type(get_stylesheet_directory() . '/blocks/about-empowering');
 	register_block_type(get_stylesheet_directory() . '/blocks/before-footer-cta');
+
+	// Water Sports page blocks
+	register_block_type(get_stylesheet_directory() . '/blocks/feature-split');
+	register_block_type(get_stylesheet_directory() . '/blocks/feature-banner');
+	register_block_type(get_stylesheet_directory() . '/blocks/coaching-section');
 }
 add_action('init', 'cwc_register_blocks');
 
