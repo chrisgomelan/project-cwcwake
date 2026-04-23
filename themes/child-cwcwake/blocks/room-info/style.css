@@ -311,14 +311,20 @@
 
 /* ---------- Responsive collapse ---------- */
 
-@media (max-width: 900px) {
+@media (max-width: 991px) {
 	.cwc-room-info__layout {
 		grid-template-columns: minmax(0, 1fr);
 	}
 
+	.cwc-room-info__title,
+	.cwc-room-info__label,
+	.cwc-room-info__description {
+		text-align: center;
+	}
+
 	.cwc-room-info__pricing {
 		max-width: 430px;
-		justify-self: stretch;
+		justify-self: center;
 	}
 
 	.cwc-room-info__policies {
@@ -328,6 +334,12 @@
 	.cwc-room-info__policy-desc {
 		border-top: 0;
 		padding-top: 0;
+		text-align: center;
+	}
+
+	.cwc-room-info__policy-name {
+		justify-content: center;
+		text-align: center;
 	}
 }
 
@@ -355,7 +367,7 @@
 	border-radius: 999px;
 	background: #f59f00;
 	color: #fff;
-	font-size: 0.7rem;
+	font-size: clamp(10px, 0.8vw, 12px);
 	font-weight: 700;
 	letter-spacing: 0.08em;
 	text-transform: uppercase;
@@ -369,7 +381,7 @@
 	background: #ffe3e3;
 	color: #c92a2a;
 	font-weight: 700;
-	font-size: 0.85rem;
+	font-size: clamp(12px, 0.9vw, 14px);
 	letter-spacing: 0.04em;
 	text-transform: uppercase;
 	text-align: center;

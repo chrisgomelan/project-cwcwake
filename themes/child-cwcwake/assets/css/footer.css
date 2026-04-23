@@ -100,7 +100,7 @@
 	border-radius: 8px;
 	font-family: "Sora", sans-serif;
 	font-weight: 500;
-	font-size: 14px;
+	font-size: clamp(12px, 1.2vw, 14px);
 	line-height: 1.4;
 	border: 1px solid transparent;
 }
@@ -141,7 +141,7 @@
 	padding: 0 clamp(14px, 1.5vw + 6px, 24px);
 	font-family: "Sora", sans-serif;
 	font-weight: 400;
-	font-size: 15px;
+	font-size: clamp(13px, 1.2vw, 15px);
 	color: #1A1A1A;
 }
 
@@ -396,9 +396,6 @@
 		flex: none;
 	}
 
-	.cwc-site-footer__contact-list li {
-		font-size: 13px;
-	}
 
 	.cwc-site-footer__partners-logos img {
 		width: clamp(140px, 42vw, 240px);

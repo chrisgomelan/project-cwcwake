@@ -163,9 +163,10 @@
 
 /* ── Responsive ── */
 
-@media (max-width: 991px) {
+@media (max-width: 1024px) {
 	.cwc-timeline__line,
-	.cwc-timeline__dot {
+	.cwc-timeline__dot,
+	.cwc-timeline__image {
 		display: none;
 	}
 
@@ -186,5 +187,11 @@
 	.cwc-timeline__image img {
 		height: auto;
 		max-height: 280px;
+	}
+}
+
+@media (max-width: 1024px) {
+	.cwc-timeline {
+		padding-bottom: 0;
 	}
 }

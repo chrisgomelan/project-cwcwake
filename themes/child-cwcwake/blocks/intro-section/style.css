@@ -37,7 +37,7 @@
 .cwc-intro__heading {
 	font-family: 'Sora', var(--wp--preset--font-family--heading);
 	font-weight: 700;
-	font-size: 64px;
+	font-size: clamp(32px, 5vw, 64px);
 	line-height: 100%;
 	letter-spacing: 0;
 	color: var(--wp--preset--color--text);
@@ -53,7 +53,7 @@
 .cwc-intro__description {
 	font-family: var(--wp--preset--font-family--body);
 	font-weight: 500;
-	font-size: 20px;
+	font-size: clamp(16px, 2vw, 20px);
 	line-height: 1.65;
 	color: #1A1A1A;
 	margin: 0;
@@ -71,12 +71,12 @@
 /* Tagline */
 .cwc-intro__tagline {
 	position: absolute;
-    top: -10px;
-    right: 25px;
+	top: -10px;
+	right: 25px;
 	z-index: 2;
 	font-family: 'Sora', var(--wp--preset--font-family--heading);
 	font-weight: 700;
-	font-size: 43px;
+	font-size: clamp(24px, 2vw, 43px);
 	line-height: 100%;
 	letter-spacing: 0;
 	text-transform: uppercase;
@@ -87,10 +87,10 @@
 /* Corner bracket shapes */
 .cwc-intro__bracket {
 	position: absolute;
-    width: 100px;
-    height: 120px;
-    border: 400px solid var(--wp--preset--color--primary);
-    z-index: 1;
+	width: clamp(50px, 7vw, 100px);
+	height: clamp(60px, 8.5vw, 120px);
+	border: clamp(10px, 15vw, 400px) solid var(--wp--preset--color--primary);
+	z-index: 1;
 }
 
 .cwc-intro__bracket--tl {
@@ -166,10 +166,16 @@
 		text-align: center;
 	}
 
+	.cwc-intro__media {
+		padding: 0;
+	}
+
 	.cwc-intro__tagline {
-		position: relative;
+		position: static;
+		display: block;
+		width: 100%;
 		text-align: center;
-		margin-bottom: var(--wp--preset--spacing--20);
+		margin-bottom: var(--wp--preset--spacing--30);
 	}
 
 	.cwc-intro__bracket {

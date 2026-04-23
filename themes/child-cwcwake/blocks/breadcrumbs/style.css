@@ -41,7 +41,7 @@
 	list-style: none;
 	font-family: 'Inter', system-ui, sans-serif;
 	font-weight: 600;
-	font-size: 20px;
+	font-size: clamp(16px, 1.5vw, 20px);
 	line-height: 1;
 	letter-spacing: 0;
 	color: #1A1A1A;
@@ -96,14 +96,4 @@
 	font-family: 'Sora', system-ui, sans-serif;
 	font-weight: 600;
 	color: #0096C7;
-}
-
-/* ----------------------------------------
-   Responsive
-   ---------------------------------------- */
-
-@media (max-width: 600px) {
-	.cwc-breadcrumbs__list {
-		font-size: 16px;
-	}
 }

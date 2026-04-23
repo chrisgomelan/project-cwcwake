@@ -15,9 +15,17 @@
 /* ---------- Heading ---------- */
 
 .cwc-cards-section__heading-wrap {
-	max-width: 700px;
-	margin: 0 auto var(--wp--preset--spacing--60);
-	text-align: center;
+	max-width: 100%;
+	margin: 0 0 var(--wp--preset--spacing--60);
+	text-align: left;
+}
+
+@media (max-width: 991px) {
+	.cwc-cards-section__heading-wrap {
+		margin-left: auto;
+		margin-right: auto;
+		text-align: center;
+	}
 }
 
 .cwc-cards-section__heading {
@@ -42,7 +50,7 @@
 .cwc-cards-section__section-desc {
 	font-family: 'Archivo', var(--wp--preset--font-family--body);
 	font-weight: 500;
-	font-size: 20px;
+	font-size: clamp(16px, 1.2vw + 14px, 20px);
 	line-height: 1;
 	color: #1A1A1A;
 	margin: 0;
@@ -127,7 +135,7 @@
 	margin: 0;
 	font-family: var(--wp--preset--font-family--heading);
 	font-weight: 700;
-	font-size: 1.6rem;
+	font-size: clamp(1.25rem, 2vw, 1.6rem);
 	line-height: 1;
 	letter-spacing: 0;
 	text-transform: uppercase;
@@ -238,7 +246,7 @@
 	display: flex;
 	flex-direction: column;
 	justify-content: flex-end;
-	align-items: flex-start;
+	align-items: flex-start !important;
 	transition:
 		bottom 0.6s cubic-bezier(0.4, 0, 0.2, 1),
 		opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1);
@@ -269,7 +277,7 @@
 	max-width: 100%;
 	font-family: var(--wp--preset--font-family--heading);
 	font-weight: 700;
-	font-size: 1.4rem;
+	font-size: clamp(1.1rem, 2vw, 1.4rem);
 	line-height: 1.1;
 	letter-spacing: 0;
 	text-transform: uppercase;
@@ -294,11 +302,11 @@
 .cwc-cards-section__card-description {
 	margin: 0;
 	width: 100%;
-	min-width: 480px;
-	margin-right: -300px;
+	min-width: 0;
+	margin-right: 0;
 	font-family: var(--wp--preset--font-family--body);
 	font-weight: 500;
-	font-size: 20px;
+	font-size: clamp(16px, 1.5vw, 20px);
 	line-height: 1.4;
 	letter-spacing: 0;
 	text-align: center;
@@ -327,6 +335,35 @@
 	transform: scale(1.08);
 }
 
+/* ---------- Tablet & Mobile (991px and below) ---------- */
+@media (max-width: 991px) {
+
+
+	.cwc-cards-section__card--overlay .cwc-cards-section__card-content {
+		align-items: center;
+	}
+
+	.cwc-cards-section__card--overlay .cwc-cards-section__card-title {
+		display: block; /* Show initially */
+		opacity: 1;
+		transition: opacity 0.4s ease;
+	}
+
+	.cwc-cards-section__card--overlay:hover .cwc-cards-section__card-title {
+		display: none; /* Remove from flow so description can center natively */
+	}
+
+	.cwc-cards-section__card--overlay:hover .cwc-cards-section__card-content {
+		bottom: 50%;
+		transform: translateY(50%);
+		justify-content: center;
+	}
+
+	.cwc-cards-section__card--overlay:hover .cwc-cards-section__card-description {
+		margin-top: 0;
+	}
+}
+
 /* ---------- Tablet (768px+) ---------- */
 
 @media (min-width: 768px) {
@@ -350,6 +387,7 @@
 
 	.cwc-cards-section__card--detailed .cwc-cards-section__card-body {
 		padding: 1.5rem;
+
 	}
 
 	.cwc-cards-section__card--detailed .cwc-cards-section__card-title {
@@ -368,6 +406,7 @@
 		left: 1.5rem;
 		bottom: 1.5rem;
 		right: 1.5rem;
+		align-items: center;
 	}
 
 	.cwc-cards-section__card--overlay {
@@ -460,7 +499,7 @@
 	margin: 0 0 1rem 0 !important;
 	font-family: var(--wp--preset--font-family--heading) !important;
 	font-weight: 700 !important;
-	font-size: clamp(48px, 24px, 48px) !important;
+	font-size: clamp(32px, 5vw, 48px) !important;
 	/* Larger headings as per screenshot */
 	line-height: 1.1 !important;
 	color: #F5F1EB !important;
@@ -477,7 +516,7 @@
 	margin: 0 !important;
 	font-family: 'Archivo', var(--wp--preset--font-family--body) !important;
 	font-weight: 500 !important;
-	font-size: 20px !important;
+	font-size: clamp(16px, 1.5vw, 20px) !important;
 	line-height: 1.2 !important;
 	/* Slightly more than 100% for better legibility on multi-line */
 	color: #F5F1EB !important;

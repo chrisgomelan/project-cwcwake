@@ -144,7 +144,24 @@
 
 @media (max-width: 900px) {
 	.cwc-page-banner {
-		padding-top: 100px;
+		padding: 20px 1rem var(--wp--preset--spacing--40);
+		text-align: center;
+		display: flex;
+		justify-content: center;
+	}
+
+	.cwc-page-banner__content {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		text-align: center;
+		width: 100%;
+		margin: 0;
+	}
+
+	.cwc-page-banner__subtitle {
+		width: 100%;
+		max-width: 100%;
 	}
 
 	.cwc-page-banner--default {
@@ -168,5 +185,9 @@
 
 	.cwc-page-banner--compact {
 		min-height: 150px;
+	}
+
+	.cwc-page-banner__subtitle {
+		display: none;
 	}
 }

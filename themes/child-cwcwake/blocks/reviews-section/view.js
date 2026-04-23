@@ -1,6 +1,7 @@
 ( () => {
 	document.querySelectorAll( '.cwc-reviews__slider' ).forEach( ( slider ) => {
 		const slides = slider.querySelectorAll( '.cwc-reviews__slide' );
+		const currentDisplay = slider.querySelector( '.cwc-reviews__counter-current' );
 		const total = slides.length;
 		if ( total < 2 ) return;
 
@@ -20,8 +21,8 @@
 					s.classList.remove( 'cwc-reviews__slide--outgoing' );
 				}
 
-				const prevBtn = s.querySelector( '.cwc-reviews__arrow--prev' );
-				const nextBtn = s.querySelector( '.cwc-reviews__arrow--next' );
+				const prevBtn = s.querySelector( '.cwc-reviews__arrow--prev' ) || slider.querySelector( '.cwc-reviews__arrow--prev' );
+				const nextBtn = s.querySelector( '.cwc-reviews__arrow--next' ) || slider.querySelector( '.cwc-reviews__arrow--next' );
 
 				if ( prevBtn ) prevBtn.disabled = ( index === 0 );
 				if ( nextBtn ) nextBtn.disabled = ( index === total - 1 );
@@ -29,6 +30,11 @@
 
 			slides[ index ].classList.remove( 'cwc-reviews__slide--outgoing' );
 			slides[ index ].classList.add( 'cwc-reviews__slide--active' );
+
+			// Update counter text 
+			if ( currentDisplay ) {
+				currentDisplay.textContent = String( index + 1 ).padStart( 2, '0' );
+			}
 
 			clearTimeout( timer );
 			timer = setTimeout( () => {

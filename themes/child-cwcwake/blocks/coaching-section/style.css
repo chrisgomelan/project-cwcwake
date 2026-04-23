@@ -154,20 +154,47 @@
 
 @media (max-width: 991px) {
 	.cwc-coaching__inner {
-		flex-direction: column;
+		flex-direction: column-reverse;
 	}
 
 	.cwc-coaching--reversed .cwc-coaching__inner {
-		flex-direction: column;
+		flex-direction: column-reverse;
 	}
 
 	.cwc-coaching__media {
 		flex: 0 1 auto;
 		width: 100%;
+		max-width: 600px;
+		margin: 0 auto var(--wp--preset--spacing--40);
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 20px;
+		min-height: 0;
+		padding: 0;
 	}
 
-	.cwc-coaching__image {
-		max-width: 100%;
+	.cwc-coaching__img {
+		width: 100%;
+		position: static !important;
+		aspect-ratio: 4/3;
+	}
+
+	.cwc-coaching__content {
+		width: 100%;
+		text-align: center;
+	}
+}
+
+@media (max-width: 600px) {
+	.cwc-coaching {
+		padding-left: 1.5rem;
+		padding-right: 1.5rem;
+	}
+
+	.cwc-coaching__media {
+		max-width: 320px;
+		grid-template-columns: 1fr;
+		gap: 15px;
 	}
 
 	.cwc-coaching__content {
@@ -176,6 +203,6 @@
 
 	.cwc-coaching__desc,
 	.cwc-coaching__subheading {
-		text-align: left;
+		text-align: center;
 	}
 }

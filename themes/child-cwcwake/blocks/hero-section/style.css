@@ -79,7 +79,7 @@
 .cwc-hero__subtitle {
 	font-family: 'Archivo', var(--wp--preset--font-family--body);
 	font-weight: 600;
-	font-size: 32px;
+	font-size: clamp(18px, 3vw, 32px);
 	font-style: normal;
 	line-height: 100%;
 	letter-spacing: 0;
@@ -263,7 +263,7 @@
 .cwc-hero__scroll-dive span {
 	font-family: 'Archivo', var(--wp--preset--font-family--body);
 	font-weight: 500;
-	font-size: 16px;
+	font-size: clamp(12px, 1.5vw, 16px);
 	line-height: 100%;
 	color: #F5F1EB;
 	text-transform: uppercase;
@@ -272,6 +272,21 @@
 /* ----------------------------------------
    Responsive
    ---------------------------------------- */
+
+@media (max-width: 900px) {
+	.cwc-hero__content {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		text-align: center;
+		margin: 0 auto;
+	}
+
+	.cwc-hero__heading,
+	.cwc-hero__subtitle {
+		text-align: center;
+	}
+}
 
 @media (max-width: 600px) {
 	.cwc-hero {

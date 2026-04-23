@@ -308,6 +308,10 @@
 	.cwc-faq__divider {
 		display: none;
 	}
+
+	.cwc-faq__question-text {
+		line-height: normal;
+	}
 }
 
 @media (max-width: 600px) {

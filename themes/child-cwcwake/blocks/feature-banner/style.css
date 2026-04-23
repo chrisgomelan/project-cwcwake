@@ -64,12 +64,23 @@
 
 @media (max-width: 768px) {
 	.cwc-feature-banner {
-		margin-left: 1rem !important;
-		margin-right: 1rem !important;
+		width: calc(100% - 2rem);
+		justify-content: center;
+		align-items: center;
+		margin: 0 auto var(--wp--preset--spacing--40) !important;
 		border-radius: 16px;
 	}
 
 	.cwc-feature-banner__overlay {
 		border-radius: 16px;
+	}
+
+	.cwc-feature-banner__content {
+		text-align: center;
+		padding: 40px 24px;
+	}
+
+	.cwc-feature-banner__desc {
+		margin: 0 auto;
 	}
 }

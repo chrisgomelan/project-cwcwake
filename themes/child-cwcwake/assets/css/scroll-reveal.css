@@ -154,14 +154,20 @@
 	transform: translateX(60px);
 }
 
+[data-reveal="split"].is-revealed > *:nth-child(odd):not(.no-reveal),
+[data-reveal="split"].is-revealed > *:nth-child(even):not(.no-reveal) {
+	opacity: 1;
+	transform: none;
+}
+
 /*
  * Grandchildren (blocks with a single __inner wrapper).
  * The __inner itself stays visible; its children animate.
  */
-[data-reveal="split"] > *:only-child {
+[data-reveal="split"] > *:only-child:not(.no-reveal) {
 	/* The lone wrapper child should not animate itself */
-	opacity: 1;
-	transform: none;
+	opacity: 1 !important;
+	transform: none !important;
 	will-change: auto;
 }
 

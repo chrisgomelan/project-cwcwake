@@ -103,8 +103,246 @@ function cwc_enqueue_styles()
 		CWC_VERSION,
 		true
 	);
+
+	// Search Overlay — AI-ready semantic search with local fallback.
+	wp_enqueue_style(
+		'cwc-search-overlay',
+		get_stylesheet_directory_uri() . '/assets/css/search-overlay.css',
+		['cwc-global'],
+		CWC_VERSION
+	);
+
+	wp_enqueue_script(
+		'cwc-search-overlay',
+		get_stylesheet_directory_uri() . '/assets/js/search-overlay.js',
+		[],
+		CWC_VERSION,
+		true
+	);
+
+	// Pass config to JS (Priority AI toggle)
+	wp_localize_script('cwc-search-overlay', 'cwcSearchConfig', [
+		'hasAi' => defined('CWC_AI_KEY') && !empty(CWC_AI_KEY),
+		'nonce' => wp_create_nonce('wp_rest')
+	]);
 }
 add_action('wp_enqueue_scripts', 'cwc_enqueue_styles');
+
+/**
+ * Inject the Search Overlay HTML into the footer.
+ */
+function cwc_inject_search_overlay_html()
+{
+	?>
+	<div class="cwc-search-overlay" aria-hidden="true">
+		<button class="cwc-search-overlay__close" aria-label="Close search">
+			<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+				stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+				<line x1="18" y1="6" x2="6" y2="18" />
+				<line x1="6" y1="6" x2="18" y2="18" />
+			</svg>
+		</button>
+		<div class="cwc-search-overlay__inner">
+			<div class="cwc-search-overlay__field-wrap">
+				<input type="text" class="cwc-search-overlay__input" placeholder="Type to explore..."
+					aria-label="Search site">
+				<span class="cwc-search-overlay__status"></span>
+			</div>
+			<div class="cwc-search-overlay__results"></div>
+		</div>
+	</div>
+	<?php
+}
+add_action('wp_footer', 'cwc_inject_search_overlay_html');
+
+/**
+ * Register REST API endpoints for Search (Local Fallback & Semantic).
+ */
+function cwc_register_search_endpoints()
+{
+	// Endpoint for local fuzzy search data
+	register_rest_route('cwc/v1', '/search-data', [
+		'methods' => 'GET',
+		'callback' => 'cwc_get_search_data',
+		'permission_callback' => '__return_true'
+	]);
+
+	// Endpoint for quick suggestions/recommendations
+	register_rest_route('cwc/v1', '/search-suggestions', [
+		'methods' => 'GET',
+		'callback' => 'cwc_get_search_suggestions',
+		'permission_callback' => '__return_true'
+	]);
+
+	// Stub for Semantic Search (Placeholder for AI integration)
+	register_rest_route('cwc/v1', '/semantic-search', [
+		'methods' => 'POST',
+		'callback' => 'cwc_handle_semantic_search',
+		'permission_callback' => '__return_true'
+	]);
+}
+add_action('rest_api_init', 'cwc_register_search_endpoints');
+
+/**
+ * Get all searchable content for local fuzzy matching.
+ */
+function cwc_get_search_data($request = null)
+{
+	$query_str = $request ? $request->get_param('q') : '';
+	$items = [];
+
+	$args = [
+		'post_type' => get_post_types(['public' => true]),
+		'posts_per_page' => 100,
+		'post_status' => 'publish'
+	];
+
+	if (!empty($query_str)) {
+		$args['s'] = $query_str;
+	}
+
+	$query = new WP_Query($args);
+
+	if ($query->have_posts()) {
+		while ($query->have_posts()) {
+			$query->the_post();
+			$items[] = [
+				'title' => get_the_title(),
+				'url' => get_permalink(),
+				'excerpt' => wp_trim_words(get_the_excerpt(), 20),
+				'type' => get_post_type_labels(get_post_type_object(get_post_type()))->singular_name
+			];
+		}
+		wp_reset_postdata();
+	}
+
+	return rest_ensure_response($items);
+}
+
+/**
+ * Handle Semantic Search logic using OpenRouter AI.
+ * 
+ * Strategy:
+ * 1. Fetch top 15 potential matches via fast keyword search.
+ * 2. Use OpenRouter AI to analyze and rerank these results by semantic meaning.
+ * 3. Fall back to weighted keyword results if AI fails or key is missing.
+ */
+function cwc_handle_semantic_search($request)
+{
+	$query_str = $request->get_param('query');
+	if (empty($query_str)) {
+		return rest_ensure_response([]);
+	}
+
+	// 1. Get potential candidates via keyword search
+	global $wpdb;
+	$search_term = '%' . $wpdb->esc_like($query_str) . '%';
+	$search_words = explode(' ', $query_str);
+	$where_parts = [];
+	$query_params = [];
+
+	foreach ($search_words as $word) {
+		if (strlen($word) < 3)
+			continue;
+		$term = '%' . $wpdb->esc_like($word) . '%';
+		$where_parts[] = "(post_title LIKE %s OR post_content LIKE %s)";
+		$query_params[] = $term;
+		$query_params[] = $term;
+	}
+
+	if (empty($where_parts)) {
+		$where_clause = "(post_title LIKE %s OR post_content LIKE %s)";
+		$query_params = [$search_term, $search_term];
+	} else {
+		$where_clause = implode(' OR ', $where_parts);
+	}
+
+	$public_types = get_post_types(['public' => true]);
+	$types_placeholders = implode(',', array_fill(0, count($public_types), '%s'));
+
+	$candidates = $wpdb->get_results($wpdb->prepare(
+		"SELECT ID, post_title, post_type, post_content
+		FROM $wpdb->posts 
+		WHERE post_status = 'publish' 
+		AND post_type IN ($types_placeholders)
+		AND ($where_clause)
+		ORDER BY id DESC
+		LIMIT 25",
+		...array_merge($public_types, $query_params)
+	));
+
+	if (empty($candidates)) {
+		return rest_ensure_response([]);
+	}
+
+	$items = [];
+	foreach ($candidates as $post) {
+		$items[] = [
+			'id' => $post->ID,
+			'title' => $post->post_title,
+			'url' => get_permalink($post->ID),
+			'excerpt' => wp_trim_words(strip_tags($post->post_content), 15),
+			'type' => get_post_type_labels(get_post_type_object($post->post_type))->singular_name
+		];
+	}
+
+	// 2. Attempt AI Reranking via OpenRouter if key exists
+	if (defined('CWC_AI_KEY') && !empty(CWC_AI_KEY)) {
+		$api_key = CWC_AI_KEY;
+
+		// Map candidates for AI context
+		$context = "";
+		foreach ($items as $index => $item) {
+			$context .= "[$index] Title: {$item['title']}, Content: {$item['excerpt']}\n";
+		}
+
+		$prompt = "You are a search assistant for CWC Wake (a water sports park). 
+		The user is searching for: \"{$query_str}\".
+		Below are the potential matches. Re-order them from most semantically relevant to least relevant.
+		Respond ONLY with a comma-separated list of the indices. If something is irrelevant, exclude it.
+		Example: 2,0,5
+		
+		Candidates:
+		{$context}";
+
+		$response = wp_remote_post('https://openrouter.ai/api/v1/chat/completions', [
+			'timeout' => 5, // Keep it fast for search
+			'headers' => [
+				'Authorization' => 'Bearer ' . $api_key,
+				'Content-Type' => 'application/json',
+				'HTTP-Referer' => home_url(),
+			],
+			'body' => json_encode([
+				'model' => 'google/gemma-4-26b-a4b:free', // Better for chat-based ranking
+				'messages' => [['role' => 'user', 'content' => $prompt]],
+				'temperature' => 0
+			])
+		]);
+
+		if (!is_wp_error($response) && wp_remote_retrieve_response_code($response) === 200) {
+			$body = json_decode(wp_remote_retrieve_body($response), true);
+			$order_str = $body['choices'][0]['message']['content'] ?? '';
+
+			// Parse the AI's suggested order
+			preg_match_all('/\d+/', $order_str, $matches);
+			if (!empty($matches[0])) {
+				$reordered_items = [];
+				foreach ($matches[0] as $index) {
+					if (isset($items[(int) $index])) {
+						$reordered_items[] = $items[(int) $index];
+					}
+				}
+				if (!empty($reordered_items)) {
+					return rest_ensure_response(array_slice($reordered_items, 0, 8));
+				}
+			}
+		}
+	}
+
+	// Fallback to basic results if AI fails
+	return rest_ensure_response(array_slice($items, 0, 8));
+}
+
 
 /**
  * Enqueue styles and scripts for single blog posts.
@@ -120,7 +358,7 @@ add_action('wp_enqueue_scripts', 'cwc_enqueue_styles');
  */
 function cwc_enqueue_single_post_assets()
 {
-	if ( ! is_singular( 'post' ) ) {
+	if (!is_singular('post')) {
 		return;
 	}
 
@@ -139,27 +377,27 @@ function cwc_enqueue_single_post_assets()
 		true
 	);
 
-	$post_id   = get_the_ID();
+	$post_id = get_the_ID();
 	$thumb_url = '';
-	$thumb_id  = (int) get_post_thumbnail_id( $post_id );
-	if ( $thumb_id > 0 ) {
-		$src = wp_get_attachment_image_url( $thumb_id, 'full' );
-		if ( is_string( $src ) && '' !== $src ) {
+	$thumb_id = (int) get_post_thumbnail_id($post_id);
+	if ($thumb_id > 0) {
+		$src = wp_get_attachment_image_url($thumb_id, 'full');
+		if (is_string($src) && '' !== $src) {
 			$thumb_url = $src;
 		}
 	}
 
-	$word_count = str_word_count( wp_strip_all_tags( get_post_field( 'post_content', $post_id ) ) );
-	$read_min   = max( 1, (int) ceil( $word_count / 200 ) );
+	$word_count = str_word_count(wp_strip_all_tags(get_post_field('post_content', $post_id)));
+	$read_min = max(1, (int) ceil($word_count / 200));
 
-	wp_localize_script( 'cwc-single-post', 'cwcSinglePost', [
-		'image'    => esc_url( $thumb_url ),
-		'date'     => get_the_date( 'F j, Y', $post_id ),
-		'readTime' => $read_min . ' minute' . ( $read_min > 1 ? 's' : '' ) . ' read',
+	wp_localize_script('cwc-single-post', 'cwcSinglePost', [
+		'image' => esc_url($thumb_url),
+		'date' => get_the_date('F j, Y', $post_id),
+		'readTime' => $read_min . ' minute' . ($read_min > 1 ? 's' : '') . ' read',
 		'themeUri' => get_stylesheet_directory_uri(),
-	] );
+	]);
 }
-add_action( 'wp_enqueue_scripts', 'cwc_enqueue_single_post_assets' );
+add_action('wp_enqueue_scripts', 'cwc_enqueue_single_post_assets');
 
 /**
  * Automatically add IDs to H2 and H3 headings on single posts.
@@ -169,44 +407,44 @@ add_action( 'wp_enqueue_scripts', 'cwc_enqueue_single_post_assets' );
  * actual `<h2>` / `<h3>` tags so the scrollspy JS can match them up.
  * Existing IDs are left untouched.
  */
-function cwc_add_heading_ids( $content )
+function cwc_add_heading_ids($content)
 {
-	if ( ! is_singular( 'post' ) ) {
+	if (!is_singular('post')) {
 		return $content;
 	}
 
 	return preg_replace_callback(
 		'/<(h[23])(.*?)>(.*?)<\/h\1>/i',
-		function ( $matches ) {
-			$tag   = $matches[1];
+		function ($matches) {
+			$tag = $matches[1];
 			$attrs = $matches[2];
-			$text  = $matches[3];
+			$text = $matches[3];
 
-			if ( strpos( $attrs, 'id=' ) !== false ) {
+			if (strpos($attrs, 'id=') !== false) {
 				return $matches[0];
 			}
 
-			$id = sanitize_title( strip_tags( $text ) );
+			$id = sanitize_title(strip_tags($text));
 			return "<$tag $attrs id=\"$id\">$text</$tag>";
 		},
 		$content
 	);
 }
-add_filter( 'the_content', 'cwc_add_heading_ids' );
+add_filter('the_content', 'cwc_add_heading_ids');
 
 /**
  * Inject the Scroll to Top button markup into the footer.
  */
 function cwc_inject_scroll_top_html()
 {
-?>
+	?>
 	<button id="cwc-scroll-top" class="cwc-scroll-top" aria-label="Scroll to top">
-		<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-			stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+		<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+			stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
 			<path d="M12 19V5M5 12l7-7 7 7" />
 		</svg>
 	</button>
-<?php
+	<?php
 }
 add_action('wp_footer', 'cwc_inject_scroll_top_html');
 

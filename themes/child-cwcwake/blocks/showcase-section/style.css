@@ -338,7 +338,7 @@
 .cwc-showcase__social-name {
 	font-family: "Archivo", sans-serif;
 	font-weight: 700;
-	font-size: 36px;
+	font-size: clamp(20px, 3vw, 36px);
 	line-height: 100%;
 	letter-spacing: 0;
 	text-align: left;
@@ -348,7 +348,7 @@
 .cwc-showcase__social-tagline {
 	font-family: "Archivo", sans-serif;
 	font-weight: 500;
-	font-size: 20px;
+	font-size: clamp(16px, 2vw, 20px);
 	line-height: 100%;
 	letter-spacing: 0;
 	text-align: left;
@@ -365,7 +365,7 @@
 	color: var(--wp--preset--color--background);
 	font-family: "Archivo", sans-serif;
 	font-weight: 600;
-	font-size: 20px;
+	font-size: clamp(16px, 2vw, 20px);
 	line-height: 100%;
 	letter-spacing: 0;
 	text-decoration: none;
@@ -440,10 +440,59 @@
    ---------------------------------------- */
 
 @media (max-width: 900px) {
+	.cwc-showcase__header {
+		text-align: center;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+	}
+	
+	.cwc-showcase__heading,
+	.cwc-showcase__subtitle {
+		text-align: center;
+	}
+	
+	.cwc-showcase__subtitle {
+		margin: 0 auto;
+	}
+
+	.cwc-showcase__social-header {
+		flex-direction: column;
+		gap: 30px;
+	}
+
+	.cwc-showcase__social-profile {
+		flex-direction: column;
+		gap: 20px;
+	}
+
+	.cwc-showcase__social-name,
+	.cwc-showcase__social-tagline {
+		text-align: center;
+	}
+
+	.cwc-showcase__social-logo-ring {
+		width: 180px;
+		height: 180px;
+	}
+
+	.cwc-showcase__social-logo {
+		width: 156px;
+		height: 156px;
+	}
+
 	.cwc-showcase__grid {
 		grid-template-columns: 1fr;
 		max-width: 480px;
 		margin: 0 auto;
+	}
+
+	.cwc-showcase--videos .cwc-showcase__grid {
+		max-width: none;
+	}
+
+	.cwc-showcase--videos .cwc-showcase__card--video {
+		flex: 0 0 100%;
 	}
 }
 
@@ -451,5 +500,13 @@
 	.cwc-showcase__grid {
 		grid-template-columns: repeat(2, 1fr);
 		max-width: none;
+	}
+
+	.cwc-showcase--cards .cwc-showcase__card:last-child:nth-child(odd) {
+		grid-column: 1 / -1;
+	}
+
+	.cwc-showcase--videos .cwc-showcase__card--video {
+		flex: 0 0 calc((100% - var(--wp--preset--spacing--40)) / 2);
 	}
 }

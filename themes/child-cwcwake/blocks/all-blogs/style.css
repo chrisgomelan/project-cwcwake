@@ -354,8 +354,17 @@
 
 	.cwc-all-blogs__header {
 		flex-direction: column;
-		align-items: flex-start;
-		gap: 1.25rem;
+		align-items: center;
+		text-align: center;
+		gap: 1.5rem;
+	}
+
+	.cwc-all-blogs__intro {
+		max-width: 100%;
+	}
+
+	.cwc-all-blogs__filter {
+		align-self: center;
 	}
 
 	.cwc-all-blogs__grid {

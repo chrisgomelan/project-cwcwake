@@ -25,7 +25,7 @@
 	position: relative;
 	z-index: 1;
 	text-align: center;
-	padding: clamp(32px, 5vw, 64px) clamp(1.5rem, 4vw, 4rem);
+	padding: clamp(32px, 5vw, 64px) clamp(1rem, 4vw, 4rem);
 	max-width: 1200px !important;
 }
 

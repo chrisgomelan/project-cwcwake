@@ -54,6 +54,121 @@
 			"countMode": "auto",
 			"align": "full"
 		} /-->
+
+		<!-- wp:html -->
+		<script>
+			document.addEventListener("DOMContentLoaded", function () {
+				const content = document.querySelector(".cwc-tropical-section .wp-block-post-content");
+				if (!content) return;
+
+				let gallery = content.querySelector(".wp-block-gallery");
+				const looseImages = content.querySelectorAll(":scope > .wp-block-image, :scope > p > .wp-block-image");
+
+				if (looseImages.length > 0) {
+					if (!gallery) {
+						gallery = document.createElement("figure");
+						gallery.className = "wp-block-gallery has-nested-images columns-default is-cropped";
+						content.insertBefore(gallery, looseImages[0].closest('p') || looseImages[0]);
+					}
+
+					looseImages.forEach(function (img) {
+						// If the editor accidentally wrapped it in a P tag, clean it up
+						const p = img.closest('p');
+						gallery.appendChild(img);
+						if (p && p.childElementCount === 0 && p.textContent.trim() === '') {
+							p.remove();
+						}
+					});
+				}
+
+				// --- Pagination Component ---
+				if (gallery) {
+					const items = Array.from(gallery.querySelectorAll(':scope > .wp-block-image'));
+					if (items.length === 0) return;
+
+					const pagination = document.createElement("div");
+					pagination.className = "cwc-pagination";
+					// Add space around and on the sides
+					pagination.style.margin = "4rem auto";
+					pagination.style.padding = "0 clamp(1rem, 5vw, 4rem)";
+					gallery.after(pagination);
+
+					let itemsPerPage = 12;
+					let currentPage = 1;
+
+					const updateConfig = () => {
+						const w = window.innerWidth;
+						if (w <= 600) itemsPerPage = 3;      // Mobile
+						else if (w <= 1024) itemsPerPage = 6; // Tablet
+						else itemsPerPage = 12;               // Desktop
+					};
+
+					const goToPage = (page) => {
+						const totalPages = Math.ceil(items.length / itemsPerPage);
+						if (page > totalPages) page = totalPages || 1;
+						if (page < 1) page = 1;
+						
+						currentPage = page;
+						const start = (page - 1) * itemsPerPage;
+						const end = start + itemsPerPage;
+
+						items.forEach((item, index) => {
+							item.style.display = (index >= start && index < end) ? "" : "none";
+						});
+
+						renderUI(totalPages);
+
+						// Scroll back to gallery top when changing pages
+						if (page !== 1) {
+							const offset = gallery.getBoundingClientRect().top + window.pageYOffset - 150;
+							window.scrollTo({ top: offset, behavior: 'smooth' });
+						}
+					};
+
+					const renderUI = (totalPages) => {
+						pagination.innerHTML = "";
+						if (totalPages <= 1) {
+							pagination.style.display = "none";
+							return;
+						} else {
+							pagination.style.display = "flex";
+						}
+
+						const createBtn = (html, target, isDisabled, isCurrent) => {
+							const btn = document.createElement("button");
+							btn.className = `cwc-page ${isDisabled ? 'cwc-page--disabled' : ''} ${isCurrent ? 'cwc-page--current' : ''}`;
+							btn.innerHTML = html;
+							btn.onclick = () => { if (!isDisabled && !isCurrent) goToPage(target); };
+							pagination.appendChild(btn);
+						};
+
+						createBtn("&larr;", currentPage - 1, currentPage === 1, false);
+						for (let i = 1; i <= totalPages; i++) {
+							createBtn(i, i, false, i === currentPage);
+						}
+						createBtn("&rarr;", currentPage + 1, currentPage === totalPages, false);
+					};
+
+					updateConfig();
+					goToPage(1);
+
+					// Update layout on resize (debounced)
+					let resizeTimer;
+					window.addEventListener('resize', () => {
+						clearTimeout(resizeTimer);
+						resizeTimer = setTimeout(() => {
+							const prevLimit = itemsPerPage;
+							updateConfig();
+							if (prevLimit !== itemsPerPage) {
+								goToPage(1); // Reset to page 1 if grid layout changes
+							}
+						}, 200);
+					});
+				}
+			});
+		</script>
+		<!-- /wp:html -->
+		<!-- /wp:html -->
 	</main>
 	<!-- /wp:group -->
 

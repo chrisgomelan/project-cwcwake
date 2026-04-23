@@ -179,7 +179,11 @@ endif;
 $heading = isset($attributes['heading']) ? (string) $attributes['heading'] : '';
 $heading_highlight = isset($attributes['headingHighlight']) ? (string) $attributes['headingHighlight'] : '';
 $description = isset($attributes['description']) ? (string) $attributes['description'] : '';
-$per_page = isset($attributes['perPage']) ? max(1, (int) $attributes['perPage']) : 6;
+$current_per_page = 6;
+
+// Detect device for responsive pagination counts
+$per_page = wp_is_mobile() ? 3 : 6;
+
 $read_more_label = isset($attributes['readMoreLabel']) ? (string) $attributes['readMoreLabel'] : __('Read More', 'child-cwcwake');
 $placeholder = isset($attributes['placeholderImage']) ? (string) $attributes['placeholderImage'] : '';
 

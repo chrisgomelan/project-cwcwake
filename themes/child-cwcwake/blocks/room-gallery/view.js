@@ -8,6 +8,11 @@ document.addEventListener('DOMContentLoaded', () => {
     
     if (!modal) return;
 
+    // Move the modal out of the block hierarchy directly into the body
+    // to prevent Gutenberg's 'contain: layout' or 'container-type' 
+    // from trapping the position:fixed modal inside the section.
+    document.body.appendChild(modal);
+
     const closeBtn = modal.querySelector('.cwc-gallery-modal__close');
     const overlay = modal.querySelector('.cwc-gallery-modal__overlay');
 

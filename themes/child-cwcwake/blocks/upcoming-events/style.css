@@ -308,6 +308,20 @@
 		grid-template-columns: 1fr;
 	}
 
+	.cwc-upcoming-events__header {
+		text-align: center;
+		margin-bottom: 2.5rem;
+	}
+
+	.cwc-upcoming-events__description {
+		max-width: 100%;
+	}
+
+	.cwc-upcoming-events__card-stack,
+	.cwc-upcoming-events__card {
+		min-height: 0;
+	}
+
 	.cwc-upcoming-events__timeline {
 		flex-direction: row;
 		justify-content: center;
@@ -325,16 +339,33 @@
 		grid-template-columns: auto;
 		justify-items: center;
 		text-align: center;
-		gap: 0.5rem;
+		gap: 0.25rem;
+		margin: 0 5px;
 	}
 
 	.cwc-upcoming-events__month {
 		text-align: center;
-		font-size: 0.95rem;
+		font-size: 0.75rem;
+		text-transform: uppercase;
+		letter-spacing: 0.1em;
+		font-weight: 700;
+		color: rgba(0, 0, 0, 0.4);
+		margin-bottom: -5px;
+		z-index: 2;
+	}
+
+	.cwc-upcoming-events__rail-item--active .cwc-upcoming-events__month {
+		color: var(--wp--preset--color--primary);
+	}
+
+	.cwc-upcoming-events__day--active {
+		border: 4px solid #fff;
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 	}
 
 	.cwc-upcoming-events__card-image-link {
 		margin: 1rem;
+		aspect-ratio: 16 / 9;
 	}
 
 	.cwc-upcoming-events__card-body {

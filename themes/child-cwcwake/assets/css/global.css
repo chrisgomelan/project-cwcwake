@@ -224,7 +224,7 @@ img {
 .cwc-modal__caption {
 	color: #fff;
 	margin-top: 20px;
-	font-size: 18px;
+	font-size: clamp(16px, 1.5vw, 20px);
 	text-align: center;
 }
 
@@ -286,7 +286,7 @@ img {
 	left: 50%;
 	transform: translateX(-50%);
 	color: #fff;
-	font-size: 14px;
+	font-size: clamp(12px, 1.2vw, 14px);
 	opacity: 0.6;
 }
 
@@ -373,12 +373,16 @@ img {
 .cwc-tropical-section>.wp-block-cwc-faq-section,
 .cwc-tropical-section>.wp-block-cwc-about-timeline,
 .cwc-tropical-section>.wp-block-cwc-about-champions,
-.cwc-tropical-section>.wp-block-cwc-about-empowering {
+.cwc-tropical-section>.wp-block-cwc-about-empowering,
+.cwc-tropical-section>.wp-block-cwc-why-stay,
+.cwc-tropical-section>.wp-block-cwc-feature-split,
+.cwc-tropical-section>.wp-block-cwc-coaching-section,
+.cwc-tropical-section>.wp-block-cwc-feature-banner {
 	width: 100%;
 	max-width: 1921px;
 	margin-inline: auto;
-	padding-left: clamp(1.5rem, 4vw, 4rem);
-	padding-right: clamp(1.5rem, 4vw, 4rem);
+	padding-left: clamp(1rem, 4vw, 4rem);
+	padding-right: clamp(1rem, 4vw, 4rem);
 }
 
 /* ----------------------------------------
@@ -424,6 +428,69 @@ img {
 
 .cwc-breadcrumb a:hover {
 	text-decoration: underline;
+}
+
+/* ----------------------------------------
+   Pagination (Shared Component)
+   ---------------------------------------- */
+
+.cwc-pagination {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	gap: 0.5rem;
+	margin-top: 2.5rem;
+}
+
+.cwc-page {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 48px;
+	height: 48px;
+	background-color: #ffffff;
+	border-radius: 8px;
+	font-family: var(--wp--preset--font-family--ui);
+	font-weight: 600;
+	font-size: 1.125rem;
+	color: #181818;
+	text-decoration: none;
+	transition: background-color 150ms ease, color 150ms ease;
+	box-shadow: -2px 4px 12px rgba(24, 24, 24, 0.06);
+	cursor: pointer;
+	border: none;
+}
+
+.cwc-page:hover,
+.cwc-page:focus-visible {
+	background-color: var(--wp--preset--color--surface);
+}
+
+.cwc-page--current {
+	background-color: var(--wp--preset--color--secondary);
+	color: #ffffff;
+	pointer-events: none;
+}
+
+.cwc-page--ellipsis {
+	background: transparent;
+	box-shadow: none;
+	color: var(--wp--preset--color--text-muted);
+	pointer-events: none;
+}
+
+.cwc-page--disabled {
+	opacity: 0.4;
+	pointer-events: none;
+	cursor: not-allowed;
+}
+
+@media (max-width: 600px) {
+	.cwc-page {
+		width: 40px;
+		height: 40px;
+		font-size: 1rem;
+	}
 }
 
 /* ----------------------------------------
