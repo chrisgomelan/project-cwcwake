@@ -1,0 +1,48 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "cwc/land-feature-split",
+	"version": "1.0.0",
+	"title": "Land Feature Split",
+	"category": "theme",
+	"icon": "columns",
+	"description": "Two-column section: left text with dark doodle background, right image. Reusable for Land Activities.",
+	"textdomain": "child-cwcwake",
+	"supports": {
+		"align": ["full"],
+		"html": false,
+		"anchor": true
+	},
+	"attributes": {
+		"titleStart": {
+			"type": "string",
+			"default": "PROFESSIONAL"
+		},
+		"titleAccent": {
+			"type": "string",
+			"default": "SKATE"
+		},
+		"titleEnd": {
+			"type": "string",
+			"default": "& BMX"
+		},
+		"description": {
+			"type": "string",
+			"default": ""
+		},
+		"iconPath": {
+			"type": "string",
+			"default": "/assets/images/skate-park.svg"
+		},
+		"image": {
+			"type": "string",
+			"default": ""
+		},
+		"reversed": {
+			"type": "boolean",
+			"default": false
+		}
+	},
+	"render": "file:./render.php",
+	"style": "file:./style.css"
+}

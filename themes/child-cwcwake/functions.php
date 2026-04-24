@@ -561,6 +561,12 @@ require_once get_stylesheet_directory() . '/inc/faqs-page-seed.php';
 require_once get_stylesheet_directory() . '/inc/water-sports-page-seed.php';
 
 /*
+ * Land Activities page seeder — assigns the `page-land-activities` template
+ * to the existing `/activities/land-activities/` page. Idempotent (option-guarded).
+ */
+require_once get_stylesheet_directory() . '/inc/land-activities-page-seed.php';
+
+/*
  * Accommodations (Rooms) data layer.
  *
  * The `accommodation` CPT, its meta fields, the admin meta boxes,
@@ -834,6 +840,10 @@ function cwc_register_blocks() {
 	register_block_type( get_stylesheet_directory() . '/blocks/feature-split' );
 	register_block_type( get_stylesheet_directory() . '/blocks/feature-banner' );
 	register_block_type( get_stylesheet_directory() . '/blocks/coaching-section' );
+
+	// Land Activities page blocks.
+	register_block_type( get_stylesheet_directory() . '/blocks/land-feature-split' );
+	register_block_type( get_stylesheet_directory() . '/blocks/header-multi-image' );
 }
 add_action( 'init', 'cwc_register_blocks' );
 
@@ -847,7 +857,7 @@ add_action( 'init', 'cwc_register_blocks' );
  * @return array Modified classes.
  */
 function cwc_body_class_front_page( $classes ) {
-	if ( is_front_page() || is_page( 'about' ) || is_page( 'accommodations' ) || is_page( 'water-sports' ) ) {
+	if ( is_front_page() || is_page( 'about' ) || is_page( 'accommodations' ) || is_page( 'water-sports' ) || is_page( 'land-activities' ) ) {
 		$classes[] = 'cwc-home';
 	}
 	return $classes;
