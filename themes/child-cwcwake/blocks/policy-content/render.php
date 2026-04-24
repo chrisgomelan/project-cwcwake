@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 $intro    = isset( $attributes['intro'] ) ? (string) $attributes['intro'] : '';
-$sections = isset( $attributes['sections'] ) && is_array( $attributes['sections'] ) ? $attributes['sections'] : [];
+$sections = isset( $attributes['sections'] ) && is_array( $attributes['sections'] ) ? $attributes['sections'] : array();
 
 /*
  * Bail out gracefully when the page hasn't been seeded yet so the
@@ -61,7 +61,7 @@ if ( ! function_exists( 'cwc_policy_paragraphs' ) ) {
 	}
 }
 
-$wrapper_attrs = get_block_wrapper_attributes( [ 'class' => 'cwc-policy' ] );
+$wrapper_attrs = get_block_wrapper_attributes( array( 'class' => 'cwc-policy' ) );
 ?>
 <section <?php echo $wrapper_attrs; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
 	<?php if ( '' !== trim( $intro ) ) : ?>
@@ -74,7 +74,8 @@ $wrapper_attrs = get_block_wrapper_attributes( [ 'class' => 'cwc-policy' ] );
 
 	<?php if ( ! empty( $sections ) ) : ?>
 		<div class="cwc-policy__panel">
-			<?php foreach ( $sections as $section ) :
+			<?php
+			foreach ( $sections as $section ) :
 				$label = isset( $section['label'] ) ? (string) $section['label'] : '';
 				$body  = isset( $section['body'] ) ? (string) $section['body'] : '';
 
@@ -87,7 +88,7 @@ $wrapper_attrs = get_block_wrapper_attributes( [ 'class' => 'cwc-policy' ] );
 				 * deep-linkable (e.g. `#section-cookies`).
 				 */
 				$anchor = 'section-' . sanitize_title( $label );
-			?>
+				?>
 				<article class="cwc-policy__section" id="<?php echo esc_attr( $anchor ); ?>">
 					<?php if ( '' !== trim( $label ) ) : ?>
 						<h2 class="cwc-policy__label"><?php echo esc_html( $label ); ?></h2>

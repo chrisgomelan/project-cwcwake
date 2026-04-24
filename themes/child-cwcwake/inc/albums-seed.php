@@ -56,26 +56,26 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @return array<string, array{title:string, excerpt:string, cover_basename:string, menu_order:int}>
  */
 function cwc_album_categories_catalogue() {
-	return [
-		'events' => [
+	return array(
+		'events'         => array(
 			'title'          => 'Events',
 			'excerpt'        => 'Relive the highlights of CWC\'s most exciting events — from high-energy wakeboarding competitions to unforgettable nights and crowd-filled celebrations. Browse through moments that capture the energy, atmosphere, and community that make every event at CWC worth experiencing.',
 			'cover_basename' => 'events.webp',
 			'menu_order'     => 1,
-		],
-		'lifestyle' => [
+		),
+		'lifestyle'      => array(
 			'title'          => 'Lifestyle',
 			'excerpt'        => 'A glimpse into the laid-back lifestyle at CWC — sun-drenched mornings, scenic afternoons, and the easygoing rhythm of life by the water.',
 			'cover_basename' => 'lifestyle.webp',
 			'menu_order'     => 2,
-		],
-		'explore-camsur' => [
+		),
+		'explore-camsur' => array(
 			'title'          => 'Explore CamSur',
 			'excerpt'        => 'Step beyond CWC and discover the natural beauty, hidden corners, and local charm of Camarines Sur.',
 			'cover_basename' => 'explore-camsur.webp',
 			'menu_order'     => 3,
-		],
-	];
+		),
+	);
 }
 
 /**
@@ -111,20 +111,20 @@ function cwc_albums_find_attachment_by_basename( $basename ) {
 	}
 
 	$query = new WP_Query(
-		[
+		array(
 			'post_type'      => 'attachment',
 			'post_status'    => 'inherit',
 			'posts_per_page' => 1,
 			'fields'         => 'ids',
 			'no_found_rows'  => true,
-			'meta_query'     => [
-				[
+			'meta_query'     => array(
+				array(
 					'key'     => '_wp_attached_file',
 					'value'   => '/' . ltrim( $basename, '/' ),
 					'compare' => 'LIKE',
-				],
-			],
-		]
+				),
+			),
+		)
 	);
 
 	$ids = $query->posts;
@@ -149,13 +149,13 @@ function cwc_albums_find_attachment_by_basename( $basename ) {
 function cwc_album_find_category_post( $slug, $title ) {
 	// Pass 1: exact slug match (across all statuses).
 	$by_slug = get_posts(
-		[
+		array(
 			'name'             => $slug,
 			'post_type'        => 'cwc_album',
 			'post_status'      => 'any',
 			'posts_per_page'   => 1,
 			'suppress_filters' => false,
-		]
+		)
 	);
 	if ( ! empty( $by_slug ) ) {
 		return $by_slug[0];
@@ -164,13 +164,13 @@ function cwc_album_find_category_post( $slug, $title ) {
 	// Pass 2: title fallback (handles `events-2` style slug bumps).
 	if ( '' !== $title ) {
 		$by_title = get_posts(
-			[
+			array(
 				'title'            => $title,
 				'post_type'        => 'cwc_album',
 				'post_status'      => 'any',
 				'posts_per_page'   => 1,
 				'suppress_filters' => false,
-			]
+			)
 		);
 		if ( ! empty( $by_title ) ) {
 			return $by_title[0];
@@ -203,7 +203,7 @@ function cwc_album_ensure_category( $slug, array $data ) {
 	$existing = cwc_album_find_category_post( $slug, $data['title'] );
 
 	if ( $existing instanceof WP_Post ) {
-		$updates = [ 'ID' => (int) $existing->ID ];
+		$updates = array( 'ID' => (int) $existing->ID );
 
 		// Restore from trash automatically.
 		if ( 'trash' === $existing->post_status ) {
@@ -214,7 +214,7 @@ function cwc_album_ensure_category( $slug, array $data ) {
 		}
 
 		// Force top-level (categories are never nested).
-		if ( (int) $existing->post_parent !== 0 ) {
+		if ( 0 !== (int) $existing->post_parent ) {
 			$updates['post_parent'] = 0;
 		}
 
@@ -224,7 +224,7 @@ function cwc_album_ensure_category( $slug, array $data ) {
 		}
 
 		// Heal an editor-cleared menu_order so the static cards stay ordered.
-		if ( (int) $existing->menu_order === 0 ) {
+		if ( 0 === (int) $existing->menu_order ) {
 			$updates['menu_order'] = (int) $data['menu_order'];
 		}
 
@@ -235,7 +235,7 @@ function cwc_album_ensure_category( $slug, array $data ) {
 		$post_id = (int) $existing->ID;
 	} else {
 		$post_id = wp_insert_post(
-			[
+			array(
 				'post_type'    => 'cwc_album',
 				'post_status'  => 'publish',
 				'post_title'   => $data['title'],
@@ -244,7 +244,7 @@ function cwc_album_ensure_category( $slug, array $data ) {
 				'post_content' => '',
 				'post_parent'  => 0,
 				'menu_order'   => (int) $data['menu_order'],
-			],
+			),
 			true
 		);
 
@@ -264,9 +264,11 @@ function cwc_album_ensure_category( $slug, array $data ) {
 	return $post_id;
 }
 
-/* ---------------------------------------------------------
+/*
+---------------------------------------------------------
  * Legacy page cleanup
- * --------------------------------------------------------- */
+ * ---------------------------------------------------------
+ */
 
 /**
  * Trash the legacy gallery child PAGES that collide with album slugs.
@@ -302,11 +304,11 @@ function cwc_album_trash_legacy_gallery_pages() {
 		return;
 	}
 
-	$legacy_paths = [
+	$legacy_paths = array(
 		'plan-your-trip/gallery/events',
 		'plan-your-trip/gallery/lifestyle',
 		'plan-your-trip/gallery/explore-camsur',
-	];
+	);
 
 	foreach ( $legacy_paths as $path ) {
 		$page = get_page_by_path( $path );

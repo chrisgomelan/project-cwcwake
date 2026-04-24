@@ -26,14 +26,14 @@ if ( ! is_singular( 'cwc_album' ) ) {
 	return;
 }
 
-$post_id = (int) get_queried_object_id();
-$link    = cwc_album_back_link( $post_id );
+$album_post_id   = (int) get_queried_object_id();
+$back_link_data = cwc_album_back_link( $album_post_id );
 
-$wrapper_attrs = get_block_wrapper_attributes( [ 'class' => 'cwc-album-back-link' ] );
+$wrapper_attrs = get_block_wrapper_attributes( array( 'class' => 'cwc-album-back-link' ) );
 ?>
 <div <?php echo $wrapper_attrs; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
-	<a class="cwc-album-back-link__anchor" href="<?php echo esc_url( $link['url'] ); ?>">
+	<a class="cwc-album-back-link__anchor" href="<?php echo esc_url( $back_link_data['url'] ); ?>">
 		<span class="cwc-album-back-link__arrow" aria-hidden="true">&#8592;</span>
-		<span class="cwc-album-back-link__label"><?php echo esc_html( $link['label'] ); ?></span>
+		<span class="cwc-album-back-link__label"><?php echo esc_html( $back_link_data['label'] ); ?></span>
 	</a>
 </div>

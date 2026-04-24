@@ -1,4 +1,10 @@
 <?php
+/**
+ * Render template for the cwc/reviews-section block.
+ *
+ * @package CWC_Wake
+ */
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -6,56 +12,59 @@ if ( ! defined( 'ABSPATH' ) ) {
 $heading_start  = $attributes['headingStart'] ?? 'Client';
 $heading_emp    = $attributes['headingEmphasis'] ?? 'REVIEWS';
 $emphasis_color = $attributes['emphasisColor'] ?? 'primary';
-$items          = $attributes['items'] ?? [];
+$items          = $attributes['items'] ?? array();
 
 if ( empty( $items ) ) {
-	$items = [
-		[
-			'quote'    => 'Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum',
-			'name'     => 'First Name, Last Name',
-			'country'  => 'Country',
-			'rating'   => 5,
-			'image'    => '',
-		],
-		[
-			'quote'    => 'An incredible experience! The facilities are top-notch and the staff is amazing.',
-			'name'     => 'Jane Doe',
-			'country'  => 'Australia',
-			'rating'   => 5,
-			'image'    => '',
-		],
-		[
-			'quote'    => 'Best wakepark I have ever visited. Will definitely come back!',
-			'name'     => 'John Smith',
-			'country'  => 'USA',
-			'rating'   => 5,
-			'image'    => '',
-		],
-	];
+	$items = array(
+		array(
+			'quote'   => 'Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum',
+			'name'    => 'First Name, Last Name',
+			'country' => 'Country',
+			'rating'  => 5,
+			'image'   => '',
+		),
+		array(
+			'quote'   => 'An incredible experience! The facilities are top-notch and the staff is amazing.',
+			'name'    => 'Jane Doe',
+			'country' => 'Australia',
+			'rating'  => 5,
+			'image'   => '',
+		),
+		array(
+			'quote'   => 'Best wakepark I have ever visited. Will definitely come back!',
+			'name'    => 'John Smith',
+			'country' => 'USA',
+			'rating'  => 5,
+			'image'   => '',
+		),
+	);
 }
 
 $total = count( $items );
 
-$wrapper_attrs = get_block_wrapper_attributes( [
-	'class' => 'cwc-reviews',
-] );
+$wrapper_attrs = get_block_wrapper_attributes(
+	array(
+		'class' => 'cwc-reviews',
+	)
+);
 ?>
 
-<section <?php echo $wrapper_attrs; ?>>
+<section <?php echo $wrapper_attrs; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
 	<div class="cwc-reviews__inner">
 
 		<div class="cwc-reviews__slider" data-total="<?php echo esc_attr( $total ); ?>">
 
 			<!-- Slides -->
-			<?php foreach ( $items as $index => $item ) :
+			<?php
+			foreach ( $items as $index => $item ) :
 				$quote   = $item['quote'] ?? '';
 				$name    = $item['name'] ?? '';
 				$country = $item['country'] ?? '';
 				$rating  = (int) ( $item['rating'] ?? 5 );
 				$image   = $item['image'] ?? '';
 				$active  = ( 0 === $index ) ? ' cwc-reviews__slide--active' : '';
-			?>
-				<div class="cwc-reviews__slide<?php echo $active; ?>" data-index="<?php echo esc_attr( $index ); ?>">
+				?>
+				<div class="cwc-reviews__slide<?php echo esc_attr( $active ); ?>" data-index="<?php echo esc_attr( $index ); ?>">
 
 					<!-- Left: quote -->
 					<div class="cwc-reviews__quote-col">
@@ -76,7 +85,11 @@ $wrapper_attrs = get_block_wrapper_attributes( [
 
 						<div class="cwc-reviews__reviewer">
 							<span class="cwc-reviews__reviewer-name">
-								<?php echo esc_html( $name ); ?><?php if ( ! empty( $country ) ) : ?> - <?php echo esc_html( $country ); ?><?php endif; ?>
+								<?php echo esc_html( $name ); ?>
+								<?php
+								if ( ! empty( $country ) ) :
+									?>
+									- <?php echo esc_html( $country ); ?><?php endif; ?>
 							</span>
 							<span class="cwc-reviews__stars">
 								<?php for ( $i = 0; $i < $rating; $i++ ) : ?>
@@ -108,7 +121,7 @@ $wrapper_attrs = get_block_wrapper_attributes( [
 									</div>
 									<div class="cwc-reviews__counter-container">
 										<span class="cwc-reviews__counter">
-											<span class="cwc-reviews__counter-current"><?php echo str_pad( $index + 1, 2, '0', STR_PAD_LEFT ); ?></span>/<span class="cwc-reviews__counter-total"><?php echo str_pad( $total, 2, '0', STR_PAD_LEFT ); ?></span>
+											<span class="cwc-reviews__counter-current"><?php echo esc_html( str_pad( (string) ( $index + 1 ), 2, '0', STR_PAD_LEFT ) ); ?></span>/<span class="cwc-reviews__counter-total"><?php echo esc_html( str_pad( (string) $total, 2, '0', STR_PAD_LEFT ) ); ?></span>
 										</span>
 									</div>
 								</div>

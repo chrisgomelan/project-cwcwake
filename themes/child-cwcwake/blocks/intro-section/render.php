@@ -1,4 +1,10 @@
 <?php
+/**
+ * Intro Section block — render template.
+ *
+ * @package CWC_Wake
+ */
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -14,12 +20,14 @@ $video_poster     = $attributes['videoPoster'] ?? '';
 $is_vimeo = ! empty( $video_url ) && preg_match( '/vimeo\.com\/(\d+)/', $video_url, $vimeo_match );
 $vimeo_id = $is_vimeo ? $vimeo_match[1] : '';
 
-$wrapper_attrs = get_block_wrapper_attributes( [
-	'class' => 'cwc-intro',
-] );
+$wrapper_attrs = get_block_wrapper_attributes(
+	array(
+		'class' => 'cwc-intro',
+	)
+);
 ?>
 
-<section <?php echo $wrapper_attrs; ?>>
+<section <?php echo $wrapper_attrs; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
 	<div class="cwc-intro__inner">
 
 		<!-- Left: text column -->

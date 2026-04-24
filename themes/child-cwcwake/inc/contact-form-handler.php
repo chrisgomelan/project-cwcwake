@@ -33,8 +33,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @return string MD5 hash safe to embed in a transient key.
  */
-function cwc_contact_form_session_key()
-{
+function cwc_contact_form_session_key() {
 	static $cache = null;
 	if ( null !== $cache ) {
 		return $cache;
@@ -58,11 +57,10 @@ function cwc_contact_form_session_key()
  *
  * @return string Safe absolute URL to redirect back to.
  */
-function cwc_contact_form_resolve_redirect()
-{
+function cwc_contact_form_resolve_redirect() {
 	$candidate = '';
 
-	if ( isset( $_POST['redirect_to'] ) ) {
+	if ( isset( $_POST['redirect_to'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
 		$candidate = esc_url_raw( wp_unslash( $_POST['redirect_to'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
 	}
 
@@ -88,10 +86,9 @@ function cwc_contact_form_resolve_redirect()
  * @param string[] $error_fields  Optional. List of invalid field keys.
  * @return void
  */
-function cwc_contact_form_redirect_back( $status, array $error_fields = [] )
-{
-	$base = remove_query_arg( [ 'cwc_contact', 'cwc_err' ], cwc_contact_form_resolve_redirect() );
-	$args = [ 'cwc_contact' => $status ];
+function cwc_contact_form_redirect_back( $status, array $error_fields = array() ) {
+	$base = remove_query_arg( array( 'cwc_contact', 'cwc_err' ), cwc_contact_form_resolve_redirect() );
+	$args = array( 'cwc_contact' => $status );
 
 	if ( $error_fields ) {
 		$args['cwc_err'] = implode( ',', $error_fields );
@@ -119,8 +116,7 @@ function cwc_contact_form_redirect_back( $status, array $error_fields = [] )
  *
  * @return void
  */
-function cwc_handle_contact_submit()
-{
+function cwc_handle_contact_submit() {
 	$nonce = isset( $_POST['cwc_contact_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['cwc_contact_nonce'] ) ) : '';
 	if ( ! wp_verify_nonce( $nonce, 'cwc_contact_submit' ) ) {
 		cwc_contact_form_redirect_back( 'error' );
@@ -132,7 +128,7 @@ function cwc_handle_contact_submit()
 	 * submission as a "success" so they don't probe for the failure
 	 * mode, but never actually send mail.
 	 */
-	$honeypot = isset( $_POST['cwc_company'] ) ? trim( (string) wp_unslash( $_POST['cwc_company'] ) ) : '';
+	$honeypot = isset( $_POST['cwc_company'] ) ? sanitize_text_field( wp_unslash( $_POST['cwc_company'] ) ) : '';
 	if ( '' !== $honeypot ) {
 		cwc_contact_form_redirect_back( 'success' );
 	}
@@ -141,7 +137,7 @@ function cwc_handle_contact_submit()
 	$email   = isset( $_POST['cwc_email'] ) ? sanitize_email( wp_unslash( $_POST['cwc_email'] ) ) : '';
 	$message = isset( $_POST['cwc_message'] ) ? sanitize_textarea_field( wp_unslash( $_POST['cwc_message'] ) ) : '';
 
-	$errors = [];
+	$errors = array();
 	if ( '' === $name ) {
 		$errors[] = 'name';
 	}
@@ -155,11 +151,11 @@ function cwc_handle_contact_submit()
 	if ( $errors ) {
 		set_transient(
 			'cwc_contact_old_' . cwc_contact_form_session_key(),
-			[
+			array(
 				'name'    => $name,
 				'email'   => $email,
 				'message' => $message,
-			],
+			),
 			15 * MINUTE_IN_SECONDS
 		);
 		cwc_contact_form_redirect_back( 'error', $errors );
@@ -187,21 +183,21 @@ function cwc_handle_contact_submit()
 	 * the site default so the message passes SPF/DKIM checks
 	 * configured in WP Mail SMTP.
 	 */
-	$headers = [ 'Reply-To: ' . $name . ' <' . $email . '>' ];
+	$headers = array( 'Reply-To: ' . $name . ' <' . $email . '>' );
 
 	$sent = wp_mail( $recipient, $subject, $body, $headers );
 
 	if ( ! $sent ) {
 		set_transient(
 			'cwc_contact_old_' . cwc_contact_form_session_key(),
-			[
+			array(
 				'name'    => $name,
 				'email'   => $email,
 				'message' => $message,
-			],
+			),
 			15 * MINUTE_IN_SECONDS
 		);
-		cwc_contact_form_redirect_back( 'error', [ 'send' ] );
+		cwc_contact_form_redirect_back( 'error', array( 'send' ) );
 	}
 
 	cwc_contact_form_redirect_back( 'success' );

@@ -5,32 +5,34 @@
  * @package CWC_Wake
  */
 
-if ( ! defined( 'ABSPATH' ) ) exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
 $theme_uri = get_stylesheet_directory_uri();
 
-$cards = [
-	[
+$cards = array(
+	array(
 		'icon'  => 'sustainable-tourism.svg',
 		'title' => 'Sustainable Tourism',
 		'desc'  => 'By promoting eco-friendly practices, maintaining natural green spaces, and supporting sustainable recreational benefit from increased tourism in the region.',
-	],
-	[
+	),
+	array(
 		'icon'  => 'local-employment.svg',
 		'title' => 'Local Employment',
 		'desc'  => 'The complex provides stable jobs to local residents — from administration and hospitality to instructors and groundskeeping — helping uplift and empower the local community.',
-	],
-	[
+	),
+	array(
 		'icon'  => 'youth-sports-dev.svg',
 		'title' => 'Youth & Sports Development',
-		'desc'  => "By providing national-standard facilities for aspiring athletes, CWC nurtures young talents and puts Camarines Sur on the map as a competitive sports hub.",
-	],
-];
+		'desc'  => 'By providing national-standard facilities for aspiring athletes, CWC nurtures young talents and puts Camarines Sur on the map as a competitive sports hub.',
+	),
+);
 
-$wrapper = get_block_wrapper_attributes( [ 'class' => 'cwc-empower' ] );
+$wrapper = get_block_wrapper_attributes( array( 'class' => 'cwc-empower' ) );
 ?>
 
-<section <?php echo $wrapper; ?>>
+<section <?php echo $wrapper; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
 	<header class="cwc-empower__header">
 		<h2 class="cwc-empower__title">
 			<span class="cwc-empower__accent">EMPOWERING</span> the REGION.

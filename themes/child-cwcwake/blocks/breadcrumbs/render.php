@@ -20,19 +20,23 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-$wrapper_attrs = get_block_wrapper_attributes( [
-	'class' => 'cwc-breadcrumbs__wrap',
-] );
+$wrapper_attrs = get_block_wrapper_attributes(
+	array(
+		'class' => 'cwc-breadcrumbs__wrap',
+	)
+);
 
-$markup = cwc_render_breadcrumbs( [
-	'home_label'     => $attributes['homeLabel'] ?? 'Home',
-	'show_home_icon' => ! empty( $attributes['showHomeIcon'] ),
-] );
+$markup = cwc_render_breadcrumbs(
+	array(
+		'home_label'     => $attributes['homeLabel'] ?? 'Home',
+		'show_home_icon' => ! empty( $attributes['showHomeIcon'] ),
+	)
+);
 
 if ( '' === $markup ) {
 	return;
 }
 ?>
-<div <?php echo $wrapper_attrs; ?>>
-	<?php echo $markup; ?>
+<div <?php echo $wrapper_attrs; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
+	<?php echo wp_kses_post( $markup ); ?>
 </div>

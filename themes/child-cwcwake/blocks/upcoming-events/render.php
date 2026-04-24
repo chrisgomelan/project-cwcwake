@@ -54,31 +54,31 @@ if ( ! function_exists( 'cwc_upcoming_events_query' ) ) :
 	 */
 	function cwc_upcoming_events_query( int $limit ): array {
 		if ( $limit <= 0 ) {
-			return [];
+			return array();
 		}
 
 		$meta_key = defined( 'CWC_BLOG_META_EVENT_DATE' ) ? CWC_BLOG_META_EVENT_DATE : '_cwc_event_date';
 		$today    = gmdate( 'Y-m-d' );
 
 		return get_posts(
-			[
+			array(
 				'post_type'              => 'post',
 				'post_status'            => 'publish',
 				'posts_per_page'         => $limit,
 				'meta_key'               => $meta_key, // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
 				'orderby'                => 'meta_value',
 				'order'                  => 'ASC',
-				'meta_query'             => [ // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
-					[
+				'meta_query'             => array( // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
+					array(
 						'key'     => $meta_key,
 						'value'   => $today,
 						'compare' => '>=',
 						'type'    => 'DATE',
-					],
-				],
+					),
+				),
 				'no_found_rows'          => true,
 				'update_post_term_cache' => false,
-			]
+			)
 		);
 	}
 endif;
@@ -116,11 +116,11 @@ if ( ! function_exists( 'cwc_event_meta_for_post' ) ) :
 			$timestamp = (int) get_post_time( 'U', true, $post );
 		}
 
-		return [
+		return array(
 			'day'      => date_i18n( 'j', $timestamp ),
 			'month'    => date_i18n( 'F', $timestamp ),
 			'readable' => date_i18n( get_option( 'date_format', 'F j, Y' ), $timestamp ),
-		];
+		);
 	}
 endif;
 
@@ -136,7 +136,7 @@ if ( empty( $events ) ) {
 	return;
 }
 
-$wrapper_attrs = get_block_wrapper_attributes( [ 'class' => 'cwc-upcoming-events' ] );
+$wrapper_attrs = get_block_wrapper_attributes( array( 'class' => 'cwc-upcoming-events' ) );
 ?>
 <section <?php echo $wrapper_attrs; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
 	<header class="cwc-upcoming-events__header">
@@ -165,22 +165,24 @@ $wrapper_attrs = get_block_wrapper_attributes( [ 'class' => 'cwc-upcoming-events
 				$event_img  = cwc_blog_card_image_url( $event_id, $placeholder );
 				$is_active  = ( 0 === $index );
 
-				$item_data = [
+				$item_data = array(
 					'title'   => get_the_title( $event_id ),
 					'excerpt' => cwc_blog_card_excerpt( $event, 60 ),
 					'image'   => $event_img,
 					'url'     => get_permalink( $event_id ),
-				];
+				);
 				?>
 				<li class="cwc-upcoming-events__rail-item <?php echo $is_active ? 'cwc-upcoming-events__rail-item--active' : ''; ?>"
 					data-event-index="<?php echo (int) $index; ?>"
 					data-event-data='<?php echo esc_attr( wp_json_encode( $item_data ) ); ?>'>
 					<span class="cwc-upcoming-events__month"><?php echo esc_html( $event_meta['month'] ); ?></span>
 					<button class="cwc-upcoming-events__day <?php echo $is_active ? 'cwc-upcoming-events__day--active' : ''; ?>"
-						aria-label="<?php
+						aria-label="
+						<?php
 						/* translators: 1: Event title. 2: Event date. */
 						echo esc_attr( sprintf( __( '%1$s on %2$s', 'child-cwcwake' ), get_the_title( $event_id ), $event_meta['readable'] ) );
-						?>"
+						?>
+						"
 						aria-pressed="<?php echo $is_active ? 'true' : 'false'; ?>">
 						<?php echo esc_html( $event_meta['day'] ); ?>
 					</button>
@@ -199,11 +201,11 @@ $wrapper_attrs = get_block_wrapper_attributes( [ 'class' => 'cwc-upcoming-events
 		<div class="cwc-upcoming-events__card-stack">
 			<?php
 			foreach ( $events as $index => $event ) :
-				$ev_id    = (int) $event->ID;
-				$ev_img   = cwc_blog_card_image_url( $ev_id, $placeholder );
-				$ev_title = get_the_title( $ev_id );
-				$ev_url   = get_permalink( $ev_id );
-				$ev_exc   = cwc_blog_card_excerpt( $event, 60 );
+				$ev_id     = (int) $event->ID;
+				$ev_img    = cwc_blog_card_image_url( $ev_id, $placeholder );
+				$ev_title  = get_the_title( $ev_id );
+				$ev_url    = get_permalink( $ev_id );
+				$ev_exc    = cwc_blog_card_excerpt( $event, 60 );
 				$is_active = ( 0 === $index );
 				?>
 				<article class="cwc-upcoming-events__card <?php echo $is_active ? 'is-active' : ''; ?>"

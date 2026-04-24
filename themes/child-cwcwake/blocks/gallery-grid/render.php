@@ -43,26 +43,29 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-$items = $attributes['items'] ?? [];
+$items = $attributes['items'] ?? array();
 
 if ( empty( $items ) ) {
 	return;
 }
 
-$wrapper_attrs = get_block_wrapper_attributes( [
-	'class' => 'cwc-gallery-grid',
-] );
+$wrapper_attrs = get_block_wrapper_attributes(
+	array(
+		'class' => 'cwc-gallery-grid',
+	)
+);
 ?>
 
-<section <?php echo $wrapper_attrs; ?>>
+<section <?php echo $wrapper_attrs; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
 	<ul class="cwc-gallery-grid__list">
-		<?php foreach ( $items as $item ) :
-			$title       = $item['title']       ?? '';
-			$image       = $item['image']       ?? '';
-			$album_count = $item['albumCount']  ?? '';
-			$album_slug  = $item['albumSlug']   ?? '';
+		<?php
+		foreach ( $items as $item ) :
+			$item_title  = $item['title'] ?? '';
+			$image       = $item['image'] ?? '';
+			$album_count = $item['albumCount'] ?? '';
+			$album_slug  = $item['albumSlug'] ?? '';
 			$album_id    = isset( $item['albumId'] ) ? (int) $item['albumId'] : 0;
-			$url         = $item['url']         ?? '';
+			$url         = $item['url'] ?? '';
 			$width       = ( ( $item['width'] ?? 'half' ) === 'full' ) ? 'full' : 'half';
 			$item_class  = 'cwc-gallery-grid__item cwc-gallery-grid__item--' . $width;
 
@@ -92,7 +95,7 @@ $wrapper_attrs = get_block_wrapper_attributes( [
 
 			if ( 0 === $resolved_id && '' !== $album_slug ) {
 				$matches = get_posts(
-					[
+					array(
 						'name'             => $album_slug,
 						'post_type'        => 'cwc_album',
 						'post_status'      => 'publish',
@@ -100,7 +103,7 @@ $wrapper_attrs = get_block_wrapper_attributes( [
 						'fields'           => 'ids',
 						'no_found_rows'    => true,
 						'suppress_filters' => false,
-					]
+					)
 				);
 				if ( ! empty( $matches ) ) {
 					$resolved_id = (int) $matches[0];
@@ -132,17 +135,17 @@ $wrapper_attrs = get_block_wrapper_attributes( [
 			}
 
 			$is_link   = ! empty( $url );
-			$tag       = $is_link ? 'a' : 'div';
+			$html_tag  = $is_link ? 'a' : 'div';
 			$href_attr = $is_link ? sprintf( ' href="%s"', esc_url( $url ) ) : '';
-		?>
+			?>
 			<li class="<?php echo esc_attr( $item_class ); ?>">
-				<<?php echo $tag; ?> class="cwc-gallery-grid__card"<?php echo $href_attr; ?>>
+				<<?php echo $html_tag; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?> class="cwc-gallery-grid__card"<?php echo $href_attr; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
 					<div class="cwc-gallery-grid__media">
 						<?php if ( ! empty( $image ) ) : ?>
 							<img
 								class="cwc-gallery-grid__img"
 								src="<?php echo esc_url( $image ); ?>"
-								alt="<?php echo esc_attr( $title ); ?>"
+								alt="<?php echo esc_attr( $item_title ); ?>"
 								loading="lazy"
 							/>
 						<?php endif; ?>
@@ -155,10 +158,10 @@ $wrapper_attrs = get_block_wrapper_attributes( [
 						<span class="cwc-gallery-grid__corner cwc-gallery-grid__corner--br" aria-hidden="true"></span>
 					</div>
 
-					<?php if ( ! empty( $title ) || ! empty( $album_count ) ) : ?>
+					<?php if ( ! empty( $item_title ) || ! empty( $album_count ) ) : ?>
 						<div class="cwc-gallery-grid__meta">
-							<?php if ( ! empty( $title ) ) : ?>
-								<h3 class="cwc-gallery-grid__title"><?php echo esc_html( $title ); ?></h3>
+							<?php if ( ! empty( $item_title ) ) : ?>
+								<h3 class="cwc-gallery-grid__title"><?php echo esc_html( $item_title ); ?></h3>
 							<?php endif; ?>
 
 							<?php if ( ! empty( $album_count ) ) : ?>
@@ -166,7 +169,7 @@ $wrapper_attrs = get_block_wrapper_attributes( [
 							<?php endif; ?>
 						</div>
 					<?php endif; ?>
-				</<?php echo $tag; ?>>
+				</<?php echo $html_tag; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
 			</li>
 		<?php endforeach; ?>
 	</ul>

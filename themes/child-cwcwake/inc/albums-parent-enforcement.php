@@ -35,10 +35,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-/* ---------------------------------------------------------
+/*
+---------------------------------------------------------
  * Parent dropdown — restrict the choices to the three
  * canonical categories.
- * --------------------------------------------------------- */
+ * ---------------------------------------------------------
+ */
 
 /**
  * Restrict the REST `parent` lookups for `cwc_album` to the three
@@ -130,17 +132,17 @@ function cwc_album_canonical_parent_ids() {
 		return $cache;
 	}
 
-	$ids = [];
+	$ids = array();
 	foreach ( cwc_album_canonical_parent_slugs() as $slug ) {
 		$matches = get_posts(
-			[
+			array(
 				'name'           => $slug,
 				'post_type'      => 'cwc_album',
 				'post_status'    => 'publish',
 				'posts_per_page' => 1,
 				'fields'         => 'ids',
 				'no_found_rows'  => true,
-			]
+			)
 		);
 		if ( ! empty( $matches ) ) {
 			$ids[] = (int) $matches[0];
@@ -151,9 +153,11 @@ function cwc_album_canonical_parent_ids() {
 	return $cache;
 }
 
-/* ---------------------------------------------------------
+/*
+---------------------------------------------------------
  * Save guard — block orphan top-level albums.
- * --------------------------------------------------------- */
+ * ---------------------------------------------------------
+ */
 
 /**
  * Demote orphan top-level albums to draft on save.
@@ -181,7 +185,7 @@ function cwc_album_block_orphan_publishes( $data, $postarr ) {
 	}
 
 	// Only act on real publishes; drafts/auto-drafts/inherited are fine.
-	if ( ! in_array( $data['post_status'] ?? '', [ 'publish', 'future' ], true ) ) {
+	if ( ! in_array( $data['post_status'] ?? '', array( 'publish', 'future' ), true ) ) {
 		return $data;
 	}
 
@@ -227,9 +231,9 @@ function cwc_album_block_orphan_publishes( $data, $postarr ) {
 	if ( $user_id > 0 ) {
 		set_transient(
 			'cwc_album_orphan_notice_' . $user_id,
-			[
+			array(
 				'title' => $data['post_title'] ?? __( 'Untitled album', 'child-cwcwake' ),
-			],
+			),
 			MINUTE_IN_SECONDS * 5
 		);
 	}
@@ -238,9 +242,11 @@ function cwc_album_block_orphan_publishes( $data, $postarr ) {
 }
 add_filter( 'wp_insert_post_data', 'cwc_album_block_orphan_publishes', 20, 2 );
 
-/* ---------------------------------------------------------
+/*
+---------------------------------------------------------
  * Admin notices — editor guidance.
- * --------------------------------------------------------- */
+ * ---------------------------------------------------------
+ */
 
 /**
  * Render the "demoted to draft" notice queued by the save guard.

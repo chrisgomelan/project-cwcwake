@@ -55,13 +55,13 @@ if ( ! function_exists( 'cwc_featured_blogs_query' ) ) :
 	 */
 	function cwc_featured_blogs_query( int $limit ): array {
 		if ( $limit <= 0 ) {
-			return [];
+			return array();
 		}
 
 		$meta_key = defined( 'CWC_BLOG_META_FEATURED' ) ? CWC_BLOG_META_FEATURED : '_cwc_blog_featured';
 
 		$featured = get_posts(
-			[
+			array(
 				'post_type'              => 'post',
 				'post_status'            => 'publish',
 				'posts_per_page'         => $limit,
@@ -71,7 +71,7 @@ if ( ! function_exists( 'cwc_featured_blogs_query' ) ) :
 				'meta_value'             => '1',
 				'no_found_rows'          => true,
 				'update_post_term_cache' => false,
-			]
+			)
 		);
 
 		if ( count( $featured ) >= $limit ) {
@@ -80,7 +80,7 @@ if ( ! function_exists( 'cwc_featured_blogs_query' ) ) :
 
 		$exclude  = wp_list_pluck( $featured, 'ID' );
 		$fallback = get_posts(
-			[
+			array(
 				'post_type'              => 'post',
 				'post_status'            => 'publish',
 				'posts_per_page'         => $limit - count( $featured ),
@@ -89,7 +89,7 @@ if ( ! function_exists( 'cwc_featured_blogs_query' ) ) :
 				'post__not_in'           => $exclude,
 				'no_found_rows'          => true,
 				'update_post_term_cache' => false,
-			]
+			)
 		);
 
 		return array_merge( $featured, $fallback );
@@ -102,13 +102,13 @@ $description       = isset( $attributes['description'] ) ? (string) $attributes[
 $read_more_label   = isset( $attributes['readMoreLabel'] ) ? (string) $attributes['readMoreLabel'] : __( 'Read More', 'child-cwcwake' );
 $placeholder       = isset( $attributes['placeholderImage'] ) ? (string) $attributes['placeholderImage'] : '';
 
-$posts = cwc_featured_blogs_query( 5 );
+$featured_posts = cwc_featured_blogs_query( 5 );
 
-if ( empty( $posts ) ) {
+if ( empty( $featured_posts ) ) {
 	return;
 }
 
-$wrapper_attrs = get_block_wrapper_attributes( [ 'class' => 'cwc-featured-blogs' ] );
+$wrapper_attrs = get_block_wrapper_attributes( array( 'class' => 'cwc-featured-blogs' ) );
 
 /*
  * The grid hard-codes 5 slots so the design's asymmetric layout
@@ -116,7 +116,7 @@ $wrapper_attrs = get_block_wrapper_attributes( [ 'class' => 'cwc-featured-blogs'
  * than 5 published posts in total, the missing slots simply
  * collapse — preferable to silently rearranging the layout.
  */
-$slots = array_slice( $posts, 0, 5 );
+$slots = array_slice( $featured_posts, 0, 5 );
 ?>
 <section <?php echo $wrapper_attrs; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
 	<header class="cwc-featured-blogs__header">
@@ -139,12 +139,12 @@ $slots = array_slice( $posts, 0, 5 );
 	<div class="cwc-featured-blogs__grid">
 		<?php
 		foreach ( $slots as $index => $post_obj ) :
-			$post_id = (int) $post_obj->ID;
-			$image   = cwc_blog_card_image_url( $post_id, $placeholder );
-			$title   = get_the_title( $post_id );
-			$excerpt = cwc_blog_card_excerpt( $post_obj, 22 );
-			$date    = get_the_date( 'M j, Y', $post_id );
-			$url     = (string) get_permalink( $post_id );
+			$current_post_id = (int) $post_obj->ID;
+			$image           = cwc_blog_card_image_url( $current_post_id, $placeholder );
+			$post_title      = get_the_title( $current_post_id );
+			$excerpt         = cwc_blog_card_excerpt( $post_obj, 22 );
+			$date            = get_the_date( 'M j, Y', $current_post_id );
+			$url             = (string) get_permalink( $current_post_id );
 
 			/*
 			 * Slot index drives the BEM modifier so the CSS grid can
@@ -154,16 +154,16 @@ $slots = array_slice( $posts, 0, 5 );
 			$slot_class = 'cwc-featured-blogs__card cwc-featured-blogs__card--slot-' . ( $index + 1 );
 			?>
 			<article class="<?php echo esc_attr( $slot_class ); ?>">
-				<a class="cwc-featured-blogs__link" href="<?php echo esc_url( $url ); ?>" aria-label="<?php echo esc_attr( $title ); ?>">
+				<a class="cwc-featured-blogs__link" href="<?php echo esc_url( $url ); ?>" aria-label="<?php echo esc_attr( $post_title ); ?>">
 					<?php if ( '' !== $image ) : ?>
 						<span class="cwc-featured-blogs__image" role="img"
-							aria-label="<?php echo esc_attr( $title ); ?>"
+							aria-label="<?php echo esc_attr( $post_title ); ?>"
 							style="background-image:url('<?php echo esc_url( $image ); ?>');"></span>
 					<?php endif; ?>
 					<span class="cwc-featured-blogs__overlay" aria-hidden="true"></span>
 
 					<div class="cwc-featured-blogs__content">
-						<h3 class="cwc-featured-blogs__card-title"><?php echo esc_html( $title ); ?></h3>
+						<h3 class="cwc-featured-blogs__card-title"><?php echo esc_html( $post_title ); ?></h3>
 
 						<?php if ( '' !== $excerpt ) : ?>
 							<p class="cwc-featured-blogs__card-excerpt"><?php echo esc_html( $excerpt ); ?></p>

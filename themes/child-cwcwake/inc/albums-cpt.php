@@ -25,9 +25,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-/* ---------------------------------------------------------
+/*
+---------------------------------------------------------
  * CPT registration
- * --------------------------------------------------------- */
+ * ---------------------------------------------------------
+ */
 
 /**
  * Register the `cwc_album` post type and flush rewrites once.
@@ -45,7 +47,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @return void
  */
 function cwc_register_album_cpt() {
-	$labels = [
+	$labels = array(
 		'name'                  => _x( 'Albums', 'Post type general name', 'child-cwcwake' ),
 		'singular_name'         => _x( 'Album', 'Post type singular name', 'child-cwcwake' ),
 		'menu_name'             => _x( 'Albums', 'Admin Menu text', 'child-cwcwake' ),
@@ -65,25 +67,25 @@ function cwc_register_album_cpt() {
 		'remove_featured_image' => _x( 'Remove cover image', 'Remove featured image label', 'child-cwcwake' ),
 		'use_featured_image'    => _x( 'Use as cover image', 'Use as featured image label', 'child-cwcwake' ),
 		'archives'              => _x( 'Album archives', 'Archive label', 'child-cwcwake' ),
-	];
+	);
 
-	$args = [
-		'labels'              => $labels,
-		'public'              => true,
-		'publicly_queryable'  => true,
-		'show_ui'             => true,
-		'show_in_menu'        => true,
-		'show_in_rest'        => true,
-		'menu_position'       => 5,
-		'menu_icon'           => 'dashicons-format-gallery',
-		'capability_type'     => 'post',
-		'hierarchical'        => true,
-		'has_archive'         => false,
-		'rewrite'             => [
+	$args = array(
+		'labels'             => $labels,
+		'public'             => true,
+		'publicly_queryable' => true,
+		'show_ui'            => true,
+		'show_in_menu'       => true,
+		'show_in_rest'       => true,
+		'menu_position'      => 5,
+		'menu_icon'          => 'dashicons-format-gallery',
+		'capability_type'    => 'post',
+		'hierarchical'       => true,
+		'has_archive'        => false,
+		'rewrite'            => array(
 			'slug'       => 'gallery',
 			'with_front' => false,
-		],
-		'supports'            => [
+		),
+		'supports'           => array(
 			'title',
 			'editor',
 			'thumbnail',
@@ -91,11 +93,18 @@ function cwc_register_album_cpt() {
 			'page-attributes',
 			'revisions',
 			'custom-fields',
-		],
-		'template'            => [
-			[ 'core/gallery', [ 'columns' => 3, 'imageCrop' => true, 'linkTo' => 'media' ] ],
-		],
-	];
+		),
+		'template'           => array(
+			array(
+				'core/gallery',
+				array(
+					'columns'   => 3,
+					'imageCrop' => true,
+					'linkTo'    => 'media',
+				),
+			),
+		),
+	);
 
 	register_post_type( 'cwc_album', $args );
 
@@ -125,9 +134,11 @@ function cwc_album_maybe_refresh_rewrites() {
 }
 add_action( 'wp_loaded', 'cwc_album_maybe_refresh_rewrites' );
 
-/* ---------------------------------------------------------
+/*
+---------------------------------------------------------
  * Helpers
- * --------------------------------------------------------- */
+ * ---------------------------------------------------------
+ */
 
 /**
  * Return all image attachments parented to an album.
@@ -143,11 +154,11 @@ add_action( 'wp_loaded', 'cwc_album_maybe_refresh_rewrites' );
  */
 function cwc_album_get_photos( $post_id ) {
 	if ( ! $post_id ) {
-		return [];
+		return array();
 	}
 
 	$attachments = get_posts(
-		[
+		array(
 			'post_parent'    => (int) $post_id,
 			'post_type'      => 'attachment',
 			'post_mime_type' => 'image',
@@ -155,10 +166,10 @@ function cwc_album_get_photos( $post_id ) {
 			'numberposts'    => -1,
 			'orderby'        => 'menu_order',
 			'order'          => 'ASC',
-		]
+		)
 	);
 
-	return $attachments instanceof WP_Error ? [] : $attachments;
+	return $attachments instanceof WP_Error ? array() : $attachments;
 }
 
 /**
@@ -187,16 +198,19 @@ function cwc_album_photo_count( $post_id ) {
  */
 function cwc_album_get_children( $parent_id = 0 ) {
 	$children = get_posts(
-		[
+		array(
 			'post_type'   => 'cwc_album',
 			'post_parent' => (int) $parent_id,
 			'post_status' => 'publish',
 			'numberposts' => -1,
-			'orderby'     => [ 'menu_order' => 'ASC', 'title' => 'ASC' ],
-		]
+			'orderby'     => array(
+				'menu_order' => 'ASC',
+				'title'      => 'ASC',
+			),
+		)
 	);
 
-	return $children instanceof WP_Error ? [] : $children;
+	return $children instanceof WP_Error ? array() : $children;
 }
 
 /**
@@ -224,7 +238,7 @@ function cwc_album_child_count( $parent_id ) {
  * @return string Permalink to the Gallery page (or `/gallery/` fallback).
  */
 function cwc_album_gallery_url() {
-	$candidates = [ 'plan-your-trip/gallery', 'gallery' ];
+	$candidates = array( 'plan-your-trip/gallery', 'gallery' );
 
 	foreach ( $candidates as $path ) {
 		$page = get_page_by_path( $path );
@@ -250,32 +264,34 @@ function cwc_album_gallery_url() {
 function cwc_album_back_link( $post_id ) {
 	$post = get_post( $post_id );
 	if ( ! $post instanceof WP_Post ) {
-		return [
+		return array(
 			'label' => __( 'Back to Gallery', 'child-cwcwake' ),
 			'url'   => cwc_album_gallery_url(),
-		];
+		);
 	}
 
 	if ( (int) $post->post_parent > 0 ) {
 		$parent = get_post( (int) $post->post_parent );
 		if ( $parent instanceof WP_Post ) {
-			return [
+			return array(
 				/* translators: %s: Parent album title. */
 				'label' => sprintf( __( 'Back to %s', 'child-cwcwake' ), get_the_title( $parent ) ),
 				'url'   => get_permalink( $parent ),
-			];
+			);
 		}
 	}
 
-	return [
+	return array(
 		'label' => __( 'Back to Gallery', 'child-cwcwake' ),
 		'url'   => cwc_album_gallery_url(),
-	];
+	);
 }
 
-/* ---------------------------------------------------------
+/*
+---------------------------------------------------------
  * Breadcrumb integration
- * --------------------------------------------------------- */
+ * ---------------------------------------------------------
+ */
 
 /**
  * Inject "Gallery" + ancestor albums into the breadcrumb trail on
@@ -305,20 +321,29 @@ function cwc_album_breadcrumbs( $crumbs ) {
 	 * Rebuild from scratch so we own ordering + formatting:
 	 * Home → Gallery → (ancestors…) → Current.
 	 */
-	$rebuilt = [
-		[ 'label' => __( 'Home', 'child-cwcwake' ), 'url' => home_url( '/' ) ],
-		[ 'label' => __( 'Gallery', 'child-cwcwake' ), 'url' => cwc_album_gallery_url() ],
-	];
+	$rebuilt = array(
+		array(
+			'label' => __( 'Home', 'child-cwcwake' ),
+			'url'   => home_url( '/' ),
+		),
+		array(
+			'label' => __( 'Gallery', 'child-cwcwake' ),
+			'url'   => cwc_album_gallery_url(),
+		),
+	);
 
 	$ancestors = array_reverse( get_post_ancestors( $post ) );
 	foreach ( $ancestors as $ancestor_id ) {
-		$rebuilt[] = [
+		$rebuilt[] = array(
 			'label' => get_the_title( $ancestor_id ),
 			'url'   => get_permalink( $ancestor_id ),
-		];
+		);
 	}
 
-	$rebuilt[] = [ 'label' => get_the_title( $post ), 'url' => null ];
+	$rebuilt[] = array(
+		'label' => get_the_title( $post ),
+		'url'   => null,
+	);
 
 	return $rebuilt;
 }

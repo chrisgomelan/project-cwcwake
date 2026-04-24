@@ -22,10 +22,12 @@ if ( '' !== $bg_image ) {
 	$bg_style = sprintf( 'background-image:url(%s);', esc_url( $bg_image ) );
 }
 
-$wrapper_attrs = get_block_wrapper_attributes( [
-	'class' => 'cwc-feature-banner',
-	'style' => $bg_style,
-] );
+$wrapper_attrs = get_block_wrapper_attributes(
+	array(
+		'class' => 'cwc-feature-banner',
+		'style' => $bg_style,
+	)
+);
 ?>
 
 <section <?php echo $wrapper_attrs; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>

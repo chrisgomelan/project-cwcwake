@@ -32,19 +32,18 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @return string Block markup ready for `post_content`.
  */
-function cwc_render_contact_page_blocks()
-{
+function cwc_render_contact_page_blocks() {
 	$flags = JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE;
 
-	$info_attrs = wp_json_encode( [ 'align' => 'full' ], $flags );
-	$form_attrs = wp_json_encode( [ 'align' => 'full' ], $flags );
+	$info_attrs = wp_json_encode( array( 'align' => 'full' ), $flags );
+	$form_attrs = wp_json_encode( array( 'align' => 'full' ), $flags );
 
 	return implode(
 		"\n\n",
-		[
+		array(
 			'<!-- wp:cwc/contact-info ' . $info_attrs . ' /-->',
 			'<!-- wp:cwc/contact-form ' . $form_attrs . ' /-->',
-		]
+		)
 	);
 }
 
@@ -59,8 +58,7 @@ function cwc_render_contact_page_blocks()
  *
  * @return void
  */
-function cwc_seed_contact_page()
-{
+function cwc_seed_contact_page() {
 	if ( get_option( 'cwc_contact_page_seeded' ) ) {
 		return;
 	}
@@ -78,10 +76,10 @@ function cwc_seed_contact_page()
 
 	if ( '' === trim( (string) $page->post_content ) ) {
 		wp_update_post(
-			[
+			array(
 				'ID'           => (int) $page->ID,
 				'post_content' => cwc_render_contact_page_blocks(),
-			]
+			)
 		);
 	}
 

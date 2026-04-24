@@ -14,12 +14,12 @@
  * @since   1.0.0
  */
 
-if (!defined('ABSPATH')) {
+if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-$heading = isset($attributes['heading']) ? (string) $attributes['heading'] : '';
-$items = isset($attributes['items']) && is_array($attributes['items']) ? $attributes['items'] : [];
+$heading = isset( $attributes['heading'] ) ? (string) $attributes['heading'] : '';
+$items   = isset( $attributes['items'] ) && is_array( $attributes['items'] ) ? $attributes['items'] : array();
 
 /*
  * Meta fallback (room-management-transition.md § 4):
@@ -37,28 +37,31 @@ $items = isset($attributes['items']) && is_array($attributes['items']) ? $attrib
  * with more rooms.
  */
 if ( empty( $items ) && function_exists( 'cwc_is_accommodation_context' ) && cwc_is_accommodation_context() ) {
-	$current = get_post();
+	$current    = get_post();
 	$current_id = $current instanceof WP_Post ? (int) $current->ID : 0;
 
 	$siblings = get_posts(
-		[
+		array(
 			'post_type'      => 'accommodation',
 			'post_status'    => 'publish',
 			'posts_per_page' => 6,
-			'post__not_in'   => $current_id > 0 ? [ $current_id ] : [],
-			'orderby'        => [ 'menu_order' => 'ASC', 'title' => 'ASC' ],
+			'post__not_in'   => $current_id > 0 ? array( $current_id ) : array(),
+			'orderby'        => array(
+				'menu_order' => 'ASC',
+				'title'      => 'ASC',
+			),
 			'no_found_rows'  => true,
-		]
+		)
 	);
 
 	foreach ( $siblings as $sibling ) {
 		$thumb_id = (int) get_post_thumbnail_id( $sibling );
 		$image    = $thumb_id > 0 ? (string) wp_get_attachment_image_url( $thumb_id, 'large' ) : '';
-		$items[]  = [
+		$items[]  = array(
 			'label' => get_the_title( $sibling ),
 			'image' => $image,
 			'url'   => (string) get_permalink( $sibling ),
-		];
+		);
 	}
 
 	if ( '' === $heading ) {
@@ -66,55 +69,55 @@ if ( empty( $items ) && function_exists( 'cwc_is_accommodation_context' ) && cwc
 	}
 }
 
-if (empty($items)) {
+if ( empty( $items ) ) {
 	return;
 }
 
-$wrapper_attrs = get_block_wrapper_attributes(['class' => 'cwc-other-rooms']);
+$wrapper_attrs = get_block_wrapper_attributes( array( 'class' => 'cwc-other-rooms' ) );
 ?>
 <section <?php echo $wrapper_attrs; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
 	<div class="cwc-other-rooms__panel">
 		<span class="cwc-other-rooms__accent" aria-hidden="true"></span>
 
 		<div class="cwc-other-rooms__body">
-			<?php if ($heading !== ''): ?>
-				<h2 class="cwc-other-rooms__heading"><?php echo esc_html($heading); ?></h2>
+			<?php if ( '' !== $heading ) : ?>
+				<h2 class="cwc-other-rooms__heading"><?php echo esc_html( $heading ); ?></h2>
 			<?php endif; ?>
 
 			<ul class="cwc-other-rooms__list">
 				<?php
-				foreach ($items as $item) {
-					if (!is_array($item)) {
+				foreach ( $items as $item ) {
+					if ( ! is_array( $item ) ) {
 						continue;
 					}
-					$label = isset($item['label']) ? (string) $item['label'] : '';
-					$image = isset($item['image']) ? (string) $item['image'] : '';
-					$url = isset($item['url']) ? (string) $item['url'] : '';
+					$label = isset( $item['label'] ) ? (string) $item['label'] : '';
+					$image = isset( $item['image'] ) ? (string) $item['image'] : '';
+					$url   = isset( $item['url'] ) ? (string) $item['url'] : '';
 
-					if ($label === '' && $image === '') {
+					if ( '' === $label && '' === $image ) {
 						continue;
 					}
 
-					$has_link = $url !== '';
-					$tag = $has_link ? 'a' : 'div';
+					$has_link = '' !== $url;
+					$html_tag = $has_link ? 'a' : 'div';
 					?>
 					<li class="cwc-other-rooms__item">
-						<<?php echo $tag; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+						<<?php echo $html_tag; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 							class="cwc-other-rooms__card"
-							<?php if ($has_link): ?>
-								href="<?php echo esc_url($url); ?>"
-								aria-label="<?php echo esc_attr($label); ?>"
+							<?php if ( $has_link ) : ?>
+								href="<?php echo esc_url( $url ); ?>"
+								aria-label="<?php echo esc_attr( $label ); ?>"
 							<?php endif; ?>
 							>
-							<?php if ($image !== ''): ?>
-								<span class="cwc-other-rooms__image" role="img" <?php echo $label !== '' ? 'aria-label="' . esc_attr($label) . '"' : ''; ?>
-									style="background-image:url('<?php echo esc_url($image); ?>');"></span>
+							<?php if ( '' !== $image ) : ?>
+								<span class="cwc-other-rooms__image" role="img" <?php echo '' !== $label ? 'aria-label="' . esc_attr( $label ) . '"' : ''; ?>
+									style="background-image:url('<?php echo esc_url( $image ); ?>');"></span>
 							<?php endif; ?>
 							<span class="cwc-other-rooms__overlay" aria-hidden="true"></span>
-							<?php if ($label !== ''): ?>
-								<span class="cwc-other-rooms__label"><?php echo esc_html($label); ?></span>
+							<?php if ( '' !== $label ) : ?>
+								<span class="cwc-other-rooms__label"><?php echo esc_html( $label ); ?></span>
 							<?php endif; ?>
-						</<?php echo $tag; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
+						</<?php echo $html_tag; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
 					</li>
 					<?php
 				}

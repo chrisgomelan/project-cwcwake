@@ -36,9 +36,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-/* ---------------------------------------------------------
+/*
+---------------------------------------------------------
  * Resolve the accommodation context (if any)
- * --------------------------------------------------------- */
+ * ---------------------------------------------------------
+ */
 
 /*
  * `cwc_is_accommodation_context()` is the single check we use to
@@ -47,40 +49,44 @@ if ( ! defined( 'ABSPATH' ) ) {
  * stops at "block attribute" and the block behaves exactly the way
  * it always has — no surprise data leaks from another room's meta.
  */
-$post_id              = 0;
+$current_post_id      = 0;
 $is_accommodation_ctx = false;
 if ( function_exists( 'cwc_is_accommodation_context' ) && cwc_is_accommodation_context() ) {
-	$post                 = get_post();
-	$post_id              = $post instanceof WP_Post ? (int) $post->ID : 0;
-	$is_accommodation_ctx = $post_id > 0;
+	$current_post         = get_post();
+	$current_post_id      = $current_post instanceof WP_Post ? (int) $current_post->ID : 0;
+	$is_accommodation_ctx = $current_post_id > 0;
 }
 
-/* ---------------------------------------------------------
+/*
+---------------------------------------------------------
  * Pull attributes (block-editor-supplied values win)
- * --------------------------------------------------------- */
+ * ---------------------------------------------------------
+ */
 
-$title             = isset( $attributes['title'] ) ? (string) $attributes['title'] : '';
+$block_title       = isset( $attributes['title'] ) ? (string) $attributes['title'] : '';
 $description_label = isset( $attributes['descriptionLabel'] ) ? (string) $attributes['descriptionLabel'] : '';
 $description       = isset( $attributes['description'] ) ? (string) $attributes['description'] : '';
 $amenities_label   = isset( $attributes['amenitiesLabel'] ) ? (string) $attributes['amenitiesLabel'] : '';
-$amenities         = isset( $attributes['amenities'] ) && is_array( $attributes['amenities'] ) ? $attributes['amenities'] : [];
+$amenities         = isset( $attributes['amenities'] ) && is_array( $attributes['amenities'] ) ? $attributes['amenities'] : array();
 $price             = isset( $attributes['price'] ) ? (string) $attributes['price'] : '';
 $price_sub_label   = isset( $attributes['priceSubLabel'] ) ? (string) $attributes['priceSubLabel'] : '';
 $book_button_label = isset( $attributes['bookButtonLabel'] ) ? (string) $attributes['bookButtonLabel'] : '';
 $book_button_url   = isset( $attributes['bookButtonUrl'] ) ? (string) $attributes['bookButtonUrl'] : '';
 $policies_label    = isset( $attributes['policiesLabel'] ) ? (string) $attributes['policiesLabel'] : '';
 $policies_intro    = isset( $attributes['policiesIntro'] ) ? (string) $attributes['policiesIntro'] : '';
-$policies          = isset( $attributes['policies'] ) && is_array( $attributes['policies'] ) ? $attributes['policies'] : [];
+$policies          = isset( $attributes['policies'] ) && is_array( $attributes['policies'] ) ? $attributes['policies'] : array();
 
-/* ---------------------------------------------------------
+/*
+---------------------------------------------------------
  * Meta fallbacks (only when on a single accommodation)
- * --------------------------------------------------------- */
+ * ---------------------------------------------------------
+ */
 
 $availability = 'available';
 
 if ( $is_accommodation_ctx ) {
-	if ( '' === $title ) {
-		$title = get_the_title( $post_id );
+	if ( '' === $block_title ) {
+		$block_title = get_the_title( $current_post_id );
 	}
 
 	if ( '' === $description ) {
@@ -89,24 +95,24 @@ if ( $is_accommodation_ctx ) {
 		 * amenity chips — `post_content` now holds the block stack
 		 * itself, which would render as raw HTML if dropped here.
 		 */
-		$description = (string) get_post_field( 'post_excerpt', $post_id );
+		$description = (string) get_post_field( 'post_excerpt', $current_post_id );
 	}
 
 	if ( empty( $amenities ) && function_exists( 'cwc_accommodation_amenities' ) ) {
-		$amenities = cwc_accommodation_amenities( $post_id );
+		$amenities = cwc_accommodation_amenities( $current_post_id );
 	}
 
 	if ( '' === $price ) {
-		$price = (string) get_post_meta( $post_id, '_cwc_price', true );
+		$price = (string) get_post_meta( $current_post_id, '_cwc_price', true );
 	}
 
-	$meta_price_sub = trim( (string) get_post_meta( $post_id, '_cwc_price_sub', true ) );
-	$meta_capacity  = trim( (string) get_post_meta( $post_id, '_cwc_capacity', true ) );
+	$meta_price_sub = trim( (string) get_post_meta( $current_post_id, '_cwc_price_sub', true ) );
+	$meta_capacity  = trim( (string) get_post_meta( $current_post_id, '_cwc_capacity', true ) );
 
-	if ( '' !== $meta_capacity && stripos( $meta_price_sub, 'maximum' ) === false ) {
-		$person_text = ( (int) $meta_capacity === 1 ) ? 'person' : 'persons';
+	if ( '' !== $meta_capacity && false === stripos( $meta_price_sub, 'maximum' ) ) {
+		$person_text  = ( 1 === (int) $meta_capacity ) ? 'person' : 'persons';
 		$capacity_str = sprintf( 'Maximum %s %s', $meta_capacity, $person_text );
-		
+
 		if ( '' !== $meta_price_sub ) {
 			$meta_price_sub .= ' · ' . $capacity_str;
 		} else {
@@ -123,8 +129,8 @@ if ( $is_accommodation_ctx ) {
 		 */
 		if ( '' === $price_sub_label || 'per night' === $price_sub_label ) {
 			$price_sub_label = $meta_price_sub;
-		} elseif ( '' !== $meta_capacity && stripos( $price_sub_label, 'maximum' ) === false ) {
-			$person_text = ( (int) $meta_capacity === 1 ) ? 'person' : 'persons';
+		} elseif ( '' !== $meta_capacity && false === stripos( $price_sub_label, 'maximum' ) ) {
+			$person_text      = ( 1 === (int) $meta_capacity ) ? 'person' : 'persons';
 			$price_sub_label .= ' · Maximum ' . $meta_capacity . ' ' . $person_text;
 		}
 	}
@@ -134,21 +140,25 @@ if ( $is_accommodation_ctx ) {
 	}
 
 	if ( function_exists( 'cwc_accommodation_availability' ) ) {
-		$availability = cwc_accommodation_availability( $post_id );
+		$availability = cwc_accommodation_availability( $current_post_id );
 	}
 }
 
-/* ---------------------------------------------------------
+/*
+---------------------------------------------------------
  * Bail gracefully if there's still nothing to show
- * --------------------------------------------------------- */
+ * ---------------------------------------------------------
+ */
 
-if ( '' === $title && '' === $description && empty( $amenities ) && empty( $policies ) ) {
+if ( '' === $block_title && '' === $description && empty( $amenities ) && empty( $policies ) ) {
 	return;
 }
 
-/* ---------------------------------------------------------
+/*
+---------------------------------------------------------
  * Availability-driven booking UI
- * --------------------------------------------------------- */
+ * ---------------------------------------------------------
+ */
 
 /*
  * Each availability state owns a small data bag the booking aside
@@ -164,14 +174,14 @@ if ( '' === $title && '' === $description && empty( $amenities ) && empty( $poli
  * - `badge` is the "Coming Soon" pill rendered next to the title in
  *   maintenance mode.
  */
-$state = [
+$state = array(
 	'show_pricing' => true,
 	'show_button'  => true,
 	'button_label' => $book_button_label,
 	'button_url'   => $book_button_url,
 	'notice'       => '',
 	'badge'        => '',
-];
+);
 
 if ( 'fully-booked' === $availability ) {
 	$state['button_label'] = __( 'Inquire', 'child-cwcwake' );
@@ -182,14 +192,16 @@ if ( 'fully-booked' === $availability ) {
 	$state['badge']        = __( 'Coming Soon', 'child-cwcwake' );
 }
 
-/* ---------------------------------------------------------
+/*
+---------------------------------------------------------
  * Render
- * --------------------------------------------------------- */
+ * ---------------------------------------------------------
+ */
 
 $wrapper_attrs = get_block_wrapper_attributes(
-	[
+	array(
 		'class' => 'cwc-room-info cwc-room-info--' . sanitize_html_class( $availability ),
-	]
+	)
 );
 
 /**
@@ -227,9 +239,9 @@ $icon = static function ( $slug ) {
 		<span class="cwc-room-info__accent" aria-hidden="true"></span>
 
 		<div class="cwc-room-info__body">
-			<?php if ( '' !== $title ) : ?>
+			<?php if ( '' !== $block_title ) : ?>
 				<h2 class="cwc-room-info__title">
-					<?php echo esc_html( $title ); ?>
+					<?php echo esc_html( $block_title ); ?>
 					<?php if ( '' !== $state['badge'] ) : ?>
 						<span class="cwc-room-info__badge"><?php echo esc_html( $state['badge'] ); ?></span>
 					<?php endif; ?>
@@ -256,7 +268,7 @@ $icon = static function ( $slug ) {
 								<?php
 								foreach ( $amenities as $amenity ) {
 									if ( ! is_array( $amenity ) ) {
-										$amenity = [ 'label' => (string) $amenity ];
+										$amenity = array( 'label' => (string) $amenity );
 									}
 									$label    = isset( $amenity['label'] ) ? (string) $amenity['label'] : '';
 									$icon_key = isset( $amenity['icon'] ) ? (string) $amenity['icon'] : '';

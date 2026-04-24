@@ -36,14 +36,16 @@ function cwc_seed_water_sports_page(): void {
 		return;
 	}
 
-	// Force template assignment
+	// Force template assignment.
 	update_post_meta( (int) $page->ID, '_wp_page_template', 'page-water-sports' );
 
-	// Clear post content so the .html template file takes priority
-	wp_update_post( [
-		'ID'           => $page->ID,
-		'post_content' => '',
-	] );
+	// Clear post content so the .html template file takes priority.
+	wp_update_post(
+		array(
+			'ID'           => $page->ID,
+			'post_content' => '',
+		)
+	);
 
 	update_option( 'cwc_water_sports_page_seeded_v2', time() );
 }

@@ -36,11 +36,12 @@ if ( empty( $matches ) ) {
 			<div class="cwc-toc__dot"></div>
 		</div>
 		<ul class="cwc-toc__list">
-			<?php foreach ( $matches as $match ) :
+			<?php
+			foreach ( $matches as $match ) :
 				$level  = $match[1];
 				$text   = strip_tags( $match[2] );
 				$anchor = sanitize_title( $text );
-			?>
+				?>
 				<li class="cwc-toc__item cwc-toc__item--h<?php echo esc_attr( $level ); ?>">
 					<a href="#<?php echo esc_attr( $anchor ); ?>" class="cwc-toc__link">
 						<?php echo esc_html( $text ); ?>

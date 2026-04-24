@@ -9,13 +9,13 @@
  */
 
 /* ----------------------------------------
-   Custom Fonts
-   ---------------------------------------- */
+	Custom Fonts
+	---------------------------------------- */
 
 
 /* ----------------------------------------
-   Base
-   ---------------------------------------- */
+	Base
+	---------------------------------------- */
 
 *,
 *::before,
@@ -35,17 +35,17 @@ img {
 }
 
 /* WordPress generates padding on the site-blocks wrapper from theme.json
-   layout settings. Reset it so full-width blocks own their own insets. */
+	layout settings. Reset it so full-width blocks own their own insets. */
 .wp-site-blocks {
 	padding-left: 0 !important;
 	padding-right: 0 !important;
 }
 
 /* Prevent WordPress core alignfull from using 100vw + negative margins,
-   which shifts content wider than the 100%-based header on viewports
-   with a visible scrollbar. All full-width blocks should use 100% instead.
-   The doubled class (.alignfull.alignfull) and the constrained-layout
-   selector both outweigh the WP-generated rules. */
+	which shifts content wider than the 100%-based header on viewports
+	with a visible scrollbar. All full-width blocks should use 100% instead.
+	The doubled class (.alignfull.alignfull) and the constrained-layout
+	selector both outweigh the WP-generated rules. */
 .alignfull.alignfull,
 .is-layout-constrained > .alignfull,
 .is-layout-flow > .alignfull {
@@ -56,8 +56,8 @@ img {
 }
 
 /* ----------------------------------------
-   Footer
-   ---------------------------------------- */
+	Footer
+	---------------------------------------- */
 
 .cwc-footer {
 	font-family: var(--wp--preset--font-family--body);
@@ -83,8 +83,8 @@ img {
 }
 
 /* ----------------------------------------
-   Buttons — shared base
-   ---------------------------------------- */
+	Buttons — shared base
+	---------------------------------------- */
 
 .wp-block-button__link {
 	font-family: var(--wp--preset--font-family--heading);
@@ -106,8 +106,8 @@ img {
 }
 
 /* ----------------------------------------
-   Primary (default) — teal bg, white text
-   ---------------------------------------- */
+	Primary (default) — teal bg, white text
+	---------------------------------------- */
 
 .wp-block-button:not([class*="is-style-"]) .wp-block-button__link {
 	background: var(--wp--preset--color--primary);
@@ -119,8 +119,8 @@ img {
 }
 
 /* ----------------------------------------
-   Outline / Secondary — transparent + border
-   ---------------------------------------- */
+	Outline / Secondary — transparent + border
+	---------------------------------------- */
 
 .wp-block-button.is-style-outline .wp-block-button__link {
 	background: transparent;
@@ -134,8 +134,8 @@ img {
 }
 
 /* ----------------------------------------
-   Accent — orange bg
-   ---------------------------------------- */
+	Accent — orange bg
+	---------------------------------------- */
 
 .wp-block-button.is-style-accent .wp-block-button__link {
 	background: var(--wp--preset--color--accent);
@@ -147,8 +147,8 @@ img {
 }
 
 /* ----------------------------------------
-   Light — white bg, dark text
-   ---------------------------------------- */
+	Light — white bg, dark text
+	---------------------------------------- */
 
 .wp-block-button.is-style-light .wp-block-button__link {
 	background: var(--wp--preset--color--background);
@@ -160,8 +160,8 @@ img {
 }
 
 /* ----------------------------------------
-   Dark — secondary (navy) bg, white text
-   ---------------------------------------- */
+	Dark — secondary (navy) bg, white text
+	---------------------------------------- */
 
 .wp-block-button.is-style-dark .wp-block-button__link {
 	background: var(--wp--preset--color--secondary);
@@ -173,8 +173,8 @@ img {
 }
 
 /* ----------------------------------------
-   Custom Image Modal
-   ---------------------------------------- */
+	Custom Image Modal
+	---------------------------------------- */
 
 .cwc-modal {
 	position: fixed;
@@ -304,9 +304,9 @@ img {
 }
 
 /* ----------------------------------------
-   With arrow icon  (add class "cwc-btn-arrow")
-   Appends the uploaded arrow-up SVG after the label.
-   ---------------------------------------- */
+	With arrow icon  (add class "cwc-btn-arrow")
+	Appends the uploaded arrow-up SVG after the label.
+	---------------------------------------- */
 
 .cwc-btn-arrow .wp-block-button__link {
 	display: inline-flex;
@@ -324,8 +324,8 @@ img {
 }
 
 /* ----------------------------------------
-   Hero & Cover blocks
-   ---------------------------------------- */
+	Hero & Cover blocks
+	---------------------------------------- */
 
 .wp-block-cover {
 	font-family: var(--wp--preset--font-family--heading);
@@ -336,15 +336,15 @@ img {
 }
 
 /* ----------------------------------------
-   Tropical-bg section
-   ----------------------------------------
-   Shared wrapper used on Gallery, Accommodations, Contact, Terms,
-   and Privacy pages. Sits below the page banner and contains the
-   breadcrumbs + main content.
+	Tropical-bg section
+	----------------------------------------
+	Shared wrapper used on Gallery, Accommodations, Contact, Terms,
+	and Privacy pages. Sits below the page banner and contains the
+	breadcrumbs + main content.
 
-   Direct children mirror `.cwc-header__inner` (max-width 1921 +
-   horizontal clamp padding) so the breadcrumbs and post-content
-   line up with the header logo. */
+	Direct children mirror `.cwc-header__inner` (max-width 1921 +
+	horizontal clamp padding) so the breadcrumbs and post-content
+	line up with the header logo. */
 
 .cwc-tropical-section {
 
@@ -357,7 +357,7 @@ img {
 	background-repeat: no-repeat;
 	margin-block-start: 0 !important;
 	/* No left/right padding here — children own the inset to mirror
-	   the header geometry exactly. */
+		the header geometry exactly. */
 	padding-left: 0 !important;
 	padding-right: 0 !important;
 }
@@ -385,8 +385,8 @@ img {
 }
 
 /* ----------------------------------------
-   Cards (reusable pattern)
-   ---------------------------------------- */
+	Cards (reusable pattern)
+	---------------------------------------- */
 
 .cwc-card {
 	background: var(--wp--preset--color--background);
@@ -412,8 +412,8 @@ img {
 }
 
 /* ----------------------------------------
-   Breadcrumb
-   ---------------------------------------- */
+	Breadcrumb
+	---------------------------------------- */
 
 .cwc-breadcrumb {
 	font-size: var(--wp--preset--font-size--small);
@@ -430,8 +430,8 @@ img {
 }
 
 /* ----------------------------------------
-   Pagination (Shared Component)
-   ---------------------------------------- */
+	Pagination (Shared Component)
+	---------------------------------------- */
 
 .cwc-pagination {
 	display: flex;
@@ -493,16 +493,16 @@ img {
 }
 
 /* ----------------------------------------
-   Album Topbar
-   ---------------------------------------- */
+	Album Topbar
+	---------------------------------------- */
 
 .cwc-album-topbar {
 	padding-block: var(--wp--preset--spacing--30);
 }
 
 /* ----------------------------------------
-   Utility classes
-   ---------------------------------------- */
+	Utility classes
+	---------------------------------------- */
 
 .u-text-center {
 	text-align: center;
@@ -521,8 +521,8 @@ img {
 }
 
 /* ----------------------------------------
-   Responsive adjustments
-   ---------------------------------------- */
+	Responsive adjustments
+	---------------------------------------- */
 
 @media (max-width: 767px) {
 	.wp-block-columns {
@@ -536,8 +536,8 @@ img {
 }
 
 /* ----------------------------------------
-   Scroll to Top
-   ---------------------------------------- */
+	Scroll to Top
+	---------------------------------------- */
 
 .cwc-scroll-top {
 	position: fixed;
@@ -613,8 +613,8 @@ img {
 }
 
 /* ----------------------------------------
-   404 Page
-   ---------------------------------------- */
+	404 Page
+	---------------------------------------- */
 
 .cwc-404-section {
 	display: flex !important;

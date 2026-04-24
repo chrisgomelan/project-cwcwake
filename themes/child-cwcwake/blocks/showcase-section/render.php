@@ -1,4 +1,10 @@
 <?php
+/**
+ * Showcase Section block — render template.
+ *
+ * @package CWC_Wake
+ */
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -9,7 +15,7 @@ $heading_emp    = $attributes['headingEmphasis'] ?? 'ADVENTURE';
 $emphasis_color = $attributes['emphasisColor'] ?? 'accent';
 $subtitle       = $attributes['subtitle'] ?? '';
 $bg_image       = $attributes['backgroundImage'] ?? '';
-$items          = $attributes['items'] ?? [];
+$items          = $attributes['items'] ?? array();
 
 $profile_logo      = $attributes['profileLogo'] ?? '';
 $profile_name      = $attributes['profileName'] ?? 'cwcwakepark';
@@ -17,23 +23,47 @@ $profile_tagline   = $attributes['profileTagline'] ?? 'Best Wakepark on Earth';
 $profile_url       = $attributes['profileUrl'] ?? '';
 $profile_btn_label = $attributes['profileBtnLabel'] ?? 'Follow Us';
 
-$fallback_items_cards = [
-	[ 'title' => 'Water Sports',     'image' => '', 'buttonLabel' => 'EXPLORE', 'buttonUrl' => '/water-sports/' ],
-	[ 'title' => 'Land Activities',  'image' => '', 'buttonLabel' => 'EXPLORE', 'buttonUrl' => '/land-activities/' ],
-	[ 'title' => 'Elite Facilities', 'image' => '', 'buttonLabel' => 'EXPLORE', 'buttonUrl' => '/elite-facilities/' ],
-];
+$fallback_items_cards = array(
+	array(
+		'title'       => 'Water Sports',
+		'image'       => '',
+		'buttonLabel' => 'EXPLORE',
+		'buttonUrl'   => '/water-sports/',
+	),
+	array(
+		'title'       => 'Land Activities',
+		'image'       => '',
+		'buttonLabel' => 'EXPLORE',
+		'buttonUrl'   => '/land-activities/',
+	),
+	array(
+		'title'       => 'Elite Facilities',
+		'image'       => '',
+		'buttonLabel' => 'EXPLORE',
+		'buttonUrl'   => '/elite-facilities/',
+	),
+);
 
-$fallback_items_videos = [
-	[ 'videoUrl' => '', 'videoPoster' => '' ],
-	[ 'videoUrl' => '', 'videoPoster' => '' ],
-	[ 'videoUrl' => '', 'videoPoster' => '' ],
-];
+$fallback_items_videos = array(
+	array(
+		'videoUrl'    => '',
+		'videoPoster' => '',
+	),
+	array(
+		'videoUrl'    => '',
+		'videoPoster' => '',
+	),
+	array(
+		'videoUrl'    => '',
+		'videoPoster' => '',
+	),
+);
 
-$fallback_items_social = [
-	[ 'image' => '' ],
-	[ 'image' => '' ],
-	[ 'image' => '' ],
-];
+$fallback_items_social = array(
+	array( 'image' => '' ),
+	array( 'image' => '' ),
+	array( 'image' => '' ),
+);
 
 if ( empty( $items ) ) {
 	if ( 'videos' === $variant ) {
@@ -50,13 +80,15 @@ if ( ! empty( $bg_image ) ) {
 	$bg_style = sprintf( 'background-image:url(%s);', esc_url( $bg_image ) );
 }
 
-$wrapper_attrs = get_block_wrapper_attributes( [
-	'class' => 'cwc-showcase cwc-showcase--' . esc_attr( $variant ),
-	'style' => $bg_style,
-] );
+$wrapper_attrs = get_block_wrapper_attributes(
+	array(
+		'class' => 'cwc-showcase cwc-showcase--' . esc_attr( $variant ),
+		'style' => $bg_style,
+	)
+);
 ?>
 
-<section <?php echo $wrapper_attrs; ?>>
+<section <?php echo $wrapper_attrs; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
 	<div class="cwc-showcase__inner">
 
 		<?php if ( 'social' === $variant ) : ?>
@@ -123,11 +155,11 @@ $wrapper_attrs = get_block_wrapper_attributes( [
 
 					if ( strpos( $vid_url, 'vimeo.com' ) !== false ) {
 						if ( preg_match( '/vimeo\.com\/(\d+)/', $vid_url, $matches ) ) {
-							$embed_url = "https://player.vimeo.com/video/" . $matches[1] . "?badge=0&autopause=1";
+							$embed_url = 'https://player.vimeo.com/video/' . $matches[1] . '?badge=0&autopause=1';
 						}
 					} elseif ( strpos( $vid_url, 'youtube.com' ) !== false || strpos( $vid_url, 'youtu.be' ) !== false ) {
 						if ( preg_match( '/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/', $vid_url, $matches ) ) {
-							$embed_url = "https://www.youtube.com/embed/" . $matches[1];
+							$embed_url = 'https://www.youtube.com/embed/' . $matches[1];
 						}
 					}
 					?>
@@ -199,10 +231,10 @@ $wrapper_attrs = get_block_wrapper_attributes( [
 					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
 				</button>
 				<div class="cwc-showcase__dots">
-					<?php 
+					<?php
 					$dots_count = ceil( count( $items ) / 3 );
-					for ( $i = 0; $i < $dots_count; $i++ ) : 
-					?>
+					for ( $i = 0; $i < $dots_count; $i++ ) :
+						?>
 						<span class="cwc-showcase__dot<?php echo 0 === $i ? ' cwc-showcase__dot--active' : ''; ?>"></span>
 					<?php endfor; ?>
 				</div>

@@ -135,8 +135,11 @@ function cwc_blog_inject_breadcrumb( array $crumbs ): array {
 	 * keeps the math obvious and avoids a `usort()` rebuild that
 	 * would silently drop URL-less items.
 	 */
-	$last = array_pop( $crumbs );
-	$crumbs[] = [ 'label' => __( 'Blogs', 'child-cwcwake' ), 'url' => $blogs_url ];
+	$last     = array_pop( $crumbs );
+	$crumbs[] = array(
+		'label' => __( 'Blogs', 'child-cwcwake' ),
+		'url'   => $blogs_url,
+	);
 	$crumbs[] = $last;
 
 	return $crumbs;

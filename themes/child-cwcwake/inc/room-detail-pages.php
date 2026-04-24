@@ -28,81 +28,138 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @return array<string,array<string,mixed>> Keyed by page slug.
  */
-function cwc_room_detail_catalogue()
-{
+function cwc_room_detail_catalogue() {
 	$uploads = '/wp-content/uploads/2026/04/';
 
-	$standard_policies = [
-		[
+	$standard_policies = array(
+		array(
 			'icon'        => 'check-in',
 			'name'        => 'Check-in',
 			'description' => 'From 02:00 PM to 09:00 PM',
-		],
-		[
+		),
+		array(
 			'icon'        => 'check-out',
 			'name'        => 'Check-out',
 			'description' => 'Until 12:00 PM',
-		],
-		[
+		),
+		array(
 			'icon'        => 'breakfast',
 			'name'        => 'Breakfast',
 			'description' => 'Breakfast Available (may be included in selected rooms).',
-		],
-		[
+		),
+		array(
 			'icon'        => 'reception',
 			'name'        => 'Reception Hours',
 			'description' => 'Open until 09:00 PM',
-		],
-		[
+		),
+		array(
 			'icon'        => 'children',
 			'name'        => 'Children and beds',
 			'description' => 'Infants (0–3 yrs): free. Children (4–8 yrs): extra bed charge applies. Guests (9+): considered adults.',
-		],
-		[
+		),
+		array(
 			'icon'        => 'no-age',
 			'name'        => 'No age restriction',
 			'description' => 'Guests of all ages are welcome.',
-		],
-		[
+		),
+		array(
 			'icon'        => 'smoking',
 			'name'        => 'Smoking',
 			'description' => 'Smoking is not allowed.',
-		],
-	];
+		),
+	);
 
-	$amenities_full = [
-		[ 'icon' => 'wifi',       'label' => 'Free Wi-Fi' ],
-		[ 'icon' => 'parking',    'label' => 'Free Parking' ],
-		[ 'icon' => 'pool',       'label' => 'Pool Access' ],
-		[ 'icon' => 'air',        'label' => 'Air Conditioning' ],
-		[ 'icon' => 'garden',     'label' => 'Garden View' ],
-		[ 'icon' => 'bar',        'label' => 'Mini Bar' ],
-		[ 'icon' => 'coffee',     'label' => 'Coffee Maker' ],
-		[ 'icon' => 'smoke-free', 'label' => 'Non-Smoking' ],
-	];
+	$amenities_full = array(
+		array(
+			'icon'  => 'wifi',
+			'label' => 'Free Wi-Fi',
+		),
+		array(
+			'icon'  => 'parking',
+			'label' => 'Free Parking',
+		),
+		array(
+			'icon'  => 'pool',
+			'label' => 'Pool Access',
+		),
+		array(
+			'icon'  => 'air',
+			'label' => 'Air Conditioning',
+		),
+		array(
+			'icon'  => 'garden',
+			'label' => 'Garden View',
+		),
+		array(
+			'icon'  => 'bar',
+			'label' => 'Mini Bar',
+		),
+		array(
+			'icon'  => 'coffee',
+			'label' => 'Coffee Maker',
+		),
+		array(
+			'icon'  => 'smoke-free',
+			'label' => 'Non-Smoking',
+		),
+	);
 
-	$amenities_compact = [
-		[ 'icon' => 'wifi',       'label' => 'Free Wi-Fi' ],
-		[ 'icon' => 'parking',    'label' => 'Free Parking' ],
-		[ 'icon' => 'pool',       'label' => 'Pool Access' ],
-		[ 'icon' => 'air',        'label' => 'Air Conditioning' ],
-		[ 'icon' => 'coffee',     'label' => 'Coffee Maker' ],
-		[ 'icon' => 'smoke-free', 'label' => 'Non-Smoking' ],
-	];
+	$amenities_compact = array(
+		array(
+			'icon'  => 'wifi',
+			'label' => 'Free Wi-Fi',
+		),
+		array(
+			'icon'  => 'parking',
+			'label' => 'Free Parking',
+		),
+		array(
+			'icon'  => 'pool',
+			'label' => 'Pool Access',
+		),
+		array(
+			'icon'  => 'air',
+			'label' => 'Air Conditioning',
+		),
+		array(
+			'icon'  => 'coffee',
+			'label' => 'Coffee Maker',
+		),
+		array(
+			'icon'  => 'smoke-free',
+			'label' => 'Non-Smoking',
+		),
+	);
 
 	/*
 	 * The four sibling thumbnails reuse the existing accommodations
 	 * card images. Each room's "siblings" list is the other three.
 	 */
-	$siblings_pool = [
-		'villas'  => [ 'label' => 'VILLAS',  'image' => $uploads . 'VILLAS.webp',  'url' => '/accommodations/villas/' ],
-		'cabanas' => [ 'label' => 'CABANAS', 'image' => $uploads . 'CABANA.webp',  'url' => '/accommodations/cabanas/' ],
-		'dwell'   => [ 'label' => 'DWELL',   'image' => $uploads . 'DWELL.webp',   'url' => '/accommodations/dwell/' ],
-		'cabin'   => [ 'label' => 'CABIN',   'image' => $uploads . 'CABIN.webp',   'url' => '/accommodations/cabin/' ],
-	];
+	$siblings_pool = array(
+		'villas'  => array(
+			'label' => 'VILLAS',
+			'image' => $uploads . 'VILLAS.webp',
+			'url'   => '/accommodations/villas/',
+		),
+		'cabanas' => array(
+			'label' => 'CABANAS',
+			'image' => $uploads . 'CABANA.webp',
+			'url'   => '/accommodations/cabanas/',
+		),
+		'dwell'   => array(
+			'label' => 'DWELL',
+			'image' => $uploads . 'DWELL.webp',
+			'url'   => '/accommodations/dwell/',
+		),
+		'cabin'   => array(
+			'label' => 'CABIN',
+			'image' => $uploads . 'CABIN.webp',
+			'url'   => '/accommodations/cabin/',
+		),
+	);
 
 	$siblings_for = static function ( string $current ) use ( $siblings_pool ): array {
-		$out = [];
+		$out = array();
 		foreach ( $siblings_pool as $slug => $card ) {
 			if ( $slug === $current ) {
 				continue;
@@ -117,25 +174,49 @@ function cwc_room_detail_catalogue()
 	 * Other rooms reuse their accommodations thumbnail four times as a
 	 * placeholder; editors can swap them in the Media Library / page editor.
 	 */
-	$villa_gallery = [
-		[ 'url' => $uploads . 'image-1-villa-scaled.webp', 'alt' => 'Villa exterior view' ],
-		[ 'url' => $uploads . 'image-2-villa-scaled.webp', 'alt' => 'Villa living area' ],
-		[ 'url' => $uploads . 'image-3-villa-scaled.webp', 'alt' => 'Villa bedroom' ],
-		[ 'url' => $uploads . 'image-4-villa-scaled.webp', 'alt' => 'Villa bathroom' ],
-	];
+	$villa_gallery = array(
+		array(
+			'url' => $uploads . 'image-1-villa-scaled.webp',
+			'alt' => 'Villa exterior view',
+		),
+		array(
+			'url' => $uploads . 'image-2-villa-scaled.webp',
+			'alt' => 'Villa living area',
+		),
+		array(
+			'url' => $uploads . 'image-3-villa-scaled.webp',
+			'alt' => 'Villa bedroom',
+		),
+		array(
+			'url' => $uploads . 'image-4-villa-scaled.webp',
+			'alt' => 'Villa bathroom',
+		),
+	);
 
 	$placeholder_gallery = static function ( string $image, string $alt ) use ( $uploads ) {
 		$src = $uploads . $image;
-		return [
-			[ 'url' => $src, 'alt' => $alt ],
-			[ 'url' => $src, 'alt' => $alt ],
-			[ 'url' => $src, 'alt' => $alt ],
-			[ 'url' => $src, 'alt' => $alt ],
-		];
+		return array(
+			array(
+				'url' => $src,
+				'alt' => $alt,
+			),
+			array(
+				'url' => $src,
+				'alt' => $alt,
+			),
+			array(
+				'url' => $src,
+				'alt' => $alt,
+			),
+			array(
+				'url' => $src,
+				'alt' => $alt,
+			),
+		);
 	};
 
-	return [
-		'villas'  => [
+	return array(
+		'villas'  => array(
 			'title'           => 'VILLAS',
 			'description'     => 'A spacious private villa designed for relaxation, perfect for families or groups seeking comfort, privacy, and unforgettable views just steps from the cable park.',
 			'amenities'       => $amenities_full,
@@ -144,8 +225,8 @@ function cwc_room_detail_catalogue()
 			'gallery'         => $villa_gallery,
 			'siblings'        => $siblings_for( 'villas' ),
 			'policies'        => $standard_policies,
-		],
-		'cabanas' => [
+		),
+		'cabanas' => array(
 			'title'           => 'CABANAS',
 			'description'     => 'Open-air cabanas blending tropical comfort with the laid-back wakeboarding lifestyle — ideal for friends or small families staying close to the action.',
 			'amenities'       => $amenities_full,
@@ -154,8 +235,8 @@ function cwc_room_detail_catalogue()
 			'gallery'         => $placeholder_gallery( 'CABANA.webp', 'Cabana exterior' ),
 			'siblings'        => $siblings_for( 'cabanas' ),
 			'policies'        => $standard_policies,
-		],
-		'dwell'   => [
+		),
+		'dwell'   => array(
 			'title'           => 'DWELL',
 			'description'     => 'A cozy dwell-style room for couples or solo travelers — modern essentials, restful nights, and easy access to every CWC experience.',
 			'amenities'       => $amenities_compact,
@@ -164,8 +245,8 @@ function cwc_room_detail_catalogue()
 			'gallery'         => $placeholder_gallery( 'DWELL.webp', 'Dwell room interior' ),
 			'siblings'        => $siblings_for( 'dwell' ),
 			'policies'        => $standard_policies,
-		],
-		'cabin'   => [
+		),
+		'cabin'   => array(
 			'title'           => 'CABIN',
 			'description'     => 'A simple, comfortable cabin for budget-friendly stays — everything you need to recharge between sessions on the water.',
 			'amenities'       => $amenities_compact,
@@ -174,8 +255,8 @@ function cwc_room_detail_catalogue()
 			'gallery'         => $placeholder_gallery( 'CABIN.webp', 'Cabin interior' ),
 			'siblings'        => $siblings_for( 'cabin' ),
 			'policies'        => $standard_policies,
-		],
-	];
+		),
+	);
 }
 
 /**
@@ -190,8 +271,7 @@ function cwc_room_detail_catalogue()
  * @param string $slug Page slug (e.g. `villas`, `cabanas`, `dwell`, `cabin`).
  * @return string Serialized block markup, or empty string when slug is unknown.
  */
-function cwc_render_room_detail_blocks( string $slug ): string
-{
+function cwc_render_room_detail_blocks( string $slug ): string {
 	$catalogue = cwc_room_detail_catalogue();
 	if ( ! isset( $catalogue[ $slug ] ) ) {
 		return '';
@@ -207,19 +287,19 @@ function cwc_render_room_detail_blocks( string $slug ): string
 	$json_flags = JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE;
 
 	$gallery_attrs = wp_json_encode(
-		[
+		array(
 			'images'        => $room['gallery'],
 			'backLinkLabel' => 'Back to Accommodations',
 			'backLinkUrl'   => '/accommodations/',
 			'seeAllLabel'   => 'See All Images',
 			'seeAllUrl'     => '',
 			'align'         => 'full',
-		],
+		),
 		$json_flags
 	);
 
 	$info_attrs = wp_json_encode(
-		[
+		array(
 			'title'            => $room['title'],
 			'descriptionLabel' => 'Room Description',
 			'description'      => $room['description'],
@@ -233,26 +313,26 @@ function cwc_render_room_detail_blocks( string $slug ): string
 			'policiesIntro'    => 'Everything you need to know about your stay policies and house rules.',
 			'policies'         => $room['policies'],
 			'align'            => 'full',
-		],
+		),
 		$json_flags
 	);
 
 	$others_attrs = wp_json_encode(
-		[
+		array(
 			'heading' => 'Other Rooms',
 			'items'   => $room['siblings'],
 			'align'   => 'full',
-		],
+		),
 		$json_flags
 	);
 
 	return implode(
 		"\n\n",
-		[
+		array(
 			'<!-- wp:cwc/room-gallery ' . $gallery_attrs . ' /-->',
 			'<!-- wp:cwc/room-info ' . $info_attrs . ' /-->',
 			'<!-- wp:cwc/other-rooms ' . $others_attrs . ' /-->',
-		]
+		)
 	);
 }
 
@@ -273,15 +353,14 @@ function cwc_render_room_detail_blocks( string $slug ): string
  *
  * @since 1.0.0
  */
-function cwc_seed_room_detail_pages()
-{
+function cwc_seed_room_detail_pages() {
 	$catalogue = cwc_room_detail_catalogue();
 	$seeded    = (bool) get_option( 'cwc_room_detail_seeded', false );
 
 	foreach ( $catalogue as $slug => $_room ) {
 		$page = get_page_by_path( 'accommodations/' . $slug );
 
-		// Fallback check if it was moved to root
+		// Fallback check if it was moved to root.
 		if ( ! $page instanceof WP_Post ) {
 			$page = get_page_by_path( $slug );
 		}
@@ -302,10 +381,10 @@ function cwc_seed_room_detail_pages()
 		 */
 		if ( ! $seeded && '' === trim( (string) $page->post_content ) ) {
 			wp_update_post(
-				[
+				array(
 					'ID'           => (int) $page->ID,
 					'post_content' => cwc_render_room_detail_blocks( $slug ),
-				]
+				)
 			);
 		}
 	}
@@ -317,21 +396,20 @@ function cwc_seed_room_detail_pages()
 add_action( 'init', 'cwc_seed_room_detail_pages', 30 );
 
 	/**
- * Targeted label migrations for already-seeded room pages.
- *
- * The seeder above only writes content into pages that are empty, so any
- * label change made later in the catalogue does not propagate to live
- * pages. This runs a list of safe `str_replace` patches (old → new) on
- * the four known room pages, then bumps a version option so each patch
- * runs exactly once.
- *
- * To add another label rename in the future, append a new entry to
- * `$patches` and bump `CWC_ROOM_DETAIL_LABEL_VERSION`.
- *
- * @since 1.0.0
- */
-function cwc_migrate_room_detail_labels()
-{
+	 * Targeted label migrations for already-seeded room pages.
+	 *
+	 * The seeder above only writes content into pages that are empty, so any
+	 * label change made later in the catalogue does not propagate to live
+	 * pages. This runs a list of safe `str_replace` patches (old → new) on
+	 * the four known room pages, then bumps a version option so each patch
+	 * runs exactly once.
+	 *
+	 * To add another label rename in the future, append a new entry to
+	 * `$patches` and bump `CWC_ROOM_DETAIL_LABEL_VERSION`.
+	 *
+	 * @since 1.0.0
+	 */
+function cwc_migrate_room_detail_labels() {
 	$current_version = 2;
 	$stored_version  = (int) get_option( 'cwc_room_detail_label_version', 0 );
 
@@ -344,10 +422,10 @@ function cwc_migrate_room_detail_labels()
 	 * Patterns include the JSON key so we never touch unrelated copy
 	 * (e.g. body text that happens to mention "Back to Rooms").
 	 */
-	$patches = [
+	$patches = array(
 		'"backLinkLabel":"Back to Rooms"'         => '"backLinkLabel":"Back to Accommodations"',
 		'"backLinkLabel":"Back to Accomodations"' => '"backLinkLabel":"Back to Accommodations"',
-	];
+	);
 
 	$slugs = array_keys( cwc_room_detail_catalogue() );
 
@@ -366,10 +444,10 @@ function cwc_migrate_room_detail_labels()
 		}
 
 		wp_update_post(
-			[
+			array(
 				'ID'           => (int) $page->ID,
 				'post_content' => $updated,
-			]
+			)
 		);
 	}
 

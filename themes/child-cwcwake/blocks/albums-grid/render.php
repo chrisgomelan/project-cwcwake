@@ -137,7 +137,7 @@ if ( ! function_exists( 'cwc_album_cover_url' ) ) {
  * they don't appear twice. Order strategies map directly onto
  * `WP_Query` ordering primitives.
  */
-$more_ids = [];
+$more_ids = array();
 if ( $show_more_section && $more_limit > 0 ) {
 	switch ( $more_order_by ) {
 		case 'random':
@@ -147,7 +147,7 @@ if ( $show_more_section && $more_limit > 0 ) {
 			break;
 
 		case 'menu_order':
-			$pool = ! empty( $albums ) ? $albums : cwc_album_get_children( 0 );
+			$pool     = ! empty( $albums ) ? $albums : cwc_album_get_children( 0 );
 			$more_ids = array_slice( wp_list_pluck( $pool, 'ID' ), 0, $more_limit );
 			break;
 
@@ -165,8 +165,8 @@ if ( $show_more_section && $more_limit > 0 ) {
 	}
 }
 
-$more_ids       = array_map( 'intval', $more_ids );
-$standard_pool  = array_values(
+$more_ids      = array_map( 'intval', $more_ids );
+$standard_pool = array_values(
 	array_filter(
 		$albums,
 		static function ( $album ) use ( $more_ids ) {
@@ -178,7 +178,7 @@ if ( $standard_limit > 0 ) {
 	$standard_pool = array_slice( $standard_pool, 0, $standard_limit );
 }
 
-$more_pool = [];
+$more_pool = array();
 if ( ! empty( $more_ids ) ) {
 	$current_root_id = 0;
 	if ( is_singular( 'cwc_album' ) ) {
@@ -191,7 +191,7 @@ if ( ! empty( $more_ids ) ) {
 	}
 
 	$all_possible = ! empty( $albums ) ? $albums : cwc_album_get_children( 0 );
-	$more_pool = array_values(
+	$more_pool    = array_values(
 		array_filter(
 			$all_possible,
 			static function ( $album ) use ( $more_ids, $current_root_id ) {
@@ -210,27 +210,28 @@ if ( ! empty( $more_ids ) ) {
 	);
 }
 
-$wrapper_attrs = get_block_wrapper_attributes( [ 'class' => 'cwc-albums' ] );
+$wrapper_attrs = get_block_wrapper_attributes( array( 'class' => 'cwc-albums' ) );
 ?>
 <section <?php echo $wrapper_attrs; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
 
 	<?php if ( $show_standard_grid && ! empty( $standard_pool ) ) : ?>
 		<ul class="cwc-albums__grid">
-			<?php foreach ( $standard_pool as $album ) :
-				$is_single = ( 1 === count( $standard_pool ) );
-				$cover     = cwc_album_cover_url( $album, $is_single ? 'full' : 'large' );
-				$label     = cwc_album_card_count_label( $album, $count_mode );
-				$href  = get_permalink( $album );
-				$title = get_the_title( $album );
-			?>
+			<?php
+			foreach ( $standard_pool as $album ) :
+				$is_single   = ( 1 === count( $standard_pool ) );
+				$cover       = cwc_album_cover_url( $album, $is_single ? 'full' : 'large' );
+				$label       = cwc_album_card_count_label( $album, $count_mode );
+				$href        = get_permalink( $album );
+				$album_title = get_the_title( $album );
+				?>
 				<li class="cwc-albums__item">
-					<a class="cwc-albums__card" href="<?php echo esc_url( $href ); ?>" aria-label="<?php echo esc_attr( $title . ' — ' . $label ); ?>">
+					<a class="cwc-albums__card" href="<?php echo esc_url( $href ); ?>" aria-label="<?php echo esc_attr( $album_title . ' — ' . $label ); ?>">
 						<div class="cwc-albums__media">
 							<?php if ( '' !== $cover ) : ?>
 								<img
 									class="cwc-albums__img"
 									src="<?php echo esc_url( $cover ); ?>"
-									alt="<?php echo esc_attr( $title ); ?>"
+									alt="<?php echo esc_attr( $album_title ); ?>"
 									loading="lazy"
 									decoding="async"
 								/>
@@ -245,7 +246,7 @@ $wrapper_attrs = get_block_wrapper_attributes( [ 'class' => 'cwc-albums' ] );
 						</div>
 
 						<div class="cwc-albums__meta">
-							<h3 class="cwc-albums__title"><?php echo esc_html( $title ); ?></h3>
+							<h3 class="cwc-albums__title"><?php echo esc_html( $album_title ); ?></h3>
 							<span class="cwc-albums__count"><?php echo esc_html( $label ); ?></span>
 						</div>
 					</a>
@@ -261,19 +262,20 @@ $wrapper_attrs = get_block_wrapper_attributes( [ 'class' => 'cwc-albums' ] );
 			<?php endif; ?>
 
 			<ul class="cwc-albums__featured-list">
-				<?php foreach ( $more_pool as $album ) :
-					$cover = cwc_album_cover_url( $album, 'full' );
-					$label = cwc_album_card_count_label( $album, $count_mode );
-					$href  = get_permalink( $album );
-					$title = get_the_title( $album );
-				?>
+				<?php
+				foreach ( $more_pool as $album ) :
+					$cover       = cwc_album_cover_url( $album, 'full' );
+					$label       = cwc_album_card_count_label( $album, $count_mode );
+					$href        = get_permalink( $album );
+					$album_title = get_the_title( $album );
+					?>
 					<li class="cwc-albums__featured-item">
-						<a class="cwc-albums__featured-card" href="<?php echo esc_url( $href ); ?>" aria-label="<?php echo esc_attr( $title . ' — ' . $label ); ?>">
+						<a class="cwc-albums__featured-card" href="<?php echo esc_url( $href ); ?>" aria-label="<?php echo esc_attr( $album_title . ' — ' . $label ); ?>">
 							<?php if ( '' !== $cover ) : ?>
 								<img
 									class="cwc-albums__featured-img"
 									src="<?php echo esc_url( $cover ); ?>"
-									alt="<?php echo esc_attr( $title ); ?>"
+									alt="<?php echo esc_attr( $album_title ); ?>"
 									loading="lazy"
 									decoding="async"
 								/>
@@ -287,7 +289,7 @@ $wrapper_attrs = get_block_wrapper_attributes( [ 'class' => 'cwc-albums' ] );
 							<span class="cwc-albums__corner cwc-albums__corner--br cwc-albums__corner--light" aria-hidden="true"></span>
 
 							<div class="cwc-albums__featured-content">
-								<h3 class="cwc-albums__featured-title"><?php echo esc_html( $title ); ?></h3>
+								<h3 class="cwc-albums__featured-title"><?php echo esc_html( $album_title ); ?></h3>
 								<span class="cwc-albums__featured-count"><?php echo esc_html( $label ); ?></span>
 							</div>
 						</a>

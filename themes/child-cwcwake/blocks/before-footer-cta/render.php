@@ -8,23 +8,25 @@
  * @package CWC_Wake
  */
 
-if ( ! defined( 'ABSPATH' ) ) exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
-$title          = $attributes['title'] ?? 'START YOUR OWN';
-$title_accent   = $attributes['titleAccent'] ?? 'STORY';
-$accent_first   = $attributes['accentFirst'] ?? false;
-$description    = $attributes['description'] ?? "Whether you're a first-timer or a pro, the water is waiting. Plan your visit to the world's premier cable park today.";
-$button_label   = $attributes['buttonLabel'] ?? 'BOOK NOW';
-$button_url     = $attributes['buttonUrl'] ?? '#book';
-$sec_btn_label  = $attributes['secondaryBtnLabel'] ?? '';
-$sec_btn_url    = $attributes['secondaryBtnUrl'] ?? '';
-$bg_image       = $attributes['backgroundImage'] ?? '';
-$overlay_grad   = $attributes['overlayGradient'] ?? '';
+$cta_title     = $attributes['title'] ?? 'START YOUR OWN';
+$title_accent  = $attributes['titleAccent'] ?? 'STORY';
+$accent_first  = $attributes['accentFirst'] ?? false;
+$description   = $attributes['description'] ?? "Whether you're a first-timer or a pro, the water is waiting. Plan your visit to the world's premier cable park today.";
+$button_label  = $attributes['buttonLabel'] ?? 'BOOK NOW';
+$button_url    = $attributes['buttonUrl'] ?? '#book';
+$sec_btn_label = $attributes['secondaryBtnLabel'] ?? '';
+$sec_btn_url   = $attributes['secondaryBtnUrl'] ?? '';
+$bg_image      = $attributes['backgroundImage'] ?? '';
+$overlay_grad  = $attributes['overlayGradient'] ?? '';
 
 /* Inline styles for custom background + overlay. */
-$inline_bg    = '';
-$inline_over  = '';
-$extra_class  = '';
+$inline_bg   = '';
+$inline_over = '';
+$extra_class = '';
 
 if ( ! empty( $bg_image ) ) {
 	$inline_bg   = sprintf( 'background-image:url(%s);', esc_url( $bg_image ) );
@@ -35,27 +37,35 @@ if ( ! empty( $overlay_grad ) ) {
 	$inline_over = sprintf( 'background:%s;', esc_attr( $overlay_grad ) );
 }
 
-$wrapper = get_block_wrapper_attributes( [
-	'class' => 'cwc-cta-footer' . $extra_class,
-	'style' => $inline_bg,
-] );
+$wrapper = get_block_wrapper_attributes(
+	array(
+		'class' => 'cwc-cta-footer' . $extra_class,
+		'style' => $inline_bg,
+	)
+);
 ?>
 
-<section <?php echo $wrapper; ?>>
-	<div class="cwc-cta-footer__overlay" aria-hidden="true"<?php if ( $inline_over ) echo ' style="' . $inline_over . '"'; ?>></div>
+<section <?php echo $wrapper; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
+	<div class="cwc-cta-footer__overlay" aria-hidden="true"
+	<?php
+	if ( $inline_over ) {
+		echo ' style="' . esc_attr( $inline_over ) . '"'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+	}
+	?>
+	></div>
 	<div class="cwc-cta-footer__content">
-		<?php if ( $title || $title_accent ) : ?>
+		<?php if ( $cta_title || $title_accent ) : ?>
 			<h2 class="cwc-cta-footer__title">
 				<?php if ( $accent_first && $title_accent ) : ?>
 					<em class="cwc-cta-footer__title-accent"><?php echo esc_html( $title_accent ); ?></em> 
 				<?php endif; ?>
 
-				<?php if ( $title ) : ?>
-					<span class="cwc-cta-footer__title-main"><?php echo esc_html( $title ); ?></span>
+				<?php if ( $cta_title ) : ?>
+					<span class="cwc-cta-footer__title-main"><?php echo esc_html( $cta_title ); ?></span>
 				<?php endif; ?>
 
 				<?php if ( ! $accent_first && $title_accent ) : ?>
-					 <em class="cwc-cta-footer__title-accent"><?php echo esc_html( $title_accent ); ?></em>
+					<em class="cwc-cta-footer__title-accent"><?php echo esc_html( $title_accent ); ?></em>
 				<?php endif; ?>
 			</h2>
 		<?php endif; ?>

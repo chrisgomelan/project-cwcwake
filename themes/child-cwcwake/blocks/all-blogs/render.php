@@ -27,7 +27,7 @@
  * @var array $attributes Block attributes.
  */
 
-if (!defined('ABSPATH')) {
+if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
@@ -38,7 +38,7 @@ if (!defined('ABSPATH')) {
  * normal top-of-file function hoisting, which is why these cannot
  * live at the bottom of the file.
  */
-if (!function_exists('cwc_all_blogs_build_query')):
+if ( ! function_exists( 'cwc_all_blogs_build_query' ) ) :
 	/**
 	 * Build the WP_Query for the All Blogs grid.
 	 *
@@ -53,28 +53,27 @@ if (!function_exists('cwc_all_blogs_build_query')):
 	 * @param string $category     Optional category slug to filter by. Empty = no filter.
 	 * @return WP_Query Built query (already executed).
 	 */
-	function cwc_all_blogs_build_query(int $per_page, int $current_page, string $category = ''): WP_Query
-	{
-		$args = [
-			'post_type' => 'post',
-			'post_status' => 'publish',
-			'posts_per_page' => $per_page,
-			'paged' => $current_page,
-			'orderby' => 'date',
-			'order' => 'DESC',
-			'ignore_sticky_posts' => true,
+	function cwc_all_blogs_build_query( int $per_page, int $current_page, string $category = '' ): WP_Query {
+		$args = array(
+			'post_type'              => 'post',
+			'post_status'            => 'publish',
+			'posts_per_page'         => $per_page,
+			'paged'                  => $current_page,
+			'orderby'                => 'date',
+			'order'                  => 'DESC',
+			'ignore_sticky_posts'    => true,
 			'update_post_term_cache' => false,
-		];
+		);
 
-		if ('' !== $category) {
+		if ( '' !== $category ) {
 			$args['category_name'] = $category;
 		}
 
-		return new WP_Query($args);
+		return new WP_Query( $args );
 	}
 endif;
 
-if (!function_exists('cwc_render_blog_pagination')):
+if ( ! function_exists( 'cwc_render_blog_pagination' ) ) :
 	/**
 	 * Render numeric pagination controls for the All Blogs grid.
 	 *
@@ -91,20 +90,19 @@ if (!function_exists('cwc_render_blog_pagination')):
 	 * @param string $category     Active category slug, preserved across page links.
 	 * @return string Pagination markup (empty string when only one page).
 	 */
-	function cwc_render_blog_pagination(int $total_pages, int $current_page, string $category = ''): string
-	{
-		if ($total_pages <= 1) {
+	function cwc_render_blog_pagination( int $total_pages, int $current_page, string $category = '' ): string {
+		if ( $total_pages <= 1 ) {
 			return '';
 		}
 
-		$base_url = remove_query_arg(['blog_page', 'blog_cat']);
+		$base_url = remove_query_arg( array( 'blog_page', 'blog_cat' ) );
 
-		$build_url = static function (int $page) use ($base_url, $category): string {
-			$args = ['blog_page' => $page];
-			if ('' !== $category) {
+		$build_url = static function ( int $page ) use ( $base_url, $category ): string {
+			$args = array( 'blog_page' => $page );
+			if ( '' !== $category ) {
 				$args['blog_cat'] = $category;
 			}
-			return add_query_arg($args, $base_url);
+			return add_query_arg( $args, $base_url );
 		};
 
 		/*
@@ -112,48 +110,48 @@ if (!function_exists('cwc_render_blog_pagination')):
 		 * control stays compact on long archives. We always show
 		 * first + last, with `…` separators when there's a gap.
 		 */
-		$window = 1;
-		$pages = [];
+		$window  = 1;
+		$pages   = array();
 		$pages[] = 1;
-		for ($i = max(2, $current_page - $window); $i <= min($total_pages - 1, $current_page + $window); $i++) {
+		for ( $i = max( 2, $current_page - $window ); $i <= min( $total_pages - 1, $current_page + $window ); $i++ ) {
 			$pages[] = $i;
 		}
-		if ($total_pages > 1) {
+		if ( $total_pages > 1 ) {
 			$pages[] = $total_pages;
 		}
-		$pages = array_values(array_unique($pages));
+		$pages = array_values( array_unique( $pages ) );
 
 		ob_start();
 		?>
-		<nav class="cwc-all-blogs__pagination" aria-label="<?php esc_attr_e('Blog pagination', 'child-cwcwake'); ?>">
-			<?php if ($current_page > 1): ?>
+		<nav class="cwc-all-blogs__pagination" aria-label="<?php esc_attr_e( 'Blog pagination', 'child-cwcwake' ); ?>">
+			<?php if ( $current_page > 1 ) : ?>
 				<a class="cwc-all-blogs__page cwc-all-blogs__page--prev"
-					href="<?php echo esc_url($build_url($current_page - 1)); ?>"
-					aria-label="<?php esc_attr_e('Previous page', 'child-cwcwake'); ?>">‹</a>
-			<?php else: ?>
+					href="<?php echo esc_url( $build_url( $current_page - 1 ) ); ?>"
+					aria-label="<?php esc_attr_e( 'Previous page', 'child-cwcwake' ); ?>">‹</a>
+			<?php else : ?>
 				<span class="cwc-all-blogs__page cwc-all-blogs__page--prev cwc-all-blogs__page--disabled"
 					aria-hidden="true">‹</span>
 			<?php endif; ?>
 
 			<?php
 			$prev_page = 0;
-			foreach ($pages as $page):
-				if ($prev_page > 0 && ($page - $prev_page) > 1):
+			foreach ( $pages as $page ) :
+				if ( $prev_page > 0 && ( $page - $prev_page ) > 1 ) :
 					?>
 					<span class="cwc-all-blogs__page cwc-all-blogs__page--ellipsis" aria-hidden="true">…</span>
 					<?php
 				endif;
 
-				if ($page === $current_page):
+				if ( $page === $current_page ) :
 					?>
 					<span class="cwc-all-blogs__page cwc-all-blogs__page--current" aria-current="page">
-						<?php echo esc_html((string) $page); ?>
+						<?php echo esc_html( (string) $page ); ?>
 					</span>
 					<?php
-				else:
+				else :
 					?>
-					<a class="cwc-all-blogs__page" href="<?php echo esc_url($build_url($page)); ?>">
-						<?php echo esc_html((string) $page); ?>
+					<a class="cwc-all-blogs__page" href="<?php echo esc_url( $build_url( $page ) ); ?>">
+						<?php echo esc_html( (string) $page ); ?>
 					</a>
 					<?php
 				endif;
@@ -162,11 +160,11 @@ if (!function_exists('cwc_render_blog_pagination')):
 			endforeach;
 			?>
 
-			<?php if ($current_page < $total_pages): ?>
+			<?php if ( $current_page < $total_pages ) : ?>
 				<a class="cwc-all-blogs__page cwc-all-blogs__page--next"
-					href="<?php echo esc_url($build_url($current_page + 1)); ?>"
-					aria-label="<?php esc_attr_e('Next page', 'child-cwcwake'); ?>">›</a>
-			<?php else: ?>
+					href="<?php echo esc_url( $build_url( $current_page + 1 ) ); ?>"
+					aria-label="<?php esc_attr_e( 'Next page', 'child-cwcwake' ); ?>">›</a>
+			<?php else : ?>
 				<span class="cwc-all-blogs__page cwc-all-blogs__page--next cwc-all-blogs__page--disabled"
 					aria-hidden="true">›</span>
 			<?php endif; ?>
@@ -176,44 +174,44 @@ if (!function_exists('cwc_render_blog_pagination')):
 	}
 endif;
 
-$heading = isset($attributes['heading']) ? (string) $attributes['heading'] : '';
-$heading_highlight = isset($attributes['headingHighlight']) ? (string) $attributes['headingHighlight'] : '';
-$description = isset($attributes['description']) ? (string) $attributes['description'] : '';
-$current_per_page = 6;
+$heading           = isset( $attributes['heading'] ) ? (string) $attributes['heading'] : '';
+$heading_highlight = isset( $attributes['headingHighlight'] ) ? (string) $attributes['headingHighlight'] : '';
+$description       = isset( $attributes['description'] ) ? (string) $attributes['description'] : '';
+$current_per_page  = 6;
 
-// Detect device for responsive pagination counts
-$per_page = wp_is_mobile() ? 3 : 6;
+// Detect device for responsive pagination counts.
+$posts_per_page = wp_is_mobile() ? 3 : 6;
 
-$read_more_label = isset($attributes['readMoreLabel']) ? (string) $attributes['readMoreLabel'] : __('Read More', 'child-cwcwake');
-$placeholder = isset($attributes['placeholderImage']) ? (string) $attributes['placeholderImage'] : '';
+$read_more_label = isset( $attributes['readMoreLabel'] ) ? (string) $attributes['readMoreLabel'] : __( 'Read More', 'child-cwcwake' );
+$placeholder     = isset( $attributes['placeholderImage'] ) ? (string) $attributes['placeholderImage'] : '';
 
-$current_page = isset($_GET['blog_page']) ? max(1, absint(wp_unslash($_GET['blog_page']))) : 1; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-$active_cat = isset($_GET['blog_cat']) ? sanitize_title(wp_unslash($_GET['blog_cat'])) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+$current_page = isset( $_GET['blog_page'] ) ? max( 1, absint( wp_unslash( $_GET['blog_page'] ) ) ) : 1; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+$active_cat   = isset( $_GET['blog_cat'] ) ? sanitize_title( wp_unslash( $_GET['blog_cat'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
-$query = cwc_all_blogs_build_query($per_page, $current_page, $active_cat);
-$posts = $query->posts;
+$query      = cwc_all_blogs_build_query( $posts_per_page, $current_page, $active_cat );
+$blog_posts = $query->posts;
 
-$wrapper_attrs = get_block_wrapper_attributes(['class' => 'cwc-all-blogs']);
+$wrapper_attrs = get_block_wrapper_attributes( array( 'class' => 'cwc-all-blogs' ) );
 
-$base_url = remove_query_arg(['blog_page', 'blog_cat']);
-$categories = get_categories(['hide_empty' => true]);
+$base_url   = remove_query_arg( array( 'blog_page', 'blog_cat' ) );
+$categories = get_categories( array( 'hide_empty' => true ) );
 ?>
 <section <?php echo $wrapper_attrs; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
 	<header class="cwc-all-blogs__header">
 		<div class="cwc-all-blogs__intro">
-			<?php if ('' !== $heading || '' !== $heading_highlight): ?>
+			<?php if ( '' !== $heading || '' !== $heading_highlight ) : ?>
 				<h2 class="cwc-all-blogs__title">
-					<?php if ('' !== $heading): ?>
-						<span class="cwc-all-blogs__title-text"><?php echo esc_html($heading); ?></span>
+					<?php if ( '' !== $heading ) : ?>
+						<span class="cwc-all-blogs__title-text"><?php echo esc_html( $heading ); ?></span>
 					<?php endif; ?>
-					<?php if ('' !== $heading_highlight): ?>
-						<em class="cwc-all-blogs__title-highlight"><?php echo esc_html($heading_highlight); ?></em>
+					<?php if ( '' !== $heading_highlight ) : ?>
+						<em class="cwc-all-blogs__title-highlight"><?php echo esc_html( $heading_highlight ); ?></em>
 					<?php endif; ?>
 				</h2>
 			<?php endif; ?>
 
-			<?php if ('' !== $description): ?>
-				<p class="cwc-all-blogs__description"><?php echo esc_html($description); ?></p>
+			<?php if ( '' !== $description ) : ?>
+				<p class="cwc-all-blogs__description"><?php echo esc_html( $description ); ?></p>
 			<?php endif; ?>
 		</div>
 
@@ -230,10 +228,10 @@ $categories = get_categories(['hide_empty' => true]);
 					<?php esc_html_e( 'All Blogs', 'child-cwcwake' ); ?>
 					<span class="cwc-all-blogs__filter-dot"></span>
 				</button>
-				<?php foreach ( $categories as $cat ) : ?>
-					<button type="button" class="cwc-all-blogs__filter-option <?php echo $active_cat === $cat->slug ? 'is-active' : ''; ?>" 
-						data-value="<?php echo esc_attr( $cat->slug ); ?>">
-						<?php echo esc_html( $cat->name ); ?>
+				<?php foreach ( $categories as $category ) : ?>
+					<button type="button" class="cwc-all-blogs__filter-option <?php echo $active_cat === $category->slug ? 'is-active' : ''; ?>" 
+						data-value="<?php echo esc_attr( $category->slug ); ?>">
+						<?php echo esc_html( $category->name ); ?>
 						<span class="cwc-all-blogs__filter-dot"></span>
 					</button>
 				<?php endforeach; ?>
@@ -241,56 +239,56 @@ $categories = get_categories(['hide_empty' => true]);
 
 			<select name="blog_cat" class="cwc-all-blogs__filter-native js-filter-native" style="display:none;">
 				<option value="" <?php selected( '', $active_cat ); ?>><?php esc_html_e( 'All Blogs', 'child-cwcwake' ); ?></option>
-				<?php foreach ( $categories as $cat ) : ?>
-					<option value="<?php echo esc_attr( $cat->slug ); ?>" <?php selected( $cat->slug, $active_cat ); ?>>
-						<?php echo esc_html( $cat->name ); ?>
+				<?php foreach ( $categories as $category ) : ?>
+					<option value="<?php echo esc_attr( $category->slug ); ?>" <?php selected( $category->slug, $active_cat ); ?>>
+						<?php echo esc_html( $category->name ); ?>
 					</option>
 				<?php endforeach; ?>
 			</select>
 		</div>
 			<div class="cwc-all-blogs__content js-all-blogs-target">
-				<?php if (empty($posts)): ?>
+				<?php if ( empty( $blog_posts ) ) : ?>
 					<p class="cwc-all-blogs__empty">
-						<?php esc_html_e('No blog posts found for this filter.', 'child-cwcwake'); ?></p>
-				<?php else: ?>
+						<?php esc_html_e( 'No blog posts found for this filter.', 'child-cwcwake' ); ?></p>
+				<?php else : ?>
 					<div class="cwc-all-blogs__grid">
 						<?php
-						foreach ($posts as $post_obj):
-							$post_id = (int) $post_obj->ID;
-							$image = cwc_blog_card_image_url($post_id, $placeholder);
-							$title = get_the_title($post_id);
-							$excerpt = cwc_blog_card_excerpt($post_obj, 24);
-							$date = get_the_date('M j, Y', $post_id);
-							$url = (string) get_permalink($post_id);
+						foreach ( $blog_posts as $post_obj ) :
+							$current_post_id = (int) $post_obj->ID;
+							$image           = cwc_blog_card_image_url( $current_post_id, $placeholder );
+							$post_title      = get_the_title( $current_post_id );
+							$excerpt         = cwc_blog_card_excerpt( $post_obj, 24 );
+							$date            = get_the_date( 'M j, Y', $current_post_id );
+							$url             = (string) get_permalink( $current_post_id );
 							?>
 							<article class="cwc-all-blogs__card">
-								<a class="cwc-all-blogs__card-image-link" href="<?php echo esc_url($url); ?>"
-									aria-label="<?php echo esc_attr($title); ?>">
-									<?php if ('' !== $image): ?>
+								<a class="cwc-all-blogs__card-image-link" href="<?php echo esc_url( $url ); ?>"
+									aria-label="<?php echo esc_attr( $post_title ); ?>">
+									<?php if ( '' !== $image ) : ?>
 										<span class="cwc-all-blogs__card-image" role="img"
-											aria-label="<?php echo esc_attr($title); ?>"
-											style="background-image:url('<?php echo esc_url($image); ?>');"></span>
+											aria-label="<?php echo esc_attr( $post_title ); ?>"
+											style="background-image:url('<?php echo esc_url( $image ); ?>');"></span>
 									<?php endif; ?>
 								</a>
 
 								<div class="cwc-all-blogs__card-body">
 									<h3 class="cwc-all-blogs__card-title">
-										<a href="<?php echo esc_url($url); ?>"><?php echo esc_html($title); ?></a>
+										<a href="<?php echo esc_url( $url ); ?>"><?php echo esc_html( $post_title ); ?></a>
 									</h3>
 
-									<?php if ('' !== $excerpt): ?>
-										<p class="cwc-all-blogs__card-excerpt"><?php echo esc_html($excerpt); ?></p>
+									<?php if ( '' !== $excerpt ) : ?>
+										<p class="cwc-all-blogs__card-excerpt"><?php echo esc_html( $excerpt ); ?></p>
 									<?php endif; ?>
 
-									<?php if ('' !== $date): ?>
+									<?php if ( '' !== $date ) : ?>
 										<time class="cwc-all-blogs__card-date"
-											datetime="<?php echo esc_attr(get_the_date(DATE_W3C, $post_id)); ?>">
-											<?php echo esc_html($date); ?>
+											datetime="<?php echo esc_attr( get_the_date( DATE_W3C, $current_post_id ) ); ?>">
+											<?php echo esc_html( $date ); ?>
 										</time>
 									<?php endif; ?>
 
-									<a class="cwc-all-blogs__card-cta" href="<?php echo esc_url($url); ?>">
-										<?php echo esc_html($read_more_label); ?>
+									<a class="cwc-all-blogs__card-cta" href="<?php echo esc_url( $url ); ?>">
+										<?php echo esc_html( $read_more_label ); ?>
 									</a>
 								</div>
 							</article>

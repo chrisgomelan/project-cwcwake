@@ -316,9 +316,9 @@
 }
 
 /* ----------------------------------------
-   Tablet & laptop — collapse 4-col link grid to 2 columns
-   and centre the layout when columns wrap onto new rows.
-   ---------------------------------------- */
+	Tablet & laptop — collapse 4-col link grid to 2 columns
+	and centre the layout when columns wrap onto new rows.
+	---------------------------------------- */
 
 @media (max-width: 1200px) {
 	.cwc-site-footer__main {
@@ -372,8 +372,8 @@
 }
 
 /* ----------------------------------------
-   Phones — single-column links, stacked subscribe form
-   ---------------------------------------- */
+	Phones — single-column links, stacked subscribe form
+	---------------------------------------- */
 
 @media (max-width: 768px) {
 	.cwc-site-footer__links-grid {

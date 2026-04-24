@@ -40,10 +40,10 @@ if ( '' === $side_image_url ) {
 	$side_image_url = get_stylesheet_directory_uri() . '/assets/images/get-in-touch-image.webp';
 }
 
-$assets_uri  = get_stylesheet_directory_uri() . '/assets/images/';
-$phone_icon  = $assets_uri . 'get-in-touch-phone-icon.svg';
-$email_icon  = $assets_uri . 'email-icon.svg';
-$maps_icon   = $assets_uri . 'maps.svg';
+$assets_uri = get_stylesheet_directory_uri() . '/assets/images/';
+$phone_icon = $assets_uri . 'get-in-touch-phone-icon.svg';
+$email_icon = $assets_uri . 'email-icon.svg';
+$maps_icon  = $assets_uri . 'maps.svg';
 
 /*
  * Strip any framing markup (e.g. a full `<iframe ...></iframe>` pasted
@@ -58,7 +58,7 @@ if ( '' !== $map_src && false !== stripos( $map_src, '<iframe' ) ) {
 	}
 }
 
-$wrapper_attrs = get_block_wrapper_attributes( [ 'class' => 'cwc-contact-info' ] );
+$wrapper_attrs = get_block_wrapper_attributes( array( 'class' => 'cwc-contact-info' ) );
 ?>
 <section <?php echo $wrapper_attrs; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
 	<div class="cwc-contact-info__panel">

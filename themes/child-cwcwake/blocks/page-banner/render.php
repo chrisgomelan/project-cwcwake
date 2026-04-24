@@ -16,17 +16,17 @@
  * @var array $attributes Block attributes passed in by WordPress.
  */
 
-if (!defined('ABSPATH')) {
+if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-$bg_image = $attributes['backgroundImage'] ?? '';
-$overlay_opacity = $attributes['overlayOpacity'] ?? 40;
-$title = $attributes['title'] ?? '';
-$subtitle = $attributes['subtitle'] ?? '';
-$size = $attributes['size'] ?? 'default';
-$show_corners = !empty($attributes['showCorners']);
-$use_featured_image = !empty($attributes['useFeaturedImage']);
+$bg_image           = $attributes['backgroundImage'] ?? '';
+$overlay_opacity    = $attributes['overlayOpacity'] ?? 40;
+$banner_title       = $attributes['title'] ?? '';
+$subtitle           = $attributes['subtitle'] ?? '';
+$size               = $attributes['size'] ?? 'default';
+$show_corners       = ! empty( $attributes['showCorners'] );
+$use_featured_image = ! empty( $attributes['useFeaturedImage'] );
 
 /*
  * Resolve the background image. Priority:
@@ -36,11 +36,11 @@ $use_featured_image = !empty($attributes['useFeaturedImage']);
  *   2. Explicit `backgroundImage` attribute (template author's fallback).
  *   3. The bundled fallback image inside the theme.
  */
-if ($use_featured_image && has_post_thumbnail()) {
-	$bg_image = get_the_post_thumbnail_url(null, 'full');
+if ( $use_featured_image && has_post_thumbnail() ) {
+	$bg_image = get_the_post_thumbnail_url( null, 'full' );
 }
 
-if (empty($bg_image)) {
+if ( empty( $bg_image ) ) {
 	$bg_image = get_stylesheet_directory_uri() . '/assets/images/hero-fallback.jpg';
 }
 
@@ -49,35 +49,35 @@ if (empty($bg_image)) {
  * fall back to the current post's title so a shared template can
  * serve many pages without each one duplicating the block attributes.
  */
-if ('' === $title && is_singular()) {
-	$title = get_the_title();
+if ( '' === $banner_title && is_singular() ) {
+	$banner_title = get_the_title();
 }
 
-if ('' === $subtitle && is_singular()) {
+if ( '' === $subtitle && is_singular() ) {
 	$subtitle = get_the_excerpt();
 }
 
-$size_class = 'cwc-page-banner--' . ('compact' === $size ? 'compact' : 'default');
+$size_class = 'cwc-page-banner--' . ( 'compact' === $size ? 'compact' : 'default' );
 
 $min_height = $attributes['minHeight'] ?? 0;
 
 $wrapper_attrs = get_block_wrapper_attributes(
-	[
+	array(
 		'class' => 'cwc-page-banner ' . $size_class,
 		'style' => sprintf(
 			'--cwc-banner-bg:url(%s);--cwc-banner-overlay:%s;%s',
-			esc_url($bg_image),
-			esc_attr($overlay_opacity / 100),
-			$min_height ? esc_attr("--cwc-banner-min-height:{$min_height}px;") : ''
+			esc_url( $bg_image ),
+			esc_attr( $overlay_opacity / 100 ),
+			$min_height ? esc_attr( "--cwc-banner-min-height:{$min_height}px;" ) : ''
 		),
-	]
+	)
 );
 ?>
 
-<section <?php echo $wrapper_attrs; ?>>
+<section <?php echo $wrapper_attrs; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
 	<div class="cwc-page-banner__overlay" aria-hidden="true"></div>
 
-	<?php if ($show_corners): ?>
+	<?php if ( $show_corners ) : ?>
 		<span class="cwc-page-banner__corner cwc-page-banner__corner--tl" aria-hidden="true"></span>
 		<span class="cwc-page-banner__corner cwc-page-banner__corner--tr" aria-hidden="true"></span>
 		<span class="cwc-page-banner__corner cwc-page-banner__corner--bl" aria-hidden="true"></span>
@@ -85,12 +85,12 @@ $wrapper_attrs = get_block_wrapper_attributes(
 	<?php endif; ?>
 
 	<div class="cwc-page-banner__content">
-		<?php if (!empty($title)): ?>
-			<h1 class="cwc-page-banner__title"><?php echo esc_html($title); ?></h1>
+		<?php if ( ! empty( $banner_title ) ) : ?>
+			<h1 class="cwc-page-banner__title"><?php echo esc_html( $banner_title ); ?></h1>
 		<?php endif; ?>
 
-		<?php if (!empty($subtitle)): ?>
-			<p class="cwc-page-banner__subtitle"><?php echo esc_html($subtitle); ?></p>
+		<?php if ( ! empty( $subtitle ) ) : ?>
+			<p class="cwc-page-banner__subtitle"><?php echo esc_html( $subtitle ); ?></p>
 		<?php endif; ?>
 	</div>
 </section>

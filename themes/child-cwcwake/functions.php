@@ -6,96 +6,104 @@
  * @since   0.1.0
  */
 
-if (!defined('ABSPATH')) {
+if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define('CWC_VERSION', wp_get_theme()->get('Version'));
+define( 'CWC_VERSION', wp_get_theme()->get( 'Version' ) );
 
-// Remove the admin bar for a cleaner frontend experience
-add_filter('show_admin_bar', '__return_false');
+// Remove the admin bar for a cleaner frontend experience.
+add_filter( 'show_admin_bar', '__return_false' );
 
 /**
  * Enqueue parent and child theme stylesheets.
  */
-function cwc_enqueue_styles()
-{
+function cwc_enqueue_styles() {
 	wp_enqueue_style(
 		'cwc-google-fonts',
 		'https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=Archivo:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap',
-		[],
+		array(),
 		null
 	);
 
 	wp_enqueue_style(
 		'twentytwentyfive-style',
 		get_template_directory_uri() . '/style.css',
-		['cwc-google-fonts'],
-		wp_get_theme('twentytwentyfive')->get('Version')
+		array( 'cwc-google-fonts' ),
+		wp_get_theme( 'twentytwentyfive' )->get( 'Version' )
 	);
 
 	wp_enqueue_style(
 		'cwc-global',
 		get_stylesheet_directory_uri() . '/assets/css/global.css',
-		['twentytwentyfive-style'],
+		array( 'twentytwentyfive-style' ),
 		CWC_VERSION
 	);
 
 	wp_enqueue_style(
 		'cwc-header',
 		get_stylesheet_directory_uri() . '/assets/css/header.css',
-		['cwc-global'],
+		array( 'cwc-global' ),
 		CWC_VERSION
 	);
 
 	wp_enqueue_style(
 		'cwc-footer',
 		get_stylesheet_directory_uri() . '/assets/css/footer.css',
-		['cwc-global'],
+		array( 'cwc-global' ),
 		CWC_VERSION
 	);
 
 	wp_enqueue_style(
 		'cwc-style',
 		get_stylesheet_uri(),
-		['cwc-header'],
+		array( 'cwc-header' ),
 		CWC_VERSION
 	);
 
 	wp_enqueue_script(
 		'cwc-header',
 		get_stylesheet_directory_uri() . '/assets/js/header.js',
-		[],
+		array(),
 		CWC_VERSION,
-		['strategy' => 'defer', 'in_footer' => true]
+		array(
+			'strategy'  => 'defer',
+			'in_footer' => true,
+		)
 	);
 
 	// Custom Image Modal — Lightweight native popup slider.
 	wp_enqueue_script(
 		'cwc-image-modal',
 		get_stylesheet_directory_uri() . '/assets/js/image-modal.js',
-		[],
+		array(),
 		CWC_VERSION,
-		['strategy' => 'defer', 'in_footer' => true]
+		array(
+			'strategy'  => 'defer',
+			'in_footer' => true,
+		)
 	);
 
 	// Scroll to Top — Premium navigation helper.
 	wp_enqueue_script(
 		'cwc-scroll-top',
 		get_stylesheet_directory_uri() . '/assets/js/scroll-to-top.js',
-		[],
+		array(),
 		CWC_VERSION,
-		['strategy' => 'defer', 'in_footer' => true]
+		array(
+			'strategy'  => 'defer',
+			'in_footer' => true,
+		)
 	);
-
-
-
-
 }
-add_action('wp_enqueue_scripts', 'cwc_enqueue_styles');
+add_action( 'wp_enqueue_scripts', 'cwc_enqueue_styles' );
 
 /**
  * Add preconnect resource hints for Google Fonts to speed up font download.
+ *
+ * @param array  $urls          URLs to print for resource hints.
+ * @param string $relation_type The relation type the URLs are printed for.
+ * @return array Modified resource hints.
  */
 function cwc_preconnect_google_fonts( $urls, $relation_type ) {
 	if ( wp_style_is( 'cwc-google-fonts', 'queue' ) && 'preconnect' === $relation_type ) {
@@ -153,48 +161,51 @@ add_action( 'wp_head', 'cwc_preload_lcp_resources', 1 );
  * human-readable publish date, estimated read time, and the theme URI for
  * resolving icon paths.
  */
-function cwc_enqueue_single_post_assets()
-{
-	if (!is_singular('post')) {
+function cwc_enqueue_single_post_assets() {
+	if ( ! is_singular( 'post' ) ) {
 		return;
 	}
 
 	wp_enqueue_style(
 		'cwc-single-post',
 		get_stylesheet_directory_uri() . '/assets/css/single-post.css',
-		['cwc-global'],
+		array( 'cwc-global' ),
 		CWC_VERSION
 	);
 
 	wp_enqueue_script(
 		'cwc-single-post',
 		get_stylesheet_directory_uri() . '/assets/js/single-post.js',
-		[],
+		array(),
 		CWC_VERSION,
 		true
 	);
 
-	$post_id = get_the_ID();
+	$post_id   = get_the_ID();
 	$thumb_url = '';
-	$thumb_id = (int) get_post_thumbnail_id($post_id);
-	if ($thumb_id > 0) {
-		$src = wp_get_attachment_image_url($thumb_id, 'full');
-		if (is_string($src) && '' !== $src) {
+	$thumb_id  = (int) get_post_thumbnail_id( $post_id );
+	if ( $thumb_id > 0 ) {
+		$src = wp_get_attachment_image_url( $thumb_id, 'full' );
+		if ( is_string( $src ) && '' !== $src ) {
 			$thumb_url = $src;
 		}
 	}
 
-	$word_count = str_word_count(wp_strip_all_tags(get_post_field('post_content', $post_id)));
-	$read_min = max(1, (int) ceil($word_count / 200));
+	$word_count = str_word_count( wp_strip_all_tags( get_post_field( 'post_content', $post_id ) ) );
+	$read_min   = max( 1, (int) ceil( $word_count / 200 ) );
 
-	wp_localize_script('cwc-single-post', 'cwcSinglePost', [
-		'image' => esc_url($thumb_url),
-		'date' => get_the_date('F j, Y', $post_id),
-		'readTime' => $read_min . ' minute' . ($read_min > 1 ? 's' : '') . ' read',
-		'themeUri' => get_stylesheet_directory_uri(),
-	]);
+	wp_localize_script(
+		'cwc-single-post',
+		'cwcSinglePost',
+		array(
+			'image'    => esc_url( $thumb_url ),
+			'date'     => get_the_date( 'F j, Y', $post_id ),
+			'readTime' => $read_min . ' minute' . ( $read_min > 1 ? 's' : '' ) . ' read',
+			'themeUri' => get_stylesheet_directory_uri(),
+		)
+	);
 }
-add_action('wp_enqueue_scripts', 'cwc_enqueue_single_post_assets');
+add_action( 'wp_enqueue_scripts', 'cwc_enqueue_single_post_assets' );
 
 /**
  * Automatically add IDs to H2 and H3 headings on single posts.
@@ -203,37 +214,38 @@ add_action('wp_enqueue_scripts', 'cwc_enqueue_single_post_assets');
  * `sanitize_title()`. This filter applies the same transform to the
  * actual `<h2>` / `<h3>` tags so the scrollspy JS can match them up.
  * Existing IDs are left untouched.
+ *
+ * @param string $content Post content.
+ * @return string Modified content.
  */
-function cwc_add_heading_ids($content)
-{
-	if (!is_singular('post')) {
+function cwc_add_heading_ids( $content ) {
+	if ( ! is_singular( 'post' ) ) {
 		return $content;
 	}
 
 	return preg_replace_callback(
 		'/<(h[23])(.*?)>(.*?)<\/h\1>/i',
-		function ($matches) {
-			$tag = $matches[1];
+		function ( $matches ) {
+			$tag   = $matches[1];
 			$attrs = $matches[2];
-			$text = $matches[3];
+			$text  = $matches[3];
 
-			if (strpos($attrs, 'id=') !== false) {
+			if ( strpos( $attrs, 'id=' ) !== false ) {
 				return $matches[0];
 			}
 
-			$id = sanitize_title(strip_tags($text));
+			$id = sanitize_title( strip_tags( $text ) );
 			return "<$tag $attrs id=\"$id\">$text</$tag>";
 		},
 		$content
 	);
 }
-add_filter('the_content', 'cwc_add_heading_ids');
+add_filter( 'the_content', 'cwc_add_heading_ids' );
 
 /**
  * Inject the Scroll to Top button markup into the footer.
  */
-function cwc_inject_scroll_top_html()
-{
+function cwc_inject_scroll_top_html() {
 	?>
 	<button id="cwc-scroll-top" class="cwc-scroll-top" aria-label="Scroll to top">
 		<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -243,44 +255,47 @@ function cwc_inject_scroll_top_html()
 	</button>
 	<?php
 }
-add_action('wp_footer', 'cwc_inject_scroll_top_html');
+add_action( 'wp_footer', 'cwc_inject_scroll_top_html' );
 
 /**
  * Load Google Fonts in the block editor to match frontend.
  */
-function cwc_enqueue_editor_styles()
-{
-	add_editor_style('https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=Archivo:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap');
-	add_editor_style('assets/css/global.css');
+function cwc_enqueue_editor_styles() {
+	add_editor_style( 'https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=Archivo:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap' );
+	add_editor_style( 'assets/css/global.css' );
 }
-add_action('after_setup_theme', 'cwc_enqueue_editor_styles');
+add_action( 'after_setup_theme', 'cwc_enqueue_editor_styles' );
 
 /**
  * Theme setup: register supports, menus, image sizes.
  */
-function cwc_theme_setup()
-{
-	add_theme_support('title-tag');
-	add_theme_support('post-thumbnails');
-	add_theme_support('html5', [
-		'search-form',
-		'comment-form',
-		'comment-list',
-		'gallery',
-		'caption',
-		'style',
-		'script',
-	]);
-	add_theme_support('editor-styles');
-	add_theme_support('wp-block-styles');
-	add_theme_support('responsive-embeds');
+function cwc_theme_setup() {
+	add_theme_support( 'title-tag' );
+	add_theme_support( 'post-thumbnails' );
+	add_theme_support(
+		'html5',
+		array(
+			'search-form',
+			'comment-form',
+			'comment-list',
+			'gallery',
+			'caption',
+			'style',
+			'script',
+		)
+	);
+	add_theme_support( 'editor-styles' );
+	add_theme_support( 'wp-block-styles' );
+	add_theme_support( 'responsive-embeds' );
 
-	register_nav_menus([
-		'primary' => __('Primary Navigation', 'child-cwcwake'),
-		'footer' => __('Footer Navigation', 'child-cwcwake'),
-	]);
+	register_nav_menus(
+		array(
+			'primary' => __( 'Primary Navigation', 'child-cwcwake' ),
+			'footer'  => __( 'Footer Navigation', 'child-cwcwake' ),
+		)
+	);
 }
-add_action('after_setup_theme', 'cwc_theme_setup');
+add_action( 'after_setup_theme', 'cwc_theme_setup' );
 
 /**
  * Create initial page structure on theme activation.
@@ -288,88 +303,115 @@ add_action('after_setup_theme', 'cwc_theme_setup');
  * Builds the full site hierarchy: top-level pages and their children.
  * Only runs once — guarded by the 'cwc_pages_created' option.
  */
-function cwc_create_initial_pages()
-{
-	if (get_option('cwc_pages_created')) {
+function cwc_create_initial_pages() {
+	if ( get_option( 'cwc_pages_created' ) ) {
 		return;
 	}
 
-	$pages = [
-		'Home' => ['order' => 1, 'template' => ''],
-		'Activities' => [
-			'order' => 2,
+	$pages = array(
+		'Home'               => array(
+			'order'    => 1,
+			'template' => '',
+		),
+		'Activities'         => array(
+			'order'    => 2,
 			'template' => 'page-activities',
-			'children' => ['Water Sports', 'Land Activities', 'Elite Facilities'],
-		],
-		'Accommodations' => [
-			'order' => 3,
+			'children' => array( 'Water Sports', 'Land Activities', 'Elite Facilities' ),
+		),
+		'Accommodations'     => array(
+			'order'    => 3,
 			'template' => 'page-accommodations',
-			'children' => [
-				'Villas' => 'room-detail',
+			'children' => array(
+				'Villas'  => 'room-detail',
 				'Cabanas' => 'room-detail',
-				'Dwell' => 'room-detail',
-				'Cabin' => 'room-detail',
-			],
-		],
-		'Plan Your Trip' => [
-			'order' => 4,
+				'Dwell'   => 'room-detail',
+				'Cabin'   => 'room-detail',
+			),
+		),
+		'Plan Your Trip'     => array(
+			'order'    => 4,
 			'template' => 'page-plan-your-trip',
-			'children' => [
-				'Rates' => 'page-child',
-				'FAQs' => 'page-child',
-				'Blogs' => 'page-child',
-				'Gallery' => [
+			'children' => array(
+				'Rates'   => 'page-child',
+				'FAQs'    => 'page-child',
+				'Blogs'   => 'page-child',
+				'Gallery' => array(
 					'template' => 'page-gallery',
-					'children' => [
-						'Events' => 'page-child',
-						'Lifestyle' => 'page-child',
+					'children' => array(
+						'Events'         => 'page-child',
+						'Lifestyle'      => 'page-child',
 						'Explore CamSur' => 'page-child',
-					],
-				],
-			],
-		],
-		'About' => ['order' => 5, 'template' => 'page-about'],
-		'Contact Us' => ['order' => 6, 'template' => 'page-contact'],
-		'Terms & Conditions' => ['order' => 7, 'template' => 'page-terms-and-conditions'],
-		'Privacy Policy' => ['order' => 8, 'template' => 'page-privacy-policy'],
-	];
+					),
+				),
+			),
+		),
+		'About'              => array(
+			'order'    => 5,
+			'template' => 'page-about',
+		),
+		'Contact Us'         => array(
+			'order'    => 6,
+			'template' => 'page-contact',
+		),
+		'Terms & Conditions' => array(
+			'order'    => 7,
+			'template' => 'page-terms-and-conditions',
+		),
+		'Privacy Policy'     => array(
+			'order'    => 8,
+			'template' => 'page-privacy-policy',
+		),
+	);
 
-	foreach ($pages as $title => $config) {
-		$post_data = [
-			'post_title' => $title,
+	foreach ( $pages as $title => $config ) {
+		$post_data = array(
+			'post_title'  => $title,
 			'post_status' => 'publish',
-			'post_type' => 'page',
-			'menu_order' => $config['order'],
-		];
+			'post_type'   => 'page',
+			'menu_order'  => $config['order'],
+		);
 
-		if (!empty($config['template'])) {
+		if ( ! empty( $config['template'] ) ) {
 			$post_data['page_template'] = $config['template'];
 		}
 
-		$parent_id = wp_insert_post($post_data);
+		$parent_id = wp_insert_post( $post_data );
 
-		if (is_wp_error($parent_id)) {
+		if ( is_wp_error( $parent_id ) ) {
 			continue;
 		}
 
-		if (!empty($config['template'])) {
-			update_post_meta($parent_id, '_wp_page_template', $config['template']);
+		if ( ! empty( $config['template'] ) ) {
+			update_post_meta( $parent_id, '_wp_page_template', $config['template'] );
 		}
 
-		if (!empty($config['children'])) {
-			cwc_seed_child_pages($config['children'], $parent_id);
+		if ( ! empty( $config['children'] ) ) {
+			cwc_seed_child_pages( $config['children'], $parent_id );
 		}
 	}
 
-	$home = get_page_by_title('Home');
-	if ($home) {
-		update_option('show_on_front', 'page');
-		update_option('page_on_front', $home->ID);
+	$home_query = new WP_Query(
+		array(
+			'title'                  => 'Home',
+			'post_type'              => 'page',
+			'post_status'            => 'publish',
+			'posts_per_page'         => 1,
+			'no_found_rows'          => true,
+			'ignore_sticky_posts'    => true,
+			'update_post_term_cache' => false,
+			'update_post_meta_cache' => false,
+		)
+	);
+	$home       = $home_query->have_posts() ? $home_query->posts[0] : null;
+
+	if ( $home ) {
+		update_option( 'show_on_front', 'page' );
+		update_option( 'page_on_front', $home->ID );
 	}
 
-	update_option('cwc_pages_created', true);
+	update_option( 'cwc_pages_created', true );
 }
-add_action('after_switch_theme', 'cwc_create_initial_pages');
+add_action( 'after_switch_theme', 'cwc_create_initial_pages' );
 
 /**
  * Recursively create child pages under a given parent.
@@ -384,43 +426,44 @@ add_action('after_switch_theme', 'cwc_create_initial_pages');
  * @param array $children  Children definitions.
  * @param int   $parent_id Parent post ID to attach the new pages to.
  */
-function cwc_seed_child_pages(array $children, $parent_id)
-{
+function cwc_seed_child_pages( array $children, $parent_id ) {
 	$order = 1;
 
-	foreach ($children as $key => $value) {
-		if (is_int($key)) {
-			$title = $value;
-			$template = 'page-child';
-			$grandchildren = [];
-		} elseif (is_array($value)) {
-			$title = $key;
-			$template = $value['template'] ?? 'page-child';
-			$grandchildren = $value['children'] ?? [];
+	foreach ( $children as $key => $value ) {
+		if ( is_int( $key ) ) {
+			$title         = $value;
+			$template      = 'page-child';
+			$grandchildren = array();
+		} elseif ( is_array( $value ) ) {
+			$title         = $key;
+			$template      = $value['template'] ?? 'page-child';
+			$grandchildren = $value['children'] ?? array();
 		} else {
-			$title = $key;
-			$template = $value;
-			$grandchildren = [];
+			$title         = $key;
+			$template      = $value;
+			$grandchildren = array();
 		}
 
-		$child_id = wp_insert_post([
-			'post_title' => $title,
-			'post_status' => 'publish',
-			'post_type' => 'page',
-			'post_parent' => $parent_id,
-			'menu_order' => $order++,
-		]);
+		$child_id = wp_insert_post(
+			array(
+				'post_title'  => $title,
+				'post_status' => 'publish',
+				'post_type'   => 'page',
+				'post_parent' => $parent_id,
+				'menu_order'  => $order++,
+			)
+		);
 
-		if (is_wp_error($child_id)) {
+		if ( is_wp_error( $child_id ) ) {
 			continue;
 		}
 
-		if (!empty($template)) {
-			update_post_meta($child_id, '_wp_page_template', $template);
+		if ( ! empty( $template ) ) {
+			update_post_meta( $child_id, '_wp_page_template', $template );
 		}
 
-		if (!empty($grandchildren)) {
-			cwc_seed_child_pages($grandchildren, $child_id);
+		if ( ! empty( $grandchildren ) ) {
+			cwc_seed_child_pages( $grandchildren, $child_id );
 		}
 	}
 }
@@ -455,7 +498,6 @@ require_once get_stylesheet_directory() . '/inc/contact-page-seed.php';
  * clauses copied from the Figma mockups. Idempotent.
  */
 // Policy pages content is now managed directly in templates.
-// require_once get_stylesheet_directory() . '/inc/policy-pages-seed.php';
 
 /*
  * Albums (Gallery) custom post type. Registers a hierarchical
@@ -545,74 +587,86 @@ require_once get_stylesheet_directory() . '/inc/water-sports-page-seed.php';
  * Creates the menu and assigns it to the 'primary' location.
  * Only runs once — guarded by the 'cwc_menu_created' option.
  */
-function cwc_create_primary_menu()
-{
-	if (get_option('cwc_menu_created')) {
+function cwc_create_primary_menu() {
+	if ( get_option( 'cwc_menu_created' ) ) {
 		return;
 	}
 
 	$menu_name = 'Primary Navigation';
-	$menu_id = wp_create_nav_menu($menu_name);
+	$menu_id   = wp_create_nav_menu( $menu_name );
 
-	if (is_wp_error($menu_id)) {
+	if ( is_wp_error( $menu_id ) ) {
 		return;
 	}
 
 	$menu_order = 1;
-	$pages = get_pages(['sort_column' => 'menu_order', 'hierarchical' => false]);
-	$page_map = [];
+	$pages      = get_pages(
+		array(
+			'sort_column'  => 'menu_order',
+			'hierarchical' => false,
+		)
+	);
+	$page_map   = array();
 
-	foreach ($pages as $page) {
-		$page_map[$page->post_title] = $page->ID;
+	foreach ( $pages as $page ) {
+		$page_map[ $page->post_title ] = $page->ID;
 	}
 
-	$structure = [
-		'Home' => [],
-		'Activities' => ['Water Sports', 'Land Activities', 'Elite Facilities'],
-		'Accommodations' => ['Villas', 'Cabanas', 'Dwell', 'Cabin'],
-		'Gallery' => ['Events', 'Lifestyle', 'Explore CamSur'],
-		'Plan Your Trip' => ['Rates', 'FAQs', 'Blogs'],
-		'About' => [],
-	];
+	$structure = array(
+		'Home'           => array(),
+		'Activities'     => array( 'Water Sports', 'Land Activities', 'Elite Facilities' ),
+		'Accommodations' => array( 'Villas', 'Cabanas', 'Dwell', 'Cabin' ),
+		'Gallery'        => array( 'Events', 'Lifestyle', 'Explore CamSur' ),
+		'Plan Your Trip' => array( 'Rates', 'FAQs', 'Blogs' ),
+		'About'          => array(),
+	);
 
-	foreach ($structure as $parent_title => $children) {
-		if (!isset($page_map[$parent_title])) {
+	foreach ( $structure as $parent_title => $children ) {
+		if ( ! isset( $page_map[ $parent_title ] ) ) {
 			continue;
 		}
 
-		$parent_menu_item_id = wp_update_nav_menu_item($menu_id, 0, [
-			'menu-item-title' => $parent_title,
-			'menu-item-object' => 'page',
-			'menu-item-object-id' => $page_map[$parent_title],
-			'menu-item-type' => 'post_type',
-			'menu-item-status' => 'publish',
-			'menu-item-position' => $menu_order++,
-		]);
+		$parent_menu_item_id = wp_update_nav_menu_item(
+			$menu_id,
+			0,
+			array(
+				'menu-item-title'     => $parent_title,
+				'menu-item-object'    => 'page',
+				'menu-item-object-id' => $page_map[ $parent_title ],
+				'menu-item-type'      => 'post_type',
+				'menu-item-status'    => 'publish',
+				'menu-item-position'  => $menu_order++,
+			)
+		);
 
-		foreach ($children as $child_title) {
-			if (!isset($page_map[$child_title])) {
+		foreach ( $children as $child_title ) {
+			if ( ! isset( $page_map[ $child_title ] ) ) {
 				continue;
 			}
 
-			wp_update_nav_menu_item($menu_id, 0, [
-				'menu-item-title' => $child_title,
-				'menu-item-object' => 'page',
-				'menu-item-object-id' => $page_map[$child_title],
-				'menu-item-type' => 'post_type',
-				'menu-item-status' => 'publish',
-				'menu-item-parent-id' => $parent_menu_item_id,
-				'menu-item-position' => $menu_order++,
-			]);
+			wp_update_nav_menu_item(
+				$menu_id,
+				0,
+				array(
+					'menu-item-title'     => $child_title,
+					'menu-item-object'    => 'page',
+					'menu-item-object-id' => $page_map[ $child_title ],
+					'menu-item-type'      => 'post_type',
+					'menu-item-status'    => 'publish',
+					'menu-item-parent-id' => $parent_menu_item_id,
+					'menu-item-position'  => $menu_order++,
+				)
+			);
 		}
 	}
 
-	$locations = get_theme_mod('nav_menu_locations', []);
+	$locations            = get_theme_mod( 'nav_menu_locations', array() );
 	$locations['primary'] = $menu_id;
-	set_theme_mod('nav_menu_locations', $locations);
+	set_theme_mod( 'nav_menu_locations', $locations );
 
-	update_option('cwc_menu_created', true);
+	update_option( 'cwc_menu_created', true );
 }
-add_action('after_switch_theme', 'cwc_create_primary_menu', 20);
+add_action( 'after_switch_theme', 'cwc_create_primary_menu', 20 );
 
 /**
  * Build the breadcrumb trail for the current request.
@@ -622,98 +676,116 @@ add_action('after_switch_theme', 'cwc_create_primary_menu', 20);
  *
  * Each crumb is `[ 'label' => string, 'url' => string|null ]`.
  * A null URL marks the current (non-link) item.
+ *
+ * @param string $home_label The label for the home link.
  */
-function cwc_build_breadcrumbs($home_label = 'Home')
-{
-	$crumbs = [
-		['label' => $home_label, 'url' => home_url('/')],
-	];
+function cwc_build_breadcrumbs( $home_label = 'Home' ) {
+	$crumbs = array(
+		array(
+			'label' => $home_label,
+			'url'   => home_url( '/' ),
+		),
+	);
 
-	if (is_front_page()) {
-		$crumbs[count($crumbs) - 1]['url'] = null;
-	} elseif (is_page()) {
-		$ancestors = array_reverse(get_post_ancestors(get_the_ID()));
-		foreach ($ancestors as $ancestor_id) {
-			$crumbs[] = [
-				'label' => get_the_title($ancestor_id),
-				'url' => get_permalink($ancestor_id),
-			];
+	if ( is_front_page() ) {
+		$crumbs[ count( $crumbs ) - 1 ]['url'] = null;
+	} elseif ( is_page() ) {
+		$ancestors = array_reverse( get_post_ancestors( get_the_ID() ) );
+		foreach ( $ancestors as $ancestor_id ) {
+			$crumbs[] = array(
+				'label' => get_the_title( $ancestor_id ),
+				'url'   => get_permalink( $ancestor_id ),
+			);
 		}
-		$crumbs[] = ['label' => get_the_title(), 'url' => null];
-	} elseif (is_singular()) {
-		$crumbs[] = ['label' => get_the_title(), 'url' => null];
-	} elseif (is_category() || is_tag() || is_tax() || is_post_type_archive() || is_archive()) {
-		$crumbs[] = [
-			'label' => wp_strip_all_tags(get_the_archive_title()),
-			'url' => null,
-		];
-	} elseif (is_search()) {
-		/* translators: %s: Search query. */
-		$crumbs[] = [
-			'label' => sprintf(__('Search: %s', 'child-cwcwake'), get_search_query()),
-			'url' => null,
-		];
-	} elseif (is_404()) {
-		$crumbs[] = ['label' => __('Not Found', 'child-cwcwake'), 'url' => null];
+		$crumbs[] = array(
+			'label' => get_the_title(),
+			'url'   => null,
+		);
+	} elseif ( is_singular() ) {
+		$crumbs[] = array(
+			'label' => get_the_title(),
+			'url'   => null,
+		);
+	} elseif ( is_category() || is_tag() || is_tax() || is_post_type_archive() || is_archive() ) {
+		$crumbs[] = array(
+			'label' => wp_strip_all_tags( get_the_archive_title() ),
+			'url'   => null,
+		);
+	} elseif ( is_search() ) {
+		$crumbs[] = array(
+			/* translators: %s: Search query. */
+			'label' => sprintf( __( 'Search: %s', 'child-cwcwake' ), get_search_query() ),
+			'url'   => null,
+		);
+	} elseif ( is_404() ) {
+		$crumbs[] = array(
+			'label' => __( 'Not Found', 'child-cwcwake' ),
+			'url'   => null,
+		);
 	}
 
 	/** This filter is documented in blocks/breadcrumbs/render.php */
-	return apply_filters('cwc_breadcrumbs_items', $crumbs);
+	return apply_filters( 'cwc_breadcrumbs_items', $crumbs );
 }
 
 /**
  * Render the breadcrumb trail HTML.
  *
  * @param array $args {
+ *     Array of arguments.
+ *
  *     @type string $home_label     Label for the first crumb. Default 'Home'.
  *     @type bool   $show_home_icon Whether to show the home icon. Default true.
  *     @type string $extra_class    Optional extra class appended to the <nav> element.
  * }
  * @return string Rendered <nav> markup, or empty string if there's nothing to render.
  */
-function cwc_render_breadcrumbs($args = [])
-{
-	$args = wp_parse_args($args, [
-		'home_label' => 'Home',
-		'show_home_icon' => true,
-		'extra_class' => '',
-	]);
+function cwc_render_breadcrumbs( $args = array() ) {
+	$args = wp_parse_args(
+		$args,
+		array(
+			'home_label'     => 'Home',
+			'show_home_icon' => true,
+			'extra_class'    => '',
+		)
+	);
 
-	$crumbs = cwc_build_breadcrumbs($args['home_label']);
-	if (count($crumbs) < 2) {
+	$crumbs = cwc_build_breadcrumbs( $args['home_label'] );
+	if ( count( $crumbs ) < 2 ) {
 		return '';
 	}
 
-	$class = trim('cwc-breadcrumbs ' . $args['extra_class']);
-	$last = count($crumbs) - 1;
+	$class = trim( 'cwc-breadcrumbs ' . $args['extra_class'] );
+	$last  = count( $crumbs ) - 1;
 
 	ob_start();
 	?>
-	<nav class="<?php echo esc_attr($class); ?>" role="navigation"
-		aria-label="<?php esc_attr_e('Breadcrumb', 'child-cwcwake'); ?>">
+	<nav class="<?php echo esc_attr( $class ); ?>" role="navigation"
+		aria-label="<?php esc_attr_e( 'Breadcrumb', 'child-cwcwake' ); ?>">
 		<ol class="cwc-breadcrumbs__list">
-			<?php foreach ($crumbs as $i => $crumb):
-				$is_first = (0 === $i);
-				$is_last = ($last === $i);
+			<?php
+			foreach ( $crumbs as $i => $crumb ) :
+				$is_first = ( 0 === $i );
+				$is_last  = ( $last === $i );
 				?>
 				<li class="cwc-breadcrumbs__item<?php echo $is_last ? ' cwc-breadcrumbs__item--current' : ''; ?>">
-					<?php if (!empty($crumb['url'])): ?>
-						<a class="cwc-breadcrumbs__link" href="<?php echo esc_url($crumb['url']); ?>">
-							<?php if ($is_first && $args['show_home_icon']): ?>
+					<?php if ( ! empty( $crumb['url'] ) ) : ?>
+						<a class="cwc-breadcrumbs__link" href="<?php echo esc_url( $crumb['url'] ); ?>">
+							<?php if ( $is_first && $args['show_home_icon'] ) : ?>
 								<svg class="cwc-breadcrumbs__home-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14"
 									viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
 									<path d="M12 3 2 12h3v8h6v-6h2v6h6v-8h3z" />
 								</svg>
 							<?php endif; ?>
-							<span><?php echo esc_html($crumb['label']); ?></span>
+							<span><?php echo esc_html( $crumb['label'] ); ?></span>
 						</a>
-					<?php else: ?>
+					<?php else : ?>
 						<span class="cwc-breadcrumbs__current" aria-current="page">
-							<?php echo esc_html($crumb['label']); ?>
+							<?php echo esc_html( $crumb['label'] ); ?>
 						</span>
 					<?php endif; ?>
 
-					<?php if (!$is_last): ?>
+					<?php if ( ! $is_last ) : ?>
 						<span class="cwc-breadcrumbs__separator" aria-hidden="true">&rsaquo;</span>
 					<?php endif; ?>
 				</li>
@@ -727,59 +799,60 @@ function cwc_render_breadcrumbs($args = [])
 /**
  * Register custom blocks.
  */
-function cwc_register_blocks()
-{
-	register_block_type(get_stylesheet_directory() . '/blocks/hero-section');
-	register_block_type(get_stylesheet_directory() . '/blocks/intro-section');
-	register_block_type(get_stylesheet_directory() . '/blocks/showcase-section');
-	register_block_type(get_stylesheet_directory() . '/blocks/accommodations-section');
-	register_block_type(get_stylesheet_directory() . '/blocks/reviews-section');
-	register_block_type(get_stylesheet_directory() . '/blocks/page-banner');
-	register_block_type(get_stylesheet_directory() . '/blocks/breadcrumbs');
-	register_block_type(get_stylesheet_directory() . '/blocks/gallery-grid');
-	register_block_type(get_stylesheet_directory() . '/blocks/cards-section');
-	register_block_type(get_stylesheet_directory() . '/blocks/room-gallery');
-	register_block_type(get_stylesheet_directory() . '/blocks/room-info');
-	register_block_type(get_stylesheet_directory() . '/blocks/other-rooms');
-	register_block_type(get_stylesheet_directory() . '/blocks/contact-info');
-	register_block_type(get_stylesheet_directory() . '/blocks/contact-form');
-	register_block_type(get_stylesheet_directory() . '/blocks/policy-content');
-	register_block_type(get_stylesheet_directory() . '/blocks/albums-grid');
-	register_block_type(get_stylesheet_directory() . '/blocks/album-back-link');
-	register_block_type(get_stylesheet_directory() . '/blocks/why-stay');
-	register_block_type(get_stylesheet_directory() . '/blocks/featured-blogs');
-	register_block_type(get_stylesheet_directory() . '/blocks/upcoming-events');
-	register_block_type(get_stylesheet_directory() . '/blocks/all-blogs');
-	register_block_type(get_stylesheet_directory() . '/blocks/table-of-contents');
-	register_block_type(get_stylesheet_directory() . '/blocks/rates-manager');
-	register_block_type(get_stylesheet_directory() . '/blocks/faq-section');
-	register_block_type(get_stylesheet_directory() . '/blocks/about-timeline');
-	register_block_type(get_stylesheet_directory() . '/blocks/about-champions');
-	register_block_type(get_stylesheet_directory() . '/blocks/about-certified');
-	register_block_type(get_stylesheet_directory() . '/blocks/about-empowering');
-	register_block_type(get_stylesheet_directory() . '/blocks/before-footer-cta');
+function cwc_register_blocks() {
+	register_block_type( get_stylesheet_directory() . '/blocks/hero-section' );
+	register_block_type( get_stylesheet_directory() . '/blocks/intro-section' );
+	register_block_type( get_stylesheet_directory() . '/blocks/showcase-section' );
+	register_block_type( get_stylesheet_directory() . '/blocks/accommodations-section' );
+	register_block_type( get_stylesheet_directory() . '/blocks/reviews-section' );
+	register_block_type( get_stylesheet_directory() . '/blocks/page-banner' );
+	register_block_type( get_stylesheet_directory() . '/blocks/breadcrumbs' );
+	register_block_type( get_stylesheet_directory() . '/blocks/gallery-grid' );
+	register_block_type( get_stylesheet_directory() . '/blocks/cards-section' );
+	register_block_type( get_stylesheet_directory() . '/blocks/room-gallery' );
+	register_block_type( get_stylesheet_directory() . '/blocks/room-info' );
+	register_block_type( get_stylesheet_directory() . '/blocks/other-rooms' );
+	register_block_type( get_stylesheet_directory() . '/blocks/contact-info' );
+	register_block_type( get_stylesheet_directory() . '/blocks/contact-form' );
+	register_block_type( get_stylesheet_directory() . '/blocks/policy-content' );
+	register_block_type( get_stylesheet_directory() . '/blocks/albums-grid' );
+	register_block_type( get_stylesheet_directory() . '/blocks/album-back-link' );
+	register_block_type( get_stylesheet_directory() . '/blocks/why-stay' );
+	register_block_type( get_stylesheet_directory() . '/blocks/featured-blogs' );
+	register_block_type( get_stylesheet_directory() . '/blocks/upcoming-events' );
+	register_block_type( get_stylesheet_directory() . '/blocks/all-blogs' );
+	register_block_type( get_stylesheet_directory() . '/blocks/table-of-contents' );
+	register_block_type( get_stylesheet_directory() . '/blocks/rates-manager' );
+	register_block_type( get_stylesheet_directory() . '/blocks/faq-section' );
+	register_block_type( get_stylesheet_directory() . '/blocks/about-timeline' );
+	register_block_type( get_stylesheet_directory() . '/blocks/about-champions' );
+	register_block_type( get_stylesheet_directory() . '/blocks/about-certified' );
+	register_block_type( get_stylesheet_directory() . '/blocks/about-empowering' );
+	register_block_type( get_stylesheet_directory() . '/blocks/before-footer-cta' );
 
-	// Water Sports page blocks
-	register_block_type(get_stylesheet_directory() . '/blocks/feature-split');
-	register_block_type(get_stylesheet_directory() . '/blocks/feature-banner');
-	register_block_type(get_stylesheet_directory() . '/blocks/coaching-section');
+	// Water Sports page blocks.
+	register_block_type( get_stylesheet_directory() . '/blocks/feature-split' );
+	register_block_type( get_stylesheet_directory() . '/blocks/feature-banner' );
+	register_block_type( get_stylesheet_directory() . '/blocks/coaching-section' );
 }
-add_action('init', 'cwc_register_blocks');
+add_action( 'init', 'cwc_register_blocks' );
 
 /**
  * Add a body class to mark the front page.
  *
  * Used by the header CSS/JS so the transparent-on-top behavior only
  * applies on the home page; all other pages get an opaque header.
+ *
+ * @param array $classes Body classes.
+ * @return array Modified classes.
  */
-function cwc_body_class_front_page($classes)
-{
-	if (is_front_page() || is_page('about') || is_page('accommodations') || is_page('water-sports')) {
+function cwc_body_class_front_page( $classes ) {
+	if ( is_front_page() || is_page( 'about' ) || is_page( 'accommodations' ) || is_page( 'water-sports' ) ) {
 		$classes[] = 'cwc-home';
 	}
 	return $classes;
 }
-add_filter('body_class', 'cwc_body_class_front_page');
+add_filter( 'body_class', 'cwc_body_class_front_page' );
 
 /**
  * Pages that must never appear in the header navigation.
@@ -789,17 +862,16 @@ add_filter('body_class', 'cwc_body_class_front_page');
  * both classic nav menus and the page-list fallback that the
  * `wp:navigation` block uses when no menu is explicitly assigned.
  */
-function cwc_header_excluded_page_ids()
-{
+function cwc_header_excluded_page_ids() {
 	static $cache = null;
-	if ($cache !== null) {
+	if ( null !== $cache ) {
 		return $cache;
 	}
 
-	$cache = [];
-	foreach (['contact-us', 'terms-and-conditions', 'privacy-policy'] as $slug) {
-		$page = get_page_by_path($slug);
-		if ($page) {
+	$cache = array();
+	foreach ( array( 'contact-us', 'terms-and-conditions', 'privacy-policy' ) as $slug ) {
+		$page = get_page_by_path( $slug );
+		if ( $page ) {
 			$cache[] = (int) $page->ID;
 		}
 	}
@@ -809,19 +881,26 @@ function cwc_header_excluded_page_ids()
 /**
  * Strip excluded pages from any classic nav menu (covers a menu
  * assigned to the `primary` location and rendered by `wp:navigation`).
+ *
+ * @param array $items Nav menu objects.
+ * @return array Filtered menu objects.
  */
-function cwc_filter_nav_menu_items($items)
-{
+function cwc_filter_nav_menu_items( $items ) {
 	$excluded = cwc_header_excluded_page_ids();
-	if (empty($excluded)) {
+	if ( empty( $excluded ) ) {
 		return $items;
 	}
 
-	return array_values(array_filter($items, function ($item) use ($excluded) {
-		return 'page' !== $item->object || !in_array((int) $item->object_id, $excluded, true);
-	}));
+	return array_values(
+		array_filter(
+			$items,
+			function ( $item ) use ( $excluded ) {
+				return 'page' !== $item->object || ! in_array( (int) $item->object_id, $excluded, true );
+			}
+		)
+	);
 }
-add_filter('wp_nav_menu_objects', 'cwc_filter_nav_menu_items');
+add_filter( 'wp_nav_menu_objects', 'cwc_filter_nav_menu_items' );
 
 /**
  * Strip excluded pages from `get_pages()` on the public frontend.
@@ -830,23 +909,30 @@ add_filter('wp_nav_menu_objects', 'cwc_filter_nav_menu_items');
  * when no menu is set) calls `get_pages()` to build its tree. The
  * admin and REST contexts are left untouched so editors and page
  * pickers still see every page.
+ *
+ * @param WP_Post[] $pages Pages array from `get_pages()`.
+ * @return WP_Post[] Filtered pages.
  */
-function cwc_filter_get_pages($pages)
-{
-	if (is_admin() || (defined('REST_REQUEST') && REST_REQUEST)) {
+function cwc_filter_get_pages( $pages ) {
+	if ( is_admin() || ( defined( 'REST_REQUEST' ) && REST_REQUEST ) ) {
 		return $pages;
 	}
 
 	$excluded = cwc_header_excluded_page_ids();
-	if (empty($excluded)) {
+	if ( empty( $excluded ) ) {
 		return $pages;
 	}
 
-	return array_values(array_filter($pages, function ($p) use ($excluded) {
-		return !in_array((int) $p->ID, $excluded, true);
-	}));
+	return array_values(
+		array_filter(
+			$pages,
+			function ( $p ) use ( $excluded ) {
+				return ! in_array( (int) $p->ID, $excluded, true );
+			}
+		)
+	);
 }
-add_filter('get_pages', 'cwc_filter_get_pages');
+add_filter( 'get_pages', 'cwc_filter_get_pages' );
 
 /**
  * Resolve the Accommodations page ID (cached per request).
@@ -858,14 +944,13 @@ add_filter('get_pages', 'cwc_filter_get_pages');
  *
  * @return int Page ID, or 0 when the page is missing.
  */
-function cwc_accommodations_page_id()
-{
+function cwc_accommodations_page_id() {
 	static $cache = null;
-	if ($cache !== null) {
+	if ( null !== $cache ) {
 		return $cache;
 	}
 
-	$page = get_page_by_path('accommodations');
+	$page  = get_page_by_path( 'accommodations' );
 	$cache = $page instanceof WP_Post ? (int) $page->ID : 0;
 	return $cache;
 }
@@ -888,10 +973,9 @@ function cwc_accommodations_page_id()
  * @param array $items Nav menu objects.
  * @return array Filtered list with Accommodations children removed.
  */
-function cwc_filter_nav_remove_accommodations_children($items)
-{
+function cwc_filter_nav_remove_accommodations_children( $items ) {
 	$accommodations_id = cwc_accommodations_page_id();
-	if (!$accommodations_id) {
+	if ( ! $accommodations_id ) {
 		return $items;
 	}
 
@@ -900,22 +984,27 @@ function cwc_filter_nav_remove_accommodations_children($items)
 	 * can drop any item whose `menu_item_parent` matches its ID.
 	 */
 	$accommodations_item_id = 0;
-	foreach ($items as $item) {
-		if ('page' === $item->object && (int) $item->object_id === $accommodations_id) {
+	foreach ( $items as $item ) {
+		if ( 'page' === $item->object && (int) $item->object_id === $accommodations_id ) {
 			$accommodations_item_id = (int) $item->ID;
 			break;
 		}
 	}
 
-	if (!$accommodations_item_id) {
+	if ( ! $accommodations_item_id ) {
 		return $items;
 	}
 
-	return array_values(array_filter($items, function ($item) use ($accommodations_item_id) {
-		return (int) $item->menu_item_parent !== $accommodations_item_id;
-	}));
+	return array_values(
+		array_filter(
+			$items,
+			function ( $item ) use ( $accommodations_item_id ) {
+				return (int) $item->menu_item_parent !== $accommodations_item_id;
+			}
+		)
+	);
 }
-add_filter('wp_nav_menu_objects', 'cwc_filter_nav_remove_accommodations_children');
+add_filter( 'wp_nav_menu_objects', 'cwc_filter_nav_remove_accommodations_children' );
 
 /**
  * Hide Accommodations child pages from the page-list nav fallback.
@@ -933,32 +1022,38 @@ add_filter('wp_nav_menu_objects', 'cwc_filter_nav_remove_accommodations_children
  * @param WP_Post[] $pages Pages array from `get_pages()`.
  * @return WP_Post[] Filtered pages.
  */
-function cwc_filter_get_pages_remove_accommodations_children($pages)
-{
-	if (is_admin() || (defined('REST_REQUEST') && REST_REQUEST)) {
+function cwc_filter_get_pages_remove_accommodations_children( $pages ) {
+	if ( is_admin() || ( defined( 'REST_REQUEST' ) && REST_REQUEST ) ) {
 		return $pages;
 	}
 
 	$accommodations_id = cwc_accommodations_page_id();
-	if (!$accommodations_id) {
+	if ( ! $accommodations_id ) {
 		return $pages;
 	}
 
-	return array_values(array_filter($pages, function ($p) use ($accommodations_id) {
-		return (int) $p->post_parent !== $accommodations_id;
-	}));
+	return array_values(
+		array_filter(
+			$pages,
+			function ( $p ) use ( $accommodations_id ) {
+				return (int) $p->post_parent !== $accommodations_id;
+			}
+		)
+	);
 }
-add_filter('get_pages', 'cwc_filter_get_pages_remove_accommodations_children');
+add_filter( 'get_pages', 'cwc_filter_get_pages_remove_accommodations_children' );
 
 /**
  * Allow SVG uploads in the Media Library.
+ *
+ * @param array $mimes Array of mime types keyed by the file extension regex.
+ * @return array Modified mime types.
  */
-function cwc_allow_svg_uploads($mimes)
-{
+function cwc_allow_svg_uploads( $mimes ) {
 	$mimes['svg'] = 'image/svg+xml';
 	return $mimes;
 }
-add_filter('upload_mimes', 'cwc_allow_svg_uploads');
+add_filter( 'upload_mimes', 'cwc_allow_svg_uploads' );
 
 /**
  * Block direct access to navigation hub pages.
@@ -976,7 +1071,7 @@ function cwc_block_hub_pages() {
 		return;
 	}
 
-	$blocked_slugs = [ 'activities', 'plan-your-trip' ];
+	$blocked_slugs = array( 'activities', 'plan-your-trip' );
 	$post          = get_queried_object();
 
 	if ( ! $post instanceof WP_Post ) {
@@ -984,7 +1079,7 @@ function cwc_block_hub_pages() {
 	}
 
 	// Only block if this page itself is one of the hub slugs (not a child).
-	if ( $post->post_parent === 0 && in_array( $post->post_name, $blocked_slugs, true ) ) {
+	if ( 0 === $post->post_parent && in_array( $post->post_name, $blocked_slugs, true ) ) {
 		global $wp_query;
 		$wp_query->set_404();
 		status_header( 404 );
@@ -1003,7 +1098,7 @@ add_action( 'template_redirect', 'cwc_block_hub_pages' );
  */
 function cwc_hub_page_exclude_ids() {
 	static $cache = null;
-	if ( $cache !== null ) {
+	if ( null !== $cache ) {
 		return $cache;
 	}
 
@@ -1021,20 +1116,27 @@ function cwc_hub_page_exclude_ids() {
 
 	// Add all descendants of those pages.
 	if ( ! empty( $exclude ) ) {
-		$ids_in      = implode( ',', $exclude );
-		$child_ids   = $wpdb->get_col(
+		$placeholders = implode( ',', array_fill( 0, count( $exclude ), '%d' ) );
+		$query        = $wpdb->prepare(
 			"SELECT ID FROM {$wpdb->posts}
 			 WHERE post_type   = 'page'
 			   AND post_status = 'publish'
-			   AND post_parent IN ({$ids_in})"
+			   AND post_parent IN ({$placeholders})", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+			$exclude
 		);
-		$exclude = array_unique( array_merge( $exclude, array_map( 'intval', (array) $child_ids ) ) );
+		$child_ids    = $wpdb->get_col( $query ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+		$exclude      = array_unique( array_merge( $exclude, array_map( 'intval', (array) $child_ids ) ) );
 	}
 
 	$cache = $exclude;
 	return $cache;
 }
 
+/**
+ * Exclude hub pages and their children from search results.
+ *
+ * @param WP_Query $query The WP_Query instance.
+ */
 function cwc_exclude_hub_pages_from_search( WP_Query $query ) {
 	if ( ! $query->is_search() || ! $query->is_main_query() || is_admin() ) {
 		return;
@@ -1053,6 +1155,10 @@ add_action( 'pre_get_posts', 'cwc_exclude_hub_pages_from_search' );
 /**
  * SQL-level safety net: strip hub pages from search even if
  * post__not_in is overridden elsewhere.
+ *
+ * @param string   $where The WHERE clause of the query.
+ * @param WP_Query $query The WP_Query instance.
+ * @return string Modified WHERE clause.
  */
 function cwc_exclude_hub_pages_where( $where, WP_Query $query ) {
 	if ( ! $query->is_search() || ! $query->is_main_query() || is_admin() ) {
@@ -1065,69 +1171,84 @@ function cwc_exclude_hub_pages_where( $where, WP_Query $query ) {
 	}
 
 	global $wpdb;
-	$ids_in  = implode( ',', $exclude );
-	$where  .= " AND {$wpdb->posts}.ID NOT IN ({$ids_in})";
+	$ids_in = implode( ',', $exclude );
+	$where .= " AND {$wpdb->posts}.ID NOT IN ({$ids_in})";
 	return $where;
 }
 add_filter( 'posts_where', 'cwc_exclude_hub_pages_where', 10, 2 );
 
 /**
  * Fix WordPress rejecting SVGs even when the MIME type is allowed.
+ *
+ * @param array        $data     Array of file data.
+ * @param string       $file     Full path to the file.
+ * @param string       $filename The name of the file.
+ * @param array|string $mimes    Array of mime types or string of mime types.
+ * @return array Modified file data.
  */
-function cwc_fix_svg_filetype($data, $file, $filename, $mimes)
-{
-	$ext = pathinfo($filename, PATHINFO_EXTENSION);
-	if ('svg' === strtolower($ext)) {
+function cwc_fix_svg_filetype( $data, $file, $filename, $mimes ) {
+	$ext = pathinfo( $filename, PATHINFO_EXTENSION );
+	if ( 'svg' === strtolower( $ext ) ) {
 		$data['type'] = 'image/svg+xml';
-		$data['ext'] = 'svg';
+		$data['ext']  = 'svg';
 	}
 	return $data;
 }
-add_filter('wp_check_filetype_and_ext', 'cwc_fix_svg_filetype', 10, 4);
+add_filter( 'wp_check_filetype_and_ext', 'cwc_fix_svg_filetype', 10, 4 );
 
 /**
  * Switch the block template for cwc_album based on whether it's a category or album.
  *
  * Uses 'single-cwc_album-category.html' for top-level categories and
  * 'single-cwc_album.html' for individual photo albums.
+ *
+ * @param string $template The path to the template.
+ * @return string Modified template path.
  */
-function cwc_album_template_switcher($template)
-{
-	if (!is_singular('cwc_album')) {
+function cwc_album_template_switcher( $template ) {
+	if ( ! is_singular( 'cwc_album' ) ) {
 		return $template;
 	}
 
 	$post = get_queried_object();
-	if (!$post || $post->post_parent !== 0) {
+	if ( ! $post || 0 !== $post->post_parent ) {
 		return $template;
 	}
 
 	// It's a top-level category album. Try to load the category template.
-	$category_template = locate_block_template('single-cwc_album-category', 'single-cwc_album-category', []);
-	if ($category_template) {
+	$category_template = locate_block_template( 'single-cwc_album-category', 'single-cwc_album-category', array() );
+	if ( $category_template ) {
 		return $category_template;
 	}
 
 	return $template;
 }
-add_filter('single_template', 'cwc_album_template_switcher', 20);
+add_filter( 'single_template', 'cwc_album_template_switcher', 20 );
 
 /**
  * Defer non-critical CSS to improve render-blocking times.
+ *
+ * @param string $html   The link tag for the enqueued style.
+ * @param string $handle The style's registered handle.
+ * @param string $href   The stylesheet's source URL.
+ * @param string $media  The stylesheet's media attribute.
+ * @return string Modified link tag.
  */
 function cwc_defer_non_critical_css( $html, $handle, $href, $media ) {
-	$defer_styles = [
-		'cwc-footer'
-	];
+	$defer_styles = array(
+		'cwc-footer',
+	);
 
-	if ( in_array( $handle, $defer_styles ) ) {
-		$html = sprintf(
-			'<link rel="stylesheet" id="%s-css" href="%s" media="print" onload="this.media=\'all\'" />',
+	if ( in_array( $handle, $defer_styles, true ) ) {
+		// phpcs:ignore WordPress.WP.EnqueuedResources.NonEnqueuedStylesheet
+		$html  = sprintf(
+			'<link rel="stylesheet" id="%s-css" href="%s" media="print" onload="this.media=\'all\'" />', // phpcs:ignore WordPress.WP.EnqueuedResources.NonEnqueuedStylesheet
 			esc_attr( $handle ),
 			esc_url( $href )
 		);
+		// phpcs:ignore WordPress.WP.EnqueuedResources.NonEnqueuedStylesheet
 		$html .= sprintf(
-			'<noscript><link rel="stylesheet" id="%s-noscript-css" href="%s" media="%s" /></noscript>',
+			'<noscript><link rel="stylesheet" id="%s-noscript-css" href="%s" media="%s" /></noscript>', // phpcs:ignore WordPress.WP.EnqueuedResources.NonEnqueuedStylesheet
 			esc_attr( $handle ),
 			esc_url( $href ),
 			esc_attr( $media )

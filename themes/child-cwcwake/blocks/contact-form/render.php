@@ -26,17 +26,17 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-$title              = isset( $attributes['title'] ) ? (string) $attributes['title'] : '';
-$name_label         = isset( $attributes['nameLabel'] ) ? (string) $attributes['nameLabel'] : 'Name';
-$name_placeholder   = isset( $attributes['namePlaceholder'] ) ? (string) $attributes['namePlaceholder'] : '';
-$email_label        = isset( $attributes['emailLabel'] ) ? (string) $attributes['emailLabel'] : 'Email';
-$email_placeholder  = isset( $attributes['emailPlaceholder'] ) ? (string) $attributes['emailPlaceholder'] : '';
-$message_label      = isset( $attributes['messageLabel'] ) ? (string) $attributes['messageLabel'] : 'Message';
+$form_title          = isset( $attributes['title'] ) ? (string) $attributes['title'] : '';
+$name_label          = isset( $attributes['nameLabel'] ) ? (string) $attributes['nameLabel'] : 'Name';
+$name_placeholder    = isset( $attributes['namePlaceholder'] ) ? (string) $attributes['namePlaceholder'] : '';
+$email_label         = isset( $attributes['emailLabel'] ) ? (string) $attributes['emailLabel'] : 'Email';
+$email_placeholder   = isset( $attributes['emailPlaceholder'] ) ? (string) $attributes['emailPlaceholder'] : '';
+$message_label       = isset( $attributes['messageLabel'] ) ? (string) $attributes['messageLabel'] : 'Message';
 $message_placeholder = isset( $attributes['messagePlaceholder'] ) ? (string) $attributes['messagePlaceholder'] : '';
-$submit_label       = isset( $attributes['submitLabel'] ) ? (string) $attributes['submitLabel'] : 'Send Message';
-$success_message    = isset( $attributes['successMessage'] ) ? (string) $attributes['successMessage'] : '';
-$error_message      = isset( $attributes['errorMessage'] ) ? (string) $attributes['errorMessage'] : '';
-$recipient_email    = isset( $attributes['recipientEmail'] ) ? (string) $attributes['recipientEmail'] : '';
+$submit_label        = isset( $attributes['submitLabel'] ) ? (string) $attributes['submitLabel'] : 'Send Message';
+$success_message     = isset( $attributes['successMessage'] ) ? (string) $attributes['successMessage'] : '';
+$error_message       = isset( $attributes['errorMessage'] ) ? (string) $attributes['errorMessage'] : '';
+$recipient_email     = isset( $attributes['recipientEmail'] ) ? (string) $attributes['recipientEmail'] : '';
 
 /*
  * Status feedback comes from a POST → redirect cycle, so we read it from
@@ -44,10 +44,10 @@ $recipient_email    = isset( $attributes['recipientEmail'] ) ? (string) $attribu
  * handler in `cwc_err`) so we can mark the failing inputs with
  * `aria-invalid` and a visible style.
  */
-$status        = isset( $_GET['cwc_contact'] ) ? sanitize_key( wp_unslash( $_GET['cwc_contact'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-$error_fields  = [];
-if ( 'error' === $status && isset( $_GET['cwc_err'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-	$raw = sanitize_text_field( wp_unslash( $_GET['cwc_err'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+$submission_status = isset( $_GET['cwc_contact'] ) ? sanitize_key( wp_unslash( $_GET['cwc_contact'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+$error_fields      = array();
+if ( 'error' === $submission_status && isset( $_GET['cwc_err'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+	$raw          = sanitize_text_field( wp_unslash( $_GET['cwc_err'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 	$error_fields = array_filter( array_map( 'sanitize_key', explode( ',', $raw ) ) );
 }
 
@@ -55,12 +55,12 @@ if ( 'error' === $status && isset( $_GET['cwc_err'] ) ) { // phpcs:ignore WordPr
  * Repopulate the inputs after a validation failure so the user does
  * not have to retype everything.
  */
-$old_values = [
+$old_values = array(
 	'name'    => '',
 	'email'   => '',
 	'message' => '',
-];
-if ( 'error' === $status ) {
+);
+if ( 'error' === $submission_status ) {
 	$old = get_transient( 'cwc_contact_old_' . cwc_contact_form_session_key() );
 	if ( is_array( $old ) ) {
 		$old_values = wp_parse_args( $old, $old_values );
@@ -69,15 +69,16 @@ if ( 'error' === $status ) {
 }
 
 $wrapper_attrs = get_block_wrapper_attributes(
-	[
+	array(
 		'class' => 'cwc-contact-form',
+
 		/*
 		 * Stable id used as the redirect-back anchor target so users
 		 * always land on the form (not at the top of the page) after
 		 * a successful submit or a validation error.
 		 */
 		'id'    => 'contact-form',
-	]
+	)
 );
 $action_url    = esc_url( admin_url( 'admin-post.php' ) );
 $is_invalid    = static function ( string $field ) use ( $error_fields ): string {
@@ -87,7 +88,7 @@ $is_invalid    = static function ( string $field ) use ( $error_fields ): string
 <section <?php echo $wrapper_attrs; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
 	<div class="cwc-contact-form__panel">
 
-		<?php if ( '' !== $title ) : ?>
+		<?php if ( '' !== $form_title ) : ?>
 			<header class="cwc-contact-form__header">
 				<span class="cwc-contact-form__icon-wrap" aria-hidden="true">
 					<img
@@ -100,11 +101,11 @@ $is_invalid    = static function ( string $field ) use ( $error_fields ): string
 						decoding="async"
 					/>
 				</span>
-				<h2 class="cwc-contact-form__title"><?php echo esc_html( $title ); ?></h2>
+				<h2 class="cwc-contact-form__title"><?php echo esc_html( $form_title ); ?></h2>
 			</header>
 		<?php endif; ?>
 
-		<?php if ( 'success' === $status && '' !== $success_message ) : ?>
+		<?php if ( 'success' === $submission_status && '' !== $success_message ) : ?>
 			<div
 				class="cwc-contact-form__banner cwc-contact-form__banner--success"
 				role="status"
@@ -113,7 +114,7 @@ $is_invalid    = static function ( string $field ) use ( $error_fields ): string
 			>
 				<?php echo esc_html( $success_message ); ?>
 			</div>
-		<?php elseif ( 'error' === $status && '' !== $error_message ) : ?>
+		<?php elseif ( 'error' === $submission_status && '' !== $error_message ) : ?>
 			<div
 				class="cwc-contact-form__banner cwc-contact-form__banner--error"
 				role="alert"

@@ -11,8 +11,8 @@
  */
 
 /* ----------------------------------------
-   Back link
-   ---------------------------------------- */
+	Back link
+	---------------------------------------- */
 
 .cwc-single-post__inner {
 	width: 100%;
@@ -45,8 +45,8 @@
 }
 
 /* ----------------------------------------
-   Blog title
-   ---------------------------------------- */
+	Blog title
+	---------------------------------------- */
 
 .cwc-single-post__title {
 	font-family: 'Sora', var(--wp--preset--font-family--heading) !important;
@@ -59,8 +59,8 @@
 }
 
 /* ----------------------------------------
-   Hero image (featured image) + meta bar
-   ---------------------------------------- */
+	Hero image (featured image) + meta bar
+	---------------------------------------- */
 
 .cwc-single-post__hero {
 	width: 100%;
@@ -101,8 +101,8 @@
 }
 
 /* ----------------------------------------
-   Two-column layout
-   ---------------------------------------- */
+	Two-column layout
+	---------------------------------------- */
 
 .cwc-single-post__columns {
 	align-items: stretch !important;
@@ -114,8 +114,8 @@
 }
 
 /* ----------------------------------------
-   Content box
-   ---------------------------------------- */
+	Content box
+	---------------------------------------- */
 
 .cwc-single-post__content-box {
 	background: #F8F9FA;
@@ -125,8 +125,8 @@
 }
 
 /* WordPress applies theme.json contentSize (720px) as a max-width on
-   the post-content block's inner layout. Override it so content and
-   images can fill the full width of our wider 75% column. */
+	the post-content block's inner layout. Override it so content and
+	images can fill the full width of our wider 75% column. */
 .cwc-single-post__content-box .wp-block-post-content,
 .cwc-single-post__content-box .wp-block-post-content > *,
 .cwc-single-post__content-box .is-layout-flow > * {
@@ -209,8 +209,8 @@
 }
 
 /* ----------------------------------------
-   Responsive — stacked at tablet
-   ---------------------------------------- */
+	Responsive — stacked at tablet
+	---------------------------------------- */
 
 @media (max-width: 991px) {
 	.cwc-single-post__columns {

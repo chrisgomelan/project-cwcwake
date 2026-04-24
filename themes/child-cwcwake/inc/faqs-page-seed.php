@@ -17,6 +17,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+/**
+ * Ensure the FAQs page is using the correct page template.
+ *
+ * @since 1.0.0
+ * @return void
+ */
 function cwc_seed_faqs_page(): void {
 	if ( get_option( 'cwc_faqs_page_seeded' ) ) {
 		return;

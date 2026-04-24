@@ -16,16 +16,18 @@ $theme_uri = get_stylesheet_directory_uri();
 $title_start     = $attributes['titleStart'] ?? 'PRO-LEVEL 6-';
 $title_accent    = $attributes['titleAccent'] ?? 'POINT SYSTEM';
 $description     = $attributes['description'] ?? '';
-$checklist_items = $attributes['checklistItems'] ?? [];
+$checklist_items = $attributes['checklistItems'] ?? array();
 $image1          = $attributes['image1'] ?? '';
 $image2          = $attributes['image2'] ?? '';
 $reversed        = ! empty( $attributes['reversed'] );
 
 $modifier = $reversed ? ' cwc-feature-split--reversed' : '';
 
-$wrapper_attrs = get_block_wrapper_attributes( [
-	'class' => 'cwc-feature-split' . $modifier,
-] );
+$wrapper_attrs = get_block_wrapper_attributes(
+	array(
+		'class' => 'cwc-feature-split' . $modifier,
+	)
+);
 ?>
 
 <section <?php echo $wrapper_attrs; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>

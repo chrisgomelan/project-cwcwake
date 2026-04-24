@@ -18,8 +18,8 @@
  */
 
 /* ----------------------------------------
-   Fluid header tokens
-   ---------------------------------------- */
+	Fluid header tokens
+	---------------------------------------- */
 
 .cwc-header {
 	--cwc-header-h: clamp(72px, 6vw + 36px, 115px);
@@ -34,8 +34,8 @@
 }
 
 /* ----------------------------------------
-   Fixed header bar
-   ---------------------------------------- */
+	Fixed header bar
+	---------------------------------------- */
 
 .cwc-header {
 	position: fixed !important;
@@ -53,7 +53,7 @@
 	padding: 0 !important;
 	margin: 0 !important;
 	/* Clip the wave ::after that extends -40px above the header (and any side overflow),
-	   but leave the bottom open so navigation submenu dropdowns can extend below. */
+		but leave the bottom open so navigation submenu dropdowns can extend below. */
 	clip-path: inset(0 0 -100vh 0);
 	transition: border-color 0.3s ease,
 		box-shadow 0.3s ease;
@@ -117,8 +117,8 @@ body.admin-bar {
 }
 
 /* ----------------------------------------
-   Inner layout — 3-column grid
-   ---------------------------------------- */
+	Inner layout — 3-column grid
+	---------------------------------------- */
 
 .cwc-header__inner {
 	width: 100%;
@@ -138,8 +138,8 @@ body.admin-bar {
 }
 
 /* ----------------------------------------
-   Logo — with top & bottom border lines
-   ---------------------------------------- */
+	Logo — with top & bottom border lines
+	---------------------------------------- */
 
 .cwc-header__logo-link {
 	display: flex;
@@ -166,8 +166,8 @@ body.admin-bar {
 }
 
 /* ----------------------------------------
-   Navigation — always centered (desktop)
-   ---------------------------------------- */
+	Navigation — always centered (desktop)
+	---------------------------------------- */
 
 .cwc-header__nav-center {
 	display: flex !important;
@@ -189,8 +189,8 @@ body.admin-bar {
 }
 
 /* ----------------------------------------
-   Desktop Hover & Active States
-   ---------------------------------------- */
+	Desktop Hover & Active States
+	---------------------------------------- */
 @media (min-width: 1200px) {
 	.cwc-header .wp-block-navigation .wp-block-navigation__container>.wp-block-navigation-item:hover {
 		background-color: var(--wp--preset--color--accent);
@@ -251,8 +251,8 @@ body.admin-bar {
 }
 
 /* ----------------------------------------
-   Right-side actions (Search + Book Now + Burger)
-   ---------------------------------------- */
+	Right-side actions (Search + Book Now + Burger)
+	---------------------------------------- */
 
 .cwc-header__actions {
 	display: flex !important;
@@ -263,8 +263,8 @@ body.admin-bar {
 }
 
 /* ----------------------------------------
-   Search toggle
-   ---------------------------------------- */
+	Search toggle
+	---------------------------------------- */
 
 .cwc-header__search-toggle {
 	width: clamp(36px, 2.5vw + 16px, 44px);
@@ -299,8 +299,8 @@ body.admin-bar {
 }
 
 /* ----------------------------------------
-   Book Now CTA — per design specs
-   ---------------------------------------- */
+	Book Now CTA — per design specs
+	---------------------------------------- */
 
 .cwc-header__book-btn {
 	display: inline-flex;
@@ -338,8 +338,8 @@ body.admin-bar {
 }
 
 /* ----------------------------------------
-   Dropdown / Submenu (desktop)
-   ---------------------------------------- */
+	Dropdown / Submenu (desktop)
+	---------------------------------------- */
 
 .cwc-header .wp-block-navigation__submenu-container {
 	background: var(--wp--preset--color--background);
@@ -401,8 +401,8 @@ body.admin-bar {
 }
 
 /* ----------------------------------------
-   Burger button — hidden on desktop
-   ---------------------------------------- */
+	Burger button — hidden on desktop
+	---------------------------------------- */
 
 .cwc-header__burger {
 	display: none;
@@ -451,8 +451,8 @@ body.admin-bar {
 }
 
 /* ----------------------------------------
-   Off-canvas backdrop
-   ---------------------------------------- */
+	Off-canvas backdrop
+	---------------------------------------- */
 
 .cwc-header__backdrop {
 	position: fixed;
@@ -472,8 +472,8 @@ body.admin-bar {
 }
 
 /* ----------------------------------------
-   Drawer close button — hidden on desktop, visible inside drawer
-   ---------------------------------------- */
+	Drawer close button — hidden on desktop, visible inside drawer
+	---------------------------------------- */
 
 .cwc-header__nav-close {
 	display: none;
@@ -506,8 +506,8 @@ body.admin-bar {
 }
 
 /* ----------------------------------------
-   Tablet & below — Premium Light Off-canvas
-   ---------------------------------------- */
+	Tablet & below — Premium Light Off-canvas
+	---------------------------------------- */
 
 .cwc-header__nav-logo {
 	display: none;
@@ -842,8 +842,8 @@ body.admin-bar {
 }
 
 /* ----------------------------------------
-   Phones — tighten the actions row
-   ---------------------------------------- */
+	Phones — tighten the actions row
+	---------------------------------------- */
 
 @media (max-width: 600px) {
 	.cwc-header__search-toggle {
@@ -862,19 +862,19 @@ body.admin-bar {
 }
 
 /* ----------------------------------------
-   Lock body scroll while the off-canvas is open
-   ---------------------------------------- */
+	Lock body scroll while the off-canvas is open
+	---------------------------------------- */
 
 body.cwc-nav-open {
 	overflow: hidden;
 }
 
 /* ----------------------------------------
-   Non-home pages — always opaque header
-   ----------------------------------------
-   The transparent-at-top + wave-on-scroll behavior is reserved for the
-   home page only. Every other page mirrors the .cwc-header--scrolled
-   appearance permanently and skips the wave animation entirely. */
+	Non-home pages — always opaque header
+	----------------------------------------
+	The transparent-at-top + wave-on-scroll behavior is reserved for the
+	home page only. Every other page mirrors the .cwc-header--scrolled
+	appearance permanently and skips the wave animation entirely. */
 
 body:not(.cwc-home) .cwc-header {
 	background: var(--wp--preset--color--background);

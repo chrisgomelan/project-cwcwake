@@ -1,4 +1,10 @@
 <?php
+/**
+ * Hero Section block — render template.
+ *
+ * @package CWC_Wake
+ */
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -21,16 +27,21 @@ $show_scroll      = $attributes['showScrollToDive'] ?? false;
 $fallback_image = get_stylesheet_directory_uri() . '/assets/images/hero-fallback.jpg';
 $bg_src         = ! empty( $bg_image ) ? esc_url( $bg_image ) : esc_url( $fallback_image );
 
-$wrapper_attrs = get_block_wrapper_attributes( [
-	'class' => 'cwc-hero',
-	'style' => sprintf( '--cwc-hero-bg:url(%s);--cwc-hero-overlay:%s;min-height:%s;', $bg_src, $overlay_opacity / 100, esc_attr( $min_height ) ),
-] );
+$wrapper_attrs = get_block_wrapper_attributes(
+	array(
+		'class' => 'cwc-hero',
+		'style' => sprintf( '--cwc-hero-bg:url(%s);--cwc-hero-overlay:%s;min-height:%s;', $bg_src, $overlay_opacity / 100, esc_attr( $min_height ) ),
+	)
+);
 ?>
 
-<section <?php echo $wrapper_attrs; ?>>
+<section <?php echo $wrapper_attrs; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
 	<?php if ( ! empty( $bg_video ) ) : ?>
 		<video class="cwc-hero__video" autoplay muted loop playsinline preload="auto"
-			<?php if ( ! empty( $bg_src ) ) : ?>poster="<?php echo $bg_src; ?>"<?php endif; ?>>
+			<?php
+			if ( ! empty( $bg_src ) ) :
+				?>
+				poster="<?php echo esc_url( $bg_src ); ?>"<?php endif; ?>>
 			<source src="<?php echo esc_url( $bg_video ); ?>" type="video/mp4">
 		</video>
 	<?php endif; ?>

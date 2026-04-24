@@ -42,90 +42,90 @@ if ( ! defined( 'ABSPATH' ) ) {
  * }> Catalogue keyed by a stable id.
  */
 function cwc_policy_pages_catalogue() {
-	return [
-		'privacy-policy' => [
+	return array(
+		'privacy-policy'       => array(
 			'slug'     => 'privacy-policy',
 			'template' => 'page-privacy-policy',
-			'intro'    => "Welcome to CamSur Watersports Complex. Your privacy is important to us, and we are committed to protecting your personal information. This Privacy Policy explains how we collect, use, and safeguard your data when you use our website.",
-			'sections' => [
-				[
+			'intro'    => 'Welcome to CamSur Watersports Complex. Your privacy is important to us, and we are committed to protecting your personal information. This Privacy Policy explains how we collect, use, and safeguard your data when you use our website.',
+			'sections' => array(
+				array(
 					'label' => 'Information We Collect',
-					'body'  => "We may collect personal information such as your name, email address, phone number, and booking details when you register or make a reservation on our site. We also collect non-personal information like browser type, device information, and website usage data to improve user experience.",
-				],
-				[
+					'body'  => 'We may collect personal information such as your name, email address, phone number, and booking details when you register or make a reservation on our site. We also collect non-personal information like browser type, device information, and website usage data to improve user experience.',
+				),
+				array(
 					'label' => 'How We Use Your Information',
-					'body'  => "Your information is used to process bookings, provide customer support, and improve our services. We may also use your contact details to send updates, promotions, or important notifications related to your reservations.",
-				],
-				[
+					'body'  => 'Your information is used to process bookings, provide customer support, and improve our services. We may also use your contact details to send updates, promotions, or important notifications related to your reservations.',
+				),
+				array(
 					'label' => 'Sharing of Information',
-					'body'  => "We do not sell or trade your personal information. However, we may share your data with trusted partners or service providers who help us operate the website and deliver services, such as payment processors or booking systems.",
-				],
-				[
+					'body'  => 'We do not sell or trade your personal information. However, we may share your data with trusted partners or service providers who help us operate the website and deliver services, such as payment processors or booking systems.',
+				),
+				array(
 					'label' => 'Data Security',
-					'body'  => "We implement appropriate security measures to protect your personal information from unauthorized access, alteration, or disclosure. While we strive to protect your data, please note that no online platform is completely secure.",
-				],
-				[
+					'body'  => 'We implement appropriate security measures to protect your personal information from unauthorized access, alteration, or disclosure. While we strive to protect your data, please note that no online platform is completely secure.',
+				),
+				array(
 					'label' => 'Cookies',
-					'body'  => "Our website uses cookies to enhance your browsing experience. Cookies help us understand user behavior and improve website functionality. You may choose to disable cookies through your browser settings.",
-				],
-				[
+					'body'  => 'Our website uses cookies to enhance your browsing experience. Cookies help us understand user behavior and improve website functionality. You may choose to disable cookies through your browser settings.',
+				),
+				array(
 					'label' => 'Your Rights',
-					'body'  => "You have the right to access, update, or delete your personal information. If you wish to make changes or request removal of your data, you may contact us directly.",
-				],
-				[
+					'body'  => 'You have the right to access, update, or delete your personal information. If you wish to make changes or request removal of your data, you may contact us directly.',
+				),
+				array(
 					'label' => 'Changes to This Policy',
-					'body'  => "We may update this Privacy Policy from time to time. Any changes will be posted on this page with an updated effective date.",
-				],
-				[
+					'body'  => 'We may update this Privacy Policy from time to time. Any changes will be posted on this page with an updated effective date.',
+				),
+				array(
 					'label' => 'Contact Us',
 					'body'  => "If you have any questions or concerns about this Privacy Policy, please contact us at:\nEmail: support@camsurwatersports.com\nPhone: +63 912 345 6789",
-				],
-			],
-		],
-		'terms-and-conditions' => [
+				),
+			),
+		),
+		'terms-and-conditions' => array(
 			'slug'     => 'terms-and-conditions',
 			'template' => 'page-terms-and-conditions',
-			'intro'    => "Welcome to CamSur Watersports Complex. Your privacy is important to us, and we are committed to protecting your personal information. This Privacy Policy explains how we collect, use, and safeguard your data when you use our website.",
-			'sections' => [
-				[
+			'intro'    => 'Welcome to CamSur Watersports Complex. Your privacy is important to us, and we are committed to protecting your personal information. This Privacy Policy explains how we collect, use, and safeguard your data when you use our website.',
+			'sections' => array(
+				array(
 					'label' => 'Use of Website',
-					'body'  => "Welcome to CamSur Watersports. By accessing and using our website, you agree to comply with and be bound by the following Terms and Conditions. Please read them carefully before making any bookings or using our services.",
-				],
-				[
+					'body'  => 'Welcome to CamSur Watersports. By accessing and using our website, you agree to comply with and be bound by the following Terms and Conditions. Please read them carefully before making any bookings or using our services.',
+				),
+				array(
 					'label' => 'Bookings and Reservations',
-					'body'  => "All bookings made through our website are subject to availability and confirmation. You are responsible for providing accurate and complete information when making a reservation. We reserve the right to cancel or refuse bookings if necessary.",
-				],
-				[
+					'body'  => 'All bookings made through our website are subject to availability and confirmation. You are responsible for providing accurate and complete information when making a reservation. We reserve the right to cancel or refuse bookings if necessary.',
+				),
+				array(
 					'label' => 'Payments',
-					'body'  => "Payments must be completed through the approved methods available on the website. Prices are subject to change without prior notice. Once a booking is confirmed, payment is considered final unless stated otherwise in our cancellation policy.",
-				],
-				[
+					'body'  => 'Payments must be completed through the approved methods available on the website. Prices are subject to change without prior notice. Once a booking is confirmed, payment is considered final unless stated otherwise in our cancellation policy.',
+				),
+				array(
 					'label' => 'Cancellations and Refunds',
-					'body'  => "Cancellations must be made within the allowed time frame to be eligible for a refund. Refund policies may vary depending on the activity or service booked. Processing of refunds may take several business days.",
-				],
-				[
+					'body'  => 'Cancellations must be made within the allowed time frame to be eligible for a refund. Refund policies may vary depending on the activity or service booked. Processing of refunds may take several business days.',
+				),
+				array(
 					'label' => 'User Responsibilities',
-					'body'  => "Users are expected to behave responsibly and follow all safety guidelines when participating in watersports activities. Any damage to property or violation of rules may result in penalties or termination of services.",
-				],
-				[
+					'body'  => 'Users are expected to behave responsibly and follow all safety guidelines when participating in watersports activities. Any damage to property or violation of rules may result in penalties or termination of services.',
+				),
+				array(
 					'label' => 'Limitation of Liability',
-					'body'  => "CamSur Watersports Complex shall not be held liable for any injuries, losses, or damages incurred during the use of our services, except where required by law. Participation in activities is at your own risk.",
-				],
-				[
+					'body'  => 'CamSur Watersports Complex shall not be held liable for any injuries, losses, or damages incurred during the use of our services, except where required by law. Participation in activities is at your own risk.',
+				),
+				array(
 					'label' => 'Intellectual Property',
-					'body'  => "All content on this website, including text, images, and design, is the property of CamSur Watersports & Booking. Unauthorized use, reproduction, or distribution is strictly prohibited.",
-				],
-				[
+					'body'  => 'All content on this website, including text, images, and design, is the property of CamSur Watersports & Booking. Unauthorized use, reproduction, or distribution is strictly prohibited.',
+				),
+				array(
 					'label' => 'Changes to Terms',
-					'body'  => "We reserve the right to update or modify these Terms and Conditions at any time. Changes will be effective immediately upon posting on this page.",
-				],
-				[
+					'body'  => 'We reserve the right to update or modify these Terms and Conditions at any time. Changes will be effective immediately upon posting on this page.',
+				),
+				array(
 					'label' => 'Contact Us',
 					'body'  => "If you have any questions or concerns about this Privacy Policy, please contact us at:\nEmail: support@camsurwatersports.com\nPhone: +63 912 345 6789",
-				],
-			],
-		],
-	];
+				),
+			),
+		),
+	);
 }
 
 /**
@@ -143,11 +143,11 @@ function cwc_render_policy_page_blocks( array $entry ) {
 	$flags = JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE;
 
 	$attrs = wp_json_encode(
-		[
+		array(
 			'align'    => 'full',
 			'intro'    => isset( $entry['intro'] ) ? (string) $entry['intro'] : '',
-			'sections' => isset( $entry['sections'] ) ? array_values( $entry['sections'] ) : [],
-		],
+			'sections' => isset( $entry['sections'] ) ? array_values( $entry['sections'] ) : array(),
+		),
 		$flags
 	);
 
@@ -180,10 +180,10 @@ function cwc_seed_policy_pages() {
 
 		if ( '' === trim( (string) $page->post_content ) ) {
 			wp_update_post(
-				[
+				array(
 					'ID'           => (int) $page->ID,
 					'post_content' => cwc_render_policy_page_blocks( $entry ),
-				]
+				)
 			);
 		}
 	}
