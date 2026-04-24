@@ -376,8 +376,7 @@ img {
 .cwc-tropical-section>.wp-block-cwc-about-empowering,
 .cwc-tropical-section>.wp-block-cwc-why-stay,
 .cwc-tropical-section>.wp-block-cwc-feature-split,
-.cwc-tropical-section>.wp-block-cwc-coaching-section,
-.cwc-tropical-section>.wp-block-cwc-feature-banner {
+.cwc-tropical-section>.wp-block-cwc-coaching-section {
 	width: 100%;
 	max-width: 1921px;
 	margin-inline: auto;
@@ -611,4 +610,77 @@ img {
 		width: 48px;
 		height: 48px;
 	}
+}
+
+/* ----------------------------------------
+   404 Page
+   ---------------------------------------- */
+
+.cwc-404-section {
+	display: flex !important;
+	align-items: center;
+	justify-content: center;
+}
+
+.cwc-404__inner {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: clamp(16px, 2vw, 28px);
+	text-align: center;
+	max-width: 640px;
+	padding-inline: clamp(1.5rem, 4vw, 4rem);
+}
+
+.cwc-404__code {
+	font-family: var(--wp--preset--font-family--heading);
+	font-weight: 700;
+	font-size: clamp(120px, 18vw, 240px);
+	line-height: 1;
+	color: var(--wp--preset--color--primary);
+	margin: 0;
+	opacity: 0.15;
+	letter-spacing: -0.04em;
+}
+
+.cwc-404__title {
+	font-family: var(--wp--preset--font-family--heading);
+	font-weight: 700;
+	font-size: clamp(32px, 4vw, 56px);
+	line-height: 1.1;
+	color: var(--wp--preset--color--secondary);
+	margin: 0;
+	margin-top: -3rem;
+}
+
+.cwc-404__message {
+	font-family: var(--wp--preset--font-family--body);
+	font-weight: 500;
+	font-size: clamp(16px, 1.2vw, 20px);
+	line-height: 1.6;
+	color: rgba(0, 0, 0, 0.6);
+	margin: 0;
+}
+
+.cwc-404__btn {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.5em;
+	padding: 0.85em 2.5em;
+	background: var(--wp--preset--color--primary);
+	color: #ffffff;
+	font-family: var(--wp--preset--font-family--heading);
+	font-weight: 600;
+	font-size: clamp(15px, 1vw, 18px);
+	text-decoration: none;
+	border-radius: 999px;
+	box-shadow: 0 4px 16px rgba(0, 150, 199, 0.3);
+	transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+	margin-top: 0.5rem;
+}
+
+.cwc-404__btn:hover {
+	background: var(--wp--preset--color--primary-dark);
+	transform: translateY(-2px);
+	box-shadow: 0 8px 24px rgba(0, 150, 199, 0.4);
 }

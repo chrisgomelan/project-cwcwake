@@ -16,9 +16,6 @@
 
 .cwc-single-post__inner {
 	width: 100%;
-	max-width: 1921px;
-	margin-inline: auto;
-	padding-inline: clamp(1.5rem, 4vw, 4rem);
 	padding-top: clamp(32px, 5vw, 64px);
 	overflow: visible !important; /* Required for sticky TOC */
 }
@@ -127,6 +124,15 @@
 	padding: clamp(24px, 4vw, 60px);
 }
 
+/* WordPress applies theme.json contentSize (720px) as a max-width on
+   the post-content block's inner layout. Override it so content and
+   images can fill the full width of our wider 75% column. */
+.cwc-single-post__content-box .wp-block-post-content,
+.cwc-single-post__content-box .wp-block-post-content > *,
+.cwc-single-post__content-box .is-layout-flow > * {
+	max-width: none !important;
+}
+
 /* H2 — section titles */
 .cwc-single-post__content-box h2 {
 	font-family: 'Sora', var(--wp--preset--font-family--heading) !important;
@@ -186,8 +192,11 @@
 
 /* Images inside the content box */
 .cwc-single-post__content-box img {
-	border-radius: 16px;
+	border-radius: 0;
 	margin: clamp(16px, 2vw, 32px) 0;
+	width: 100%;
+	height: 304px;
+	object-fit: cover;
 }
 
 /* Scrollspy passed-state on headings in content */

@@ -26,9 +26,16 @@
 	if (document.body.classList.contains('cwc-home')) {
 		const scrollClass = 'cwc-header--scrolled';
 		const threshold = 10;
+		let ticking = false;
 
 		const updateScroll = () => {
-			header.classList.toggle(scrollClass, window.scrollY > threshold);
+			if (!ticking) {
+				window.requestAnimationFrame(() => {
+					header.classList.toggle(scrollClass, window.scrollY > threshold);
+					ticking = false;
+				});
+				ticking = true;
+			}
 		};
 
 		window.addEventListener('scroll', updateScroll, { passive: true });
@@ -136,26 +143,29 @@
 	 *     happen naturally.
 	 */
 	drawer.addEventListener('click', (event) => {
-		// Ignore programmatically fired clicks (like our synthetic chevron clicks)
-		// to prevent infinite accordion loops.
-		if (!event.isTrusted) return;
-
 		const chevron = event.target.closest('.wp-block-navigation__submenu-icon');
 		if (chevron) {
-			// It was a native chevron click. Let Gutenberg natively open/close this specific item.
+			event.preventDefault();
+			event.stopPropagation();
+
 			const parent = chevron.closest('.wp-block-navigation-item.has-child');
 			if (parent) {
-				// Accordion: forcefully close any OTHER open submenus by clicking their chevrons!
+				const isOpening = !parent.classList.contains('is-submenu-open');
+
+				// Close all other open submenus first (Accordion style)
 				drawer.querySelectorAll('.wp-block-navigation-item.is-submenu-open').forEach((openItem) => {
 					if (openItem !== parent && !openItem.contains(parent)) {
-						const otherChevron = openItem.querySelector(':scope > .wp-block-navigation__submenu-icon');
-						if (otherChevron) {
-							otherChevron.click();
-						}
+						openItem.classList.remove('is-submenu-open');
 					}
 				});
+
+				// Toggle this one
+				if (isOpening) {
+					parent.classList.add('is-submenu-open');
+				} else {
+					parent.classList.remove('is-submenu-open');
+				}
 			}
-			// Do NOT prevent default or stop propagation. Let Gutenberg receive this natural click.
 			return;
 		}
 
@@ -171,10 +181,20 @@
 		if (item && item.classList.contains('has-child') && isPlaceholder) {
 			event.preventDefault();
 			event.stopPropagation();
-			// Proxy the click straight to the native Gutenberg chevron!
-			const ic = item.querySelector(':scope > .wp-block-navigation__submenu-icon');
-			if (ic) {
-				ic.click();
+
+			const isOpening = !item.classList.contains('is-submenu-open');
+
+			// Close others
+			drawer.querySelectorAll('.wp-block-navigation-item.is-submenu-open').forEach((openItem) => {
+				if (openItem !== item && !openItem.contains(item)) {
+					openItem.classList.remove('is-submenu-open');
+				}
+			});
+
+			if (isOpening) {
+				item.classList.add('is-submenu-open');
+			} else {
+				item.classList.remove('is-submenu-open');
 			}
 			return;
 		}
@@ -200,4 +220,41 @@
 		// Safari < 14 fallback.
 		DESKTOP_QUERY.addListener(handleViewportChange);
 	}
+
+	/* ---------- 3. Robust Active State Logic ---------- */
+	const applyActiveMenuStates = () => {
+		const currentPath = window.location.pathname;
+		const navLinks = header.querySelectorAll('.wp-block-navigation-item > a, .wp-block-navigation-item > .wp-block-navigation-item__content');
+
+		navLinks.forEach(link => {
+			const url = link.getAttribute('href');
+			if (!url || url.startsWith('#')) return;
+
+			try {
+				const linkUrl = new URL(url, window.location.origin);
+				const linkPath = linkUrl.pathname;
+
+				// Check for exact path match
+				if (linkPath === currentPath || linkPath === currentPath.replace(/\/$/, '') || linkPath === currentPath + '/') {
+					const parentItem = link.closest('.wp-block-navigation-item');
+					if (parentItem) {
+						parentItem.classList.add('current-menu-item');
+
+						const submenuContainer = parentItem.closest('.wp-block-navigation__submenu-container');
+						if (submenuContainer) {
+							const grandParentItem = submenuContainer.closest('.wp-block-navigation-item');
+							if (grandParentItem) {
+								grandParentItem.classList.add('current-menu-ancestor');
+							}
+						}
+					}
+				}
+			} catch (e) {
+				// Ignore invalid URLs
+			}
+		});
+	};
+
+	applyActiveMenuStates();
+
 })();

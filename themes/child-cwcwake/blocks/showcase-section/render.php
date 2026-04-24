@@ -175,7 +175,11 @@ $wrapper_attrs = get_block_wrapper_attributes( [
 					?>
 					<a href="<?php echo esc_url( $btn_url ); ?>" class="cwc-showcase__card cwc-showcase__card--image" <?php echo ! empty( $card_image ) ? 'style="background-image:url(' . esc_url( $card_image ) . ')"' : ''; ?>>
 						<?php if ( ! empty( $hover_gif ) ) : ?>
-							<img class="cwc-showcase__card-gif" src="<?php echo esc_url( $hover_gif ); ?>" alt="" loading="lazy">
+							<?php if ( preg_match( '/\.(webm|mp4)$/i', $hover_gif ) ) : ?>
+								<video class="cwc-showcase__card-gif" src="<?php echo esc_url( $hover_gif ); ?>" autoplay loop muted playsinline></video>
+							<?php else : ?>
+								<img class="cwc-showcase__card-gif" src="<?php echo esc_url( $hover_gif ); ?>" alt="" loading="lazy">
+							<?php endif; ?>
 						<?php endif; ?>
 						<div class="cwc-showcase__card-content">
 							<?php if ( ! empty( $card_title ) ) : ?>

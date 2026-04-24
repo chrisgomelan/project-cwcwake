@@ -31,6 +31,10 @@
 			"type": "string",
 			"default": ""
 		},
+		"dynamicSource": {
+			"type": "string",
+			"default": ""
+		},
 		"items": {
 			"type": "array",
 			"default": [],

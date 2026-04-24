@@ -67,7 +67,7 @@ function cwc_enqueue_styles()
 		get_stylesheet_directory_uri() . '/assets/js/header.js',
 		[],
 		CWC_VERSION,
-		true
+		['strategy' => 'defer', 'in_footer' => true]
 	);
 
 	// Custom Image Modal — Lightweight native popup slider.
@@ -76,7 +76,7 @@ function cwc_enqueue_styles()
 		get_stylesheet_directory_uri() . '/assets/js/image-modal.js',
 		[],
 		CWC_VERSION,
-		true
+		['strategy' => 'defer', 'in_footer' => true]
 	);
 
 	// Scroll to Top — Premium navigation helper.
@@ -85,263 +85,60 @@ function cwc_enqueue_styles()
 		get_stylesheet_directory_uri() . '/assets/js/scroll-to-top.js',
 		[],
 		CWC_VERSION,
-		true
+		['strategy' => 'defer', 'in_footer' => true]
 	);
 
-	// Scroll Reveal — Global section entrance animations.
-	wp_enqueue_style(
-		'cwc-scroll-reveal',
-		get_stylesheet_directory_uri() . '/assets/css/scroll-reveal.css',
-		['cwc-global'],
-		CWC_VERSION
-	);
 
-	wp_enqueue_script(
-		'cwc-scroll-reveal',
-		get_stylesheet_directory_uri() . '/assets/js/scroll-reveal.js',
-		[],
-		CWC_VERSION,
-		true
-	);
 
-	// Search Overlay — AI-ready semantic search with local fallback.
-	wp_enqueue_style(
-		'cwc-search-overlay',
-		get_stylesheet_directory_uri() . '/assets/css/search-overlay.css',
-		['cwc-global'],
-		CWC_VERSION
-	);
 
-	wp_enqueue_script(
-		'cwc-search-overlay',
-		get_stylesheet_directory_uri() . '/assets/js/search-overlay.js',
-		[],
-		CWC_VERSION,
-		true
-	);
-
-	// Pass config to JS (Priority AI toggle)
-	wp_localize_script('cwc-search-overlay', 'cwcSearchConfig', [
-		'hasAi' => defined('CWC_AI_KEY') && !empty(CWC_AI_KEY),
-		'nonce' => wp_create_nonce('wp_rest')
-	]);
 }
 add_action('wp_enqueue_scripts', 'cwc_enqueue_styles');
 
 /**
- * Inject the Search Overlay HTML into the footer.
+ * Add preconnect resource hints for Google Fonts to speed up font download.
  */
-function cwc_inject_search_overlay_html()
-{
-	?>
-	<div class="cwc-search-overlay" aria-hidden="true">
-		<button class="cwc-search-overlay__close" aria-label="Close search">
-			<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-				stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-				<line x1="18" y1="6" x2="6" y2="18" />
-				<line x1="6" y1="6" x2="18" y2="18" />
-			</svg>
-		</button>
-		<div class="cwc-search-overlay__inner">
-			<div class="cwc-search-overlay__field-wrap">
-				<input type="text" class="cwc-search-overlay__input" placeholder="Type to explore..."
-					aria-label="Search site">
-				<span class="cwc-search-overlay__status"></span>
-			</div>
-			<div class="cwc-search-overlay__results"></div>
-		</div>
-	</div>
-	<?php
+function cwc_preconnect_google_fonts( $urls, $relation_type ) {
+	if ( wp_style_is( 'cwc-google-fonts', 'queue' ) && 'preconnect' === $relation_type ) {
+		$urls[] = array(
+			'href' => 'https://fonts.gstatic.com',
+			'crossorigin',
+		);
+	}
+	return $urls;
 }
-add_action('wp_footer', 'cwc_inject_search_overlay_html');
+add_filter( 'wp_resource_hints', 'cwc_preconnect_google_fonts', 10, 2 );
 
 /**
- * Register REST API endpoints for Search (Local Fallback & Semantic).
+ * Preload LCP (Largest Contentful Paint) resources for the main pages.
+ * By explicitly telling the browser to download these hero images immediately,
+ * we dramatically speed up the LCP metric across the site.
  */
-function cwc_register_search_endpoints()
-{
-	// Endpoint for local fuzzy search data
-	register_rest_route('cwc/v1', '/search-data', [
-		'methods' => 'GET',
-		'callback' => 'cwc_get_search_data',
-		'permission_callback' => '__return_true'
-	]);
+function cwc_preload_lcp_resources() {
+	$preload_image = '';
 
-	// Endpoint for quick suggestions/recommendations
-	register_rest_route('cwc/v1', '/search-suggestions', [
-		'methods' => 'GET',
-		'callback' => 'cwc_get_search_suggestions',
-		'permission_callback' => '__return_true'
-	]);
+	if ( is_front_page() ) {
+		$preload_image = '/wp-content/uploads/2026/04/hero-home.jpg';
+	} elseif ( is_page( 'water-sports' ) ) {
+		$preload_image = '/wp-content/uploads/2026/04/watersports-page-bg-banner-e1776914994956.webp';
+	} elseif ( is_page( 'accommodations' ) ) {
+		$preload_image = '/wp-content/uploads/2026/04/accomodations-banner-bg.webp';
+	} elseif ( is_page( 'gallery' ) || is_singular( 'cwc_album' ) || is_tax( 'cwc_album_category' ) ) {
+		$preload_image = '/wp-content/uploads/2026/04/gallery-banner-bg.webp';
+	} elseif ( is_page( 'contact-us' ) || is_page( 'contact' ) ) {
+		$preload_image = '/wp-content/uploads/2026/04/contact-banner-bg.webp';
+	} elseif ( is_page( 'blogs' ) ) {
+		$preload_image = '/wp-content/uploads/2026/04/blogs-banner-bg-e1776821235201.webp';
+	} elseif ( is_page( 'rates' ) ) {
+		$preload_image = '/wp-content/uploads/2026/04/rates-banner-bg.webp';
+	}
 
-	// Stub for Semantic Search (Placeholder for AI integration)
-	register_rest_route('cwc/v1', '/semantic-search', [
-		'methods' => 'POST',
-		'callback' => 'cwc_handle_semantic_search',
-		'permission_callback' => '__return_true'
-	]);
+	if ( ! empty( $preload_image ) ) {
+		echo '<link rel="preload" as="image" href="' . esc_url( $preload_image ) . '">';
+	}
 }
-add_action('rest_api_init', 'cwc_register_search_endpoints');
+add_action( 'wp_head', 'cwc_preload_lcp_resources', 1 );
 
-/**
- * Get all searchable content for local fuzzy matching.
- */
-function cwc_get_search_data($request = null)
-{
-	$query_str = $request ? $request->get_param('q') : '';
-	$items = [];
 
-	$args = [
-		'post_type' => get_post_types(['public' => true]),
-		'posts_per_page' => 100,
-		'post_status' => 'publish'
-	];
-
-	if (!empty($query_str)) {
-		$args['s'] = $query_str;
-	}
-
-	$query = new WP_Query($args);
-
-	if ($query->have_posts()) {
-		while ($query->have_posts()) {
-			$query->the_post();
-			$items[] = [
-				'title' => get_the_title(),
-				'url' => get_permalink(),
-				'excerpt' => wp_trim_words(get_the_excerpt(), 20),
-				'type' => get_post_type_labels(get_post_type_object(get_post_type()))->singular_name
-			];
-		}
-		wp_reset_postdata();
-	}
-
-	return rest_ensure_response($items);
-}
-
-/**
- * Handle Semantic Search logic using OpenRouter AI.
- * 
- * Strategy:
- * 1. Fetch top 15 potential matches via fast keyword search.
- * 2. Use OpenRouter AI to analyze and rerank these results by semantic meaning.
- * 3. Fall back to weighted keyword results if AI fails or key is missing.
- */
-function cwc_handle_semantic_search($request)
-{
-	$query_str = $request->get_param('query');
-	if (empty($query_str)) {
-		return rest_ensure_response([]);
-	}
-
-	// 1. Get potential candidates via keyword search
-	global $wpdb;
-	$search_term = '%' . $wpdb->esc_like($query_str) . '%';
-	$search_words = explode(' ', $query_str);
-	$where_parts = [];
-	$query_params = [];
-
-	foreach ($search_words as $word) {
-		if (strlen($word) < 3)
-			continue;
-		$term = '%' . $wpdb->esc_like($word) . '%';
-		$where_parts[] = "(post_title LIKE %s OR post_content LIKE %s)";
-		$query_params[] = $term;
-		$query_params[] = $term;
-	}
-
-	if (empty($where_parts)) {
-		$where_clause = "(post_title LIKE %s OR post_content LIKE %s)";
-		$query_params = [$search_term, $search_term];
-	} else {
-		$where_clause = implode(' OR ', $where_parts);
-	}
-
-	$public_types = get_post_types(['public' => true]);
-	$types_placeholders = implode(',', array_fill(0, count($public_types), '%s'));
-
-	$candidates = $wpdb->get_results($wpdb->prepare(
-		"SELECT ID, post_title, post_type, post_content
-		FROM $wpdb->posts 
-		WHERE post_status = 'publish' 
-		AND post_type IN ($types_placeholders)
-		AND ($where_clause)
-		ORDER BY id DESC
-		LIMIT 25",
-		...array_merge($public_types, $query_params)
-	));
-
-	if (empty($candidates)) {
-		return rest_ensure_response([]);
-	}
-
-	$items = [];
-	foreach ($candidates as $post) {
-		$items[] = [
-			'id' => $post->ID,
-			'title' => $post->post_title,
-			'url' => get_permalink($post->ID),
-			'excerpt' => wp_trim_words(strip_tags($post->post_content), 15),
-			'type' => get_post_type_labels(get_post_type_object($post->post_type))->singular_name
-		];
-	}
-
-	// 2. Attempt AI Reranking via OpenRouter if key exists
-	if (defined('CWC_AI_KEY') && !empty(CWC_AI_KEY)) {
-		$api_key = CWC_AI_KEY;
-
-		// Map candidates for AI context
-		$context = "";
-		foreach ($items as $index => $item) {
-			$context .= "[$index] Title: {$item['title']}, Content: {$item['excerpt']}\n";
-		}
-
-		$prompt = "You are a search assistant for CWC Wake (a water sports park). 
-		The user is searching for: \"{$query_str}\".
-		Below are the potential matches. Re-order them from most semantically relevant to least relevant.
-		Respond ONLY with a comma-separated list of the indices. If something is irrelevant, exclude it.
-		Example: 2,0,5
-		
-		Candidates:
-		{$context}";
-
-		$response = wp_remote_post('https://openrouter.ai/api/v1/chat/completions', [
-			'timeout' => 5, // Keep it fast for search
-			'headers' => [
-				'Authorization' => 'Bearer ' . $api_key,
-				'Content-Type' => 'application/json',
-				'HTTP-Referer' => home_url(),
-			],
-			'body' => json_encode([
-				'model' => 'google/gemma-4-26b-a4b:free', // Better for chat-based ranking
-				'messages' => [['role' => 'user', 'content' => $prompt]],
-				'temperature' => 0
-			])
-		]);
-
-		if (!is_wp_error($response) && wp_remote_retrieve_response_code($response) === 200) {
-			$body = json_decode(wp_remote_retrieve_body($response), true);
-			$order_str = $body['choices'][0]['message']['content'] ?? '';
-
-			// Parse the AI's suggested order
-			preg_match_all('/\d+/', $order_str, $matches);
-			if (!empty($matches[0])) {
-				$reordered_items = [];
-				foreach ($matches[0] as $index) {
-					if (isset($items[(int) $index])) {
-						$reordered_items[] = $items[(int) $index];
-					}
-				}
-				if (!empty($reordered_items)) {
-					return rest_ensure_response(array_slice($reordered_items, 0, 8));
-				}
-			}
-		}
-	}
-
-	// Fallback to basic results if AI fails
-	return rest_ensure_response(array_slice($items, 0, 8));
-}
 
 
 /**
@@ -713,13 +510,7 @@ require_once get_stylesheet_directory() . '/inc/blogs-page-seed.php';
  */
 require_once get_stylesheet_directory() . '/inc/faqs-page-seed.php';
 
-/*
- * Scroll Reveal — Centralized `render_block` filter that auto-injects
- * `data-reveal` attributes into block output based on a class → animation
- * mapping. No template or render.php changes are needed; edit the map
- * inside `inc/scroll-reveal.php` to adjust per-section animations.
- */
-require_once get_stylesheet_directory() . '/inc/scroll-reveal.php';
+
 
 /*
  * Water Sports page seeder — assigns the `page-water-sports` template
@@ -983,7 +774,7 @@ add_action('init', 'cwc_register_blocks');
  */
 function cwc_body_class_front_page($classes)
 {
-	if (is_front_page() || is_page('about')) {
+	if (is_front_page() || is_page('about') || is_page('accommodations') || is_page('water-sports')) {
 		$classes[] = 'cwc-home';
 	}
 	return $classes;
@@ -1170,6 +961,117 @@ function cwc_allow_svg_uploads($mimes)
 add_filter('upload_mimes', 'cwc_allow_svg_uploads');
 
 /**
+ * Block direct access to navigation hub pages.
+ *
+ * Visiting /activities/ or /plan-your-trip/ directly triggers a 404.
+ * Their child pages (Water Sports, Rates, etc.) remain fully accessible.
+ * Admin previews are left untouched so editors can still edit these pages.
+ */
+function cwc_block_hub_pages() {
+	if ( is_admin() || ( defined( 'REST_REQUEST' ) && REST_REQUEST ) ) {
+		return;
+	}
+
+	if ( ! is_page() ) {
+		return;
+	}
+
+	$blocked_slugs = [ 'activities', 'plan-your-trip' ];
+	$post          = get_queried_object();
+
+	if ( ! $post instanceof WP_Post ) {
+		return;
+	}
+
+	// Only block if this page itself is one of the hub slugs (not a child).
+	if ( $post->post_parent === 0 && in_array( $post->post_name, $blocked_slugs, true ) ) {
+		global $wp_query;
+		$wp_query->set_404();
+		status_header( 404 );
+		nocache_headers();
+	}
+}
+add_action( 'template_redirect', 'cwc_block_hub_pages' );
+
+/**
+ * Exclude navigation hub pages from search results.
+ *
+ * "Activities" and "Plan Your Trip" are parent nav pages with no
+ * standalone content. This uses a direct $wpdb query to resolve their
+ * IDs, bypassing any get_pages/get_page_by_path filters that could
+ * interfere. It also hooks posts_where as a safety net.
+ */
+function cwc_hub_page_exclude_ids() {
+	static $cache = null;
+	if ( $cache !== null ) {
+		return $cache;
+	}
+
+	global $wpdb;
+
+	// Resolve the two hub page IDs directly — no filters, no cache layers.
+	$hub_ids = $wpdb->get_col(
+		"SELECT ID FROM {$wpdb->posts}
+		 WHERE post_type   = 'page'
+		   AND post_status = 'publish'
+		   AND post_name   IN ('activities', 'plan-your-trip')"
+	);
+
+	$exclude = array_map( 'intval', (array) $hub_ids );
+
+	// Add all descendants of those pages.
+	if ( ! empty( $exclude ) ) {
+		$ids_in      = implode( ',', $exclude );
+		$child_ids   = $wpdb->get_col(
+			"SELECT ID FROM {$wpdb->posts}
+			 WHERE post_type   = 'page'
+			   AND post_status = 'publish'
+			   AND post_parent IN ({$ids_in})"
+		);
+		$exclude = array_unique( array_merge( $exclude, array_map( 'intval', (array) $child_ids ) ) );
+	}
+
+	$cache = $exclude;
+	return $cache;
+}
+
+function cwc_exclude_hub_pages_from_search( WP_Query $query ) {
+	if ( ! $query->is_search() || ! $query->is_main_query() || is_admin() ) {
+		return;
+	}
+
+	$exclude = cwc_hub_page_exclude_ids();
+	if ( empty( $exclude ) ) {
+		return;
+	}
+
+	$existing = (array) $query->get( 'post__not_in' );
+	$query->set( 'post__not_in', array_unique( array_merge( $existing, $exclude ) ) );
+}
+add_action( 'pre_get_posts', 'cwc_exclude_hub_pages_from_search' );
+
+/**
+ * SQL-level safety net: strip hub pages from search even if
+ * post__not_in is overridden elsewhere.
+ */
+function cwc_exclude_hub_pages_where( $where, WP_Query $query ) {
+	if ( ! $query->is_search() || ! $query->is_main_query() || is_admin() ) {
+		return $where;
+	}
+
+	$exclude = cwc_hub_page_exclude_ids();
+	if ( empty( $exclude ) ) {
+		return $where;
+	}
+
+	global $wpdb;
+	$ids_in  = implode( ',', $exclude );
+	$where  .= " AND {$wpdb->posts}.ID NOT IN ({$ids_in})";
+	return $where;
+}
+add_filter( 'posts_where', 'cwc_exclude_hub_pages_where', 10, 2 );
+
+/**
  * Fix WordPress rejecting SVGs even when the MIME type is allowed.
  */
 function cwc_fix_svg_filetype($data, $file, $filename, $mimes)
@@ -1209,3 +1111,29 @@ function cwc_album_template_switcher($template)
 	return $template;
 }
 add_filter('single_template', 'cwc_album_template_switcher', 20);
+
+/**
+ * Defer non-critical CSS to improve render-blocking times.
+ */
+function cwc_defer_non_critical_css( $html, $handle, $href, $media ) {
+	$defer_styles = [
+		'cwc-footer'
+	];
+
+	if ( in_array( $handle, $defer_styles ) ) {
+		$html = sprintf(
+			'<link rel="stylesheet" id="%s-css" href="%s" media="print" onload="this.media=\'all\'" />',
+			esc_attr( $handle ),
+			esc_url( $href )
+		);
+		$html .= sprintf(
+			'<noscript><link rel="stylesheet" id="%s-noscript-css" href="%s" media="%s" /></noscript>',
+			esc_attr( $handle ),
+			esc_url( $href ),
+			esc_attr( $media )
+		);
+	}
+
+	return $html;
+}
+add_filter( 'style_loader_tag', 'cwc_defer_non_critical_css', 10, 4 );

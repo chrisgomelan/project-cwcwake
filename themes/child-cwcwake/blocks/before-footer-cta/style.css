@@ -14,6 +14,13 @@
 	margin-block-start: 0 !important;
 }
 
+/* Custom background variant — inline bg-image overrides the default */
+.cwc-cta-footer--custom-bg {
+	background-size: cover;
+	background-position: center;
+	background-repeat: no-repeat;
+}
+
 .cwc-cta-footer__overlay {
 	position: absolute;
 	inset: 0;
@@ -53,11 +60,21 @@
 	margin: 0 0 clamp(20px, 3vw, 36px);
 }
 
+/* ── Button row ── */
+
+.cwc-cta-footer__actions {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: clamp(16px, 2vw, 28px);
+	flex-wrap: wrap;
+}
+
 .cwc-cta-footer__btn {
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
-	width: clamp(160px, 14vw + 40px, 212px);
+	width: auto;
 	height: clamp(48px, 4vw + 16px, 64px);
 	padding: 20px;
 	gap: 10px;
@@ -67,7 +84,7 @@
 	font-weight: 700;
 	font-size: clamp(16px, 0.8vw + 10px, 22px);
 	line-height: 100%;
-	color: #1A1A1A;
+	color: #F5F1EB;
 	text-decoration: none;
 	transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
@@ -75,4 +92,17 @@
 .cwc-cta-footer__btn:hover {
 	transform: translateY(-3px);
 	box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+	color: #F5F1EB;
+}
+
+/* ── Outline (secondary) button ── */
+
+.cwc-cta-footer__btn--outline {
+	background: transparent;
+	border: 3px solid #F8F9FA;
+	color: #F5F1EB;
+}
+
+.cwc-cta-footer__btn--outline:hover {
+	background: rgba(248, 249, 250, 0.15);
 }

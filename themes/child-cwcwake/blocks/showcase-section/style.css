@@ -502,7 +502,8 @@
 		max-width: none;
 	}
 
-	.cwc-showcase--cards .cwc-showcase__card:last-child:nth-child(odd) {
+	.cwc-showcase--cards .cwc-showcase__card:last-child:nth-child(odd),
+	.cwc-showcase--social .cwc-showcase__card--social:last-child:nth-child(odd) {
 		grid-column: 1 / -1;
 	}
 

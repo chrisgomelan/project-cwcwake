@@ -100,7 +100,20 @@ if ( $is_accommodation_ctx ) {
 		$price = (string) get_post_meta( $post_id, '_cwc_price', true );
 	}
 
-	$meta_price_sub = (string) get_post_meta( $post_id, '_cwc_price_sub', true );
+	$meta_price_sub = trim( (string) get_post_meta( $post_id, '_cwc_price_sub', true ) );
+	$meta_capacity  = trim( (string) get_post_meta( $post_id, '_cwc_capacity', true ) );
+
+	if ( '' !== $meta_capacity && stripos( $meta_price_sub, 'maximum' ) === false ) {
+		$person_text = ( (int) $meta_capacity === 1 ) ? 'person' : 'persons';
+		$capacity_str = sprintf( 'Maximum %s %s', $meta_capacity, $person_text );
+		
+		if ( '' !== $meta_price_sub ) {
+			$meta_price_sub .= ' · ' . $capacity_str;
+		} else {
+			$meta_price_sub = $capacity_str;
+		}
+	}
+
 	if ( '' !== $meta_price_sub ) {
 		/*
 		 * Override the block default ("per night") when the editor
@@ -110,6 +123,9 @@ if ( $is_accommodation_ctx ) {
 		 */
 		if ( '' === $price_sub_label || 'per night' === $price_sub_label ) {
 			$price_sub_label = $meta_price_sub;
+		} elseif ( '' !== $meta_capacity && stripos( $price_sub_label, 'maximum' ) === false ) {
+			$person_text = ( (int) $meta_capacity === 1 ) ? 'person' : 'persons';
+			$price_sub_label .= ' · Maximum ' . $meta_capacity . ' ' . $person_text;
 		}
 	}
 

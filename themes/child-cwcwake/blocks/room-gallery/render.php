@@ -47,6 +47,9 @@ if ( function_exists( 'cwc_is_accommodation_context' ) && cwc_is_accommodation_c
 		if ( '' === $back_link_url ) {
 			$back_link_url = '/accommodations/';
 		}
+		if ( '' === $see_all_label ) {
+			$see_all_label = __( 'See All Images', 'child-cwcwake' );
+		}
 	}
 }
 
@@ -99,7 +102,7 @@ $resolve_slot = static function ($slot): array {
 		</div>
 	<?php endif; ?>
 
-	<div class="cwc-room-gallery__grid">
+	<div class="cwc-room-gallery__grid" data-images="<?php echo esc_attr( min( 4, count( $images ) ) ); ?>">
 		<?php
 		$positions = ['main', 'center', 'top', 'bottom'];
 		foreach ($positions as $index => $position):

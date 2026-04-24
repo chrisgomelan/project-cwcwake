@@ -66,7 +66,7 @@
 
 .cwc-feature-split__check-item {
 	display: flex;
-	align-items: center;
+	align-items: flex-start;
 	gap: 12px;
 	font-family: 'Sora', var(--wp--preset--font-family--heading);
 	font-weight: 600;

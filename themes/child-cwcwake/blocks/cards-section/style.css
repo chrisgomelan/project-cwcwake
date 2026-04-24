@@ -9,7 +9,7 @@
 	width: 100%;
 	max-width: 1921px;
 	margin: 0 auto !important;
-	padding: var(--wp--preset--spacing--40) clamp(1rem, 4vw, 4rem);
+	padding: var(--wp--preset--spacing--40) clamp(2rem, 7vw, 7rem);
 }
 
 /* ---------- Heading ---------- */
@@ -340,23 +340,25 @@
 
 
 	.cwc-cards-section__card--overlay .cwc-cards-section__card-content {
-		align-items: center;
+		align-items: center !important;
 	}
 
 	.cwc-cards-section__card--overlay .cwc-cards-section__card-title {
-		display: block; /* Show initially */
+		display: block;
+		/* Show initially */
 		opacity: 1;
 		transition: opacity 0.4s ease;
 	}
 
 	.cwc-cards-section__card--overlay:hover .cwc-cards-section__card-title {
-		display: none; /* Remove from flow so description can center natively */
+		display: none;
+		/* Remove from flow so description can center natively */
 	}
 
 	.cwc-cards-section__card--overlay:hover .cwc-cards-section__card-content {
 		bottom: 50%;
 		transform: translateY(50%);
-		justify-content: center;
+		justify-content: center !important;
 	}
 
 	.cwc-cards-section__card--overlay:hover .cwc-cards-section__card-description {
@@ -482,11 +484,12 @@
 	inset: 0 !important;
 	display: flex !important;
 	flex-direction: column !important;
-
-	padding: 2rem !important;
+	justify-content: flex-end !important;
+	align-items: flex-start !important;
+	padding: clamp(1rem, 5vw, 2rem) !important;
 	z-index: 5 !important;
 	opacity: 1 !important;
-	text-align: center !important;
+	text-align: left !important;
 	transform: none !important;
 }
 
@@ -499,13 +502,15 @@
 	margin: 0 0 1rem 0 !important;
 	font-family: var(--wp--preset--font-family--heading) !important;
 	font-weight: 700 !important;
-	font-size: clamp(32px, 5vw, 48px) !important;
+	font-size: clamp(24px, 4vw, 48px) !important;
+	word-wrap: break-word !important;
 	/* Larger headings as per screenshot */
 	line-height: 1.1 !important;
 	color: #F5F1EB !important;
 	text-transform: uppercase !important;
 	opacity: 1 !important;
 	transform: none !important;
+	text-align: left !important;
 }
 
 .cwc-cards-section--static .cwc-cards-section__card-description {
@@ -524,6 +529,17 @@
 	transform: none !important;
 }
 
+@media (max-width: 991px) {
+	.cwc-cards-section--static .cwc-cards-section__card-content {
+		align-items: center !important;
+		text-align: center !important;
+	}
+
+	.cwc-cards-section--static .cwc-cards-section__card-description {
+		text-align: center !important;
+	}
+}
+
 @media (min-width: 1024px) {
 	.cwc-cards-section--static .cwc-cards-section__card--overlay {
 		height: 374px !important;
@@ -539,8 +555,21 @@
 }
 
 /* Center Section Header */
+.cwc-cards-section--static .cwc-cards-section__heading-wrap {
+	text-align: center;
+	max-width: 688px;
+	margin-left: auto;
+	margin-right: auto;
+}
+
 .cwc-cards-section--static .cwc-cards-section__heading {
 	text-align: center;
+}
+
+@media (max-width: 991px) {
+	.cwc-cards-section--static .cwc-cards-section__heading-wrap {
+		max-width: 100%;
+	}
 }
 
 /* ---------- Wide (1280px+) ---------- */

@@ -18,9 +18,15 @@
 	width: 100%;
 	max-width: 1921px;
 	margin: 0 auto !important;
-	padding: 0 clamp(2rem, 7vw, 7rem);
 	margin-block-start: 0 !important;
+	padding: 0 clamp(2rem, 7vw, 7rem);
 	background: transparent;
+}
+
+@media (max-width: 1199px) {
+	.cwc-breadcrumbs__wrap {
+		padding-inline: 0;
+	}
 }
 
 .cwc-breadcrumbs {

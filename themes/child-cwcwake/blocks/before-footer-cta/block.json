@@ -31,6 +31,22 @@
     "buttonUrl": {
       "type": "string",
       "default": "#book"
+    },
+    "secondaryBtnLabel": {
+      "type": "string",
+      "default": ""
+    },
+    "secondaryBtnUrl": {
+      "type": "string",
+      "default": ""
+    },
+    "backgroundImage": {
+      "type": "string",
+      "default": ""
+    },
+    "overlayGradient": {
+      "type": "string",
+      "default": ""
     }
   },
   "style": "file:./style.css",

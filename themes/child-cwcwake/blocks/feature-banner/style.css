@@ -5,8 +5,8 @@
 
 .cwc-feature-banner {
 	position: relative;
-	width: calc(100% - (clamp(2rem, 7vw, 7rem) * 2));
-	max-width: 1921px;
+	width: calc(100% - (clamp(1rem, 4vw, 4rem) * 2));
+	max-width: calc(1921px - (clamp(1rem, 4vw, 4rem) * 2));
 	margin: 0 auto var(--wp--preset--spacing--60) !important;
 	min-height: clamp(300px, 28vw, 476px);
 	border-radius: 30px;
@@ -64,7 +64,6 @@
 
 @media (max-width: 768px) {
 	.cwc-feature-banner {
-		width: calc(100% - 2rem);
 		justify-content: center;
 		align-items: center;
 		margin: 0 auto var(--wp--preset--spacing--40) !important;

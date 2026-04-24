@@ -26,6 +26,89 @@ $heading_secondary = isset($attributes['headingSecondary']) ? trim((string) $att
 $section_description = isset($attributes['sectionDescription']) ? trim((string) $attributes['sectionDescription']) : '';
 $items = isset($attributes['items']) && is_array($attributes['items']) ? $attributes['items'] : [];
 
+$dynamic_source = isset($attributes['dynamicSource']) ? trim((string) $attributes['dynamicSource']) : '';
+
+if ($dynamic_source === 'accommodation') {
+	$query = new WP_Query([
+		'post_type' => 'accommodation',
+		'posts_per_page' => -1,
+		'post_status' => 'publish',
+		'orderby' => 'menu_order title',
+		'order' => 'ASC'
+	]);
+
+	if ($query->have_posts()) {
+		$items = [];
+		while ($query->have_posts()) {
+			$query->the_post();
+			$post_id = get_the_ID();
+
+			$price = get_post_meta($post_id, '_cwc_price', true);
+			$price_sub = get_post_meta($post_id, '_cwc_price_sub', true);
+			$meta_capacity = get_post_meta($post_id, '_cwc_capacity', true);
+			$capacity = '';
+			$price_text = $price;
+
+			if (!empty($meta_capacity)) {
+				$capacity = sprintf('Maximum %s %s', $meta_capacity, (int) $meta_capacity === 1 ? 'person' : 'persons');
+			}
+
+			if (!empty($price_sub)) {
+				$parts = array_map('trim', explode('·', $price_sub));
+				$sub_text = str_replace('per ', '', $parts[0]);
+
+				if (stripos($sub_text, 'maximum') === false && stripos($sub_text, 'person') === false) {
+					$price_text .= '/ ' . $sub_text;
+				}
+
+				if (empty($capacity) && count($parts) > 1) {
+					$capacity = ucfirst($parts[1]);
+				} elseif (empty($capacity) && (stripos($parts[0], 'maximum') !== false || stripos($parts[0], 'person') !== false)) {
+					$capacity = ucfirst($parts[0]);
+				}
+			}
+
+			$items[] = [
+				'title' => get_the_title(),
+				'image' => get_the_post_thumbnail_url($post_id, 'large'),
+				'price' => $price_text,
+				'capacity' => $capacity,
+				'buttonLabel' => 'View Details',
+				'buttonUrl' => get_permalink(),
+				'span' => 4 // default: 3 per row (12/4=3 cols)
+			];
+		}
+		wp_reset_postdata();
+
+		/*
+		 * Dynamic span: fill rows evenly.
+		 *
+		 * 4 rooms  → keep original 4-across (span 3 each)
+		 * 5+ rooms → 3-column grid (span 4), last row fills space:
+		 *   - 1 leftover → span 12 (full width)
+		 *   - 2 leftover → span 6 each (half width)
+		 */
+		$total = count($items);
+
+		if ($total === 4) {
+			// Original default: 4 cards in one row
+			foreach ($items as &$item) {
+				$item['span'] = 3;
+			}
+			unset($item);
+		} elseif ($total > 4) {
+			$remainder = $total % 3;
+
+			if ($remainder === 1) {
+				$items[$total - 1]['span'] = 12;
+			} elseif ($remainder === 2) {
+				$items[$total - 2]['span'] = 6;
+				$items[$total - 1]['span'] = 6;
+			}
+		}
+	}
+}
+
 if (empty($items)) {
 	return;
 }
@@ -52,7 +135,7 @@ $person_icon = '<svg class="cwc-cards-section__icon" xmlns="http://www.w3.org/20
 					<?php endif; ?>
 				</h2>
 			<?php endif; ?>
-			
+
 			<?php if ($section_description !== ''): ?>
 				<p class="cwc-cards-section__section-desc"><?php echo esc_html($section_description); ?></p>
 			<?php endif; ?>

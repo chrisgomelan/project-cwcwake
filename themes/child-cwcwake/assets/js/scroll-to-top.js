@@ -9,14 +9,22 @@
         const btn = document.getElementById('cwc-scroll-top');
         if (!btn) return;
 
+        let ticking = false;
+
         /**
          * Toggle button visibility based on scroll depth.
          */
         const toggleVisibility = () => {
-            if (window.pageYOffset > 300) {
-                btn.classList.add('is-visible');
-            } else {
-                btn.classList.remove('is-visible');
+            if (!ticking) {
+                window.requestAnimationFrame(() => {
+                    if (window.scrollY > 300) {
+                        btn.classList.add('is-visible');
+                    } else {
+                        btn.classList.remove('is-visible');
+                    }
+                    ticking = false;
+                });
+                ticking = true;
             }
         };
 

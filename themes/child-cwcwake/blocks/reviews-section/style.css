@@ -281,12 +281,8 @@
 	align-self: flex-start;
 }
 
-/* Counter — rotated vertically */
+/* Counter — rotated vertically on desktop only */
 .cwc-reviews__counter {
-	position: absolute;
-	left: 50%;
-	top: 50%;
-	transform: translate(-50%, -50%) rotate(-90deg);
 	font-family: var(--wp--preset--font-family--body);
 	font-weight: 500;
 	font-size: 1rem;
@@ -295,6 +291,15 @@
 	color: #1A1A1A;
 	white-space: nowrap;
 	margin: 0;
+}
+
+@media (min-width: 901px) {
+	.cwc-reviews__counter {
+		position: absolute;
+		left: 50%;
+		top: 50%;
+		transform: translate(-50%, -50%) rotate(-90deg);
+	}
 }
 
 .cwc-reviews__counter-total {
