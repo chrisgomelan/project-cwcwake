@@ -22,6 +22,14 @@
 			"type": "string",
 			"default": ""
 		},
+		"titleEnd": {
+			"type": "string",
+			"default": ""
+		},
+		"unifiedTitle": {
+			"type": "boolean",
+			"default": false
+		},
 		"description": {
 			"type": "string",
 			"default": ""

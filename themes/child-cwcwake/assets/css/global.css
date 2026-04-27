@@ -35,10 +35,19 @@ img {
 }
 
 /* WordPress generates padding on the site-blocks wrapper from theme.json
-	layout settings. Reset it so full-width blocks own their own insets. */
+	layout settings. Reset it so full-width blocks own their own insets. 
+	Also implement a flexbox sticky footer solution. */
 .wp-site-blocks {
 	padding-left: 0 !important;
 	padding-right: 0 !important;
+	min-height: 100vh;
+	display: flex;
+	flex-direction: column;
+}
+
+/* Ensure the footer template part sticks to the bottom of short pages */
+.wp-site-blocks>.wp-block-template-part:last-child {
+	margin-top: auto !important;
 }
 
 /* Prevent WordPress core alignfull from using 100vw + negative margins,
@@ -47,8 +56,8 @@ img {
 	The doubled class (.alignfull.alignfull) and the constrained-layout
 	selector both outweigh the WP-generated rules. */
 .alignfull.alignfull,
-.is-layout-constrained > .alignfull,
-.is-layout-flow > .alignfull {
+.is-layout-constrained>.alignfull,
+.is-layout-flow>.alignfull {
 	width: 100% !important;
 	max-width: 100% !important;
 	margin-left: 0 !important;
@@ -599,6 +608,7 @@ img {
 		transform: scale(0);
 		opacity: 0.5;
 	}
+
 	100% {
 		transform: scale(4);
 		opacity: 0;
@@ -685,4 +695,68 @@ img {
 	background: var(--wp--preset--color--primary-dark);
 	transform: translateY(-2px);
 	box-shadow: 0 8px 24px rgba(0, 150, 199, 0.4);
+}
+
+/* ----------------------------------------
+	Global Form Styles (Dropdowns & Dates)
+	---------------------------------------- */
+
+select,
+input[type="date"],
+.cwc-custom-select {
+	width: 100%;
+	height: 60px;
+	padding: 0 30px;
+	background: #0096C7 !important;
+	border: none !important;
+	border-radius: 100px !important;
+	font-family: 'Sora', var(--wp--preset--font-family--heading);
+	font-weight: 700;
+	font-size: 18px;
+	color: #FFFFFF !important;
+	appearance: none;
+	cursor: pointer;
+	transition: background 0.3s ease;
+	outline: none !important;
+}
+
+select:hover,
+input[type="date"]:hover {
+	background: #0077A3 !important;
+}
+
+/* Custom White Chevron for standard selects */
+select {
+	background-image: url("data:image/svg+xml,%3Csvg width='14' height='8' viewBox='0 0 14 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L7 7L13 1' stroke='%23FFFFFF' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+	background-repeat: no-repeat;
+	background-position: right 30px center;
+	background-size: 14px 8px;
+	padding-right: 60px;
+}
+
+/* Date input specific adjustments */
+input[type="date"]::-webkit-calendar-picker-indicator {
+	background: transparent;
+	bottom: 0;
+	color: transparent;
+	cursor: pointer;
+	height: auto;
+	left: 0;
+	position: absolute;
+	right: 0;
+	top: 0;
+	width: auto;
+}
+
+input[type="date"]::after {
+	content: "";
+	display: block;
+	width: 20px;
+	height: 20px;
+	background: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M8 2V5M16 2V5M3.5 9.09H20.5M21 8.5V17C21 20 19.5 22 16 22H8C4.5 22 3 20 3 17V8.5C3 5.5 4.5 3.5 8 3.5H16C19.5 3.5 21 5.5 21 8.5Z' stroke='%23FFFFFF' stroke-width='2' stroke-miterlimit='10' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat;
+	position: absolute;
+	right: 30px;
+	top: 50%;
+	transform: translateY(-50%);
+	pointer-events: none;
 }

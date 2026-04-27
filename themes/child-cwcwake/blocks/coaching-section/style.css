@@ -98,6 +98,36 @@
 	display: block;
 }
 
+/* Unified Title Variant (Elite Facilities) */
+.cwc-coaching--unified-title .cwc-coaching__title {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 0;
+}
+
+.cwc-coaching--unified-title .cwc-coaching__title-main {
+	display: block;
+	line-height: 1;
+}
+
+.cwc-coaching--unified-title .cwc-coaching__title-row {
+	display: inline-flex;
+	align-items: baseline;
+	justify-content: center;
+	gap: 0.3em;
+	line-height: 1.1;
+}
+
+.cwc-coaching--unified-title .cwc-coaching__accent {
+	display: inline;
+	color: var(--cwc-coaching-accent);
+}
+
+.cwc-coaching--unified-title .cwc-coaching__title-end {
+	display: inline;
+}
+
 .cwc-coaching__desc {
 	font-family: 'Archivo', var(--wp--preset--font-family--body);
 	font-weight: 500;

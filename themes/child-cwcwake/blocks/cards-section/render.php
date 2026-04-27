@@ -23,6 +23,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 $variant             = ( isset( $attributes['variant'] ) && in_array( $attributes['variant'], array( 'overlay', 'static', 'staggered' ) ) ) ? $attributes['variant'] : 'detailed';
 $heading_primary     = isset( $attributes['headingPrimary'] ) ? trim( (string) $attributes['headingPrimary'] ) : '';
 $heading_secondary   = isset( $attributes['headingSecondary'] ) ? trim( (string) $attributes['headingSecondary'] ) : '';
+$heading_tertiary    = isset( $attributes['headingTertiary'] ) ? trim( (string) $attributes['headingTertiary'] ) : '';
 $heading_sec_color   = isset( $attributes['headingSecondaryColor'] ) ? trim( (string) $attributes['headingSecondaryColor'] ) : '';
 $section_description = isset( $attributes['sectionDescription'] ) ? trim( (string) $attributes['sectionDescription'] ) : '';
 $items               = isset( $attributes['items'] ) && is_array( $attributes['items'] ) ? $attributes['items'] : array();
@@ -73,7 +74,7 @@ if ( 'accommodation' === $dynamic_source ) {
 
 			$items[] = array(
 				'title'       => get_the_title(),
-				'image'       => get_the_post_thumbnail_url( $post_id, 'large' ),
+				'image'       => get_the_post_thumbnail_url( $current_post_id, 'large' ),
 				'price'       => $price_text,
 				'capacity'    => $capacity,
 				'buttonLabel' => 'View Details',
@@ -137,11 +138,16 @@ $person_icon = '<svg class="cwc-cards-section__icon" xmlns="http://www.w3.org/20
 		<div class="cwc-cards-section__heading-wrap">
 			<?php if ( '' !== $heading_primary || '' !== $heading_secondary ) : ?>
 				<h2 class="cwc-cards-section__heading">
-					<?php if ( '' !== $heading_primary ) : ?>
-						<span class="cwc-cards-section__heading-primary"><?php echo esc_html( $heading_primary ); ?></span>
-					<?php endif; ?>
-					<?php if ( '' !== $heading_secondary ) : ?>
-						<span class="cwc-cards-section__heading-secondary"<?php echo '' !== $heading_sec_color ? ' style="color:' . esc_attr( $heading_sec_color ) . '"' : ''; ?>> <?php echo esc_html( $heading_secondary ); ?></span>
+					<div class="cwc-cards-section__heading-row">
+						<?php if ( '' !== $heading_primary ) : ?>
+							<span class="cwc-cards-section__heading-primary"><?php echo esc_html( $heading_primary ); ?></span>
+						<?php endif; ?>
+						<?php if ( '' !== $heading_secondary ) : ?>
+							<span class="cwc-cards-section__heading-secondary"<?php echo '' !== $heading_sec_color ? ' style="color:' . esc_attr( $heading_sec_color ) . '"' : ''; ?>> <?php echo esc_html( $heading_secondary ); ?></span>
+						<?php endif; ?>
+					</div>
+					<?php if ( '' !== $heading_tertiary ) : ?>
+						<span class="cwc-cards-section__heading-tertiary"> <?php echo esc_html( $heading_tertiary ); ?></span>
 					<?php endif; ?>
 				</h2>
 			<?php endif; ?>

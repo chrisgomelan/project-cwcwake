@@ -7,12 +7,12 @@
  * @package CWC_Wake
  */
 
-if ( ! defined( 'ABSPATH' ) ) {
+if (!defined('ABSPATH')) {
 	exit;
 }
 
 $categories = $attributes['categories'] ?? array();
-if ( empty( $categories ) ) {
+if (empty($categories)) {
 	return;
 }
 
@@ -25,45 +25,70 @@ $wrapper_attributes = get_block_wrapper_attributes(
 
 <div <?php echo $wrapper_attributes; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
 	<div class="cwc-rates-manager__inner">
-		
+
 		<div class="cwc-rates-manager__columns">
-			
-			<!-- Left Side: Tabs -->
+
+			<!-- Left Side: Sidebar with Dropdown and Inquiry Card -->
 			<div class="cwc-rates-manager__sidebar">
-				<div class="cwc-rates-manager__tabs">
-					<?php foreach ( $categories as $index => $rate_cat ) : ?>
-						<button 
-							class="cwc-rates-manager__tab <?php echo 0 === $index ? 'is-active' : ''; ?>"
-							data-target="<?php echo esc_attr( $rate_cat['id'] ); ?>"
-							type="button"
-						>
-							<?php echo esc_html( $rate_cat['title'] ); ?>
-						</button>
-					<?php endforeach; ?>
+
+				<!-- Custom Dropdown -->
+				<div class="cwc-rates-manager__dropdown">
+					<button class="cwc-rates-manager__dropdown-toggle" type="button" aria-haspopup="listbox"
+						aria-expanded="false">
+						<span
+							class="cwc-rates-manager__dropdown-current"><?php echo esc_html($categories[0]['title']); ?></span>
+						<svg class="cwc-rates-manager__dropdown-chevron" width="24" height="24" viewBox="0 0 24 24"
+							fill="none" xmlns="http://www.w3.org/2000/svg">
+							<path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
+								stroke-linejoin="round" />
+						</svg>
+					</button>
+					<ul class="cwc-rates-manager__dropdown-menu" role="listbox">
+						<?php foreach ($categories as $index => $rate_cat): ?>
+							<li class="cwc-rates-manager__dropdown-item <?php echo 0 === $index ? 'is-active' : ''; ?>"
+								data-target="<?php echo esc_attr($rate_cat['id']); ?>" role="option"
+								aria-selected="<?php echo 0 === $index ? 'true' : 'false'; ?>" tabindex="0">
+								<?php echo esc_html($rate_cat['title']); ?>
+							</li>
+						<?php endforeach; ?>
+					</ul>
 				</div>
+
+				<!-- Fixed Inquiry Card -->
+				<div class="cwc-rates-manager__inquiry-card">
+					<div class="cwc-rates-manager__inquiry-icon-wrap">
+						<div class="cwc-rates-manager__inquiry-icon">
+							<img src="/wp-content/uploads/2026/04/envelope.svg">
+						</div>
+					</div>
+					<h3 class="cwc-rates-manager__inquiry-title">Inquire about CWC Rates</h3>
+					<p class="cwc-rates-manager__inquiry-desc">Get assistance for booking, packages, or group rates</p>
+					<button type="button" class="cwc-rates-manager__inquiry-btn js-open-inquiry-modal">Send an Inquiry</button>
+					<p class="cwc-rates-manager__inquiry-footer">We'll respond within 24-48 hours</p>
+				</div>
+
 			</div>
 
 			<!-- Right Side: Content -->
 			<div class="cwc-rates-manager__content-area">
-				<?php foreach ( $categories as $index => $rate_cat ) : ?>
-					<div 
-						id="cat-<?php echo esc_attr( $rate_cat['id'] ); ?>" 
-						class="cwc-rates-manager__panel <?php echo 0 === $index ? 'is-active' : ''; ?>"
-					>
+				<?php foreach ($categories as $index => $rate_cat): ?>
+					<div id="cat-<?php echo esc_attr($rate_cat['id']); ?>"
+						class="cwc-rates-manager__panel <?php echo 0 === $index ? 'is-active' : ''; ?>">
 						<div class="cwc-rates-manager__accent-bar"></div>
-						
-						<div class="cwc-rates-manager__panel-body">
-							<h2 class="cwc-rates-manager__title"><?php echo esc_html( $rate_cat['title'] ); ?></h2>
-							<p class="cwc-rates-manager__description"><?php echo esc_html( $rate_cat['description'] ); ?></p>
 
-							<?php if ( ! empty( $rate_cat['table'] ) ) : ?>
+						<div class="cwc-rates-manager__panel-body">
+							<h2 class="cwc-rates-manager__title"><?php echo esc_html($rate_cat['title']); ?></h2>
+							<p class="cwc-rates-manager__description"><?php echo esc_html($rate_cat['description']); ?>
+							</p>
+
+							<?php if (!empty($rate_cat['table'])): ?>
 								<div class="cwc-rates-manager__table-wrap">
 									<table class="cwc-rates-manager__table">
-										<?php foreach ( $rate_cat['table'] as $r_idx => $row ) : ?>
+										<?php foreach ($rate_cat['table'] as $r_idx => $row): ?>
 											<tr>
-												<?php foreach ( $row as $cell ) : ?>
+												<?php foreach ($row as $cell): ?>
 													<<?php echo 0 === $r_idx ? 'th' : 'td'; ?> class="cwc-rates-manager__cell">
-														<?php echo esc_html( $cell ); ?>
+														<?php echo esc_html($cell); ?>
 													</<?php echo 0 === $r_idx ? 'th' : 'td'; ?>>
 												<?php endforeach; ?>
 											</tr>
@@ -78,5 +103,39 @@ $wrapper_attributes = get_block_wrapper_attributes(
 
 		</div>
 
+	</div>
+
+	<!-- Inquiry Modal -->
+	<div class="cwc-inquiry-modal" id="cwc-inquiry-modal" aria-hidden="true">
+		<div class="cwc-inquiry-modal__overlay js-close-modal"></div>
+		<div class="cwc-inquiry-modal__container">
+			<div class="cwc-inquiry-modal__header" style="background-image: url('/wp-content/uploads/2026/04/pro-level-6-2.webp');">
+				<button class="cwc-inquiry-modal__close js-close-modal" aria-label="Close modal">&times;</button>
+			</div>
+			<div class="cwc-inquiry-modal__body">
+				<form class="cwc-inquiry-form">
+					<div class="cwc-inquiry-form__group">
+						<label class="cwc-inquiry-form__label">Email <span class="required">*</span></label>
+						<input type="email" class="cwc-inquiry-form__input" placeholder="Enter email address" required>
+					</div>
+					<div class="cwc-inquiry-form__group">
+						<label class="cwc-inquiry-form__label">Subject <span class="required">*</span></label>
+						<div class="cwc-inquiry-form__select-wrap">
+							<select class="cwc-inquiry-form__select" required>
+								<option value="" disabled selected>Choose a subject</option>
+								<option value="rates">General Rates</option>
+								<option value="booking">Booking Inquiry</option>
+								<option value="group">Group Packages</option>
+							</select>
+						</div>
+					</div>
+					<div class="cwc-inquiry-form__group">
+						<label class="cwc-inquiry-form__label">Message <span class="required">*</span></label>
+						<textarea class="cwc-inquiry-form__textarea" placeholder="Enter message..." required></textarea>
+					</div>
+					<button type="submit" class="cwc-inquiry-form__submit">Send Inquiry</button>
+				</form>
+			</div>
+		</div>
 	</div>
 </div>

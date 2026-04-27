@@ -9,7 +9,6 @@
 
 .cwc-feature-banner__hero {
 	position: relative;
-	width: calc(100% - (clamp(1rem, 4vw, 4rem) * 2));
 	max-width: calc(1921px - (clamp(1rem, 4vw, 4rem) * 2));
 	margin: 0 auto !important;
 	min-height: clamp(300px, 28vw, 476px);

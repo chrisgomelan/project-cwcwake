@@ -56,6 +56,20 @@
 	margin: 0;
 }
 
+/* Left-align headings for Detailed and Overlay variants on Desktop */
+@media (min-width: 992px) {
+	.cwc-cards-section--detailed .cwc-cards-section__heading-wrap,
+	.cwc-cards-section--overlay .cwc-cards-section__heading-wrap {
+		text-align: left;
+		margin-left: 0;
+	}
+
+	.cwc-cards-section--detailed .cwc-cards-section__heading,
+	.cwc-cards-section--overlay .cwc-cards-section__heading {
+		text-align: left;
+	}
+}
+
 /* ---------- Grid ---------- */
 
 .cwc-cards-section__list {
@@ -81,11 +95,10 @@
 	display: flex;
 	flex-direction: column;
 	justify-content: flex-end;
-	height: 100%;
-	min-height: 470px;
-	max-height: 470px;
-	/* Mobile minimum height */
-	border-radius: 0;
+	height: 696px !important;
+	min-height: 696px !important;
+	max-height: 696px !important;
+	border-radius: 30px;
 	overflow: hidden;
 	isolation: isolate;
 	transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1), box-shadow 0.4s ease;
@@ -110,18 +123,16 @@
 	transform: scale(1.1);
 }
 
-
 .cwc-cards-section__card--detailed .cwc-cards-section__card-body {
-	position: relative;
+	position: absolute;
+	inset: 0;
 	z-index: 1;
 	display: flex;
 	flex-direction: column;
-	gap: 0.65rem;
-	padding: 1.25rem;
-	background: linear-gradient(to top,
-			rgba(0, 0, 0, 0.78) 0%,
-			rgba(0, 0, 0, 0.55) 55%,
-			rgba(0, 0, 0, 0) 100%);
+	justify-content: flex-end;
+	gap: 0.85rem;
+	padding: clamp(1.5rem, 3vw, 2.5rem);
+	background: linear-gradient(180deg, rgba(0, 0, 0, 0.2) 0%, rgba(0, 40, 50, 0.85) 100%);
 	color: #f5f1eb;
 }
 
@@ -129,8 +140,8 @@
 	margin: 0;
 	font-family: var(--wp--preset--font-family--heading);
 	font-weight: 700;
-	font-size: clamp(1.25rem, 2vw, 1.6rem);
-	line-height: 1;
+	font-size: clamp(2rem, 3.5vw, 3.2rem);
+	line-height: 1.1;
 	letter-spacing: 0;
 	text-transform: uppercase;
 	color: #f5f1eb;
@@ -140,7 +151,7 @@
 	margin: 0;
 	font-family: var(--wp--preset--font-family--body);
 	font-weight: 600;
-	font-size: 0.9rem;
+	font-size: 1.1rem;
 	line-height: 1;
 	letter-spacing: 0;
 	color: #f5f1eb;
@@ -170,10 +181,10 @@
 	justify-content: center;
 	gap: 10px;
 	width: 100%;
-	min-height: 48px;
-	margin-top: 0.4rem;
-	padding: 0 20px;
-	border-radius: 0;
+	height: clamp(48px, 4vw, 60px);
+	margin: 0.5rem 0 0 0;
+	padding: 0 40px;
+	border-radius: 100px;
 	background: #f5f1eb;
 	color: #1a1a1a;
 	font-family: var(--wp--preset--font-family--body);
@@ -182,7 +193,7 @@
 	line-height: 1;
 	letter-spacing: 0.02em;
 	text-decoration: none;
-	text-transform: uppercase;
+	text-transform: capitalize;
 	transition: var(--wp--custom--transition--default);
 	box-shadow: var(--wp--custom--shadow--sm);
 }
@@ -192,7 +203,6 @@
 	background: #ffffff;
 	transform: translateY(-3px);
 	box-shadow: var(--wp--custom--shadow--md);
-	filter: brightness(1.02);
 }
 
 .cwc-cards-section__card-button:active {
@@ -207,10 +217,10 @@
 	display: block;
 	width: 100%;
 	height: 260px;
-	border-radius: 0;
 	overflow: hidden;
 	isolation: isolate;
 	color: inherit;
+	border-radius: 30px;
 }
 
 .cwc-cards-section__card--overlay .cwc-cards-section__card-media {
@@ -377,9 +387,9 @@
 	}
 
 	.cwc-cards-section__card--detailed {
-		min-height: 470px;
-		max-height: 470px;
-		border-radius: 0;
+		min-height: 696px;
+		max-height: 696px;
+		border-radius: 30px;
 	}
 
 	.cwc-cards-section__card--detailed .cwc-cards-section__card-body {
@@ -408,7 +418,7 @@
 
 	.cwc-cards-section__card--overlay {
 		height: 320px;
-		border-radius: 0;
+
 	}
 
 	.cwc-cards-section__card--overlay .cwc-cards-section__card-title {
@@ -424,8 +434,8 @@
 	}
 
 	.cwc-cards-section__card--detailed {
-		min-height: 470px;
-		max-height: 470px;
+		min-height: 696px;
+		max-height: 696px;
 	}
 
 	.cwc-cards-section__card--detailed .cwc-cards-section__card-body {
@@ -602,22 +612,34 @@
 	align-items: center;
 }
 
+.cwc-cards-section--staggered .cwc-cards-section__heading-row {
+	display: flex;
+	flex-direction: row;
+	align-items: baseline;
+	justify-content: center;
+	gap: 0.2em;
+}
+
 .cwc-cards-section--staggered .cwc-cards-section__heading-primary,
 .cwc-cards-section--staggered .cwc-cards-section__heading .cwc-cards-section__heading-primary {
 	color: #1A1A1A !important;
 	font-style: normal !important;
-	display: block;
 }
 
 .cwc-cards-section--staggered .cwc-cards-section__heading-secondary {
 	color: #395144;
 	font-style: italic !important;
+}
+
+.cwc-cards-section--staggered .cwc-cards-section__heading-tertiary {
 	display: block;
 }
 
 .cwc-cards-section--staggered .cwc-cards-section__card--detailed,
 .cwc-cards-section--staggered .cwc-cards-section__card--overlay {
-	height: 470px;
+	height: 470px !important;
+	min-height: 470px !important;
+	max-height: 470px !important;
 	width: 415px;
 	max-width: 100%;
 	margin-left: auto;
@@ -627,33 +649,39 @@
 }
 
 .cwc-cards-section--staggered .cwc-cards-section__card--overlay::after {
-	content: "";
-	position: absolute;
-	inset: 0;
-	z-index: 1;
-	background: linear-gradient(to top, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0.4) 30%, rgba(0, 0, 0, 0) 100%) !important;
-	display: block !important;
-	pointer-events: none;
-	opacity: 1 !important;
+	display: none !important;
 }
 
-
+.cwc-cards-section--staggered .cwc-cards-section__card-body,
 .cwc-cards-section--staggered .cwc-cards-section__card-content {
 	position: absolute !important;
 	left: 0 !important;
 	right: 0 !important;
 	bottom: 0 !important;
+	top: auto !important;
 	z-index: 2;
 	display: flex !important;
 	flex-direction: column !important;
 	justify-content: flex-end !important;
-	align-items: flex-start !important;
 	padding: 2rem !important;
 	opacity: 1 !important;
 	transform: none !important;
 	background: none !important;
 	backdrop-filter: none !important;
 	-webkit-backdrop-filter: none !important;
+}
+
+/* Create the "Dark Blur" effect using a blurred pseudo-element behind the text */
+.cwc-cards-section--staggered .cwc-cards-section__card-body::before,
+.cwc-cards-section--staggered .cwc-cards-section__card-content::before {
+	content: "";
+	position: absolute;
+	inset: -5px 0 -900px 0;
+	background: #1A1A1A;
+	filter: blur(100px);
+	z-index: -1;
+	opacity: 0.9;
+	pointer-events: none;
 }
 
 .cwc-cards-section--staggered .cwc-cards-section__card-title {

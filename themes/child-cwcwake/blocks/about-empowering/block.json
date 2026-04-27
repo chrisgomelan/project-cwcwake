@@ -8,6 +8,10 @@
 	"supports": { "html": false },
 	"textdomain": "child-cwcwake",
 	"attributes": {
+		"headingBeforeAccent": {
+			"type": "string",
+			"default": ""
+		},
 		"headingAccent": {
 			"type": "string",
 			"default": "EMPOWERING"
@@ -33,6 +37,10 @@
 			"default": ""
 		},
 		"iconCircleBg": {
+			"type": "string",
+			"default": ""
+		},
+		"accentColor": {
 			"type": "string",
 			"default": ""
 		},

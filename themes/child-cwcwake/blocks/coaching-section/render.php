@@ -11,12 +11,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-$title_start  = $attributes['titleStart'] ?? '';
-$title_accent = $attributes['titleAccent'] ?? '';
-$description  = $attributes['description'] ?? '';
-$sub_heading  = $attributes['subHeading'] ?? '';
-$image1       = isset( $attributes['image1'] ) ? trim( (string) $attributes['image1'] ) : '';
-$image2       = isset( $attributes['image2'] ) ? trim( (string) $attributes['image2'] ) : '';
+$title_start   = $attributes['titleStart'] ?? '';
+$title_accent  = $attributes['titleAccent'] ?? '';
+$title_end     = $attributes['titleEnd'] ?? '';
+$unified_title = $attributes['unifiedTitle'] ?? false;
+$description   = $attributes['description'] ?? '';
+$sub_heading   = $attributes['subHeading'] ?? '';
+$image1        = isset( $attributes['image1'] ) ? trim( (string) $attributes['image1'] ) : '';
+$image2        = isset( $attributes['image2'] ) ? trim( (string) $attributes['image2'] ) : '';
 $cards          = isset( $attributes['cards'] ) && is_array( $attributes['cards'] ) ? $attributes['cards'] : array();
 $reversed       = isset( $attributes['reversed'] ) ? (bool) $attributes['reversed'] : false;
 $accent_color   = isset( $attributes['accentColor'] ) ? trim( (string) $attributes['accentColor'] ) : '';
@@ -29,6 +31,9 @@ if ( $reversed ) {
 }
 if ( ! $accent_italic ) {
 	$coaching_classes[] = 'cwc-coaching--accent-upright';
+}
+if ( $unified_title || '' !== $title_end ) {
+	$coaching_classes[] = 'cwc-coaching--unified-title';
 }
 
 $inline_style = '';
@@ -67,14 +72,21 @@ $wrapper_attrs = get_block_wrapper_attributes( $wrapper_args );
 
 		<!-- Content column -->
 		<div class="cwc-coaching__content">
-			<?php if ( '' !== $title_start || '' !== $title_accent ) : ?>
+			<?php if ( '' !== $title_start || '' !== $title_accent || '' !== $title_end ) : ?>
 				<h2 class="cwc-coaching__title">
-					<?php if ( '' !== $title_accent ) : ?>
-						<em class="cwc-coaching__accent"><?php echo esc_html( $title_accent ); ?></em>
-					<?php endif; ?>
 					<?php if ( '' !== $title_start ) : ?>
 						<span class="cwc-coaching__title-main"><?php echo esc_html( $title_start ); ?></span>
 					<?php endif; ?>
+					
+					<div class="cwc-coaching__title-row">
+						<?php if ( '' !== $title_accent ) : ?>
+							<em class="cwc-coaching__accent"><?php echo esc_html( $title_accent ); ?></em>
+						<?php endif; ?>
+
+						<?php if ( '' !== $title_end ) : ?>
+							<span class="cwc-coaching__title-end"><?php echo esc_html( $title_end ); ?></span>
+						<?php endif; ?>
+					</div>
 				</h2>
 			<?php endif; ?>
 
