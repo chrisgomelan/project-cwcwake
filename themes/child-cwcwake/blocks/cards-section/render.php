@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-$variant             = ( isset( $attributes['variant'] ) && in_array( $attributes['variant'], array( 'overlay', 'static' ) ) ) ? $attributes['variant'] : 'detailed';
+$variant             = ( isset( $attributes['variant'] ) && in_array( $attributes['variant'], array( 'overlay', 'static', 'staggered' ) ) ) ? $attributes['variant'] : 'detailed';
 $heading_primary     = isset( $attributes['headingPrimary'] ) ? trim( (string) $attributes['headingPrimary'] ) : '';
 $heading_secondary   = isset( $attributes['headingSecondary'] ) ? trim( (string) $attributes['headingSecondary'] ) : '';
 $heading_sec_color   = isset( $attributes['headingSecondaryColor'] ) ? trim( (string) $attributes['headingSecondaryColor'] ) : '';
@@ -116,8 +116,13 @@ if ( empty( $items ) ) {
 	return;
 }
 
-$variant_class = 'overlay' === $variant || 'static' === $variant ? 'overlay' : 'detailed';
-$static_class  = 'static' === $variant ? ' cwc-cards-section--static' : '';
+$variant_class = in_array( $variant, array( 'overlay', 'static' ) ) ? 'overlay' : 'detailed';
+$static_class  = '';
+if ( 'static' === $variant ) {
+	$static_class = ' cwc-cards-section--static';
+} elseif ( 'staggered' === $variant ) {
+	$static_class = ' cwc-cards-section--staggered';
+}
 
 $wrapper_attrs = get_block_wrapper_attributes(
 	array(
@@ -149,10 +154,12 @@ $person_icon = '<svg class="cwc-cards-section__icon" xmlns="http://www.w3.org/20
 
 	<ul class="cwc-cards-section__list">
 		<?php
+		$item_index = 0;
 		foreach ( $items as $item ) {
 			if ( ! is_array( $item ) ) {
 				continue;
 			}
+			$item_index++;
 
 			$item_title   = isset( $item['title'] ) ? (string) $item['title'] : '';
 			$image        = isset( $item['image'] ) ? (string) $item['image'] : '';
@@ -167,9 +174,13 @@ $person_icon = '<svg class="cwc-cards-section__icon" xmlns="http://www.w3.org/20
 
 			$description = isset( $item['description'] ) ? (string) $item['description'] : '';
 			$item_style  = sprintf( '--cwc-card-span:%d', $span );
+			$item_classes = 'cwc-cards-section__item';
+			if ( ! empty( $item['offset'] ) ) {
+				$item_classes .= ' cwc-cards-section__item--offset';
+			}
 			?>
-			<li class="cwc-cards-section__item" style="<?php echo esc_attr( $item_style ); ?>">
-				<?php if ( 'detailed' === $variant ) : ?>
+			<li class="<?php echo esc_attr( $item_classes ); ?>" style="<?php echo esc_attr( $item_style ); ?>">
+				<?php if ( 'detailed' === $variant || 'staggered' === $variant ) : ?>
 					<article class="cwc-cards-section__card cwc-cards-section__card--detailed">
 						<?php if ( '' !== $image ) : ?>
 							<div class="cwc-cards-section__card-media" role="img" <?php echo '' !== $item_title ? ' aria-label="' . esc_attr( $item_title ) . '"' : ''; ?> style="background-image:url('<?php echo esc_url( $image ); ?>');">
@@ -178,6 +189,9 @@ $person_icon = '<svg class="cwc-cards-section__icon" xmlns="http://www.w3.org/20
 						<div class="cwc-cards-section__card-body">
 							<?php if ( '' !== $item_title ) : ?>
 								<h3 class="cwc-cards-section__card-title"><?php echo esc_html( $item_title ); ?></h3>
+							<?php endif; ?>
+							<?php if ( '' !== $description ) : ?>
+								<p class="cwc-cards-section__card-subtitle"><?php echo esc_html( $description ); ?></p>
 							<?php endif; ?>
 							<?php if ( '' !== $price ) : ?>
 								<p class="cwc-cards-section__card-price"><?php echo esc_html( $price ); ?></p>

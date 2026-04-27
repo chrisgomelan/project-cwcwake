@@ -7,7 +7,7 @@
 	position: relative;
 	width: calc(100% - (clamp(1rem, 4vw, 4rem) * 2));
 	max-width: calc(1921px - (clamp(1rem, 4vw, 4rem) * 2));
-	margin: 0 auto var(--wp--preset--spacing--60) !important;
+	margin: 0 auto 0 !important;
 	min-height: clamp(300px, 28vw, 476px);
 	border-radius: 30px;
 	background-position: center;
@@ -30,7 +30,7 @@
 	position: relative;
 	z-index: 1;
 	padding: clamp(28px, 4vw, 56px) clamp(24px, 3vw, 48px);
-	max-width: 700px;
+	max-width: 688px;
 }
 
 .cwc-feature-banner__title {
@@ -66,12 +66,12 @@
 	.cwc-feature-banner {
 		justify-content: center;
 		align-items: center;
-		margin: 0 auto var(--wp--preset--spacing--40) !important;
-		border-radius: 16px;
+		margin: 0 auto 0 !important;
+		border-radius: 30px;
 	}
 
 	.cwc-feature-banner__overlay {
-		border-radius: 16px;
+		border-radius: 30px;
 	}
 
 	.cwc-feature-banner__content {

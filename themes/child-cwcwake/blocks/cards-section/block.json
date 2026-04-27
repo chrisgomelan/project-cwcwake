@@ -17,7 +17,7 @@
 		"variant": {
 			"type": "string",
 			"default": "detailed",
-			"enum": ["detailed", "overlay", "static"]
+			"enum": ["detailed", "overlay", "static", "staggered"]
 		},
 		"headingPrimary": {
 			"type": "string",
@@ -43,7 +43,19 @@
 			"type": "array",
 			"default": [],
 			"items": {
-				"type": "object"
+				"type": "object",
+				"properties": {
+					"title": { "type": "string" },
+					"image": { "type": "string" },
+					"description": { "type": "string" },
+					"span": { "type": "integer" },
+					"url": { "type": "string" },
+					"price": { "type": "string" },
+					"capacity": { "type": "string" },
+					"buttonLabel": { "type": "string" },
+					"buttonUrl": { "type": "string" },
+					"offset": { "type": "boolean" }
+				}
 			}
 		}
 	},

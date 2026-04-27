@@ -12,6 +12,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+// Debug: output attributes as a comment for verification
+echo '<!-- Block Attributes: ' . esc_html( json_encode( $attributes ) ) . ' -->';
+
 $cta_title     = $attributes['title'] ?? 'START YOUR OWN';
 $title_accent  = $attributes['titleAccent'] ?? 'STORY';
 $accent_first  = $attributes['accentFirst'] ?? false;
@@ -29,23 +32,22 @@ $inline_over = '';
 $extra_class = '';
 
 if ( ! empty( $bg_image ) ) {
-	$inline_bg   = sprintf( 'background-image:url(%s);', esc_url( $bg_image ) );
+	$inline_bg   = sprintf( 'background:url(%s) center / cover no-repeat !important;', esc_url( $bg_image ) );
 	$extra_class = ' cwc-cta-footer--custom-bg';
 }
 
 if ( ! empty( $overlay_grad ) ) {
-	$inline_over = sprintf( 'background:%s;', esc_attr( $overlay_grad ) );
+	$inline_over = sprintf( 'background:%s !important;', esc_attr( $overlay_grad ) );
 }
 
 $wrapper = get_block_wrapper_attributes(
 	array(
 		'class' => 'cwc-cta-footer' . $extra_class,
-		'style' => $inline_bg,
 	)
 );
 ?>
 
-<section <?php echo $wrapper; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
+<section <?php echo $wrapper; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?> <?php echo $inline_bg ? 'style="' . esc_attr( $inline_bg ) . '"' : ''; ?>>
 	<div class="cwc-cta-footer__overlay" aria-hidden="true"
 	<?php
 	if ( $inline_over ) {

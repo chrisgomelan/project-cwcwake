@@ -1,13 +1,15 @@
 .cwc-land-feature-split {
-	width: 100%;
+	width: calc(100% - (clamp(1rem, 4vw, 4rem) * 2));
+	max-width: calc(1921px - (clamp(1rem, 4vw, 4rem) * 2));
+	margin: 0 auto 0 !important;
 	display: flex;
 	justify-content: center;
-	padding: var(--wp--preset--spacing--60) var(--wp--preset--spacing--20);
+	padding: var(--wp--preset--spacing--60) 0;
 }
 
 .cwc-land-feature-split__inner {
 	width: 100%;
-	max-width: var(--wp--custom--content-width--wide); /* or adjust based on site standard */
+	max-width: none;
 	display: flex;
 	flex-direction: column;
 	gap: 0;
@@ -17,8 +19,9 @@
 @media (min-width: 992px) {
 	.cwc-land-feature-split__inner {
 		flex-direction: row;
-		min-height: 436px;
+		max-height: 435px;
 	}
+
 	.cwc-land-feature-split--reversed .cwc-land-feature-split__inner {
 		flex-direction: row-reverse;
 	}
@@ -31,13 +34,14 @@
 	display: flex;
 	flex-direction: column;
 	justify-content: center;
-	padding: clamp(2rem, 5vw, 4rem);
+	padding: clamp(2rem, 5vw, 1rem);
 	flex: 0 0 100%;
 }
 
 @media (min-width: 992px) {
 	.cwc-land-feature-split__text {
-		flex: 0 0 37.3%; /* 642 / 1721 */
+		flex: 0 0 37.3%;
+		/* 642 / 1721 */
 	}
 }
 
@@ -49,7 +53,8 @@
 	height: 100%;
 	background-size: cover;
 	background-position: center;
-	opacity: 0.15; /* Adjust opacity as needed */
+	opacity: 0.15;
+	/* Adjust opacity as needed */
 	pointer-events: none;
 }
 
@@ -59,11 +64,13 @@
 	display: flex;
 	flex-direction: column;
 	height: 100%;
+	align-items: flex-end;
 }
 
 .cwc-land-feature-split__title {
 	font-family: var(--wp--preset--font-family--sora);
-	font-size: clamp(2.5rem, 4vw, 4rem); /* 64px max */
+	font-size: clamp(2.5rem, 4vw, 4rem);
+	/* 64px max */
 	font-weight: 700;
 	line-height: 1;
 	text-transform: uppercase;
@@ -78,7 +85,8 @@
 
 .cwc-land-feature-split__desc {
 	font-family: var(--wp--preset--font-family--archivo);
-	font-size: clamp(1rem, 2vw, 1.25rem); /* 20px max */
+	font-size: clamp(1rem, 2vw, 1.25rem);
+	/* 20px max */
 	font-weight: 500;
 	line-height: 1.4;
 	margin: 0 0 2rem 0;
@@ -87,7 +95,7 @@
 
 .cwc-land-feature-split__icon {
 	margin-top: auto;
-	width: 64px;
+	width: 130px;
 	height: auto;
 	object-fit: contain;
 }
@@ -99,7 +107,8 @@
 
 @media (min-width: 992px) {
 	.cwc-land-feature-split__image-col {
-		flex: 0 0 62.7%; /* 1079 / 1721 */
+		flex: 0 0 62.7%;
+		/* 1079 / 1721 */
 	}
 }
 
