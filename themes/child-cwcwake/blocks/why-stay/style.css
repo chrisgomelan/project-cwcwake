@@ -144,3 +144,66 @@
 		text-align: center;
 	}
 }
+
+/* Elite Facilities — Professional Edge (centered, orange accent) */
+
+.cwc-why-stay--elite .cwc-why-stay__header {
+	text-align: center;
+	max-width: 900px;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.cwc-why-stay--elite .cwc-why-stay__title {
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.cwc-why-stay--elite .cwc-why-stay__accent {
+	color: #ed5b26;
+	font-style: normal;
+}
+
+.cwc-why-stay--elite .cwc-why-stay__description {
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.cwc-why-stay--elite .cwc-why-stay__grid {
+	justify-content: center;
+}
+
+.cwc-why-stay--elite .cwc-why-stay__icon-wrapper {
+	width: 100px;
+	height: 100px;
+	border-radius: 50%;
+	background-color: rgba(255, 107, 53, 0.5);
+}
+
+.cwc-why-stay--elite .cwc-why-stay__item:hover .cwc-why-stay__icon-wrapper {
+	background-color: rgba(255, 107, 53, 0.65);
+}
+
+.cwc-why-stay--elite .cwc-why-stay__item-title {
+	color: #000000;
+	font-size: clamp(1.25rem, 2vw, 24px);
+	line-height: 100%;
+}
+
+.cwc-why-stay--elite .cwc-why-stay__item-desc {
+	font-weight: 400;
+	font-size: clamp(1rem, 1.2vw, 20px);
+	line-height: 100%;
+}
+
+@media (min-width: 768px) {
+	.cwc-why-stay--elite .cwc-why-stay__grid {
+		justify-content: center;
+		gap: var(--wp--preset--spacing--50);
+	}
+
+	.cwc-why-stay--elite .cwc-why-stay__item {
+		flex: 0 1 320px;
+		max-width: 360px;
+	}
+}

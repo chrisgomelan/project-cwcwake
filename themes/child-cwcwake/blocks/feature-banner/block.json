@@ -26,9 +26,21 @@
 			"type": "string",
 			"default": ""
 		},
+		"titleLine2": {
+			"type": "string",
+			"default": ""
+		},
+		"accentColor": {
+			"type": "string",
+			"default": ""
+		},
 		"description": {
 			"type": "string",
 			"default": ""
+		},
+		"gridItems": {
+			"type": "array",
+			"default": []
 		}
 	},
 	"render": "file:./render.php",

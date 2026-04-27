@@ -5,15 +5,17 @@
  * Supports an optional second button, custom background image,
  * and custom overlay gradient for per-page variations.
  *
+ * Custom `overlayGradient` values from templates usually use opaque colour
+ * stops. Painting that on a full-size overlay hides the background image.
+ * Inline gradients therefore include a slight `opacity` so the section
+ * background (default or custom photo) remains visible underneath.
+ *
  * @package CWC_Wake
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
-
-// Debug: output attributes as a comment for verification
-echo '<!-- Block Attributes: ' . esc_html( json_encode( $attributes ) ) . ' -->';
 
 $cta_title     = $attributes['title'] ?? 'START YOUR OWN';
 $title_accent  = $attributes['titleAccent'] ?? 'STORY';
@@ -26,18 +28,26 @@ $sec_btn_url   = $attributes['secondaryBtnUrl'] ?? '';
 $bg_image      = $attributes['backgroundImage'] ?? '';
 $overlay_grad  = $attributes['overlayGradient'] ?? '';
 
-/* Inline styles for custom background + overlay. */
-$inline_bg   = '';
-$inline_over = '';
-$extra_class = '';
+$extra_class     = '';
+$section_style   = '';
+$overlay_style   = '';
+$has_custom_bg   = ! empty( $bg_image );
+$has_overlay     = ! empty( $overlay_grad );
 
-if ( ! empty( $bg_image ) ) {
-	$inline_bg   = sprintf( 'background:url(%s) center / cover no-repeat !important;', esc_url( $bg_image ) );
-	$extra_class = ' cwc-cta-footer--custom-bg';
+if ( $has_custom_bg ) {
+	$extra_class   = ' cwc-cta-footer--custom-bg';
+	$section_style = sprintf( 'background:url(%s) center / cover no-repeat !important;', esc_url( $bg_image ) );
 }
 
-if ( ! empty( $overlay_grad ) ) {
-	$inline_over = sprintf( 'background:%s !important;', esc_attr( $overlay_grad ) );
+if ( $has_overlay ) {
+	/*
+	 * Template gradients often use opaque hex stops, which would fully hide
+	 * the photo on the section. Slight overlay opacity keeps the image visible.
+	 */
+	$overlay_style = sprintf(
+		'background:%s !important; opacity:0.88;',
+		wp_strip_all_tags( $overlay_grad )
+	);
 }
 
 $wrapper = get_block_wrapper_attributes(
@@ -47,19 +57,13 @@ $wrapper = get_block_wrapper_attributes(
 );
 ?>
 
-<section <?php echo $wrapper; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?> <?php echo $inline_bg ? 'style="' . esc_attr( $inline_bg ) . '"' : ''; ?>>
-	<div class="cwc-cta-footer__overlay" aria-hidden="true"
-	<?php
-	if ( $inline_over ) {
-		echo ' style="' . esc_attr( $inline_over ) . '"'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-	}
-	?>
-	></div>
+<section <?php echo $wrapper; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?> <?php echo $section_style ? 'style="' . esc_attr( $section_style ) . '"' : ''; ?>>
+	<div class="cwc-cta-footer__overlay" aria-hidden="true" <?php echo $overlay_style ? ' style="' . esc_attr( $overlay_style ) . '"' : ''; ?>></div>
 	<div class="cwc-cta-footer__content">
 		<?php if ( $cta_title || $title_accent ) : ?>
 			<h2 class="cwc-cta-footer__title">
 				<?php if ( $accent_first && $title_accent ) : ?>
-					<em class="cwc-cta-footer__title-accent"><?php echo esc_html( $title_accent ); ?></em> 
+					<em class="cwc-cta-footer__title-accent"><?php echo esc_html( $title_accent ); ?></em>
 				<?php endif; ?>
 
 				<?php if ( $cta_title ) : ?>
@@ -71,11 +75,11 @@ $wrapper = get_block_wrapper_attributes(
 				<?php endif; ?>
 			</h2>
 		<?php endif; ?>
-		
+
 		<?php if ( $description ) : ?>
 			<p class="cwc-cta-footer__desc"><?php echo esc_html( $description ); ?></p>
 		<?php endif; ?>
-		
+
 		<div class="cwc-cta-footer__actions">
 			<?php if ( $button_label ) : ?>
 				<a href="<?php echo esc_url( $button_url ); ?>" class="cwc-cta-footer__btn">

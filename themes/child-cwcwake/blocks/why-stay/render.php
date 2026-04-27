@@ -16,8 +16,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 $heading     = isset( $attributes['heading'] ) ? $attributes['heading'] : '';
 $description = isset( $attributes['description'] ) ? (string) $attributes['description'] : '';
 $items       = isset( $attributes['items'] ) && is_array( $attributes['items'] ) ? $attributes['items'] : array();
+$tone        = isset( $attributes['tone'] ) ? (string) $attributes['tone'] : 'default';
 
 $class_name = 'cwc-why-stay';
+if ( 'elite' === $tone ) {
+	$class_name .= ' cwc-why-stay--elite';
+}
 if ( ! empty( $attributes['className'] ) ) {
 	$class_name .= ' ' . esc_attr( $attributes['className'] );
 }

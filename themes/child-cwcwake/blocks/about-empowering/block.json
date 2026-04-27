@@ -1,12 +1,46 @@
 {
-  "$schema": "https://schemas.wp.org/trunk/block.json",
-  "apiVersion": 3,
-  "name": "cwc/about-empowering",
-  "title": "About — Empowering the Region",
-  "category": "theme",
-  "description": "Two-column layout with organic image wrapper and stacked info cards.",
-  "supports": { "html": false },
-  "textdomain": "child-cwcwake",
-  "style": "file:./style.css",
-  "render": "file:./render.php"
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "cwc/about-empowering",
+	"title": "About — Empowering the Region",
+	"category": "theme",
+	"description": "Two-column layout with organic image wrapper and stacked info cards.",
+	"supports": { "html": false },
+	"textdomain": "child-cwcwake",
+	"attributes": {
+		"headingAccent": {
+			"type": "string",
+			"default": "EMPOWERING"
+		},
+		"headingAfterAccent": {
+			"type": "string",
+			"default": " the REGION."
+		},
+		"description": {
+			"type": "string",
+			"default": "Learn how CWC supports the Bicolano community through sustainable tourism, local employment, and youth sports development."
+		},
+		"image": {
+			"type": "string",
+			"default": "/wp-content/uploads/2026/04/empowering.webp"
+		},
+		"imageAlt": {
+			"type": "string",
+			"default": ""
+		},
+		"bracketColor": {
+			"type": "string",
+			"default": ""
+		},
+		"iconCircleBg": {
+			"type": "string",
+			"default": ""
+		},
+		"cards": {
+			"type": "array",
+			"default": []
+		}
+	},
+	"style": "file:./style.css",
+	"render": "file:./render.php"
 }

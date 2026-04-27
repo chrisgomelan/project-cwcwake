@@ -14,7 +14,8 @@
     "titleAccent2": { "type": "string", "default": "PERFORMANCE" },
     "description": { "type": "string", "default": "" },
     "items": { "type": "array", "default": [] },
-    "variant": { "type": "string", "default": "cards" }
+    "variant": { "type": "string", "default": "cards" },
+    "accentColor": { "type": "string", "default": "" }
   },
   "style": "file:./style.css",
   "render": "file:./render.php"

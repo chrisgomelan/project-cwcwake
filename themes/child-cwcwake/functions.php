@@ -565,6 +565,7 @@ require_once get_stylesheet_directory() . '/inc/water-sports-page-seed.php';
  * to the existing `/activities/land-activities/` page. Idempotent (option-guarded).
  */
 require_once get_stylesheet_directory() . '/inc/land-activities-page-seed.php';
+require_once get_stylesheet_directory() . '/inc/elite-facilities-page-seed.php';
 
 /*
  * Accommodations (Rooms) data layer.

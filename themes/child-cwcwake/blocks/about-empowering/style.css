@@ -3,6 +3,8 @@
  */
 
 .cwc-empower {
+	--cwc-empower-bracket: var(--wp--preset--color--primary);
+	--cwc-empower-icon-bg: rgba(0, 175, 185, 0.2);
 	padding: var(--wp--preset--spacing--60) 0;
 }
 
@@ -106,7 +108,7 @@
 	height: clamp(72px, 7vw, 100px);
 	flex-shrink: 0;
 	border-radius: 50%;
-	background: rgba(0, 175, 185, 0.2);
+	background: var(--cwc-empower-icon-bg);
 }
 
 .cwc-empower__icon-wrap img {

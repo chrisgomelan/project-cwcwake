@@ -434,6 +434,11 @@
 			"name": "page-blogs",
 			"title": "Blogs",
 			"postTypes": ["page"]
+		},
+		{
+			"name": "page-elite-facilities",
+			"title": "Elite Facilities",
+			"postTypes": ["page"]
 		}
 	],
 	"templateParts": [

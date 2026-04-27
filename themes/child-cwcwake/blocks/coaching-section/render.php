@@ -17,14 +17,36 @@ $description  = $attributes['description'] ?? '';
 $sub_heading  = $attributes['subHeading'] ?? '';
 $image1       = isset( $attributes['image1'] ) ? trim( (string) $attributes['image1'] ) : '';
 $image2       = isset( $attributes['image2'] ) ? trim( (string) $attributes['image2'] ) : '';
-$cards        = isset( $attributes['cards'] ) && is_array( $attributes['cards'] ) ? $attributes['cards'] : array();
-$reversed     = isset( $attributes['reversed'] ) ? (bool) $attributes['reversed'] : false;
+$cards          = isset( $attributes['cards'] ) && is_array( $attributes['cards'] ) ? $attributes['cards'] : array();
+$reversed       = isset( $attributes['reversed'] ) ? (bool) $attributes['reversed'] : false;
+$accent_color   = isset( $attributes['accentColor'] ) ? trim( (string) $attributes['accentColor'] ) : '';
+$accent_italic  = array_key_exists( 'accentItalic', $attributes ) ? (bool) $attributes['accentItalic'] : true;
+$card_title_col = isset( $attributes['cardTitleColor'] ) ? trim( (string) $attributes['cardTitleColor'] ) : '';
 
-$wrapper_attrs = get_block_wrapper_attributes(
-	array(
-		'class' => 'cwc-coaching' . ( $reversed ? ' cwc-coaching--reversed' : '' ),
-	)
+$coaching_classes = array( 'cwc-coaching' );
+if ( $reversed ) {
+	$coaching_classes[] = 'cwc-coaching--reversed';
+}
+if ( ! $accent_italic ) {
+	$coaching_classes[] = 'cwc-coaching--accent-upright';
+}
+
+$inline_style = '';
+if ( '' !== $accent_color ) {
+	$inline_style .= '--cwc-coaching-accent:' . esc_attr( $accent_color ) . ';';
+}
+if ( '' !== $card_title_col ) {
+	$inline_style .= '--cwc-coaching-card-title:' . esc_attr( $card_title_col ) . ';';
+}
+
+$wrapper_args = array(
+	'class' => implode( ' ', $coaching_classes ),
 );
+if ( '' !== $inline_style ) {
+	$wrapper_args['style'] = $inline_style;
+}
+
+$wrapper_attrs = get_block_wrapper_attributes( $wrapper_args );
 ?>
 
 <section <?php echo $wrapper_attrs; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>

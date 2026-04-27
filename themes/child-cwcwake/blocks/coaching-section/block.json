@@ -45,6 +45,18 @@
 		"reversed": {
 			"type": "boolean",
 			"default": false
+		},
+		"accentColor": {
+			"type": "string",
+			"default": ""
+		},
+		"accentItalic": {
+			"type": "boolean",
+			"default": true
+		},
+		"cardTitleColor": {
+			"type": "string",
+			"default": ""
 		}
 	},
 	"render": "file:./render.php",

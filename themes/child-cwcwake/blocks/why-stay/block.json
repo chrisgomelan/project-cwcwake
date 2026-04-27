@@ -21,6 +21,10 @@
 			"type": "string",
 			"default": "Enjoy exclusive perks designed to make your stay seamless, from early park access to premium lakeside amenities."
 		},
+		"tone": {
+			"type": "string",
+			"default": "default"
+		},
 		"items": {
 			"type": "array",
 			"default": [
