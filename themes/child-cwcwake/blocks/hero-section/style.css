@@ -13,8 +13,8 @@
 	justify-content: center;
 	width: 100%;
 	min-height: 100vh;
-	margin-block-start: -115px !important;
-	padding: 115px var(--wp--preset--spacing--40) var(--wp--preset--spacing--60);
+	margin-block-start: calc(clamp(72px, 6vw + 36px, 115px) * -1) !important;
+	padding: clamp(72px, 6vw + 36px, 115px) var(--wp--preset--spacing--40) var(--wp--preset--spacing--60);
 	background: var(--cwc-hero-bg) center / cover no-repeat;
 	overflow: hidden;
 }

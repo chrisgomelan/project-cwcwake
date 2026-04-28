@@ -2,10 +2,11 @@
  * CWC Wake — About: Empowering the Region
  */
 
+.cwc-about-empower,
 .cwc-empower {
 	--cwc-empower-bracket: var(--wp--preset--color--primary);
 	--cwc-empower-icon-bg: rgba(0, 175, 185, 0.2);
-	padding: var(--wp--preset--spacing--60) 0;
+	padding: clamp(2rem, 5vw, var(--wp--preset--spacing--60)) 0;
 }
 
 /* Header */
@@ -16,7 +17,7 @@
 .cwc-empower__title {
 	font-family: 'Sora', var(--wp--preset--font-family--heading);
 	font-weight: 700;
-	font-size: clamp(2.25rem, 4vw, 4.5rem);
+	font-size: clamp(1.8rem, 6vw, 4.5rem);
 	line-height: 1.1;
 	text-transform: uppercase;
 	color: var(--wp--preset--color--text);
