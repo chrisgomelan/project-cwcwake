@@ -858,7 +858,7 @@ add_action( 'init', 'cwc_register_blocks' );
  * @return array Modified classes.
  */
 function cwc_body_class_front_page( $classes ) {
-	if ( is_front_page() || is_page( 'about' ) || is_page( 'accommodations' ) || is_page( 'water-sports' ) || is_page( 'land-activities' ) ) {
+	if ( is_front_page() || is_page( 'about' ) || is_page( 'accommodations' ) || is_page( 'water-sports' ) || is_page( 'land-activities' ) || is_page( 'elite-facilities' ) ) {
 		$classes[] = 'cwc-home';
 	}
 	return $classes;

@@ -63,7 +63,8 @@ $wrapper_attributes = get_block_wrapper_attributes(
 					</div>
 					<h3 class="cwc-rates-manager__inquiry-title">Inquire about CWC Rates</h3>
 					<p class="cwc-rates-manager__inquiry-desc">Get assistance for booking, packages, or group rates</p>
-					<button type="button" class="cwc-rates-manager__inquiry-btn js-open-inquiry-modal">Send an Inquiry</button>
+					<button type="button" class="cwc-rates-manager__inquiry-btn js-open-inquiry-modal">Send an
+						Inquiry</button>
 					<p class="cwc-rates-manager__inquiry-footer">We'll respond within 24-48 hours</p>
 				</div>
 
@@ -109,7 +110,8 @@ $wrapper_attributes = get_block_wrapper_attributes(
 	<div class="cwc-inquiry-modal" id="cwc-inquiry-modal" aria-hidden="true">
 		<div class="cwc-inquiry-modal__overlay js-close-modal"></div>
 		<div class="cwc-inquiry-modal__container">
-			<div class="cwc-inquiry-modal__header" style="background-image: url('/wp-content/uploads/2026/04/pro-level-6-2.webp');">
+			<div class="cwc-inquiry-modal__header"
+				style="background-image: url('/wp-content/uploads/2026/04/form-modal-bg.webp');">
 				<button class="cwc-inquiry-modal__close js-close-modal" aria-label="Close modal">&times;</button>
 			</div>
 			<div class="cwc-inquiry-modal__body">
