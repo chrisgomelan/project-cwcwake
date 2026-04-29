@@ -227,6 +227,10 @@
 				
 				if ( newTotal <= maxCapacity ) {
 					el.textContent = val;
+				} else {
+					if ( window.cwcToast ) {
+						window.cwcToast.show( `Maximum capacity is ${ maxCapacity } persons${ selectedRoom ? ' for the selected room' : '' }.`, 'warning' );
+					}
 				}
 			}
 		};

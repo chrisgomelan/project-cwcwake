@@ -95,6 +95,18 @@ function cwc_enqueue_styles() {
 			'in_footer' => true,
 		)
 	);
+
+	// Global Toast System
+	wp_enqueue_script(
+		'cwc-toast',
+		get_stylesheet_directory_uri() . '/assets/js/toast.js',
+		array(),
+		CWC_VERSION,
+		array(
+			'strategy'  => 'defer',
+			'in_footer' => true,
+		)
+	);
 }
 add_action( 'wp_enqueue_scripts', 'cwc_enqueue_styles' );
 
