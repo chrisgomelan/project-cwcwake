@@ -75,6 +75,8 @@ $book_button_url   = isset( $attributes['bookButtonUrl'] ) ? (string) $attribute
 $policies_label    = isset( $attributes['policiesLabel'] ) ? (string) $attributes['policiesLabel'] : '';
 $policies_intro    = isset( $attributes['policiesIntro'] ) ? (string) $attributes['policiesIntro'] : '';
 $policies          = isset( $attributes['policies'] ) && is_array( $attributes['policies'] ) ? $attributes['policies'] : array();
+$inclusions_label  = isset( $attributes['inclusionsLabel'] ) ? (string) $attributes['inclusionsLabel'] : '';
+$inclusions        = isset( $attributes['inclusions'] ) && is_array( $attributes['inclusions'] ) ? $attributes['inclusions'] : array();
 
 /*
 ---------------------------------------------------------
@@ -139,6 +141,10 @@ if ( $is_accommodation_ctx ) {
 		$policies = cwc_get_global_policies();
 	}
 
+	if ( empty( $inclusions ) && function_exists( 'cwc_accommodation_inclusions' ) ) {
+		$inclusions = cwc_accommodation_inclusions( $current_post_id );
+	}
+
 	if ( function_exists( 'cwc_accommodation_availability' ) ) {
 		$availability = cwc_accommodation_availability( $current_post_id );
 	}
@@ -150,7 +156,7 @@ if ( $is_accommodation_ctx ) {
  * ---------------------------------------------------------
  */
 
-if ( '' === $block_title && '' === $description && empty( $amenities ) && empty( $policies ) ) {
+if ( '' === $block_title && '' === $description && empty( $amenities ) && empty( $policies ) && empty( $inclusions ) ) {
 	return;
 }
 
@@ -287,6 +293,19 @@ $icon = static function ( $slug ) {
 									<?php
 								}
 								?>
+							</ul>
+						</div>
+					<?php endif; ?>
+
+					<?php if ( ! empty( $inclusions ) ) : ?>
+						<div class="cwc-room-info__section">
+							<h3 class="cwc-room-info__label"><?php echo esc_html( '' !== $inclusions_label ? $inclusions_label : __( 'Inclusions', 'child-cwcwake' ) ); ?></h3>
+							<ul class="cwc-room-info__inclusions">
+								<?php foreach ( $inclusions as $inclusion ) : ?>
+									<li class="cwc-room-info__inclusion-chip">
+										<span><?php echo esc_html( $inclusion ); ?></span>
+									</li>
+								<?php endforeach; ?>
 							</ul>
 						</div>
 					<?php endif; ?>

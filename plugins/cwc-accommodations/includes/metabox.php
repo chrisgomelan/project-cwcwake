@@ -74,6 +74,15 @@ function cwc_register_accommodation_meta_boxes() {
 		'normal',
 		'default'
 	);
+
+	add_meta_box(
+		'cwc_accommodation_inclusions',
+		__( 'Inclusions', 'cwc-accommodations' ),
+		'cwc_render_accommodation_inclusions_box',
+		'accommodation',
+		'normal',
+		'default'
+	);
 }
 add_action( 'add_meta_boxes_accommodation', 'cwc_register_accommodation_meta_boxes' );
 
@@ -124,39 +133,74 @@ function cwc_render_accommodation_pricing_box( $post ) {
 			placeholder="per night" class="widefat" />
 	</p>
 
-	<p>
-		<label for="cwc_capacity"><strong><?php esc_html_e( 'Capacity', 'cwc-accommodations' ); ?></strong></label><br />
-		<input type="number" id="cwc_capacity" name="cwc_capacity" value="<?php echo esc_attr( (string) $capacity ); ?>"
-			min="0" step="1" class="small-text" />
-		<span class="description"><?php esc_html_e( 'Max occupants (used for filtering).', 'cwc-accommodations' ); ?></span>
-	</p>
+	<table>
+		<tr>
+			<th><label for="cwc_capacity"><?php esc_html_e( 'Max Guests', 'cwc-accommodations' ); ?></label></th>
+			<td>
+				<input type="number" id="cwc_capacity" name="cwc_capacity" value="<?php echo esc_attr( (string) $capacity ); ?>" class="small-text" min="1" />
+				<p class="description"><?php esc_html_e( 'Maximum number of persons allowed in this room type.', 'cwc-accommodations' ); ?></p>
+			</td>
+		</tr>
 
-	<p>
-		<label for="cwc_availability"><strong><?php esc_html_e( 'Availability', 'cwc-accommodations' ); ?></strong></label><br />
-		<select id="cwc_availability" name="cwc_availability" class="widefat">
-			<?php foreach ( $availability_options as $value => $option ) : ?>
-				<option value="<?php echo esc_attr( $value ); ?>" <?php selected( $availability, $value ); ?>>
-					<?php echo esc_html( $option['label'] ); ?>
-				</option>
+		<tr>
+			<th><label for="cwc_inventory"><?php esc_html_e( 'Total Inventory', 'cwc-accommodations' ); ?></label></th>
+			<td>
+				<input type="number" id="cwc_inventory" name="cwc_inventory" value="<?php echo esc_attr( get_post_meta( $post->ID, '_cwc_inventory', true ) ?: 1 ); ?>" class="small-text" min="1" />
+				<p class="description"><?php esc_html_e( 'Total number of rooms. Below you can name and track them individually.', 'cwc-accommodations' ); ?></p>
+			</td>
+		</tr>
+	</table>
+
+	<hr />
+
+	<h3><?php esc_html_e( 'Individual Room Tracking', 'cwc-accommodations' ); ?></h3>
+	<p class="description"><?php esc_html_e( 'Add every physical room here to track its specific availability status.', 'cwc-accommodations' ); ?></p>
+
+	<div id="cwc-physical-rooms-wrapper">
+		<ul id="cwc-physical-rooms-list" style="margin: 0; padding: 0; list-style: none;">
+			<?php
+			$physical_rooms = cwc_get_physical_rooms( $post->ID );
+			foreach ( $physical_rooms as $idx => $room ) :
+				?>
+				<li class="cwc-physical-room-row" style="display: flex; gap: 10px; align-items: center; margin-bottom: 8px; background: #f9f9f9; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+					<input type="text" name="cwc_physical_rooms[<?php echo $idx; ?>][name]" value="<?php echo esc_attr( $room['name'] ?? '' ); ?>" placeholder="Room Name (e.g. Villa 101)" class="widefat" />
+					<select name="cwc_physical_rooms[<?php echo $idx; ?>][status]">
+						<option value="available" <?php selected( $room['status'] ?? 'available', 'available' ); ?>><?php esc_html_e( 'Available', 'cwc-accommodations' ); ?></option>
+						<option value="booked" <?php selected( $room['status'] ?? '', 'booked' ); ?>><?php esc_html_e( 'Booked', 'cwc-accommodations' ); ?></option>
+					</select>
+					<button type="button" class="button cwc-remove-physical-room" title="Remove Room">×</button>
+				</li>
 			<?php endforeach; ?>
-		</select>
-		<span class="description" id="cwc_availability_help">
-			<?php echo esc_html( $availability_options[ $availability ]['help'] ?? '' ); ?>
-		</span>
-	</p>
+		</ul>
+		<button type="button" class="button" id="cwc-add-physical-room"><?php esc_html_e( '+ Add Physical Room', 'cwc-accommodations' ); ?></button>
+	</div>
 
 	<script>
-		( function () {
-			const select = document.getElementById( 'cwc_availability' );
-			const help   = document.getElementById( 'cwc_availability_help' );
-			if ( ! select || ! help ) {
-				return;
-			}
-			const helps = <?php echo wp_json_encode( wp_list_pluck( $availability_options, 'help' ) ); ?>;
-			select.addEventListener( 'change', () => {
-				help.textContent = helps[ select.value ] || '';
-			} );
-		} )();
+	(function($) {
+		$(function() {
+			const $list = $('#cwc-physical-rooms-list');
+			const $addBtn = $('#cwc-add-physical-room');
+
+			$addBtn.on('click', function() {
+				const idx = $list.find('li').length;
+				const html = `
+					<li class="cwc-physical-room-row" style="display: flex; gap: 10px; align-items: center; margin-bottom: 8px; background: #f9f9f9; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+						<input type="text" name="cwc_physical_rooms[${idx}][name]" value="" placeholder="Room Name" class="widefat" />
+						<select name="cwc_physical_rooms[${idx}][status]">
+							<option value="available">Available</option>
+							<option value="booked">Booked</option>
+						</select>
+						<button type="button" class="button cwc-remove-physical-room">×</button>
+					</li>
+				`;
+				$list.append(html);
+			});
+
+			$list.on('click', '.cwc-remove-physical-room', function() {
+				$(this).closest('li').remove();
+			});
+		});
+	})(jQuery);
 	</script>
 	<?php
 }
@@ -345,6 +389,46 @@ function cwc_render_accommodation_gallery_box( $post ) {
 	<?php
 }
 
+/**
+ * Render the Inclusions box.
+ *
+ * Text area for comma-separated list of inclusions.
+ *
+ * @since 1.1.0
+ *
+ * @param WP_Post $post Current post being edited.
+ * @return void
+ */
+function cwc_render_accommodation_inclusions_box( $post ) {
+	$selected_raw = (string) get_post_meta( $post->ID, '_cwc_inclusions', true );
+	$selected     = array_filter( array_map( 'trim', explode( ',', $selected_raw ) ) );
+	$catalogue    = cwc_inclusion_catalogue();
+	?>
+	<p class="description">
+		<?php esc_html_e( 'Tick every inclusion this room offers. These labels come from the shared inclusion catalogue.', 'cwc-accommodations' ); ?>
+	</p>
+
+	<ul class="cwc-inclusion-checklist" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:.5rem 1rem;margin:0;padding:0;list-style:none;">
+		<?php foreach ( $catalogue as $slug => $row ) :
+			$id = 'cwc_inclusion_' . sanitize_html_class( $slug );
+			?>
+			<li>
+				<label for="<?php echo esc_attr( $id ); ?>" style="display:flex;align-items:center;gap:.5rem;">
+					<input
+						type="checkbox"
+						id="<?php echo esc_attr( $id ); ?>"
+						name="cwc_inclusions[]"
+						value="<?php echo esc_attr( $slug ); ?>"
+						<?php checked( in_array( $slug, $selected, true ) ); ?>
+					/>
+					<span><?php echo esc_html( $row['label'] ); ?></span>
+				</label>
+			</li>
+		<?php endforeach; ?>
+	</ul>
+	<?php
+}
+
 /* ---------------------------------------------------------
  * Save handler
  * --------------------------------------------------------- */
@@ -392,25 +476,47 @@ function cwc_save_accommodation_meta( $post_id ) {
 		'_cwc_price'        => $_POST['cwc_price']        ?? '',
 		'_cwc_price_sub'    => $_POST['cwc_price_sub']    ?? '',
 		'_cwc_capacity'     => $_POST['cwc_capacity']     ?? 0,
-		'_cwc_availability' => $_POST['cwc_availability'] ?? 'available',
+		'_cwc_inventory'    => $_POST['cwc_inventory']    ?? 1,
 		'_cwc_gallery_ids'  => $_POST['cwc_gallery_ids']  ?? '',
 	];
 
+	// Handle Physical Rooms (JSON encoded array)
+	$physical_rooms = [];
+	if ( isset( $_POST['cwc_physical_rooms'] ) && is_array( $_POST['cwc_physical_rooms'] ) ) {
+		foreach ( $_POST['cwc_physical_rooms'] as $room ) {
+			$name   = sanitize_text_field( $room['name'] ?? '' );
+			$status = sanitize_key( $room['status'] ?? 'available' );
+			if ( $name ) {
+				$physical_rooms[] = [ 'name' => $name, 'status' => $status ];
+			}
+		}
+	}
+	$pairs['_cwc_physical_rooms'] = wp_json_encode( $physical_rooms );
+
 	/*
-	 * Amenities arrives as a checkbox array; flatten to the
-	 * comma-separated string the sanitizer expects. We pass it
-	 * through `wp_unslash` first because WordPress slashes all
-	 * `$_POST` data globally.
+	 * Amenities and Inclusions arrive as checkbox arrays; flatten to the
+	 * comma-separated string the sanitizer expects.
 	 */
-	$amenities_in       = isset( $_POST['cwc_amenities'] ) && is_array( $_POST['cwc_amenities'] )
+	$amenities_in = isset( $_POST['cwc_amenities'] ) && is_array( $_POST['cwc_amenities'] )
 		? array_map( 'sanitize_key', wp_unslash( $_POST['cwc_amenities'] ) )
 		: [];
 	$pairs['_cwc_amenities'] = implode( ',', $amenities_in );
+
+	$inclusions_in = isset( $_POST['cwc_inclusions'] ) && is_array( $_POST['cwc_inclusions'] )
+		? array_map( 'sanitize_key', wp_unslash( $_POST['cwc_inclusions'] ) )
+		: [];
+	$pairs['_cwc_inclusions'] = implode( ',', $inclusions_in );
 
 	foreach ( $pairs as $key => $raw ) {
 		$raw       = is_string( $raw ) ? wp_unslash( $raw ) : $raw;
 		$sanitizer = cwc_accommodation_meta_sanitizer( $key );
 		$clean     = $sanitizer( $raw );
+		
+		// Debug logging to help identify why inclusions/amenities might not reflect
+		if ( '_cwc_inclusions' === $key || '_cwc_amenities' === $key ) {
+			error_log( "CWC Debug: Saving $key for Post $post_id. Raw: " . print_r($raw, true) . " | Clean: " . print_r($clean, true) );
+		}
+
 		update_post_meta( $post_id, $key, $clean );
 	}
 }

@@ -175,6 +175,31 @@
 	object-fit: contain;
 }
 
+/* ---------- Inclusion chips ---------- */
+
+.cwc-room-info__inclusions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.75rem;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.cwc-room-info__inclusion-chip {
+	display: flex;
+	align-items: center;
+	padding: 0.7rem 1.4rem;
+	border-radius: 999px;
+	background: #f4f1f8;
+	border: 1px solid rgba(0, 0, 0, 0.05);
+	font-family: var(--wp--preset--font-family--heading);
+	font-weight: 600;
+	font-size: clamp(0.9rem, 1.1vw, 1.125rem);
+	line-height: 1.2;
+	color: #2b3037;
+}
+
 /* ---------- Pricing aside ---------- */
 
 .cwc-room-info__pricing {

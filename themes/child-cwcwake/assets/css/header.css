@@ -52,52 +52,18 @@
 	align-items: center;
 	padding: 0 !important;
 	margin: 0 !important;
-	/* Clip the wave ::after that extends -40px above the header (and any side overflow),
-		but leave the bottom open so navigation submenu dropdowns can extend below. */
-	clip-path: inset(0 0 -100vh 0);
-	transition: border-color 0.3s ease,
+	transition: background-color 0.3s ease, 
+		border-color 0.3s ease,
 		box-shadow 0.3s ease;
 }
 
-.cwc-header::after {
-	content: "";
-	position: absolute;
-	inset: -40px 0 0;
-	z-index: -1;
-	background: var(--wp--preset--color--background);
-	clip-path: ellipse(60% 0% at 50% 100%);
-	transition: clip-path 0.5s ease;
+.cwc-header--scrolled {
+	background: var(--wp--preset--color--background) !important;
+	border-color: var(--wp--preset--color--border);
+	box-shadow: var(--wp--custom--shadow--sm);
 }
 
-.cwc-header--scrolled::after {
-	animation: cwc-wave-flow 0.8s ease forwards;
-}
 
-@keyframes cwc-wave-flow {
-	0% {
-		clip-path: ellipse(60% 0% at 50% 100%);
-	}
-
-	20% {
-		clip-path: ellipse(70% 35% at 50% 100%);
-	}
-
-	40% {
-		clip-path: ellipse(80% 60% at 45% 100%);
-	}
-
-	60% {
-		clip-path: ellipse(90% 80% at 55% 100%);
-	}
-
-	80% {
-		clip-path: ellipse(100% 95% at 50% 100%);
-	}
-
-	100% {
-		clip-path: ellipse(150% 100% at 50% 100%);
-	}
-}
 
 .admin-bar .cwc-header {
 	top: 32px;
@@ -464,6 +430,7 @@ body.admin-bar {
 	opacity: 0;
 	pointer-events: none;
 	transition: opacity 0.4s ease;
+	margin: 0;
 }
 
 .cwc-header__backdrop.is-visible {
@@ -877,13 +844,9 @@ body.cwc-nav-open {
 	appearance permanently and skips the wave animation entirely. */
 
 body:not(.cwc-home) .cwc-header {
-	background: var(--wp--preset--color--background);
+	background: var(--wp--preset--color--background) !important;
 	border-color: var(--wp--preset--color--border);
 	box-shadow: var(--wp--custom--shadow--sm);
-}
-
-body:not(.cwc-home) .cwc-header::after {
-	display: none;
 }
 
 body:not(.cwc-home) .cwc-header__logo-link {

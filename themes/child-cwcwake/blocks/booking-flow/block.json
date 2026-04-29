@@ -1,0 +1,24 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "cwc/booking-flow",
+	"title": "Booking Flow",
+	"category": "theme",
+	"icon": "cart",
+	"description": "Multi-step booking flow: Guest Details → Payment Details with Booking Summary sidebar.",
+	"keywords": ["booking", "checkout", "payment", "guest"],
+	"textdomain": "child-cwcwake",
+	"attributes": {
+		"align": {
+			"type": "string",
+			"default": "full"
+		}
+	},
+	"supports": {
+		"html": false,
+		"align": ["wide", "full"]
+	},
+	"render": "file:./render.php",
+	"style": "file:./style.css",
+	"viewScript": "file:./view.js"
+}

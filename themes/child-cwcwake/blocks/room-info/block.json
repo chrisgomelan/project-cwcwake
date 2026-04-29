@@ -67,6 +67,17 @@
 			"items": {
 				"type": "object"
 			}
+		},
+		"inclusionsLabel": {
+			"type": "string",
+			"default": "Inclusions"
+		},
+		"inclusions": {
+			"type": "array",
+			"default": [],
+			"items": {
+				"type": "string"
+			}
 		}
 	},
 	"render": "file:./render.php",

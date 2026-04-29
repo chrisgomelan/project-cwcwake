@@ -35,6 +35,19 @@ if ( ! defined( 'ABSPATH' ) ) {
  * CPT registration
  * --------------------------------------------------------- */
 
+function cwc_get_room_inventory( $post_id ) {
+	$inventory = get_post_meta( $post_id, '_cwc_inventory', true );
+	return $inventory !== '' ? intval( $inventory ) : 1; // Default to 1 if not set
+}
+
+function cwc_get_physical_rooms( $post_id ) {
+	$rooms_raw = get_post_meta( $post_id, '_cwc_physical_rooms', true );
+	if ( empty( $rooms_raw ) ) {
+		return [];
+	}
+	return json_decode( $rooms_raw, true ) ?: [];
+}
+
 /**
  * Register the `accommodation` post type and flush rewrites once.
  *
@@ -199,12 +212,15 @@ function cwc_register_accommodation_meta() {
 	};
 
 	$fields = [
-		'_cwc_price'        => 'string',
-		'_cwc_price_sub'    => 'string',
-		'_cwc_capacity'     => 'integer',
-		'_cwc_availability' => 'string',
-		'_cwc_amenities'    => 'string',
-		'_cwc_gallery_ids'  => 'string',
+		'_cwc_price'          => 'string',
+		'_cwc_price_sub'      => 'string',
+		'_cwc_capacity'       => 'integer',
+		'_cwc_availability'   => 'string',
+		'_cwc_amenities'      => 'string',
+		'_cwc_inclusions'     => 'string',
+		'_cwc_inventory'      => 'integer',
+		'_cwc_physical_rooms' => 'string',
+		'_cwc_gallery_ids'    => 'string',
 	];
 
 	foreach ( $fields as $key => $type ) {
@@ -246,7 +262,7 @@ function cwc_accommodation_meta_sanitizer( $key ) {
 
 		case '_cwc_availability':
 			return static function ( $value ) {
-				$allowed = [ 'available', 'fully-booked', 'maintenance' ];
+				$allowed = [ 'available', 'limited', 'booked', 'closed', 'fully-booked', 'maintenance' ];
 				$value   = is_string( $value ) ? $value : '';
 				return in_array( $value, $allowed, true ) ? $value : 'available';
 			};
@@ -254,6 +270,21 @@ function cwc_accommodation_meta_sanitizer( $key ) {
 		case '_cwc_amenities':
 			return static function ( $value ) {
 				return cwc_accommodation_normalize_slug_csv( $value, array_keys( cwc_amenity_catalogue() ) );
+			};
+
+		case '_cwc_inclusions':
+			return static function ( $value ) {
+				return cwc_accommodation_normalize_slug_csv( $value, array_keys( cwc_inclusion_catalogue() ) );
+			};
+
+		case '_cwc_inventory':
+			return static function ( $value ) {
+				return intval( $value );
+			};
+
+		case '_cwc_physical_rooms':
+			return static function ( $value ) {
+				return sanitize_text_field( $value );
 			};
 
 		case '_cwc_gallery_ids':
@@ -346,6 +377,37 @@ function cwc_amenity_catalogue() {
 	 * @param array<string,array{label:string,icon:string}> $catalogue Slug → label + icon.
 	 */
 	return apply_filters( 'cwc_amenity_catalogue', $catalogue );
+}
+
+/**
+ * Catalogue of room inclusions the site supports.
+ *
+ * Maps a stable slug → display label. Like amenities, this drives
+ * the checkbox UI in the admin and the chip cloud on the front-end.
+ *
+ * @since 1.1.0
+ *
+ * @return array<string,array{label:string}>
+ */
+function cwc_inclusion_catalogue() {
+	$dynamic = get_option( 'cwc_dynamic_inclusions', [] );
+	
+	if ( empty( $dynamic ) ) {
+		$catalogue = [
+			'wakeboard-4'    => [ 'label' => 'Free Wakeboard for 4 Guests' ],
+			'airport-pick'   => [ 'label' => 'Free Airport Pick Up in Naga Airport' ],
+			'golf-coach'     => [ 'label' => 'Free 18 holes Gold maximum of 4 Guests or One hour with Golf Coach' ],
+			'shuttle-naga'   => [ 'label' => 'Free Shuttle to Naga City' ],
+			'skate-park'     => [ 'label' => 'Free Use of Skate Park' ],
+			'bike-track'     => [ 'label' => 'Free Use of Bike Track' ],
+			'playground'     => [ 'label' => 'Free Use of Children\'s Playground' ],
+			'basketball'     => [ 'label' => 'Free Use of Outdoor Basketball Court' ],
+		];
+	} else {
+		$catalogue = $dynamic;
+	}
+
+	return apply_filters( 'cwc_inclusion_catalogue', $catalogue );
 }
 
 /**
@@ -530,6 +592,41 @@ function cwc_accommodation_amenities( $post_id ) {
 }
 
 /**
+ * Decode the comma-separated `_cwc_inclusions` meta into an array of strings.
+ *
+ * Each entry is trimmed and cleaned so it can be rendered directly
+ * as a text pill.
+ *
+ * @since 1.1.0
+ *
+ * @param int $post_id Accommodation post ID.
+ * @return array<int,string>
+ */
+function cwc_accommodation_inclusions( $post_id ) {
+	$post_id = (int) $post_id;
+	if ( $post_id <= 0 ) {
+		return [];
+	}
+
+	$raw = (string) get_post_meta( $post_id, '_cwc_inclusions', true );
+	if ( '' === $raw ) {
+		return [];
+	}
+
+	$slugs     = array_filter( array_map( 'trim', explode( ',', $raw ) ) );
+	$catalogue = cwc_inclusion_catalogue();
+	$out       = [];
+
+	foreach ( $slugs as $slug ) {
+		if ( isset( $catalogue[ $slug ] ) ) {
+			$out[] = $catalogue[ $slug ]['label'];
+		}
+	}
+
+	return $out;
+}
+
+/**
  * Resolve `_cwc_gallery_ids` meta into URL/alt rows.
  *
  * The room-gallery block expects 4 image slots; this returns up to
@@ -637,8 +734,21 @@ function cwc_accommodation_availability( $post_id ) {
 		return 'available';
 	}
 
-	$value   = (string) get_post_meta( $post_id, '_cwc_availability', true );
-	$allowed = [ 'available', 'fully-booked', 'maintenance' ];
+	$rooms = cwc_get_physical_rooms( $post_id );
+	
+	if ( empty( $rooms ) ) {
+		// Fallback to old meta if no physical rooms are defined
+		$old_value = (string) get_post_meta( $post_id, '_cwc_availability', true );
+		return in_array( $old_value, [ 'available', 'fully-booked' ], true ) ? $old_value : 'available';
+	}
 
-	return in_array( $value, $allowed, true ) ? $value : 'available';
+	$has_available = false;
+	foreach ( $rooms as $room ) {
+		if ( 'available' === ( $room['status'] ?? '' ) ) {
+			$has_available = true;
+			break;
+		}
+	}
+
+	return $has_available ? 'available' : 'fully-booked';
 }

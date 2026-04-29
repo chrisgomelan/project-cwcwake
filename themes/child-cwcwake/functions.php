@@ -845,6 +845,10 @@ function cwc_register_blocks() {
 	// Land Activities page blocks.
 	register_block_type( get_stylesheet_directory() . '/blocks/land-feature-split' );
 	register_block_type( get_stylesheet_directory() . '/blocks/header-multi-image' );
+
+	// Book a Room blocks.
+	register_block_type( get_stylesheet_directory() . '/blocks/book-a-room' );
+	register_block_type( get_stylesheet_directory() . '/blocks/booking-flow' );
 }
 add_action( 'init', 'cwc_register_blocks' );
 

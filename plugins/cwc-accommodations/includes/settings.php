@@ -24,6 +24,15 @@ function cwc_register_accommodations_settings_menu() {
 		'cwc-amenity-settings',
 		'cwc_render_accommodations_settings_page'
 	);
+
+	add_submenu_page(
+		'edit.php?post_type=accommodation',
+		__( 'Inclusions', 'cwc-accommodations' ),
+		__( 'Inclusions', 'cwc-accommodations' ),
+		'manage_options',
+		'cwc-inclusion-settings',
+		'cwc_render_accommodations_inclusions_page'
+	);
 }
 add_action( 'admin_menu', 'cwc_register_accommodations_settings_menu' );
 
@@ -42,7 +51,7 @@ function cwc_handle_accommodations_settings_save() {
 	if ( isset( $_POST['icon_pool'] ) && is_array( $_POST['icon_pool'] ) ) {
 		foreach ( $_POST['icon_pool'] as $row ) {
 			$slug = sanitize_key( $row['slug'] ?? '' );
-			$val  = sanitize_text_field( $row['value'] ?? '' );
+			$val  = sanitize_text_field( wp_unslash( $row['value'] ?? '' ) );
 			if ( $slug && $val ) {
 				$pool[ $slug ] = $val;
 			}
@@ -55,7 +64,7 @@ function cwc_handle_accommodations_settings_save() {
 	if ( isset( $_POST['amenities'] ) && is_array( $_POST['amenities'] ) ) {
 		foreach ( $_POST['amenities'] as $row ) {
 			$slug  = sanitize_key( $row['slug'] ?? '' );
-			$label = sanitize_text_field( $row['label'] ?? '' );
+			$label = sanitize_text_field( wp_unslash( $row['label'] ?? '' ) );
 			$icon  = sanitize_key( $row['icon'] ?? '' );
 			if ( $slug && $label ) {
 				$amenities[ $slug ] = [ 'label' => $label, 'icon' => $icon ];
@@ -64,6 +73,19 @@ function cwc_handle_accommodations_settings_save() {
 	}
 	update_option( 'cwc_dynamic_amenities', $amenities );
 
+	// 3. Save Inclusions
+	$inclusions = [];
+	if ( isset( $_POST['inclusions'] ) && is_array( $_POST['inclusions'] ) ) {
+		foreach ( $_POST['inclusions'] as $row ) {
+			$slug  = sanitize_key( $row['slug'] ?? '' );
+			$label = sanitize_text_field( wp_unslash( $row['label'] ?? '' ) );
+			if ( $slug && $label ) {
+				$inclusions[ $slug ] = [ 'label' => $label ];
+			}
+		}
+	}
+	update_option( 'cwc_dynamic_inclusions', $inclusions );
+
 	$seeded = 0;
 	if ( isset( $_POST['cwc_seed_blogs'] ) ) {
 		$seeded = cwc_seed_blog_posts();
@@ -71,7 +93,7 @@ function cwc_handle_accommodations_settings_save() {
 
 	wp_safe_redirect( add_query_arg( [ 
 		'post_type' => 'accommodation', 
-		'page'      => 'cwc-amenity-settings', 
+		'page'      => $_POST['page'] ?? 'cwc-amenity-settings', 
 		'updated'   => '1',
 		'seeded'    => $seeded
 	], admin_url( 'edit.php' ) ) );
@@ -259,6 +281,88 @@ function cwc_render_accommodations_settings_page() {
 			}
 
 			// Remove Row
+			document.addEventListener( 'click', ( event ) => {
+				if ( event.target.matches( '.cwc-remove-row' ) ) {
+					event.target.closest( '.cwc-row' )?.remove();
+				}
+			} );
+		} )();
+		</script>
+	</div>
+	<?php
+}
+
+/**
+ * Render the Inclusions settings page.
+ */
+function cwc_render_accommodations_inclusions_page() {
+	$inclusions = get_option( 'cwc_dynamic_inclusions', [] );
+	$updated    = isset( $_GET['updated'] );
+
+	// Default starting list if empty
+	if ( empty( $inclusions ) ) {
+		$inclusions = [
+			'wakeboard-4'    => [ 'label' => 'Free Wakeboard for 4 Guests' ],
+			'airport-pick'   => [ 'label' => 'Free Airport Pick Up in Naga Airport' ],
+			'golf-coach'     => [ 'label' => 'Free 18 holes Gold maximum of 4 Guests or One hour with Golf Coach' ],
+			'shuttle-naga'   => [ 'label' => 'Free Shuttle to Naga City' ],
+			'skate-park'     => [ 'label' => 'Free Use of Skate Park' ],
+			'bike-track'     => [ 'label' => 'Free Use of Bike Track' ],
+			'playground'     => [ 'label' => 'Free Use of Children\'s Playground' ],
+			'basketball'     => [ 'label' => 'Free Use of Outdoor Basketball Court' ],
+		];
+	}
+	?>
+	<div class="wrap">
+		<h1><?php esc_html_e( 'Room Inclusions', 'cwc-accommodations' ); ?></h1>
+
+		<?php if ( $updated ) : ?>
+			<div class="notice notice-success is-dismissible"><p><?php esc_html_e( 'Inclusions saved.', 'cwc-accommodations' ); ?></p></div>
+		<?php endif; ?>
+
+		<p class="description"><?php esc_html_e( 'Define the inclusions that can be checked on each room. These appear as text pills on the frontend.', 'cwc-accommodations' ); ?></p>
+
+		<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
+			<input type="hidden" name="action" value="cwc_acc_settings_save" />
+			<input type="hidden" name="page" value="cwc-inclusion-settings" />
+			<?php wp_nonce_field( 'cwc_acc_settings_save', 'cwc_acc_settings_nonce' ); ?>
+
+			<div id="cwc-inclusion-rows" style="display:flex;flex-direction:column;gap:.5rem;margin:1rem 0;">
+				<?php $k = 0; foreach ( $inclusions as $slug => $data ) : ?>
+					<div class="cwc-row" style="display:grid;grid-template-columns:200px 1fr 50px;gap:1rem;background:#fff;padding:.5rem;border:1px solid #ccd0d4;align-items:center;">
+						<input type="text" name="inclusions[<?php echo $k; ?>][slug]" value="<?php echo esc_attr( $slug ); ?>" placeholder="slug (e.g. free-wifi)" class="widefat" />
+						<input type="text" name="inclusions[<?php echo $k; ?>][label]" value="<?php echo esc_attr( $data['label'] ); ?>" placeholder="Display Label" class="widefat" />
+						<button type="button" class="button-link-delete cwc-remove-row">×</button>
+					</div>
+				<?php $k++; endforeach; ?>
+			</div>
+			
+			<button type="button" class="button" id="cwc-add-inclusion"><?php esc_html_e( '+ Add New Inclusion', 'cwc-accommodations' ); ?></button>
+
+			<div style="margin-top:2rem;">
+				<?php submit_button( __( 'Save Inclusions', 'cwc-accommodations' ) ); ?>
+			</div>
+		</form>
+
+		<script>
+		( function () {
+			const addBtn = document.getElementById( 'cwc-add-inclusion' );
+			if ( addBtn ) {
+				addBtn.addEventListener( 'click', () => {
+					const list    = document.getElementById( 'cwc-inclusion-rows' );
+					const counter = list.querySelectorAll( '.cwc-row' ).length;
+					const wrapper = document.createElement( 'div' );
+					wrapper.className = 'cwc-row';
+					wrapper.style.cssText = 'display:grid;grid-template-columns:200px 1fr 50px;gap:1rem;background:#fff;padding:.5rem;border:1px solid #ccd0d4;align-items:center;';
+					wrapper.innerHTML = `
+						<input type="text" name="inclusions[${counter}][slug]" placeholder="slug" class="widefat" />
+						<input type="text" name="inclusions[${counter}][label]" placeholder="Display Label" class="widefat" />
+						<button type="button" class="button-link-delete cwc-remove-row">×</button>
+					`;
+					list.appendChild( wrapper );
+				} );
+			}
+
 			document.addEventListener( 'click', ( event ) => {
 				if ( event.target.matches( '.cwc-remove-row' ) ) {
 					event.target.closest( '.cwc-row' )?.remove();

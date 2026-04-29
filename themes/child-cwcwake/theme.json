@@ -439,6 +439,16 @@
 			"name": "page-elite-facilities",
 			"title": "Elite Facilities",
 			"postTypes": ["page"]
+		},
+		{
+			"name": "page-book-now",
+			"title": "Book a Room",
+			"postTypes": ["page"]
+		},
+		{
+			"name": "page-booking",
+			"title": "Booking Flow",
+			"postTypes": ["page"]
 		}
 	],
 	"templateParts": [
