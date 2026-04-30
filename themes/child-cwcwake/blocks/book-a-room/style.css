@@ -102,7 +102,7 @@
 	position: fixed;
 	left: 50%;
 	transform: translateX(-50%);
-	z-index: 1001;
+	z-index: 10;
 	width: calc(100% - 2 * clamp(1rem, 4vw, 4rem));
 	max-width: 1429px;
 	height: 100px;
@@ -313,7 +313,6 @@
 	position: fixed;
 	inset: 0;
 	background: transparent;
-	z-index: 999;
 	display: none;
 }
 

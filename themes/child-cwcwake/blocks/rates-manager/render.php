@@ -125,9 +125,11 @@ $wrapper_attributes = get_block_wrapper_attributes(
 						<div class="cwc-inquiry-form__select-wrap">
 							<select class="cwc-inquiry-form__select" required>
 								<option value="" disabled selected>Choose a subject</option>
-								<option value="rates">General Rates</option>
-								<option value="booking">Booking Inquiry</option>
-								<option value="group">Group Packages</option>
+								<?php foreach ($categories as $rate_cat): ?>
+									<option value="<?php echo esc_attr($rate_cat['title']); ?>">
+										<?php echo esc_html($rate_cat['title']); ?>
+									</option>
+								<?php endforeach; ?>
 							</select>
 						</div>
 					</div>

@@ -313,21 +313,43 @@ $icon = static function ( $slug ) {
 
 				<?php if ( $state['show_pricing'] && ( '' !== $price || '' !== $state['button_label'] || '' !== $state['notice'] ) ) : ?>
 					<aside class="cwc-room-info__pricing">
-						<?php if ( '' !== $state['notice'] ) : ?>
-							<p class="cwc-room-info__notice"><?php echo esc_html( $state['notice'] ); ?></p>
-						<?php endif; ?>
+						<h3 class="cwc-room-info__pricing-title">Book This Room</h3>
+						
+						<div class="cwc-room-info__pricing-dates">
+							<div class="cwc-room-info__pricing-field" data-modal-target="date">
+								<img src="/wp-content/uploads/2026/04/book-check-in.svg" alt="" class="cwc-room-info__pricing-icon">
+								<div class="cwc-room-info__pricing-content">
+									<span class="cwc-room-info__pricing-label">Check in</span>
+									<span class="cwc-room-info__pricing-val" id="cwc-ri-val-checkin">Add date</span>
+								</div>
+							</div>
+							<div class="cwc-room-info__pricing-field" data-modal-target="date">
+								<img src="/wp-content/uploads/2026/04/book-check-in.svg" alt="" class="cwc-room-info__pricing-icon">
+								<div class="cwc-room-info__pricing-content">
+									<span class="cwc-room-info__pricing-label">Check out</span>
+									<span class="cwc-room-info__pricing-val" id="cwc-ri-val-checkout">Add date</span>
+								</div>
+							</div>
+						</div>
 
-						<?php if ( '' !== $price ) : ?>
-							<p class="cwc-room-info__price"><?php echo esc_html( $price ); ?></p>
-						<?php endif; ?>
-
-						<?php if ( '' !== $price_sub_label ) : ?>
-							<p class="cwc-room-info__price-sub"><?php echo esc_html( $price_sub_label ); ?></p>
-						<?php endif; ?>
+						<div class="cwc-room-info__pricing-field cwc-room-info__pricing-field--guests" data-modal-target="guests">
+							<div class="cwc-room-info__pricing-field-inner">
+								<img src="/wp-content/uploads/2026/04/guest-type.svg" alt="" class="cwc-room-info__pricing-icon">
+								<div class="cwc-room-info__pricing-content">
+									<span class="cwc-room-info__pricing-label">Guests</span>
+									<span class="cwc-room-info__pricing-val" id="cwc-ri-val-guests">0 Adult, 0 Kids</span>
+								</div>
+							</div>
+							<svg class="cwc-room-info__pricing-chevron" width="14" height="8" viewBox="0 0 14 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+								<path d="M1 1L7 7L13 1" stroke="#666666" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+							</svg>
+						</div>
 
 						<?php if ( $state['show_button'] && '' !== $state['button_label'] ) : ?>
-							<a class="cwc-room-info__book-button"
-								href="<?php echo esc_url( '' !== $state['button_url'] ? $state['button_url'] : '#book' ); ?>">
+							<a class="cwc-room-info__book-button" id="cwc-book-btn"
+								href="<?php echo esc_url( '' !== $state['button_url'] ? $state['button_url'] : '#book' ); ?>"
+								data-room-name="<?php echo esc_attr( $block_title ); ?>"
+								data-max-capacity="<?php echo esc_attr( isset($meta_capacity) && '' !== $meta_capacity ? $meta_capacity : 4 ); ?>">
 								<?php echo esc_html( $state['button_label'] ); ?>
 							</a>
 						<?php endif; ?>
@@ -377,4 +399,5 @@ $icon = static function ( $slug ) {
 			<?php endif; ?>
 		</div>
 	</div>
+
 </section>

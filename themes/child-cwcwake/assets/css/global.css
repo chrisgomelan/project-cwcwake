@@ -34,6 +34,11 @@ img {
 	display: block;
 }
 
+::selection {
+	background-color: var(--wp--preset--color--accent);
+	color: #ffffff;
+}
+
 /* WordPress generates padding on the site-blocks wrapper from theme.json
 	layout settings. Reset it so full-width blocks own their own insets. 
 	Also implement a flexbox sticky footer solution. */
@@ -799,7 +804,8 @@ input[type="date"]::after {
 	transform: translateY(0);
 }
 
-.cwc-toast--warning, .cwc-toast--error {
+.cwc-toast--warning,
+.cwc-toast--error {
 	background: var(--wp--preset--color--accent, #ED5B26);
 	color: #F5F1EB;
 }

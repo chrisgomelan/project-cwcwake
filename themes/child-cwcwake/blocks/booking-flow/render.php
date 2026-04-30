@@ -12,55 +12,95 @@
  * @package ChildCwcwake
  */
 
-if ( ! defined( 'ABSPATH' ) ) {
+if (!defined('ABSPATH')) {
 	exit;
 }
 
 $class_name = 'wp-block-cwc-booking-flow';
-if ( ! empty( $attributes['className'] ) ) {
-	$class_name .= ' ' . esc_attr( $attributes['className'] );
+if (!empty($attributes['className'])) {
+	$class_name .= ' ' . esc_attr($attributes['className']);
 }
 
-$wrapper_attrs = get_block_wrapper_attributes( array( 'class' => $class_name ) );
+$wrapper_attrs = get_block_wrapper_attributes(array(
+	'class' => $class_name,
+	'data-theme-url' => get_stylesheet_directory_uri()
+));
+
+$room_val = isset($_GET['room']) ? sanitize_text_field($_GET['room']) : '';
+$checkin_val = isset($_GET['checkin']) ? sanitize_text_field($_GET['checkin']) : '';
+$checkout_val = isset($_GET['checkout']) ? sanitize_text_field($_GET['checkout']) : '';
+$guests_val = isset($_GET['guests']) ? sanitize_text_field($_GET['guests']) : '';
+
+if (empty($room_val) || $room_val === 'Choose Room' || empty($checkin_val) || $checkin_val === 'Add date' || empty($checkout_val) || $checkout_val === 'Add date' || empty($guests_val) || $guests_val === '0 Adult, 0 Kids') {
+	?>
+	<div <?php echo $wrapper_attrs; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
+		<div class="bf-inner-container" style="text-align: center; padding: 100px 20px;">
+			<h2 style="margin-bottom: 16px;">Incomplete Booking Selection</h2>
+			<p style="margin-bottom: 24px; color: #666;">Please complete your booking selection (dates, room, and guests)
+				before proceeding.</p>
+			<a href="<?php echo esc_url(home_url('/accommodations/')); ?>" class="bf-btn-primary"
+				style="display: inline-block; text-decoration: none; padding: 12px 24px; border-radius: 8px;">Back to
+				Accommodations</a>
+		</div>
+	</div>
+	<?php
+	return;
+}
 
 /* Fetch rooms for the Selected Room modal */
 $query = new WP_Query(
 	array(
-		'post_type'      => 'accommodation',
+		'post_type' => 'accommodation',
 		'posts_per_page' => -1,
-		'post_status'    => 'publish',
-		'orderby'        => 'menu_order title',
-		'order'          => 'ASC',
+		'post_status' => 'publish',
+		'orderby' => 'menu_order title',
+		'order' => 'ASC',
 	)
 );
 
 $rooms = array();
-if ( $query->have_posts() ) {
-	while ( $query->have_posts() ) {
+if ($query->have_posts()) {
+	while ($query->have_posts()) {
 		$query->the_post();
 		$current_post_id = get_the_ID();
 
-		$capacity = get_post_meta( $current_post_id, '_cwc_capacity', true );
-		if ( empty( $capacity ) ) {
+		$capacity = get_post_meta($current_post_id, '_cwc_capacity', true);
+		if (empty($capacity)) {
 			$capacity = '4';
 		}
 
 		$rooms[] = array(
-			'title'    => get_the_title(),
-			'image'    => get_the_post_thumbnail_url( $current_post_id, 'medium' ),
-			'price'    => get_post_meta( $current_post_id, '_cwc_price', true ),
+			'title' => get_the_title(),
+			'image' => get_the_post_thumbnail_url($current_post_id, 'medium'),
+			'price' => get_post_meta($current_post_id, '_cwc_price', true),
 			'capacity' => $capacity,
+			'excerpt' => get_the_excerpt($current_post_id),
+			'beds' => function_exists('cwc_get_room_beds') ? cwc_get_room_beds($current_post_id) : [],
 		);
 	}
 	wp_reset_postdata();
 }
 
-$first_room       = ! empty( $rooms ) ? $rooms[0] : array(
-	'title'    => 'Villa',
-	'image'    => '',
-	'price'    => 'PHP 19,500',
-	'capacity' => '4',
-);
+$selected_room = array();
+foreach ($rooms as $room) {
+	if (strtolower($room['title']) === strtolower($room_val)) {
+		$selected_room = $room;
+		break;
+	}
+}
+
+if (empty($selected_room) && !empty($rooms)) {
+	$selected_room = $rooms[0];
+} else if (empty($selected_room)) {
+	$selected_room = array(
+		'title' => 'Villa',
+		'image' => '',
+		'price' => 'PHP 19,500',
+		'capacity' => '4',
+	);
+}
+
+$first_room = $selected_room;
 $first_room_price = $first_room['price'];
 ?>
 
@@ -71,7 +111,9 @@ $first_room_price = $first_room['price'];
 		<div class="bf-progress">
 			<div class="bf-progress__step bf-progress__step--done" data-step="1">
 				<span class="bf-progress__circle bf-progress__circle--done">
-					<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" fill="#fff"/></svg>
+					<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+						<path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" fill="#fff" />
+					</svg>
 				</span>
 				<span class="bf-progress__label">Your Selection</span>
 			</div>
@@ -111,27 +153,45 @@ $first_room_price = $first_room['price'];
 
 					<div class="bf-field">
 						<label class="bf-field__label">Your Full Name <span class="bf-field__req">*</span></label>
-						<input type="text" class="bf-field__input" id="bf-fullname" placeholder="Last Name, First Name" required>
-						<p class="bf-field__note">All booking confirmations, updates, and important travel details will be sent to Primary Guest.</p>
+						<input type="text" class="bf-field__input" id="bf-fullname" placeholder="Last Name, First Name"
+							required>
+						<p class="bf-field__note">All booking confirmations, updates, and important travel details will
+							be sent to Primary Guest.</p>
 					</div>
 
 					<div class="bf-field-row">
 						<div class="bf-field bf-field--half">
 							<label class="bf-field__label">Your Email <span class="bf-field__req">*</span></label>
 							<div class="bf-field__input-wrap bf-field__input-wrap--icon">
-								<img src="/wp-content/uploads/2026/04/mail-envelope.svg" alt="" class="bf-field__icon" width="20" height="20">
-								<input type="email" class="bf-field__input bf-field__input--with-icon" id="bf-email" placeholder="Enter Email Address" required>
+								<img src="/wp-content/uploads/2026/04/mail-envelope.svg" alt="" class="bf-field__icon"
+									width="20" height="20">
+								<input type="email" class="bf-field__input bf-field__input--with-icon" id="bf-email"
+									placeholder="Enter Email Address" required>
 							</div>
 						</div>
 						<div class="bf-field bf-field--half">
-							<label class="bf-field__label">Your Phone Number <span class="bf-field__req">*</span></label>
+							<label class="bf-field__label">Your Phone Number <span
+									class="bf-field__req">*</span></label>
 							<div class="bf-field__phone-row">
-								<div class="bf-field__country-code">
-									<span class="bf-field__flag">🇵🇭</span>
-									<span>+63</span>
-									<svg width="12" height="12" viewBox="0 0 12 12"><path d="M3 5l3 3 3-3" stroke="currentColor" stroke-width="1.5" fill="none"/></svg>
+								<div class="bf-field__country-selector" id="bf-country-selector">
+									<button class="bf-field__country-code" type="button">
+										<span class="bf-field__flag" id="bf-selected-flag"><img
+												src="https://flagcdn.com/w20/ph.png" width="20"
+												style="border-radius: 2px;"></span>
+										<span id="bf-selected-code">+63</span>
+										<svg width="12" height="12" viewBox="0 0 12 12">
+											<path d="M3 5l3 3 3-3" stroke="currentColor" stroke-width="1.5"
+												fill="none" />
+										</svg>
+									</button>
+									<div class="bf-country-dropdown" id="bf-country-dropdown">
+										<!-- JS populates -->
+									</div>
 								</div>
-								<input type="tel" class="bf-field__input bf-field__input--phone" id="bf-phone" placeholder="e.g. 905 123 456" required>
+								<input type="tel" class="bf-field__input bf-field__input--phone" id="bf-phone"
+									placeholder="912 345 6789" required>
+								<input type="hidden" id="bf-dial-code" value="+63">
+								<input type="hidden" id="bf-country-flag" value="ph">
 							</div>
 						</div>
 					</div>
@@ -142,18 +202,20 @@ $first_room_price = $first_room['price'];
 
 					<div class="bf-field">
 						<label class="bf-field__label">Special Requests</label>
-						<textarea class="bf-field__textarea" id="bf-requests" placeholder="Let the property know if there's anything they can assist you with."></textarea>
+						<textarea class="bf-field__textarea" id="bf-requests"
+							placeholder="Let the property know if there's anything they can assist you with."></textarea>
 					</div>
 
 					<label class="bf-checkbox">
 						<input type="checkbox" class="bf-checkbox__input" id="bf-agree-updates">
 						<span class="bf-checkbox__box"></span>
-						<span class="bf-checkbox__label">I agree to receive status updates via email &amp; sms</span>
+						<span class="bf-checkbox__label">I agree to receive status updates via Email &amp; SMS</span>
 					</label>
 
 					<button class="bf-btn-primary" id="bf-to-payment" type="button">Proceed to Payment</button>
 
-					<p class="bf-disclaimer">Deposits are non-refundable; no-shows will be charged the full booking amount, and the remaining balance must be paid at the hotel upon arrival.</p>
+					<p class="bf-disclaimer">Deposits are non-refundable; no-shows will be charged the full booking
+						amount, and the remaining balance must be paid at the hotel upon arrival.</p>
 				</div>
 
 				<!-- ── STEP 3: Payment Details ── -->
@@ -190,20 +252,24 @@ $first_room_price = $first_room['price'];
 
 						<div class="bf-field">
 							<label class="bf-field__label">Card Holder Name <span class="bf-field__req">*</span></label>
-							<input type="text" class="bf-field__input" id="bf-card-name" placeholder="Enter Card Holder Name">
+							<input type="text" class="bf-field__input" id="bf-card-name"
+								placeholder="Enter Card Holder Name">
 						</div>
 						<div class="bf-field">
 							<label class="bf-field__label">Card Number <span class="bf-field__req">*</span></label>
-							<input type="text" class="bf-field__input" id="bf-card-number" placeholder="Enter Card Number" maxlength="19">
+							<input type="text" class="bf-field__input" id="bf-card-number"
+								placeholder="Enter Card Number" maxlength="19">
 						</div>
 						<div class="bf-field-row">
 							<div class="bf-field bf-field--half">
 								<label class="bf-field__label">Expiry <span class="bf-field__req">*</span></label>
-								<input type="text" class="bf-field__input" id="bf-card-expiry" placeholder="MM/YY" maxlength="5">
+								<input type="text" class="bf-field__input" id="bf-card-expiry" placeholder="MM/YY"
+									maxlength="5">
 							</div>
 							<div class="bf-field bf-field--half">
 								<label class="bf-field__label">CVC <span class="bf-field__req">*</span></label>
-								<input type="text" class="bf-field__input" id="bf-card-cvc" placeholder="CVC" maxlength="4">
+								<input type="text" class="bf-field__input" id="bf-card-cvc" placeholder="CVC"
+									maxlength="4">
 							</div>
 						</div>
 					</div>
@@ -211,9 +277,12 @@ $first_room_price = $first_room['price'];
 					<!-- GCash QR (visible for gcash-qr) -->
 					<div class="bf-gcash-qr" id="bf-gcash-qr">
 						<h3 class="bf-panel__sub-label">GCash</h3>
-						<p class="bf-panel__desc">Please scan the QR code using your GCash app to complete your payment quickly and securely. Once done, kindly keep a screenshot of your transaction for reference.</p>
+						<p class="bf-panel__desc">Please scan the QR code using your GCash app to complete your payment
+							quickly and securely. Once done, kindly keep a screenshot of your transaction for reference.
+						</p>
 						<div class="bf-gcash-qr__image">
-							<img src="/wp-content/uploads/2026/04/gcash-qr-code.webp" alt="GCash QR Code" width="200" height="200">
+							<img src="/wp-content/uploads/2026/04/gcash-qr-code.webp" alt="GCash QR Code" width="200"
+								height="200">
 						</div>
 					</div>
 
@@ -225,7 +294,8 @@ $first_room_price = $first_room['price'];
 
 					<button class="bf-btn-primary" id="bf-confirm-pay" type="button">Confirm and Pay</button>
 
-					<p class="bf-disclaimer">Deposits are non-refundable; no-shows will be charged the full booking amount, and the remaining balance must be paid at the hotel upon arrival.</p>
+					<p class="bf-disclaimer">Deposits are non-refundable; no-shows will be charged the full booking
+						amount, and the remaining balance must be paid at the hotel upon arrival.</p>
 				</div>
 
 			</div>
@@ -237,14 +307,19 @@ $first_room_price = $first_room['price'];
 
 				<!-- Room preview -->
 				<div class="bf-summary__room-preview">
-					<?php if ( ! empty( $first_room['image'] ) ) : ?>
-						<img class="bf-summary__room-img" src="<?php echo esc_url( $first_room['image'] ); ?>" alt="<?php echo esc_attr( $first_room['title'] ); ?>" width="136" height="136">
-					<?php else : ?>
+					<?php if (!empty($first_room['image'])): ?>
+						<img class="bf-summary__room-img" src="<?php echo esc_url($first_room['image']); ?>"
+							alt="<?php echo esc_attr($first_room['title']); ?>" width="136" height="136">
+					<?php else: ?>
 						<div class="bf-summary__room-img bf-summary__room-img--empty"></div>
 					<?php endif; ?>
 					<div class="bf-summary__room-info">
-						<h3 class="bf-summary__room-name" id="bf-summary-room-name"><?php echo esc_html( $first_room['title'] ); ?> Room</h3>
-						<p class="bf-summary__room-desc">The Variety Of Accommodation At CamSur Watersports Complex Shares An Inviting And Functional Space. All Are Spacious And Elegantly Designed To Satisfy The Discriminating Taste Of Every Member And Guest.</p>
+						<h3 class="bf-summary__room-name" id="bf-summary-room-name">
+							<?php echo esc_html($first_room['title']); ?> Room
+						</h3>
+						<p class="bf-summary__room-desc" id="bf-summary-room-desc">
+							<?php echo esc_html($first_room['excerpt']); ?>
+						</p>
 					</div>
 				</div>
 
@@ -262,9 +337,11 @@ $first_room_price = $first_room['price'];
 					<p class="bf-summary__detail-text" id="bf-summary-email">—</p>
 
 					<div class="bf-summary__section-header">
-						<h3 class="bf-summary__sub-label">Additional Guest</h3>
-						<button class="bf-summary__edit-link" data-modal="additional-guests" type="button">View All</button>
+						<h3 class="bf-summary__sub-label bf-summary__additional-label">Additional Guest</h3>
+						<button class="bf-summary__edit-link" data-modal="additional-guests" type="button">View
+							All</button>
 					</div>
+					<div class="bf-summary__divider"></div>
 				</div>
 
 				<!-- Trip Summary -->
@@ -276,28 +353,33 @@ $first_room_price = $first_room['price'];
 							Edit
 						</button>
 					</div>
-					<div class="bf-summary__dates">
+					<div class="bf-summary__dates bf-summary-padded">
 						<div class="bf-summary__date-col">
 							<div class="bf-summary__date-label">
-								<img src="/wp-content/uploads/2026/04/trip-summary-check-in.svg" alt="" width="18" height="18">
+								<img src="/wp-content/uploads/2026/04/booking-summary-trip-calendar.svg" alt=""
+									width="18" height="18">
 								Check-in
 							</div>
-							<span class="bf-summary__date-val" id="bf-summary-checkin">08/14/2026</span>
+							<span class="bf-summary__date-val"
+								id="bf-summary-checkin"><?php echo esc_html($checkin_val ?: '08/14/2026'); ?></span>
 						</div>
 						<span class="bf-summary__date-divider"></span>
 						<div class="bf-summary__date-col">
 							<div class="bf-summary__date-label">
-								<img src="/wp-content/uploads/2026/04/trip-summary-check-in.svg" alt="" width="18" height="18">
+								<img src="/wp-content/uploads/2026/04/booking-summary-trip-calendar.svg" alt=""
+									width="18" height="18">
 								Check-out
 							</div>
-							<span class="bf-summary__date-val" id="bf-summary-checkout">08/19/2026</span>
+							<span class="bf-summary__date-val"
+								id="bf-summary-checkout"><?php echo esc_html($checkout_val ?: '08/19/2026'); ?></span>
 						</div>
 					</div>
 					<div class="bf-summary__guests-row">
 						<span class="bf-summary__guests-label">Guests</span>
-						<div class="bf-summary__guests-group">
+						<div class="bf-summary__guests-group bf-summary-padded">
 							<img src="/wp-content/uploads/2026/04/guests.svg" alt="" width="18" height="18">
-							<span id="bf-summary-guests">4 Adults, 0 Kids</span>
+							<span id="bf-summary-guests"
+								style="color:#000000B2 ;"><?php echo esc_html($guests_val ?: '4 Adults, 0 Kids'); ?></span>
 						</div>
 					</div>
 				</div>
@@ -312,18 +394,21 @@ $first_room_price = $first_room['price'];
 							Edit
 						</button>
 					</div>
-					<p class="bf-summary__room-type" id="bf-summary-room-type"><?php echo esc_html( $first_room['title'] ); ?> Room</p>
-					<div class="bf-summary__amenities">
+					<p class="bf-summary__room-type bf-summary-padded" id="bf-summary-room-type">
+						<?php echo esc_html($first_room['title']); ?> Room
+					</p>
+					<div class="bf-summary__amenities" id="bf-summary-amenities">
+						<?php foreach ($first_room['beds'] as $bed): ?>
+							<span class="bf-summary__amenity">
+								<img src="<?php echo esc_url($bed['icon_url']); ?>" alt="" width="16" height="16">
+								<?php echo esc_html($bed['label']); ?>
+							</span>
+							<span class="bf-summary__amenity-divider">|</span>
+						<?php endforeach; ?>
 						<span class="bf-summary__amenity">
-							<img src="/wp-content/uploads/2026/04/queen-bed.svg" alt="" width="16" height="16"> 1 Queen Bed
-						</span>
-						<span class="bf-summary__amenity-divider">|</span>
-						<span class="bf-summary__amenity">
-							<img src="/wp-content/uploads/2026/04/king-bed.svg" alt="" width="16" height="16"> 1 King Bed
-						</span>
-						<span class="bf-summary__amenity-divider">|</span>
-						<span class="bf-summary__amenity">
-							<img src="/wp-content/uploads/2026/04/max-people-icon.svg" alt="" width="16" height="16"> Max <?php echo esc_html( $first_room['capacity'] ); ?> People
+							<img src="/wp-content/uploads/2026/04/max-people-icon.svg" alt="" width="16" height="16">
+							Max <span id="bf-summary-capacity"><?php echo esc_html($first_room['capacity']); ?></span>
+							People
 						</span>
 					</div>
 				</div>
@@ -335,7 +420,8 @@ $first_room_price = $first_room['price'];
 						<span class="bf-summary__total-label">Total Price</span>
 						<span class="bf-summary__total-sub">Taxes &amp; fees included</span>
 					</div>
-					<span class="bf-summary__total-price" id="bf-summary-price">₱ <?php echo esc_html( preg_replace( '/[^0-9,.]/', '', $first_room_price ) ); ?>.00</span>
+					<span class="bf-summary__total-price" id="bf-summary-price">₱
+						<?php echo esc_html(preg_replace('/[^0-9,.]/', '', $first_room_price)); ?>.00</span>
 				</div>
 			</aside>
 
@@ -354,27 +440,24 @@ $first_room_price = $first_room['price'];
 				<button class="bf-modal__close" type="button">&times;</button>
 			</div>
 			<div class="bf-modal__body">
-				<div class="bf-modal__date-selection">
-					<div class="bf-modal__date-card" id="bf-modal-trigger-checkin">
-						<div class="bf-modal__date-header">
-							<span class="bf-modal__date-label">Check in</span>
+				<div class="bf-modal__date-selection-wrapper">
+					<div class="bf-modal__date-selection-grid">
+						<div class="bf-modal__date-icon-col">
+							<img src="/wp-content/uploads/2026/04/book-check-in.svg" alt="" width="24" height="24">
 						</div>
-						<div class="bf-modal__date-pill-wrap">
-							<img src="/wp-content/uploads/2026/04/calendar-icon-black.svg" alt="" width="20" height="20">
-							<div class="bf-modal__date-pill">
-								<span id="bf-modal-val-checkin">08/14/2026</span>
-							</div>
+						<div class="bf-modal__date-info-col" id="bf-modal-trigger-checkin">
+							<span class="bf-modal__date-label">Check in</span>
+							<span class="bf-modal__date-val" id="bf-modal-val-checkin">08/14/2026</span>
 						</div>
 					</div>
-					<div class="bf-modal__date-card" id="bf-modal-trigger-checkout">
-						<div class="bf-modal__date-header">
-							<span class="bf-modal__date-label">Check out</span>
+					<div class="bf-modal__vertical-divider"></div>
+					<div class="bf-modal__date-selection-grid">
+						<div class="bf-modal__date-icon-col">
+							<img src="/wp-content/uploads/2026/04/book-check-in.svg" alt="" width="24" height="24">
 						</div>
-						<div class="bf-modal__date-pill-wrap">
-							<img src="/wp-content/uploads/2026/04/calendar-icon-black.svg" alt="" width="20" height="20">
-							<div class="bf-modal__date-pill">
-								<span id="bf-modal-val-checkout">08/19/2026</span>
-							</div>
+						<div class="bf-modal__date-info-col" id="bf-modal-trigger-checkout">
+							<span class="bf-modal__date-label">Check out</span>
+							<span class="bf-modal__date-val" id="bf-modal-val-checkout">08/19/2026</span>
 						</div>
 					</div>
 				</div>
@@ -383,11 +466,17 @@ $first_room_price = $first_room['price'];
 				<div class="bf-calendar" id="bf-modal-calendar">
 					<div class="bf-calendar__header">
 						<button class="bf-calendar__prev" type="button">
-							<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+							<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+								stroke-width="2">
+								<path d="M15 18l-6-6 6-6" />
+							</svg>
 						</button>
 						<span class="bf-calendar__month-year">August 2026</span>
 						<button class="bf-calendar__next" type="button">
-							<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+							<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+								stroke-width="2">
+								<path d="M9 18l6-6-6-6" />
+							</svg>
 						</button>
 					</div>
 					<div class="bf-calendar__weekdays">
@@ -411,13 +500,20 @@ $first_room_price = $first_room['price'];
 			</div>
 			<div class="bf-modal__body">
 				<div class="bf-modal__room-options">
-					<?php foreach ( $rooms as $index => $room ) : ?>
+					<?php foreach ($rooms as $index => $room): ?>
 						<label class="bf-modal__room-option">
 							<div class="bf-modal__room-option-text">
-								<span class="bf-modal__room-option-name"><?php echo esc_html( $room['title'] ); ?></span>
-								<span class="bf-modal__room-option-cap">Max <?php echo esc_html( $room['capacity'] ); ?> persons</span>
+								<span class="bf-modal__room-option-name"><?php echo esc_html($room['title']); ?></span>
+								<span class="bf-modal__room-option-cap">Max <?php echo esc_html($room['capacity']); ?>
+									persons</span>
 							</div>
-							<input type="radio" name="bf_modal_room" class="bf-modal__radio" value="<?php echo esc_attr( $room['title'] ); ?>" data-price="<?php echo esc_attr( $room['price'] ); ?>" data-capacity="<?php echo esc_attr( $room['capacity'] ); ?>" data-image="<?php echo esc_url( $room['image'] ); ?>"<?php echo 0 === $index ? ' checked' : ''; ?>>
+							<input type="radio" name="bf_modal_room" class="bf-modal__radio"
+								value="<?php echo esc_attr($room['title']); ?>"
+								data-price="<?php echo esc_attr($room['price']); ?>"
+								data-capacity="<?php echo esc_attr($room['capacity']); ?>"
+								data-excerpt="<?php echo esc_attr($room['excerpt']); ?>"
+								data-beds="<?php echo esc_attr(wp_json_encode($room['beds'])); ?>"
+								data-image="<?php echo esc_url($room['image']); ?>" <?php echo 0 === $index ? ' checked' : ''; ?>>
 						</label>
 					<?php endforeach; ?>
 				</div>
@@ -436,13 +532,16 @@ $first_room_price = $first_room['price'];
 			<div class="bf-modal__body">
 				<div class="bf-field">
 					<label class="bf-field__label">Your Full Name</label>
-					<input type="text" class="bf-field__input" id="bf-modal-pi-name" placeholder="Last Name, First Name">
+					<input type="text" class="bf-field__input" id="bf-modal-pi-name"
+						placeholder="Last Name, First Name">
 				</div>
 				<div class="bf-field">
 					<label class="bf-field__label">Your Email</label>
 					<div class="bf-field__input-wrap bf-field__input-wrap--icon">
-						<img src="/wp-content/uploads/2026/04/mail-envelope.svg" alt="" class="bf-field__icon" width="20" height="20">
-						<input type="email" class="bf-field__input bf-field__input--with-icon" id="bf-modal-pi-email" placeholder="Enter Email Address">
+						<img src="/wp-content/uploads/2026/04/mail-envelope.svg" alt="" class="bf-field__icon"
+							width="20" height="20">
+						<input type="email" class="bf-field__input bf-field__input--with-icon" id="bf-modal-pi-email"
+							placeholder="Enter Email Address">
 					</div>
 				</div>
 				<div class="bf-field">
@@ -451,9 +550,12 @@ $first_room_price = $first_room['price'];
 						<div class="bf-field__country-code">
 							<span class="bf-field__flag">🇵🇭</span>
 							<span>+63</span>
-							<svg width="12" height="12" viewBox="0 0 12 12"><path d="M3 5l3 3 3-3" stroke="currentColor" stroke-width="1.5" fill="none"/></svg>
+							<svg width="12" height="12" viewBox="0 0 12 12">
+								<path d="M3 5l3 3 3-3" stroke="currentColor" stroke-width="1.5" fill="none" />
+							</svg>
 						</div>
-						<input type="tel" class="bf-field__input bf-field__input--phone" id="bf-modal-pi-phone" placeholder="e.g. 905 123 456">
+						<input type="tel" class="bf-field__input bf-field__input--phone" id="bf-modal-pi-phone"
+							placeholder="e.g. 905 123 456">
 					</div>
 				</div>
 			</div>
@@ -472,6 +574,29 @@ $first_room_price = $first_room['price'];
 				<!-- JS populates additional guest rows here -->
 			</div>
 			<button class="bf-modal__save" type="button">Save</button>
+		</div>
+	</div>
+
+	<!-- Modal: Success -->
+	<div class="bf-modal bf-modal--success" id="bf-modal-success">
+		<div class="bf-modal__inner bf-modal__inner--success">
+			<div class="bf-modal__success-icon">
+				<svg width="40" height="40" viewBox="0 0 24 24" fill="none">
+					<path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" fill="#fff" />
+				</svg>
+			</div>
+			<h2 class="bf-modal__success-title">You're all set! Your stay at CWC is confirmed.</h2>
+			<p class="bf-modal__success-desc">
+				Please check your email for your booking summary, including your accommodation details, check-in
+				instructions, and reservation information. If you don't see it, kindly check your spam or promotions
+				folder.
+			</p>
+			<p class="bf-modal__success-redirect">
+				You'll be redirected to the homepage in a few seconds...
+			</p>
+			<p class="bf-modal__success-home">
+				If nothing happens, <a href="/">click here</a> to go home.
+			</p>
 		</div>
 	</div>
 

@@ -26,7 +26,21 @@
 
 		triggers.forEach( ( trigger ) => {
 			trigger.addEventListener( 'click', () => {
-				const targetId = `cwc-modal-${ trigger.getAttribute( 'data-modal-target' ) }`;
+				const targetModal = trigger.getAttribute( 'data-modal-target' );
+				
+				if ( targetModal === 'guests' ) {
+					const roomVal = document.getElementById( 'cwc-val-room' );
+					if ( ! roomVal || roomVal.textContent.trim() === 'Choose Room' || roomVal.textContent.trim() === '' ) {
+						if ( window.cwcToast ) {
+							window.cwcToast.show( 'Please select a room first.', 'warning' );
+						} else {
+							alert( 'Please select a room first.' );
+						}
+						return;
+					}
+				}
+
+				const targetId = `cwc-modal-${ targetModal }`;
 				const modal = document.getElementById( targetId );
 				if ( modal ) {
 					closeModal();
@@ -41,7 +55,7 @@
 					modal.style.top = '';
 					modal.style.left = '';
 					modal.style.transform = '';
-				} else if ( trigger.getAttribute( 'data-modal-target' ) === 'date' ) {
+				} else if ( targetModal === 'date' ) {
 					// Date modal could be implemented with a library like flatpickr.
 					// For now we'll just simulate selecting a date.
 					const checkin = document.getElementById( 'cwc-val-checkin' );
@@ -86,6 +100,16 @@
 				} else if ( activeModal.id === 'cwc-modal-guests' ) {
 					const adults = parseInt( document.getElementById( 'cwc-val-modal-adults' )?.textContent || '0', 10 );
 					const kids = parseInt( document.getElementById( 'cwc-val-modal-kids' )?.textContent || '0', 10 );
+					
+					if ( adults < 1 ) {
+						if ( window.cwcToast ) {
+							window.cwcToast.show( 'At least one adult is required for every booking.', 'warning' );
+						} else {
+							alert( 'At least one adult is required for every booking.' );
+						}
+						return; // Prevent closing and saving
+					}
+
 					const guestsVal = document.getElementById( 'cwc-val-guests' );
 					if ( guestsVal ) {
 						guestsVal.textContent = `${ adults } Adult, ${ kids } Kids`;
@@ -251,10 +275,32 @@
 		// Proceed button → navigate to booking flow
 		const proceedBtn = document.querySelector( '.cwc-booking-bar__proceed' );
 		proceedBtn?.addEventListener( 'click', () => {
-			const room     = document.getElementById( 'cwc-val-room' )?.textContent || '';
-			const checkin  = document.getElementById( 'cwc-val-checkin' )?.textContent || '';
-			const checkout = document.getElementById( 'cwc-val-checkout' )?.textContent || '';
-			const guests   = document.getElementById( 'cwc-val-guests' )?.textContent || '';
+			const room     = document.getElementById( 'cwc-val-room' )?.textContent.trim() || '';
+			const checkin  = document.getElementById( 'cwc-val-checkin' )?.textContent.trim() || '';
+			const checkout = document.getElementById( 'cwc-val-checkout' )?.textContent.trim() || '';
+			const guests   = document.getElementById( 'cwc-val-guests' )?.textContent.trim() || '';
+
+			const guestsText = document.getElementById( 'cwc-val-guests' )?.textContent.trim() || '';
+			const adultsMatch = guestsText.match( /(\d+)\s+Adult/i );
+			const adultsSelected = adultsMatch ? parseInt( adultsMatch[1], 10 ) : 0;
+
+			if ( !room || room === 'Choose Room' || !checkin || checkin === 'Add date' || !checkout || checkout === 'Add date' || !guests || guests === '0 Adult, 0 Kids' ) {
+				if ( window.cwcToast ) {
+					window.cwcToast.show( 'Please complete your booking selection (dates, room, and guests).', 'warning' );
+				} else {
+					alert( 'Please complete your booking selection (dates, room, and guests).' );
+				}
+				return;
+			}
+
+			if ( adultsSelected < 1 ) {
+				if ( window.cwcToast ) {
+					window.cwcToast.show( 'At least one adult is required to proceed with the booking.', 'warning' );
+				} else {
+					alert( 'At least one adult is required to proceed with the booking.' );
+				}
+				return;
+			}
 
 			const params = new URLSearchParams( {
 				room,

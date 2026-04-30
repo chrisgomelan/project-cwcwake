@@ -52,7 +52,7 @@
 	display: grid;
 	grid-template-columns: minmax(0, 1fr) clamp(280px, 28%, 430px);
 	gap: clamp(1.25rem, 2.5vw, 2.5rem);
-	align-items: start;
+	align-items: flex-start;
 }
 
 .cwc-room-info__main {
@@ -101,30 +101,12 @@
  */
 
 .cwc-room-info__amenities {
-	display: grid;
-	grid-template-columns: repeat(4, minmax(0, 1fr));
+	display: flex;
+	flex-wrap: wrap;
 	gap: 0.75rem;
 	margin: 0;
 	padding: 0;
 	list-style: none;
-}
-
-@media (max-width: 1280px) {
-	.cwc-room-info__amenities {
-		grid-template-columns: repeat(3, minmax(0, 1fr));
-	}
-}
-
-@media (max-width: 768px) {
-	.cwc-room-info__amenities {
-		grid-template-columns: repeat(2, minmax(0, 1fr));
-	}
-}
-
-@media (max-width: 480px) {
-	.cwc-room-info__amenities {
-		grid-template-columns: minmax(0, 1fr);
-	}
 }
 
 /*
@@ -151,14 +133,12 @@
 }
 
 /*
- * Long amenity labels (e.g. "Air Conditioning") shouldn't wrap to
- * two lines and break the grid row's vertical rhythm — let them
- * truncate with ellipsis instead while keeping the icon visible.
+ * Allow long amenity labels to wrap to multiple lines
+ * instead of truncating.
  */
-.cwc-room-info__chip > span {
-	overflow: hidden;
-	text-overflow: ellipsis;
-	white-space: nowrap;
+.cwc-room-info__chip>span {
+	white-space: normal;
+	word-wrap: break-word;
 	min-width: 0;
 }
 
@@ -198,6 +178,13 @@
 	font-size: clamp(0.9rem, 1.1vw, 1.125rem);
 	line-height: 1.2;
 	color: #2b3037;
+	min-width: 0;
+}
+
+.cwc-room-info__inclusion-chip>span {
+	white-space: normal;
+	word-wrap: break-word;
+	min-width: 0;
 }
 
 /* ---------- Pricing aside ---------- */
@@ -205,33 +192,101 @@
 .cwc-room-info__pricing {
 	display: flex;
 	flex-direction: column;
-	align-items: center;
-	gap: 0.75rem;
-	padding: clamp(1.25rem, 2.2vw, 1.85rem);
+	align-items: stretch;
+	gap: 1.25rem;
+	padding: clamp(1.25rem, 2.2vw, 2rem);
 	background: #f8f9fa;
-	border: 1px solid rgba(0, 0, 0, 0.2);
+	border: 1px solid rgba(0, 0, 0, 0.3);
 	border-radius: 12px;
-	text-align: center;
+	text-align: left;
 }
 
-.cwc-room-info__price {
+.cwc-room-info__pricing-title {
 	margin: 0;
 	font-family: var(--wp--preset--font-family--heading);
 	font-weight: 700;
-	font-size: clamp(1.5rem, 2.4vw, 2rem);
-	line-height: 1;
-	letter-spacing: 0;
-	color: #000000;
+	font-size: clamp(1.5rem, 2vw, 2rem);
+	line-height: 1.2;
+	color: #1a1a1a;
 }
 
-.cwc-room-info__price-sub {
-	margin: 0 0 0.75rem;
+.cwc-room-info__pricing-dates {
+	display: flex;
+	align-items: stretch;
+	gap: 0.75rem;
+}
+
+.cwc-room-info__pricing-dates .cwc-room-info__pricing-field {
+	flex: 1;
+}
+
+.cwc-room-info__pricing-divider {
+	width: 1px;
+	height: 51px;
+	background: rgba(0, 0, 0, 0.4);
+	margin: auto 0;
+}
+
+.cwc-room-info__pricing-field {
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+	padding: 0.85rem 1rem;
+	min-width: 0;
+	cursor: pointer;
+	border: 1px solid rgba(0, 0, 0, 0.4);
+	border-radius: 6px;
+	background: #F7F9FBff;
+}
+
+.cwc-room-info__pricing-field--guests {
+	justify-content: space-between;
+}
+
+.cwc-room-info__pricing-field-inner {
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+}
+
+.cwc-room-info__pricing-icon {
+	width: 24px;
+	height: 24px;
+	flex-shrink: 0;
+}
+
+.cwc-room-info__pricing-chevron {
+	flex-shrink: 0;
+	width: 16px;
+	height: auto;
+}
+
+.cwc-room-info__pricing-content {
+	display: flex;
+	flex-direction: column;
+	min-width: 0;
+}
+
+.cwc-room-info__pricing-label {
+	font-family: var(--wp--preset--font-family--heading);
+	font-weight: 600;
+	font-size: 1.1rem;
+	line-height: 1.2;
+	color: #1a1a1a;
+	margin-bottom: 0.2rem;
+}
+
+.cwc-room-info__pricing-val {
 	font-family: var(--wp--preset--font-family--body);
 	font-weight: 400;
-	font-style: italic;
-	font-size: clamp(0.9rem, 1.2vw, 1.25rem);
+	font-size: 0.95rem;
 	line-height: 1.2;
-	color: #000000;
+	color: #1a1a1a;
+}
+
+.cwc-room-info__price,
+.cwc-room-info__price-sub {
+	display: none;
 }
 
 .cwc-room-info__book-button {
@@ -240,23 +295,23 @@
 	justify-content: center;
 	gap: 10px;
 	width: 100%;
-	max-width: 360px;
 	min-height: 56px;
 	padding: 0.5rem 1.25rem;
-	border-radius: 30px;
-	background: #395144;
-	color: #f5f1eb;
-	font-family: var(--wp--preset--font-family--body);
-	font-weight: 500;
-	font-size: clamp(1rem, 1.2vw, 1.25rem);
+	border-radius: 8px;
+	background: #0096C7;
+	color: #ffffff;
+	font-family: var(--wp--preset--font-family--heading);
+	font-weight: 600;
+	font-size: clamp(1.1rem, 1.2vw, 1.25rem);
 	line-height: 1;
 	text-decoration: none;
 	transition: background-color 0.2s ease, transform 0.2s ease;
+	margin-top: 0.5rem;
 }
 
 .cwc-room-info__book-button:hover,
 .cwc-room-info__book-button:focus-visible {
-	background: #2c3f35;
+	background: #007ba3;
 	color: #ffffff;
 	transform: translateY(-1px);
 }
@@ -297,7 +352,7 @@
 
 .cwc-room-info__policy-name {
 	display: flex;
-	align-items: flex-start;
+	align-items: center;
 	gap: 0.6em;
 	font-family: var(--wp--preset--font-family--heading);
 	font-weight: 600;

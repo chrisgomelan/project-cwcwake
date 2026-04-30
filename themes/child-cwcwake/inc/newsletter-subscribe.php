@@ -2,15 +2,9 @@
 /**
  * Footer newsletter subscribe handler.
  *
- * Receives POSTs from the footer subscribe form, validates the email,
+ * Receives AJAX POSTs from the footer subscribe form, validates the email,
  * stores it in the `cwc_newsletter_subscribers` option (deduplicated),
- * and emails the admin a notification through `wp_mail()` so it
- * routes through the WP Mail SMTP plugin when active. Uses the
- * Post/Redirect/Get pattern with two query args:
- *
- *   - `cwc_newsletter=success`         — banner: thanks for subscribing.
- *   - `cwc_newsletter=invalid`         — banner: please enter a valid email.
- *   - `cwc_newsletter=duplicate`       — banner: already subscribed.
+ * and emails the admin a notification through `wp_mail()`.
  *
  * @package CWC_Wake
  * @since   1.0.0
@@ -21,75 +15,26 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Resolve a safe same-host redirect target sent with the form.
- *
- * Falls back to the site home URL when the supplied value is missing
- * or points to a different host (defensive against open-redirect abuse).
+ * Handle a `cwc_newsletter_subscribe` AJAX POST.
  *
  * @since 1.0.0
- *
- * @return string Safe absolute URL.
- */
-function cwc_newsletter_resolve_redirect() {
-	$candidate = '';
-	if ( isset( $_POST['redirect_to'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
-		$candidate = esc_url_raw( wp_unslash( $_POST['redirect_to'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
-	}
-
-	$home_host = wp_parse_url( home_url(), PHP_URL_HOST );
-	$cand_host = $candidate ? wp_parse_url( $candidate, PHP_URL_HOST ) : '';
-
-	if ( ! $candidate || $cand_host !== $home_host ) {
-		$candidate = home_url( '/' );
-	}
-
-	return $candidate;
-}
-
-/**
- * Redirect back to the originating page with status context.
- *
- * Strips any prior `cwc_newsletter` arg before adding a fresh one so
- * reloads never carry stale state. Always exits.
- *
- * @since 1.0.0
- *
- * @param string $status One of `success`, `invalid`, `duplicate`, `error`.
- * @return void
- */
-function cwc_newsletter_redirect_back( $status ) {
-	$base = remove_query_arg( array( 'cwc_newsletter' ), cwc_newsletter_resolve_redirect() );
-	$url  = add_query_arg( array( 'cwc_newsletter' => $status ), $base ) . '#newsletter';
-
-	wp_safe_redirect( $url );
-	exit;
-}
-
-/**
- * Handle a `cwc_newsletter_subscribe` POST.
- *
- * Wired to both `admin_post_*` and `admin_post_nopriv_*` so logged-out
- * visitors can subscribe.
- *
- * @since 1.0.0
- *
  * @return void
  */
 function cwc_handle_newsletter_subscribe() {
 	$nonce = isset( $_POST['cwc_newsletter_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['cwc_newsletter_nonce'] ) ) : '';
 	if ( ! wp_verify_nonce( $nonce, 'cwc_newsletter_subscribe' ) ) {
-		cwc_newsletter_redirect_back( 'invalid' );
+		wp_send_json_error( [ 'message' => 'Invalid security token.', 'status' => 'invalid' ] );
 	}
 
 	/* Honeypot: silently swallow bot submissions as "success". */
 	$honeypot = isset( $_POST['cwc_website'] ) ? sanitize_text_field( wp_unslash( $_POST['cwc_website'] ) ) : '';
 	if ( '' !== $honeypot ) {
-		cwc_newsletter_redirect_back( 'success' );
+		wp_send_json_success( [ 'message' => 'Thanks for subscribing!', 'status' => 'success' ] );
 	}
 
 	$email = isset( $_POST['cwc_newsletter_email'] ) ? sanitize_email( wp_unslash( $_POST['cwc_newsletter_email'] ) ) : '';
 	if ( '' === $email || ! is_email( $email ) ) {
-		cwc_newsletter_redirect_back( 'invalid' );
+		wp_send_json_error( [ 'message' => 'Please enter a valid email address.', 'status' => 'invalid' ] );
 	}
 
 	$subscribers = get_option( 'cwc_newsletter_subscribers', array() );
@@ -97,16 +42,10 @@ function cwc_handle_newsletter_subscribe() {
 		$subscribers = array();
 	}
 
-	/*
-	 * Email comparison is intentionally case-insensitive on the local
-	 * part too — most providers treat addresses as case-insensitive,
-	 * and we'd rather be a little permissive than ask the same person
-	 * to subscribe twice.
-	 */
 	$normalized = strtolower( $email );
 	$existing   = array_map( 'strtolower', wp_list_pluck( $subscribers, 'email' ) );
 	if ( in_array( $normalized, $existing, true ) ) {
-		cwc_newsletter_redirect_back( 'duplicate' );
+		wp_send_json_error( [ 'message' => "You're already subscribed — thanks for sticking with us.", 'status' => 'duplicate' ] );
 	}
 
 	$subscribers[] = array(
@@ -132,65 +71,12 @@ function cwc_handle_newsletter_subscribe() {
 		count( $subscribers )
 	);
 
-	/*
-	 * The send result isn't fatal for the user-facing flow — they're
-	 * still subscribed even if the admin notice can't be delivered —
-	 * so we don't surface a separate error state for the visitor.
-	 */
 	wp_mail( $recipient, $subject, $body );
 
-	cwc_newsletter_redirect_back( 'success' );
+	wp_send_json_success( [ 'message' => "Thanks for subscribing! We'll keep you in the loop.", 'status' => 'success' ] );
 }
-add_action( 'admin_post_cwc_newsletter_subscribe', 'cwc_handle_newsletter_subscribe' );
-add_action( 'admin_post_nopriv_cwc_newsletter_subscribe', 'cwc_handle_newsletter_subscribe' );
-
-/**
- * Render the visible status banner that the footer template injects.
- *
- * Kept in PHP (not in the static `footer.html` markup) because the
- * banner depends on the `cwc_newsletter` query arg. The footer
- * template prints `<?php cwc_newsletter_render_banner(); ?>` (via the
- * filter below) on the frontend.
- *
- * @since 1.0.0
- *
- * @return string Banner HTML, or empty string when no status is set.
- */
-function cwc_newsletter_get_banner_html() {
-	if ( ! isset( $_GET['cwc_newsletter'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		return '';
-	}
-
-	$status = sanitize_key( wp_unslash( $_GET['cwc_newsletter'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-
-	$messages = array(
-		'success'   => array(
-			'class' => 'cwc-site-footer__banner--success',
-			'text'  => __( 'Thanks for subscribing! We\'ll keep you in the loop.', 'child-cwcwake' ),
-		),
-		'duplicate' => array(
-			'class' => 'cwc-site-footer__banner--info',
-			'text'  => __( 'You\'re already subscribed — thanks for sticking with us.', 'child-cwcwake' ),
-		),
-		'invalid'   => array(
-			'class' => 'cwc-site-footer__banner--error',
-			'text'  => __( 'Please enter a valid email address.', 'child-cwcwake' ),
-		),
-	);
-
-	if ( ! isset( $messages[ $status ] ) ) {
-		return '';
-	}
-
-	$role = ( 'invalid' === $status ) ? 'alert' : 'status';
-
-	return sprintf(
-		'<div class="cwc-site-footer__banner %1$s" role="%2$s" tabindex="-1" data-cwc-newsletter-banner>%3$s</div>',
-		esc_attr( $messages[ $status ]['class'] ),
-		esc_attr( $role ),
-		esc_html( $messages[ $status ]['text'] )
-	);
-}
+add_action( 'wp_ajax_cwc_newsletter_subscribe', 'cwc_handle_newsletter_subscribe' );
+add_action( 'wp_ajax_nopriv_cwc_newsletter_subscribe', 'cwc_handle_newsletter_subscribe' );
 
 /**
  * Inject the newsletter banner + dynamic form fields into the static
@@ -198,9 +84,7 @@ function cwc_newsletter_get_banner_html() {
  *
  * The footer is a static block-template HTML file, so we can't call
  * PHP from inside it. This filter walks the rendered template-part
- * markup and replaces two well-known sentinel comments — set in
- * `parts/footer.html` — with the dynamic banner + nonce/action/honeypot
- * inputs the subscribe handler expects.
+ * markup and replaces two well-known sentinel comments.
  *
  * @since 1.0.0
  *
@@ -212,29 +96,83 @@ function cwc_newsletter_inject_into_footer( $html ) {
 		return $html;
 	}
 
-	$action_url = esc_url( admin_url( 'admin-post.php' ) );
-	$redirect   = esc_url( ( is_singular() || is_page() ) ? get_permalink() : home_url( add_query_arg( null, null ) ) );
+	$action_url = esc_url( admin_url( 'admin-ajax.php' ) );
 	$nonce      = wp_nonce_field( 'cwc_newsletter_subscribe', 'cwc_newsletter_nonce', true, false );
 
-	/*
-	 * Sentinel-style placeholders are HTML comments that the template
-	 * editor sees as inert markup, but we know to replace at render time
-	 * to keep the form in sync with the server-side handler.
-	 */
 	$fields_replacement = sprintf(
 		'<input type="hidden" name="action" value="cwc_newsletter_subscribe" />
-		<input type="hidden" name="redirect_to" value="%1$s" />
-		%2$s
-		<div class="cwc-site-footer__honeypot" aria-hidden="true">
+		%1$s
+		<div class="cwc-site-footer__honeypot" aria-hidden="true" style="display:none;">
 			<label>Leave this empty<input type="text" name="cwc_website" tabindex="-1" autocomplete="off" /></label>
 		</div>',
-		$redirect,
 		$nonce
 	);
 
+	$banner_placeholder = '<div id="cwc-newsletter-msg" class="cwc-site-footer__banner" style="display:none; margin-bottom: 16px;"></div>';
+
 	$html = str_replace( '<!-- CWC_NEWSLETTER_FORM_FIELDS -->', $fields_replacement, $html );
 	$html = str_replace( 'CWC_NEWSLETTER_FORM_ACTION', $action_url, $html );
-	$html = str_replace( '<!-- CWC_NEWSLETTER_BANNER -->', cwc_newsletter_get_banner_html(), $html );
+	$html = str_replace( '<!-- CWC_NEWSLETTER_BANNER -->', $banner_placeholder, $html );
+
+	// Inject JS to handle AJAX form submission
+	$js = "
+	<script>
+	document.addEventListener('DOMContentLoaded', function() {
+		const form = document.querySelector('[data-cwc-newsletter-form]');
+		const msgDiv = document.getElementById('cwc-newsletter-msg');
+		if (!form) return;
+		form.addEventListener('submit', function(e) {
+			e.preventDefault();
+			const btn = form.querySelector('button[type=\"submit\"]');
+			const originalText = btn.innerHTML;
+			btn.innerHTML = 'Subscribing...';
+			btn.disabled = true;
+			msgDiv.style.display = 'none';
+
+			const formData = new FormData(form);
+
+			fetch(form.action, {
+				method: 'POST',
+				body: formData
+			})
+			.then(response => response.json())
+			.then(res => {
+				btn.innerHTML = originalText;
+				btn.disabled = false;
+				msgDiv.style.display = 'block';
+				msgDiv.innerHTML = res.data ? res.data.message : 'Error processing request.';
+				if (res.success) {
+					msgDiv.style.backgroundColor = '#d1fae5'; // Light green
+					msgDiv.style.color = '#065f46'; // Dark green
+					msgDiv.style.borderColor = 'rgba(22, 163, 74, 0.3)';
+					form.reset();
+				} else {
+					if (res.data && res.data.status === 'duplicate') {
+						msgDiv.style.backgroundColor = '#e0e7ff'; // Light blue
+						msgDiv.style.color = '#3730a3'; // Dark blue
+						msgDiv.style.borderColor = 'rgba(0, 150, 199, 0.3)';
+					} else {
+						msgDiv.style.backgroundColor = '#fee2e2'; // Light red
+						msgDiv.style.color = '#991b1b'; // Dark red
+						msgDiv.style.borderColor = 'rgba(220, 38, 38, 0.3)';
+					}
+				}
+			})
+			.catch(err => {
+				btn.innerHTML = originalText;
+				btn.disabled = false;
+				msgDiv.style.display = 'block';
+				msgDiv.style.backgroundColor = '#fee2e2';
+				msgDiv.style.color = '#991b1b';
+				msgDiv.style.borderColor = 'rgba(220, 38, 38, 0.3)';
+				msgDiv.innerHTML = 'Network error. Please try again.';
+			});
+		});
+	});
+	</script>
+	";
+
+	$html .= $js;
 
 	return $html;
 }

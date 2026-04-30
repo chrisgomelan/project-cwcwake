@@ -98,6 +98,19 @@ $wrapper_attrs = get_block_wrapper_attributes(
 				$capacity   = $item['capacity'] ?? '';
 				$btn_label  = $item['buttonLabel'] ?? 'View Details';
 				$btn_url    = $item['buttonUrl'] ?? '#';
+
+				// Dynamically fetch capacity based on the accommodation slug from the URL
+				if ( '#' !== $btn_url ) {
+					$slug = basename( untrailingslashit( wp_parse_url( $btn_url, PHP_URL_PATH ) ) );
+					$room_post = get_page_by_path( $slug, OBJECT, 'accommodation' );
+					if ( $room_post ) {
+						$meta_capacity = get_post_meta( $room_post->ID, '_cwc_capacity', true );
+						if ( ! empty( $meta_capacity ) ) {
+							$capacity = 'Maximum ' . $meta_capacity . ' persons';
+						}
+					}
+				}
+
 				$stagger    = ( 0 === $index % 2 ) ? 'cwc-accommodations__card--even' : 'cwc-accommodations__card--odd';
 				?>
 				<div class="cwc-accommodations__card <?php echo esc_attr( $stagger ); ?>">

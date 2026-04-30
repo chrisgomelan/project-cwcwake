@@ -39,6 +39,9 @@
 		const summaryGuests     = block.querySelector( '#bf-summary-guests' );
 		const summaryRoomName   = block.querySelector( '#bf-summary-room-name' );
 		const summaryRoomType   = block.querySelector( '#bf-summary-room-type' );
+		const summaryRoomDesc   = block.querySelector( '#bf-summary-room-desc' );
+		const summaryAmenities  = block.querySelector( '#bf-summary-amenities' );
+		const summaryCapacity   = block.querySelector( '#bf-summary-capacity' );
 		const summaryPrice      = block.querySelector( '#bf-summary-price' );
 
 		/* Form inputs */
@@ -46,12 +49,158 @@
 		const emailInput    = block.querySelector( '#bf-email' );
 		const phoneInput    = block.querySelector( '#bf-phone' );
 
+		/* ─── Country Code Selector ─── */
+		const countrySelector = block.querySelector( '#bf-country-selector' );
+		const countryDropdown = block.querySelector( '#bf-country-dropdown' );
+		const selectedFlag    = block.querySelector( '#bf-selected-flag' );
+		const selectedCode    = block.querySelector( '#bf-selected-code' );
+		const dialCodeInput   = block.querySelector( '#bf-dial-code' );
+		const countryFlagInput = block.querySelector( '#bf-country-flag' );
+
+		let countries = [];
+
+		async function initCountrySelector() {
+			try {
+				const themeUrl = block.dataset.themeUrl;
+				const response = await fetch( themeUrl + '/blocks/booking-flow/countries.json' );
+				if ( response.ok ) {
+					countries = await response.json();
+					renderCountryDropdown();
+				}
+			} catch ( e ) {
+				console.error( 'Failed to load countries', e );
+			}
+		}
+
+		function renderCountryDropdown() {
+			if ( ! countryDropdown ) return;
+			countryDropdown.innerHTML = countries.map( country => `
+				<div class="bf-country-item" data-code="${country.code}" data-iso="${country.iso}" data-placeholder="${country.placeholder}">
+					<img src="https://flagcdn.com/w20/${country.iso}.png" width="20">
+					<span>${country.name} (${country.code})</span>
+				</div>
+			` ).join( '' );
+
+			countryDropdown.querySelectorAll( '.bf-country-item' ).forEach( item => {
+				item.addEventListener( 'click', () => {
+					const code = item.dataset.code;
+					const iso  = item.dataset.iso;
+					const placeholder = item.dataset.placeholder;
+
+					if ( selectedFlag ) selectedFlag.innerHTML = `<img src="https://flagcdn.com/w20/${iso}.png" width="20" style="border-radius: 2px;">`;
+					if ( selectedCode ) selectedCode.textContent = code;
+					if ( dialCodeInput ) dialCodeInput.value = code;
+					if ( countryFlagInput ) countryFlagInput.value = iso;
+					if ( phoneInput ) {
+						phoneInput.placeholder = placeholder;
+						const maxDigits = placeholder.replace(/\D/g, '').length;
+						phoneInput.maxLength = maxDigits;
+						
+						// Truncate existing value if it exceeds new limit
+						let val = phoneInput.value.replace(/\D/g, '');
+						if ( val.length > maxDigits ) {
+							phoneInput.value = val.substring( 0, maxDigits );
+						}
+					}
+
+					countryDropdown.classList.remove( 'is-open' );
+				} );
+			} );
+		}
+
+		if ( countrySelector ) {
+			const selBtn = countrySelector.querySelector( '.bf-field__country-code' );
+			selBtn?.addEventListener( 'click', ( e ) => {
+				e.preventDefault();
+				e.stopPropagation();
+				countryDropdown?.classList.toggle( 'is-open' );
+			} );
+
+			document.addEventListener( 'click', () => {
+				countryDropdown?.classList.remove( 'is-open' );
+			} );
+		}
+
+		initCountrySelector();
+
+		/* ─── Phone Input Restriction ─── */
+		phoneInput?.addEventListener( 'input', ( e ) => {
+			const placeholder = phoneInput.placeholder || '912 345 6789';
+			const maxDigits = placeholder.replace(/\D/g, '').length;
+			
+			// Sync maxlength attribute
+			phoneInput.maxLength = maxDigits;
+			
+			// Remove non-digits
+			let val = e.target.value.replace(/\D/g, '');
+			
+			// Truncate if over limit
+			if ( val.length > maxDigits ) {
+				val = val.substring( 0, maxDigits );
+			}
+			
+			e.target.value = val;
+		} );
+
+		function showError( el, message ) {
+			const field = el.closest( '.bf-field, .bf-guest-row__inner' );
+			if ( ! field ) return;
+			field.classList.add( 'is-invalid' );
+			let err = field.querySelector( '.bf-field-error' );
+			if ( ! err ) {
+				err = document.createElement( 'div' );
+				err.className = 'bf-field-error';
+				field.appendChild( err );
+			}
+			err.textContent = message;
+		}
+
+		function clearErrors() {
+			block.querySelectorAll( '.is-invalid' ).forEach( el => el.classList.remove( 'is-invalid' ) );
+			block.querySelectorAll( '.bf-field-error' ).forEach( el => el.textContent = '' );
+		}
+
+		/* ─── URL Params ─── */
+		const urlParams = new URLSearchParams( window.location.search );
+		const initialGuestsStr = urlParams.get( 'guests' ) || '1 Adult, 0 Kids';
+		let initialAdults = 1;
+		let initialKids = 0;
+		const guestsMatch = initialGuestsStr.match( /(\d+)\s+Adults?,\s+(\d+)\s+Kids?/i );
+		if ( guestsMatch ) {
+			initialAdults = parseInt( guestsMatch[1], 10 );
+			initialKids = parseInt( guestsMatch[2], 10 );
+		}
+		const totalInitialGuests = initialAdults + initialKids;
+
 		/* Additional guests */
 		const addGuestBtn  = block.querySelector( '#bf-add-guest' );
 		const guestContainer = block.querySelector( '#bf-additional-guests' );
 		const capacityCount  = block.querySelector( '#bf-capacity-count' );
+		
+		// Initialize additional guests based on initial counts
 		let additionalGuests = [];
+		if ( totalInitialGuests > 1 ) {
+			// Skip the first adult (primary guest)
+			let adultsLeft = initialAdults - 1;
+			let kidsLeft = initialKids;
+			
+			for ( let i = 0; i < totalInitialGuests - 1; i++ ) {
+				if ( adultsLeft > 0 ) {
+					additionalGuests.push( { name: '', type: 'adult' } );
+					adultsLeft--;
+				} else {
+					additionalGuests.push( { name: '', type: 'kid' } );
+					kidsLeft--;
+				}
+			}
+		}
+		
+		// Initialize maxCapacity from the PHP-rendered summary sidebar
 		let maxCapacity = 4;
+		const capacityEl = block.querySelector( '#bf-summary-capacity' );
+		if ( capacityEl ) {
+			maxCapacity = parseInt( capacityEl.textContent, 10 ) || 4;
+		}
 
 		/* Modals */
 		const backdrop = block.querySelector( '#bf-modal-backdrop' );
@@ -70,6 +219,7 @@
 				stepGuest.classList.add( 'is-active' );
 				stepPayment.classList.remove( 'is-active' );
 				summaryDetails?.classList.remove( 'is-visible' );
+				block.classList.remove( 'bf-step-payment' );
 
 				/* Progress: step 1 done, step 2 active, step 3 upcoming */
 				updateProgress( 2 );
@@ -77,6 +227,7 @@
 				stepGuest.classList.remove( 'is-active' );
 				stepPayment.classList.add( 'is-active' );
 				summaryDetails?.classList.add( 'is-visible' );
+				block.classList.add( 'bf-step-payment' );
 
 				/* Populate summary details */
 				if ( summaryName )  summaryName.textContent  = fullNameInput?.value || '—';
@@ -123,31 +274,130 @@
 
 		btnToPayment?.addEventListener( 'click', () => {
 			/* Basic validation */
+			clearErrors();
+			let hasError = false;
+
 			if ( ! fullNameInput?.value?.trim() ) {
-				fullNameInput?.focus();
-				return;
+				showError( fullNameInput, 'Full name is required.' );
+				hasError = true;
 			}
 			if ( ! emailInput?.value?.trim() ) {
-				emailInput?.focus();
+				showError( emailInput, 'Email address is required.' );
+				hasError = true;
+			} else if ( ! /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test( emailInput.value.trim() ) ) {
+				showError( emailInput, 'Please enter a valid email address.' );
+				hasError = true;
+			}
+
+			// Phone validation based on digits length in placeholder
+			const phoneVal = phoneInput?.value.trim() || '';
+			const placeholder = phoneInput?.placeholder || '912 345 6789';
+			const expectedDigits = placeholder.replace(/\D/g, '').length;
+			const digitsOnly = phoneVal.replace(/\D/g, '');
+
+			if ( ! phoneVal ) {
+				showError( phoneInput, 'Phone number is required.' );
+				hasError = true;
+			} else if ( digitsOnly.length !== expectedDigits ) {
+				showError( phoneInput, `Phone number must be exactly ${expectedDigits} digits.` );
+				hasError = true;
+			}
+
+			// Validate additional guests
+			block.querySelectorAll( '.bf-guest-name' ).forEach( ( input ) => {
+				if ( ! input.value.trim() ) {
+					showError( input, 'Guest full name is required.' );
+					hasError = true;
+				}
+			} );
+
+			if ( hasError ) {
+				const firstError = block.querySelector( '.is-invalid' );
+				if ( firstError ) {
+					firstError.scrollIntoView( { behavior: 'smooth', block: 'center' } );
+				}
 				return;
 			}
+
 			showStep( 3 );
 		} );
 
 		btnConfirmPay?.addEventListener( 'click', () => {
-			/* eslint-disable-next-line no-alert */
-			alert( 'Booking confirmed! You will receive a confirmation email shortly.' );
+			const agree = block.querySelector( '#bf-agree-terms' );
+			if ( agree && ! agree.checked ) {
+				if ( window.cwcToast ) {
+					window.cwcToast.show( 'Please accept the Terms of Use and Privacy Policy to proceed.', 'warning' );
+				} else {
+					alert( 'Please accept the Terms of Use and Privacy Policy to proceed.' );
+				}
+				return;
+			}
+
+			/* Disable button to prevent double clicks */
+			btnConfirmPay.disabled = true;
+			btnConfirmPay.textContent = 'Processing...';
+
+			const formData = new URLSearchParams();
+			formData.append( 'action', 'cwc_submit_booking' );
+			formData.append( 'name', fullNameInput?.value || '' );
+			formData.append( 'email', emailInput?.value || '' );
+			formData.append( 'phone', phoneInput?.value || '' );
+			formData.append( 'checkin', summaryCheckin?.textContent || '' );
+			formData.append( 'checkout', summaryCheckout?.textContent || '' );
+			formData.append( 'room', summaryRoomName?.textContent || '' );
+			formData.append( 'price', summaryPrice?.textContent || '' );
+			
+			const paymentMethod = block.querySelector( 'input[name="bf_payment_method"]:checked' )?.value || '';
+			formData.append( 'payment_method', paymentMethod );
+			formData.append( 'guests', JSON.stringify( additionalGuests ) );
+
+			fetch( '/wp-admin/admin-ajax.php', {
+				method: 'POST',
+				body: formData
+			} )
+			.then( response => response.json() )
+			.then( result => {
+				openModal( 'success' );
+				setTimeout( () => {
+					window.location.href = '/';
+				}, 5000 );
+			} )
+			.catch( error => {
+				console.error( 'Booking Error:', error );
+				btnConfirmPay.disabled = false;
+				btnConfirmPay.textContent = 'Confirm Pay';
+				if ( window.cwcToast ) {
+					window.cwcToast.show( 'There was an issue processing your booking. Please try again.', 'error' );
+				} else {
+					alert( 'There was an issue processing your booking. Please try again.' );
+				}
+			} );
 		} );
 
 		/* ═══════════════════════════════════════
 		   Additional Guests
 		   ═══════════════════════════════════════ */
 
+		const updateSummaryGuests = () => {
+			if ( ! summaryGuests ) return;
+			
+			let adults = 1; // Primary guest
+			let kids = 0;
+			
+			additionalGuests.forEach( g => {
+				if ( g.type === 'adult' ) adults++;
+				else kids++;
+			} );
+			
+			summaryGuests.textContent = `${adults} Adult${adults !== 1 ? 's' : ''}, ${kids} Kid${kids !== 1 ? 's' : ''}`;
+		};
+
 		const updateCapacityUI = () => {
 			const count = 1 + additionalGuests.length;
 			if ( capacityCount ) {
 				capacityCount.textContent = `${ count }/${ maxCapacity }`;
 			}
+			updateSummaryGuests();
 		};
 
 		const renderGuestRows = () => {
@@ -155,24 +405,38 @@
 			guestContainer.innerHTML = '';
 
 			if ( additionalGuests.length > 0 ) {
-				const header = document.createElement( 'h3' );
-				header.className = 'bf-panel__sub-label';
-				header.style.marginBottom = '16px';
-				header.textContent = 'Additional Guest';
+				const header = document.createElement( 'h2' );
+				header.className = 'bf-panel__title';
+				header.style.marginBottom = '24px';
+				header.style.marginTop = '40px';
+				header.textContent = 'Additional Guest/s';
 				guestContainer.appendChild( header );
 			}
 
-			additionalGuests.forEach( ( name, idx ) => {
+			additionalGuests.forEach( ( guest, idx ) => {
 				const row = document.createElement( 'div' );
 				row.className = 'bf-guest-row';
 				row.innerHTML = `
-					<div class="bf-field">
+					<div class="bf-guest-row__inner">
 						<label class="bf-field__label">Full Name <span class="bf-field__req">*</span></label>
-						<input type="text" class="bf-field__input bf-guest-name" data-idx="${ idx }" placeholder="Last Name, First Name" value="${ name }">
+						<div class="bf-guest-row__field-group">
+							<button class="bf-guest-row__remove" data-idx="${ idx }" type="button">
+								<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+									<circle cx="12" cy="12" r="11" stroke="#0056FF" stroke-width="2"/>
+									<path d="M7 12H17" stroke="#0056FF" stroke-width="2" stroke-linecap="round"/>
+								</svg>
+							</button>
+							<div class="bf-guest-row__input-wrap">
+								<input type="text" class="bf-field__input bf-guest-name" data-idx="${ idx }" placeholder="Last Name, First Name" value="${ guest.name }">
+								<button class="bf-guest-type-toggle bf-guest-type-toggle--${ guest.type }" data-idx="${ idx }" type="button">
+									<span class="bf-toggle-text">${ guest.type === 'adult' ? 'Adult' : 'Kid' }</span>
+									<span class="bf-toggle-thumb">
+										<img src="/wp-content/themes/child-cwcwake/assets/images/${ guest.type }.svg" width="20" height="20">
+									</span>
+								</button>
+							</div>
+						</div>
 					</div>
-					<button class="bf-guest-row__remove" data-idx="${ idx }" type="button">
-						<img src="/wp-content/uploads/2026/04/remove-guest.svg" alt="Remove" width="24" height="24">
-					</button>
 				`;
 				guestContainer.appendChild( row );
 			} );
@@ -181,7 +445,16 @@
 			guestContainer.querySelectorAll( '.bf-guest-name' ).forEach( ( input ) => {
 				input.addEventListener( 'input', ( e ) => {
 					const i = parseInt( e.target.dataset.idx, 10 );
-					additionalGuests[ i ] = e.target.value;
+					additionalGuests[ i ].name = e.target.value;
+				} );
+			} );
+
+			guestContainer.querySelectorAll( '.bf-guest-type-toggle' ).forEach( ( btn ) => {
+				btn.addEventListener( 'click', ( e ) => {
+					const i = parseInt( e.currentTarget.dataset.idx, 10 );
+					additionalGuests[ i ].type = additionalGuests[ i ].type === 'adult' ? 'kid' : 'adult';
+					renderGuestRows();
+					updateSummaryGuests();
 				} );
 			} );
 
@@ -196,8 +469,15 @@
 		};
 
 		addGuestBtn?.addEventListener( 'click', () => {
-			if ( 1 + additionalGuests.length >= maxCapacity ) return;
-			additionalGuests.push( '' );
+			if ( 1 + additionalGuests.length >= maxCapacity ) {
+				if ( window.cwcToast ) {
+					window.cwcToast.show( `Maximum capacity for this room is ${ maxCapacity } persons.`, 'warning' );
+				} else {
+					alert( `Maximum capacity for this room is ${ maxCapacity } persons.` );
+				}
+				return;
+			}
+			additionalGuests.push( { name: '', type: 'adult' } );
 			renderGuestRows();
 			updateCapacityUI();
 		} );
@@ -222,9 +502,11 @@
 		togglePaymentUI();
 
 		/* ─── Calendar Logic ─── */
-		let currentMonth = new Date( 2026, 7, 1 ); // Start at August 2026
-		let selectedStart = new Date( 2026, 7, 14 );
-		let selectedEnd = new Date( 2026, 7, 19 );
+		const initialCheckinStr = urlParams.get( 'checkin' );
+		const initialCheckoutStr = urlParams.get( 'checkout' );
+		let selectedStart = initialCheckinStr ? new Date( initialCheckinStr ) : new Date( 2026, 7, 14 );
+		let selectedEnd = initialCheckoutStr ? new Date( initialCheckoutStr ) : new Date( 2026, 7, 19 );
+		let currentMonth = new Date( selectedStart.getTime() );
 
 		const calendarGrid = block.querySelector( '#bf-calendar-grid' );
 		const monthYearEl  = block.querySelector( '.bf-calendar__month-year' );
@@ -422,8 +704,45 @@
 						const roomName = checked.value;
 						const price    = checked.dataset.price || '';
 						const cap      = checked.dataset.capacity || '4';
+						const excerpt  = checked.dataset.excerpt || '';
+						const bedsData = checked.dataset.beds ? JSON.parse( checked.dataset.beds ) : [];
+
+						const newMaxCapacity = parseInt( cap, 10 ) || 4;
+						const currentTotalGuests = 1 + additionalGuests.length;
+						
+						if ( currentTotalGuests > newMaxCapacity ) {
+							if ( window.cwcToast ) {
+								window.cwcToast.show( `Cannot select ${roomName} Room. It accommodates up to ${newMaxCapacity} people, but you have ${currentTotalGuests} guests selected.`, 'warning' );
+							} else {
+								alert( `Cannot select ${roomName} Room. It accommodates up to ${newMaxCapacity} people, but you have ${currentTotalGuests} guests selected.` );
+							}
+							return;
+						}
+
 						if ( summaryRoomName ) summaryRoomName.textContent = `${ roomName } Room`;
 						if ( summaryRoomType ) summaryRoomType.textContent = `${ roomName } Room`;
+						if ( summaryRoomDesc ) summaryRoomDesc.textContent = excerpt;
+						
+						if ( summaryAmenities ) {
+							let amenitiesHtml = '';
+							bedsData.forEach( ( bed ) => {
+								amenitiesHtml += `
+									<span class="bf-summary__amenity">
+										<img src="${ bed.icon_url }" alt="" width="16" height="16">
+										${ bed.label }
+									</span>
+									<span class="bf-summary__amenity-divider">|</span>
+								`;
+							} );
+							amenitiesHtml += `
+								<span class="bf-summary__amenity">
+									<img src="/wp-content/uploads/2026/04/max-people-icon.svg" alt="" width="16" height="16">
+									Max <span id="bf-summary-capacity">${ cap }</span> People
+								</span>
+							`;
+							summaryAmenities.innerHTML = amenitiesHtml;
+						}
+
 						if ( summaryPrice )    summaryPrice.textContent    = `₱ ${ price.replace( /[^0-9,.\s]/g, '' ).trim() }.00`;
 						maxCapacity = parseInt( cap, 10 ) || 4;
 						updateCapacityUI();
@@ -466,7 +785,43 @@
 		};
 
 		/* ─── Init ─── */
+		const initFromUrl = () => {
+			// Sync Dates
+			if ( selectedStart && summaryCheckin ) {
+				summaryCheckin.textContent = formatDate( selectedStart.toISOString().split( 'T' )[ 0 ] );
+			}
+			if ( selectedEnd && summaryCheckout ) {
+				summaryCheckout.textContent = formatDate( selectedEnd.toISOString().split( 'T' )[ 0 ] );
+			}
+			updateModalPills();
+
+			// Sync Room
+			const roomParam = urlParams.get( 'room' );
+			if ( roomParam ) {
+				const titleMatch = {
+					'villa': 'VILLAS',
+					'villas': 'VILLAS',
+					'cabana': 'CABANAS',
+					'cabanas': 'CABANAS',
+					'dwell': 'DWELL',
+					'cabin': 'CABIN'
+				}[ roomParam.toLowerCase() ] || roomParam.toUpperCase();
+
+				const roomRadio = block.querySelector( `input[name="bf_modal_room"][value="${titleMatch}"]` );
+				if ( roomRadio ) {
+					roomRadio.checked = true;
+					const modal = roomRadio.closest( '.bf-modal' );
+					const saveBtn = modal?.querySelector( '.bf-modal__save' );
+					if ( saveBtn ) {
+						saveBtn.click();
+					}
+				}
+			}
+		};
+
+		initFromUrl();
 		showStep( 2 );
 		updateCapacityUI();
+		renderGuestRows();
 	} );
 } )();

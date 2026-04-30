@@ -56,8 +56,8 @@ function cwc_handle_accommodations_settings_save() {
 				$pool[ $slug ] = $val;
 			}
 		}
+		update_option( 'cwc_icon_pool', $pool );
 	}
-	update_option( 'cwc_icon_pool', $pool );
 
 	// 2. Save Amenities
 	$amenities = [];
@@ -70,8 +70,8 @@ function cwc_handle_accommodations_settings_save() {
 				$amenities[ $slug ] = [ 'label' => $label, 'icon' => $icon ];
 			}
 		}
+		update_option( 'cwc_dynamic_amenities', $amenities );
 	}
-	update_option( 'cwc_dynamic_amenities', $amenities );
 
 	// 3. Save Inclusions
 	$inclusions = [];
@@ -83,8 +83,22 @@ function cwc_handle_accommodations_settings_save() {
 				$inclusions[ $slug ] = [ 'label' => $label ];
 			}
 		}
+		update_option( 'cwc_dynamic_inclusions', $inclusions );
 	}
-	update_option( 'cwc_dynamic_inclusions', $inclusions );
+
+	// 4. Save Bed Types
+	$beds = [];
+	if ( isset( $_POST['bed_types'] ) && is_array( $_POST['bed_types'] ) ) {
+		foreach ( $_POST['bed_types'] as $row ) {
+			$slug  = sanitize_key( $row['slug'] ?? '' );
+			$label = sanitize_text_field( wp_unslash( $row['label'] ?? '' ) );
+			$icon  = sanitize_key( $row['icon'] ?? '' );
+			if ( $slug && $label ) {
+				$beds[ $slug ] = [ 'label' => $label, 'icon' => $icon ];
+			}
+		}
+		update_option( 'cwc_dynamic_beds', $beds );
+	}
 
 	$seeded = 0;
 	if ( isset( $_POST['cwc_seed_blogs'] ) ) {
@@ -109,6 +123,7 @@ function cwc_render_accommodations_settings_page() {
 	// Handle Seeding
 	$pool      = get_option( 'cwc_icon_pool', [] );
 	$amenities = get_option( 'cwc_dynamic_amenities', [] );
+	$bed_types = get_option( 'cwc_dynamic_beds', [] );
 	$updated   = isset( $_GET['updated'] );
 	$seeded    = isset( $_GET['seeded'] ) ? intval( $_GET['seeded'] ) : -1;
 
@@ -177,6 +192,27 @@ function cwc_render_accommodations_settings_page() {
 				<?php $j++; endforeach; ?>
 			</div>
 			<button type="button" class="button" id="cwc-add-amenity"><?php esc_html_e( '+ Add Amenity', 'cwc-accommodations' ); ?></button>
+
+			<hr style="margin:2rem 0;" />
+
+			<h2><?php esc_html_e( '3. Bed Types Catalogue', 'cwc-accommodations' ); ?></h2>
+			<p class="description"><?php esc_html_e( 'Manage the bed types that can be assigned to rooms.', 'cwc-accommodations' ); ?></p>
+
+			<div id="cwc-bed-type-rows" style="display:flex;flex-direction:column;gap:.5rem;margin:1rem 0;">
+				<?php $m = 0; foreach ( $bed_types as $slug => $data ) : ?>
+					<div class="cwc-row" style="display:grid;grid-template-columns:150px 1fr 150px 50px;gap:1rem;background:#fff;padding:.5rem;border:1px solid #ccd0d4;align-items:center;">
+						<input type="text" name="bed_types[<?php echo $m; ?>][slug]" value="<?php echo esc_attr( $slug ); ?>" placeholder="slug" class="widefat" />
+						<input type="text" name="bed_types[<?php echo $m; ?>][label]" value="<?php echo esc_attr( $data['label'] ); ?>" placeholder="Label (e.g. Queen Bed)" class="widefat" />
+						<select name="bed_types[<?php echo $m; ?>][icon]" class="widefat">
+							<?php foreach ( $pool as $p_slug => $p_val ) : ?>
+								<option value="<?php echo esc_attr( $p_slug ); ?>" <?php selected( $data['icon'], $p_slug ); ?>><?php echo esc_html( $p_slug ); ?></option>
+							<?php endforeach; ?>
+						</select>
+						<button type="button" class="button-link-delete cwc-remove-row">×</button>
+					</div>
+				<?php $m++; endforeach; ?>
+			</div>
+			<button type="button" class="button" id="cwc-add-bed-type"><?php esc_html_e( '+ Add Bed Type', 'cwc-accommodations' ); ?></button>
 
 			<div style="margin-top:2rem; display:flex; align-items:center; gap:10px;">
 				<?php submit_button( __( 'Save All Settings', 'cwc-accommodations' ), 'primary', 'submit', false ); ?>
@@ -274,6 +310,33 @@ function cwc_render_accommodations_settings_page() {
 						<input type="text" name="amenities[${counter}][slug]" placeholder="slug" class="widefat" />
 						<input type="text" name="amenities[${counter}][label]" placeholder="Label" class="widefat" />
 						<select name="amenities[${counter}][icon]" class="widefat">${options}</select>
+						<button type="button" class="button-link-delete cwc-remove-row">×</button>
+					`;
+					list.appendChild( wrapper );
+				} );
+			}
+			
+			// Add Bed Type
+			const addBedTypeBtn = document.getElementById( 'cwc-add-bed-type' );
+			if ( addBedTypeBtn ) {
+				addBedTypeBtn.addEventListener( 'click', () => {
+					const list    = document.getElementById( 'cwc-bed-type-rows' );
+					const counter = list.querySelectorAll( '.cwc-row' ).length;
+					const pool    = document.querySelectorAll( '#cwc-icon-pool-rows input[name*="[slug]"]' );
+					
+					let options = '';
+					pool.forEach( ( input ) => {
+						const slug = input.value;
+						if ( slug ) options += `<option value="${slug}">${slug}</option>`;
+					} );
+
+					const wrapper = document.createElement( 'div' );
+					wrapper.className = 'cwc-row';
+					wrapper.style.cssText = 'display:grid;grid-template-columns:150px 1fr 150px 50px;gap:1rem;background:#fff;padding:.5rem;border:1px solid #ccd0d4;align-items:center;';
+					wrapper.innerHTML = `
+						<input type="text" name="bed_types[${counter}][slug]" placeholder="slug" class="widefat" />
+						<input type="text" name="bed_types[${counter}][label]" placeholder="Label" class="widefat" />
+						<select name="bed_types[${counter}][icon]" class="widefat">${options}</select>
 						<button type="button" class="button-link-delete cwc-remove-row">×</button>
 					`;
 					list.appendChild( wrapper );

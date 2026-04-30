@@ -107,6 +107,13 @@ function cwc_enqueue_styles() {
 			'in_footer' => true,
 		)
 	);
+	wp_localize_script(
+		'cwc-header',
+		'cwcVars',
+		array(
+			'ajaxUrl' => admin_url( 'admin-ajax.php' ),
+		)
+	);
 }
 add_action( 'wp_enqueue_scripts', 'cwc_enqueue_styles' );
 
@@ -865,6 +872,29 @@ function cwc_register_blocks() {
 add_action( 'init', 'cwc_register_blocks' );
 
 /**
+ * Manually enqueue room-info view script on single accommodation pages.
+ *
+ * The block viewScript declaration in block.json sometimes fails to
+ * fire on server-rendered blocks. Enqueuing explicitly guarantees
+ * the modal logic runs every time the room-info block is on screen.
+ */
+function cwc_enqueue_room_info_scripts() {
+	if ( is_singular( 'accommodation' ) ) {
+		wp_enqueue_script(
+			'cwc-room-info-view',
+			get_stylesheet_directory_uri() . '/blocks/room-info/view.js',
+			array(),
+			CWC_VERSION,
+			array(
+				'strategy'  => 'defer',
+				'in_footer' => true,
+			)
+		);
+	}
+}
+add_action( 'wp_enqueue_scripts', 'cwc_enqueue_room_info_scripts' );
+
+/**
  * Add a body class to mark the front page.
  *
  * Used by the header CSS/JS so the transparent-on-top behavior only
@@ -1285,3 +1315,5 @@ function cwc_defer_non_critical_css( $html, $handle, $href, $media ) {
 	return $html;
 }
 add_filter( 'style_loader_tag', 'cwc_defer_non_critical_css', 10, 4 );
+
+require_once get_stylesheet_directory() . '/inc/email-handler.php';

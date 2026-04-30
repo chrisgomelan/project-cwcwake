@@ -223,13 +223,55 @@
 	width: 100%;
 	height: 60px;
 	padding: 0 30px;
-	border: 1px solid #0096C7 !important;
+	border: 1.5px solid #0096C7 !important;
 	border-radius: 100px !important;
 	font-family: 'Archivo', var(--wp--preset--font-family--body);
 	font-size: 18px;
-	color: #1A1A1A;
-	transition: border-color 0.2s ease, box-shadow 0.2s ease;
-	background: #FFFFFF;
+	color: #0096C7; /* Primary color for input text */
+	transition: all 0.2s ease;
+	background: #FFFFFF !important;
+	appearance: none; 
+}
+
+/* Placeholder styling */
+.cwc-inquiry-form__input::placeholder,
+.cwc-inquiry-form__textarea::placeholder {
+	color: #A0A0A0; /* Matching standard placeholder color */
+	opacity: 1;
+}
+
+/* Make the select's first (placeholder) option match the email placeholder color */
+.cwc-inquiry-form__select:invalid,
+.cwc-inquiry-form__select option[value=""],
+.cwc-inquiry-form__select option:first-child {
+	color: #A0A0A0 !important;
+}
+
+/* Ensure selected options (real values) use the primary color */
+.cwc-inquiry-form__select option {
+	color: #0096C7; /* Using primary color for options too */
+	background-color: #FFFFFF;
+}
+
+.cwc-inquiry-form__select:not(:invalid) {
+	color: #0096C7 !important; 
+}
+
+.cwc-inquiry-form__select-wrap {
+	position: relative;
+	width: 100%;
+}
+
+.cwc-inquiry-form__select-wrap::after {
+	content: '';
+	position: absolute;
+	right: 30px;
+	top: 50%;
+	transform: translateY(-50%);
+	width: 16px;
+	height: 16px;
+	background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230096C7' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") no-repeat center;
+	pointer-events: none;
 }
 
 .cwc-inquiry-form__textarea {
@@ -241,10 +283,26 @@
 
 .cwc-inquiry-form__input:focus,
 .cwc-inquiry-form__select:focus,
-.cwc-inquiry-form__textarea:focus {
-	outline: none;
-	background: #0077A3;
-	box-shadow: 0 0 0 4px rgba(0, 150, 199, 0.1);
+.cwc-inquiry-form__textarea:focus,
+.cwc-inquiry-form__input:active,
+.cwc-inquiry-form__select:active,
+.cwc-inquiry-form__textarea:active {
+	outline: none !important;
+	background: #FFFFFF !important;
+	background-color: #FFFFFF !important;
+	border-color: #0096C7 !important;
+	box-shadow: none !important;
+	color: #0096C7 !important;
+}
+
+/* Aggressively remove any hover background changes */
+.cwc-inquiry-form__input:hover,
+.cwc-inquiry-form__select:hover,
+.cwc-inquiry-form__textarea:hover {
+	background: #FFFFFF !important;
+	background-color: #FFFFFF !important;
+	border-color: #0096C7 !important;
+	color: #0096C7 !important;
 }
 
 /* ----------------------------------------
@@ -280,12 +338,31 @@
 	z-index: 1;
 	width: 100%;
 	max-width: 540px;
+	max-height: calc(100vh - 40px);
 	background: #FFFFFF;
 	border-radius: 30px;
-	overflow: hidden;
+	overflow-x: hidden;
+	overflow-y: auto;
 	box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
 	transform: translateY(20px);
 	transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+
+	/* Custom Scrollbar */
+	scrollbar-width: thin;
+	scrollbar-color: #0096C7 #F5F1EB;
+}
+
+.cwc-inquiry-modal__container::-webkit-scrollbar {
+	width: 6px;
+}
+
+.cwc-inquiry-modal__container::-webkit-scrollbar-track {
+	background: #F5F1EB;
+}
+
+.cwc-inquiry-modal__container::-webkit-scrollbar-thumb {
+	background: #0096C7;
+	border-radius: 10px;
 }
 
 .cwc-inquiry-modal.is-open .cwc-inquiry-modal__container {
@@ -359,6 +436,15 @@
 }
 
 @media (max-width: 600px) {
+	.cwc-inquiry-modal {
+		padding: 10px;
+	}
+
+	.cwc-inquiry-modal__container {
+		border-radius: 20px;
+		max-height: calc(100vh - 20px);
+	}
+
 	.cwc-inquiry-modal__body {
 		padding: 24px;
 	}
@@ -369,6 +455,10 @@
 
 	.cwc-inquiry-form__label {
 		font-size: 20px;
+	}
+
+	.cwc-inquiry-form {
+		gap: 16px;
 	}
 }
 

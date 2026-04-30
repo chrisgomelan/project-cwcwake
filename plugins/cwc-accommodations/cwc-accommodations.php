@@ -60,6 +60,8 @@ require_once plugin_dir_path( __FILE__ ) . 'includes/blog-seeder.php';
 require_once CWC_ACC_PATH . 'includes/metabox.php';
 require_once CWC_ACC_PATH . 'includes/policies.php';
 require_once CWC_ACC_PATH . 'includes/migrate.php';
+require_once CWC_ACC_PATH . 'includes/bookings-cpt.php';
+require_once CWC_ACC_PATH . 'includes/dashboard.php';
 
 /* ---------------------------------------------------------
  * Activation / deactivation

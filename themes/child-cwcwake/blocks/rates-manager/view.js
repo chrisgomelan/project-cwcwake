@@ -38,6 +38,64 @@
 						closeModal();
 					}
 				});
+
+				// --- Form Submission Logic ---
+				const form = modal.querySelector('.cwc-inquiry-form');
+				const submitBtn = form?.querySelector('.cwc-inquiry-form__submit');
+
+				if (form && submitBtn) {
+					form.addEventListener('submit', async (e) => {
+						e.preventDefault();
+
+						const email = form.querySelector('input[type="email"]').value;
+						const subject = form.querySelector('select').value;
+						const message = form.querySelector('textarea').value;
+
+						// Loading state
+						const originalText = submitBtn.textContent;
+						submitBtn.textContent = 'Sending...';
+						submitBtn.disabled = true;
+						submitBtn.style.opacity = '0.7';
+
+						try {
+							const formData = new FormData();
+							formData.append('action', 'cwc_submit_inquiry');
+							formData.append('email', email);
+							formData.append('subject', subject);
+							formData.append('message', message);
+
+							const response = await fetch(cwcVars.ajaxUrl, {
+								method: 'POST',
+								body: formData
+							});
+
+							const result = await response.json();
+
+							if (result.success) {
+								if (window.cwcToast) {
+									window.cwcToast.show(result.data.message, 'success');
+								} else {
+									alert(result.data.message);
+								}
+								form.reset();
+								setTimeout(closeModal, 1500);
+							} else {
+								throw new Error(result.data.message || 'Submission failed');
+							}
+						} catch (error) {
+							console.error('Inquiry Error:', error);
+							if (window.cwcToast) {
+								window.cwcToast.show(error.message || 'Something went wrong. Please try again.', 'error');
+							} else {
+								alert(error.message || 'Something went wrong. Please try again.');
+							}
+						} finally {
+							submitBtn.textContent = originalText;
+							submitBtn.disabled = false;
+							submitBtn.style.opacity = '';
+						}
+					});
+				}
 			}
 
 			const dropdown = manager.querySelector('.cwc-rates-manager__dropdown');

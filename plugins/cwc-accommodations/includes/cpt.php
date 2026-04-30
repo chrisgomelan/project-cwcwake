@@ -36,6 +36,10 @@ if ( ! defined( 'ABSPATH' ) ) {
  * --------------------------------------------------------- */
 
 function cwc_get_room_inventory( $post_id ) {
+	$physical_rooms = cwc_get_physical_rooms( $post_id );
+	if ( ! empty( $physical_rooms ) ) {
+		return count( $physical_rooms );
+	}
 	$inventory = get_post_meta( $post_id, '_cwc_inventory', true );
 	return $inventory !== '' ? intval( $inventory ) : 1; // Default to 1 if not set
 }
@@ -212,25 +216,28 @@ function cwc_register_accommodation_meta() {
 	};
 
 	$fields = [
-		'_cwc_price'          => 'string',
-		'_cwc_price_sub'      => 'string',
-		'_cwc_capacity'       => 'integer',
-		'_cwc_availability'   => 'string',
-		'_cwc_amenities'      => 'string',
-		'_cwc_inclusions'     => 'string',
-		'_cwc_inventory'      => 'integer',
-		'_cwc_physical_rooms' => 'string',
-		'_cwc_gallery_ids'    => 'string',
+		'_cwc_price'          => ['type' => 'string', 'rest' => true],
+		'_cwc_price_sub'      => ['type' => 'string', 'rest' => true],
+		'_cwc_capacity'       => ['type' => 'integer','rest' => true],
+		'_cwc_availability'   => ['type' => 'string', 'rest' => true],
+		'_cwc_amenities'      => ['type' => 'string', 'rest' => false],
+		'_cwc_inclusions'     => ['type' => 'string', 'rest' => false],
+		'_cwc_inventory'      => ['type' => 'integer','rest' => true],
+		'_cwc_physical_rooms' => ['type' => 'string', 'rest' => true],
+		'_cwc_gallery_ids'    => ['type' => 'string', 'rest' => true],
+		'_cwc_beds'           => ['type' => 'string', 'rest' => true],
 	];
 
-	foreach ( $fields as $key => $type ) {
+	foreach ( $fields as $key => $info ) {
+		$type      = $info['type'];
+		$show_rest = $info['rest'];
 		register_post_meta(
 			'accommodation',
 			$key,
 			[
 				'type'              => $type,
 				'single'            => true,
-				'show_in_rest'      => true,
+				'show_in_rest'      => $show_rest,
 				'auth_callback'     => $auth,
 				'sanitize_callback' => cwc_accommodation_meta_sanitizer( $key ),
 				'default'           => 'integer' === $type ? 0 : '',
@@ -283,6 +290,7 @@ function cwc_accommodation_meta_sanitizer( $key ) {
 			};
 
 		case '_cwc_physical_rooms':
+		case '_cwc_beds':
 			return static function ( $value ) {
 				return sanitize_text_field( $value );
 			};
@@ -351,23 +359,29 @@ function cwc_accommodation_normalize_slug_csv( $value, array $allowed ) {
  * @return array<string,array{label:string,icon:string}>
  */
 function cwc_amenity_catalogue() {
+	$defaults = [
+		'wifi'       => [ 'label' => 'Free Wi-Fi',        'icon' => 'wifi' ],
+		'parking'    => [ 'label' => 'Free Parking',      'icon' => 'parking' ],
+		'pool'       => [ 'label' => 'Pool Access',       'icon' => 'pool' ],
+		'air'        => [ 'label' => 'Air Conditioning',  'icon' => 'air' ],
+		'garden'     => [ 'label' => 'Garden View',       'icon' => 'garden' ],
+		'bar'        => [ 'label' => 'Mini Bar',          'icon' => 'bar' ],
+		'coffee'     => [ 'label' => 'Coffee Maker',      'icon' => 'coffee' ],
+		'smoke-free' => [ 'label' => 'Non-Smoking',       'icon' => 'smoke-free' ],
+	];
+
 	$dynamic = get_option( 'cwc_dynamic_amenities', [] );
-	
-	// Default starting list (if nothing is saved in DB yet)
-	if ( empty( $dynamic ) ) {
-		$catalogue = [
-			'wifi'       => [ 'label' => 'Free Wi-Fi',        'icon' => 'wifi' ],
-			'parking'    => [ 'label' => 'Free Parking',      'icon' => 'parking' ],
-			'pool'       => [ 'label' => 'Pool Access',       'icon' => 'pool' ],
-			'air'        => [ 'label' => 'Air Conditioning',  'icon' => 'air' ],
-			'garden'     => [ 'label' => 'Garden View',       'icon' => 'garden' ],
-			'bar'        => [ 'label' => 'Mini Bar',          'icon' => 'bar' ],
-			'coffee'     => [ 'label' => 'Coffee Maker',      'icon' => 'coffee' ],
-			'smoke-free' => [ 'label' => 'Non-Smoking',       'icon' => 'smoke-free' ],
-		];
-	} else {
-		$catalogue = $dynamic;
-	}
+
+	/*
+	 * Always MERGE dynamic entries on top of the hardcoded defaults.
+	 * Using dynamic-only ($catalogue = $dynamic) would cause the
+	 * sanitizer's array_intersect to strip default slugs (wifi, pool,
+	 * etc.) the moment any custom amenity is added, silently wiping
+	 * them from every saved room on the next save.
+	 */
+	$catalogue = is_array( $dynamic ) && ! empty( $dynamic )
+		? array_merge( $defaults, $dynamic )
+		: $defaults;
 
 	/**
 	 * Filter the room amenity catalogue.
@@ -390,22 +404,27 @@ function cwc_amenity_catalogue() {
  * @return array<string,array{label:string}>
  */
 function cwc_inclusion_catalogue() {
+	$defaults = [
+		'wakeboard-4'    => [ 'label' => 'Free Wakeboard for 4 Guests' ],
+		'airport-pick'   => [ 'label' => 'Free Airport Pick Up in Naga Airport' ],
+		'golf-coach'     => [ 'label' => 'Free 18 holes Gold maximum of 4 Guests or One hour with Golf Coach' ],
+		'shuttle-naga'   => [ 'label' => 'Free Shuttle to Naga City' ],
+		'skate-park'     => [ 'label' => 'Free Use of Skate Park' ],
+		'bike-track'     => [ 'label' => 'Free Use of Bike Track' ],
+		'playground'     => [ 'label' => "Free Use of Children's Playground" ],
+		'basketball'     => [ 'label' => 'Free Use of Outdoor Basketball Court' ],
+	];
+
 	$dynamic = get_option( 'cwc_dynamic_inclusions', [] );
-	
-	if ( empty( $dynamic ) ) {
-		$catalogue = [
-			'wakeboard-4'    => [ 'label' => 'Free Wakeboard for 4 Guests' ],
-			'airport-pick'   => [ 'label' => 'Free Airport Pick Up in Naga Airport' ],
-			'golf-coach'     => [ 'label' => 'Free 18 holes Gold maximum of 4 Guests or One hour with Golf Coach' ],
-			'shuttle-naga'   => [ 'label' => 'Free Shuttle to Naga City' ],
-			'skate-park'     => [ 'label' => 'Free Use of Skate Park' ],
-			'bike-track'     => [ 'label' => 'Free Use of Bike Track' ],
-			'playground'     => [ 'label' => 'Free Use of Children\'s Playground' ],
-			'basketball'     => [ 'label' => 'Free Use of Outdoor Basketball Court' ],
-		];
-	} else {
-		$catalogue = $dynamic;
-	}
+
+	/*
+	 * Always MERGE dynamic entries on top of the hardcoded defaults
+	 * so that default inclusion slugs remain valid even after a
+	 * custom inclusion is added via the Settings page.
+	 */
+	$catalogue = is_array( $dynamic ) && ! empty( $dynamic )
+		? array_merge( $defaults, $dynamic )
+		: $defaults;
 
 	return apply_filters( 'cwc_inclusion_catalogue', $catalogue );
 }
@@ -455,6 +474,30 @@ function cwc_policy_icon_catalogue() {
 	 * @param array<string,array{label:string,icon:string}> $catalogue Slug → label + icon.
 	 */
 	return apply_filters( 'cwc_policy_icon_catalogue', $catalogue );
+}
+
+/**
+ * Catalogue of bed types the site supports.
+ *
+ * @since 1.2.0
+ *
+ * @return array<string,array{label:string,icon:string}>
+ */
+function cwc_bed_catalogue() {
+	$dynamic = get_option( 'cwc_dynamic_beds', [] );
+	
+	if ( empty( $dynamic ) ) {
+		$catalogue = [
+			'queen'  => [ 'label' => __( 'Queen Bed', 'cwc-accommodations' ),  'icon' => 'queen-bed' ],
+			'king'   => [ 'label' => __( 'King Bed', 'cwc-accommodations' ),   'icon' => 'king-bed' ],
+			'twin'   => [ 'label' => __( 'Twin Bed', 'cwc-accommodations' ),   'icon' => 'children-beds' ],
+			'single' => [ 'label' => __( 'Single Bed', 'cwc-accommodations' ), 'icon' => 'check-in' ],
+		];
+	} else {
+		$catalogue = $dynamic;
+	}
+
+	return apply_filters( 'cwc_bed_catalogue', $catalogue );
 }
 
 /**
@@ -751,4 +794,39 @@ function cwc_accommodation_availability( $post_id ) {
 	}
 
 	return $has_available ? 'available' : 'fully-booked';
+}
+
+/**
+ * Resolve `_cwc_beds` meta into a list of { icon, label } rows.
+ *
+ * @since 1.2.0
+ *
+ * @param int $post_id Accommodation post ID.
+ * @return array<int,array{icon_url:string,label:string}>
+ */
+function cwc_get_room_beds( $post_id ) {
+	$beds_raw = get_post_meta( $post_id, '_cwc_beds', true );
+	if ( empty( $beds_raw ) ) {
+		return [];
+	}
+
+	$beds_data = json_decode( $beds_raw, true ) ?: [];
+	$catalogue = cwc_bed_catalogue();
+	$out       = [];
+
+	foreach ( $beds_data as $row ) {
+		$type  = $row['type'] ?? '';
+		$count = (int) ( $row['count'] ?? 0 );
+		if ( $count <= 0 || ! isset( $catalogue[ $type ] ) ) {
+			continue;
+		}
+
+		$label = sprintf( _n( '%1$s %2$s', '%1$s %2$ss', $count, 'cwc-accommodations' ), $count, $catalogue[ $type ]['label'] );
+		$out[] = [
+			'icon_url' => cwc_icon_url_for_slug( $catalogue[ $type ]['icon'] ),
+			'label'    => $label,
+		];
+	}
+
+	return $out;
 }
