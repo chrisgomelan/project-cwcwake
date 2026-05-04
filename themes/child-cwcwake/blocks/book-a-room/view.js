@@ -17,6 +17,27 @@
 
 		const triggers = document.querySelectorAll('.cwc-booking-bar__field[data-modal-target]');
 
+		// ─── Shared Calendar State ───
+		let fullyBookedDates = [];
+		let renderCalendarFn = null; // Will be defined later
+		const fetchBookedDates = async (roomName) => {
+			if (!roomName || roomName === 'Choose Room') return;
+			try {
+				const formData = new URLSearchParams();
+				formData.append('action', 'cwc_get_booked_dates');
+				formData.append('room', roomName);
+
+				const response = await fetch('/wp-admin/admin-ajax.php', { method: 'POST', body: formData });
+				const result = await response.json();
+				if (result.success) {
+					fullyBookedDates = result.data;
+					if (renderCalendarFn) renderCalendarFn();
+				}
+			} catch (err) {
+				console.error('Failed to fetch booked dates', err);
+			}
+		};
+
 		const closeModal = () => {
 			backdrop.classList.remove('is-active');
 			modals.forEach((modal) => modal.classList.remove('is-active'));
@@ -76,7 +97,14 @@
 					const selectedRadio = activeModal.querySelector('input[type="radio"]:checked');
 					if (selectedRadio) {
 						const roomVal = document.getElementById('cwc-val-room');
-						if (roomVal) roomVal.textContent = selectedRadio.value;
+						if (roomVal) {
+							if (roomVal.textContent !== selectedRadio.value) {
+								roomVal.textContent = selectedRadio.value;
+								fetchBookedDates(selectedRadio.value);
+							} else {
+								roomVal.textContent = selectedRadio.value;
+							}
+						}
 
 						// Enforce capacity on existing guest selection
 						const maxCap = parseInt(selectedRadio.dataset.capacity || 4, 10);
@@ -133,6 +161,14 @@
 		let selectedStart = null;
 		let selectedEnd = null;
 
+		// Formats date to YYYY-MM-DD in local time
+		const formatLocalDate = (d) => {
+			const year = d.getFullYear();
+			const month = String(d.getMonth() + 1).padStart(2, '0');
+			const day = String(d.getDate()).padStart(2, '0');
+			return `${year}-${month}-${day}`;
+		};
+
 		const calendarGrid = document.getElementById('cwc-calendar-grid');
 		const monthYearEl = document.querySelector('.cwc-calendar__month-year');
 		const prevMonthBtn = document.querySelector('.cwc-calendar__prev');
@@ -164,11 +200,14 @@
 
 			for (let day = 1; day <= daysInMonth; day++) {
 				const dateObj = new Date(year, month, day);
+				const dateStr = formatLocalDate(dateObj);
 				const dayDiv = document.createElement('div');
 				dayDiv.className = 'cwc-calendar__day';
 				dayDiv.textContent = day;
 
-				if (dateObj < today) {
+				let isDisabled = false;
+				if (dateObj < today || fullyBookedDates.includes(dateStr)) {
+					isDisabled = true;
 					dayDiv.classList.add('cwc-calendar__day--disabled');
 				}
 
@@ -189,7 +228,7 @@
 				}
 
 				dayDiv.addEventListener('click', () => {
-					if (dayDiv.classList.contains('cwc-calendar__day--disabled')) return;
+					if (isDisabled) return;
 
 					if (!selectedStart || (selectedStart && selectedEnd)) {
 						selectedStart = dateObj;
@@ -199,14 +238,32 @@
 					} else if (dateObj.getTime() === selectedStart.getTime()) {
 						selectedStart = null;
 					} else {
-						selectedEnd = dateObj;
+						// Check if range contains any disabled date
+						let hasDisabled = false;
+						let tempDate = new Date(selectedStart);
+						tempDate.setDate(tempDate.getDate() + 1);
+						while (tempDate < dateObj) {
+							if (fullyBookedDates.includes(formatLocalDate(tempDate))) {
+								hasDisabled = true;
+								break;
+							}
+							tempDate.setDate(tempDate.getDate() + 1);
+						}
+						
+						if (hasDisabled) {
+							selectedStart = dateObj;
+							selectedEnd = null;
+						} else {
+							selectedEnd = dateObj;
+						}
 					}
-					renderCalendar();
+					renderCalendarFn();
 				});
 
 				calendarGrid.appendChild(dayDiv);
 			}
 		};
+		renderCalendarFn = renderCalendar;
 
 		prevMonthBtn?.addEventListener('click', (e) => {
 			e.stopPropagation();

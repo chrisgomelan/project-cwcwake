@@ -415,6 +415,94 @@ function cwc_count_overlapping_bookings( $room_name, $checkin_date, $checkout_da
 	return $count;
 }
 
+/**
+ * AJAX: Get all fully booked dates for a specific room.
+ *
+ * Returns an array of Y-m-d strings where the room has 0 available units.
+ */
+function cwc_get_booked_dates() {
+	$room_name = isset( $_POST['room'] ) ? sanitize_text_field( wp_unslash( $_POST['room'] ) ) : '';
+	if ( empty( $room_name ) ) {
+		wp_send_json_success( [] );
+	}
+
+	$room_name_clean = preg_replace( '/\s+Room$/i', '', trim( $room_name ) );
+	$room_posts      = get_posts( [
+		'post_type'      => 'accommodation',
+		'post_status'    => 'publish',
+		'posts_per_page' => -1,
+	] );
+
+	$room_post_id = 0;
+	foreach ( $room_posts as $p ) {
+		$title_lower = strtolower( trim( $p->post_title ) );
+		if ( $title_lower === strtolower( $room_name_clean ) || $title_lower === strtolower( trim( $room_name ) ) ) {
+			$room_post_id = $p->ID;
+			break;
+		}
+	}
+
+	if ( ! $room_post_id ) {
+		wp_send_json_success( [] );
+	}
+
+	$total_units = cwc_get_room_inventory( $room_post_id );
+
+	$bookings = get_posts( [
+		'post_type'      => 'cwc_booking',
+		'post_status'    => 'publish',
+		'posts_per_page' => -1,
+		'fields'         => 'ids',
+	] );
+
+	$room_name_clean_lower = strtolower( $room_name_clean );
+	$date_counts           = [];
+
+	foreach ( $bookings as $booking_id ) {
+		$bk_status = get_post_meta( $booking_id, '_cwc_bk_status', true );
+		if ( in_array( $bk_status, [ 'cancelled', 'completed' ], true ) ) {
+			continue;
+		}
+
+		$bk_room = get_post_meta( $booking_id, '_cwc_bk_room', true );
+		$bk_room_clean = strtolower( preg_replace( '/\s+Room$/i', '', trim( $bk_room ) ) );
+		if ( $bk_room_clean !== $room_name_clean_lower ) {
+			continue;
+		}
+
+		$bk_checkin  = get_post_meta( $booking_id, '_cwc_bk_checkin', true );
+		$bk_checkout = get_post_meta( $booking_id, '_cwc_bk_checkout', true );
+
+		if ( empty( $bk_checkin ) || empty( $bk_checkout ) ) {
+			continue;
+		}
+
+		$start = new DateTime( $bk_checkin );
+		$end   = new DateTime( $bk_checkout );
+
+		// Increment overlap count for each night of the booking
+		$period = new DatePeriod( $start, new DateInterval( 'P1D' ), $end );
+		foreach ( $period as $date ) {
+			$date_str = $date->format( 'Y-m-d' );
+			if ( ! isset( $date_counts[ $date_str ] ) ) {
+				$date_counts[ $date_str ] = 0;
+			}
+			$date_counts[ $date_str ]++;
+		}
+	}
+
+	$fully_booked_dates = [];
+	foreach ( $date_counts as $date_str => $count ) {
+		if ( $count >= $total_units ) {
+			$fully_booked_dates[] = $date_str;
+		}
+	}
+
+	wp_send_json_success( $fully_booked_dates );
+}
+add_action( 'wp_ajax_cwc_get_booked_dates', 'cwc_get_booked_dates' );
+add_action( 'wp_ajax_nopriv_cwc_get_booked_dates', 'cwc_get_booked_dates' );
+
 /* ────────────────────────────────────────────
    Status Email Templates
    ──────────────────────────────────────────── */

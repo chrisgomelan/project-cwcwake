@@ -913,7 +913,7 @@ input.bf-field__input.bf-guest-name {
 	font-size: clamp(0.875rem, 3vw, 1.125rem);
 	font-weight: 600;
 	margin: 0;
-}
+
 }
 
 .bf-summary__room-type {

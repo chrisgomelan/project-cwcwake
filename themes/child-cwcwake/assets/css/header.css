@@ -21,8 +21,18 @@
 	Fluid header tokens
 	---------------------------------------- */
 
-.cwc-header {
+:root {
 	--cwc-header-h: clamp(72px, 6vw + 36px, 115px);
+	--cwc-admin-bar-h: 32px;
+}
+
+@media screen and (max-width: 600px) {
+	:root {
+		--cwc-admin-bar-h: 46px;
+	}
+}
+
+.cwc-header {
 	--cwc-header-pad-x: clamp(1rem, 4vw, 4rem);
 	--cwc-nav-fs: clamp(15px, 0.6vw + 12px, 24px);
 	--cwc-nav-gap: clamp(16px, 2vw + 4px, 48px);
@@ -52,7 +62,7 @@
 	align-items: center;
 	padding: 0 !important;
 	margin: 0 !important;
-	transition: background-color 0.3s ease, 
+	transition: background-color 0.3s ease,
 		border-color 0.3s ease,
 		box-shadow 0.3s ease;
 }
@@ -821,6 +831,7 @@ body.admin-bar {
 		width: auto;
 		min-width: 0;
 		padding: 0 14px;
+		font-size: 10px;
 	}
 
 	.cwc-header__nav-center {

@@ -210,6 +210,28 @@
 		let selectedStart = null;
 		let selectedEnd = null;
 		let calendarGrid, monthYearEl;
+		let fullyBookedDates = [];
+
+		const fetchBookedDates = async () => {
+			const bookBtn = document.getElementById( 'cwc-book-btn' );
+			if ( ! bookBtn || ! bookBtn.dataset.roomName ) return;
+
+			try {
+				const formData = new URLSearchParams();
+				formData.append( 'action', 'cwc_get_booked_dates' );
+				formData.append( 'room', bookBtn.dataset.roomName );
+
+				const response = await fetch( '/wp-admin/admin-ajax.php', { method: 'POST', body: formData } );
+				const result = await response.json();
+				if ( result.success ) {
+					fullyBookedDates = result.data;
+					renderCalendar();
+				}
+			} catch ( err ) {
+				console.error( 'Failed to fetch booked dates', err );
+			}
+		};
+		fetchBookedDates();
 
 		// ─── Build Date Modal ───
 		const dateModal = document.createElement( 'div' );
@@ -302,6 +324,14 @@
 			btn.addEventListener( 'click', closeAll );
 		} );
 
+		// Formats date to YYYY-MM-DD in local time (ignoring timezone offset issues)
+		const formatLocalDate = (d) => {
+			const year = d.getFullYear();
+			const month = String(d.getMonth() + 1).padStart(2, '0');
+			const day = String(d.getDate()).padStart(2, '0');
+			return `${year}-${month}-${day}`;
+		};
+
 		// ─── Calendar render ───
 		const renderCalendar = () => {
 			if ( ! calendarGrid || ! monthYearEl ) return;
@@ -324,11 +354,17 @@
 
 			for ( let day = 1; day <= daysInMonth; day++ ) {
 				const dateObj = new Date( year, month, day );
+				const dateStr = formatLocalDate( dateObj );
 				const el = document.createElement( 'div' );
 				el.className = 'cwc-ri-cal__day';
 				el.textContent = day;
 
-				if ( dateObj < today ) el.classList.add( 'cwc-ri-cal__day--disabled' );
+				let isDisabled = false;
+				if ( dateObj < today || fullyBookedDates.includes( dateStr ) ) {
+					isDisabled = true;
+					el.classList.add( 'cwc-ri-cal__day--disabled' );
+				}
+				
 				if ( selectedStart && dateObj.getTime() === selectedStart.getTime() ) {
 					el.classList.add( 'cwc-ri-cal__day--selected', 'cwc-ri-cal__day--range-start' );
 				}
@@ -340,7 +376,7 @@
 				}
 
 				el.addEventListener( 'click', () => {
-					if ( el.classList.contains( 'cwc-ri-cal__day--disabled' ) ) return;
+					if ( isDisabled ) return;
 					if ( ! selectedStart || ( selectedStart && selectedEnd ) ) {
 						selectedStart = dateObj; selectedEnd = null;
 					} else if ( dateObj < selectedStart ) {
@@ -348,7 +384,25 @@
 					} else if ( dateObj.getTime() === selectedStart.getTime() ) {
 						selectedStart = null;
 					} else {
-						selectedEnd = dateObj;
+						// Check if range contains any disabled date
+						let hasDisabled = false;
+						let tempDate = new Date(selectedStart);
+						tempDate.setDate(tempDate.getDate() + 1);
+						while (tempDate < dateObj) {
+							if (fullyBookedDates.includes(formatLocalDate(tempDate))) {
+								hasDisabled = true;
+								break;
+							}
+							tempDate.setDate(tempDate.getDate() + 1);
+						}
+						
+						if (hasDisabled) {
+							// If selection spans a disabled date, reset selection to just the new end date
+							selectedStart = dateObj;
+							selectedEnd = null;
+						} else {
+							selectedEnd = dateObj;
+						}
 					}
 					renderCalendar();
 				} );
@@ -513,13 +567,16 @@
 
 				let targetUrl = bookBtn.getAttribute( 'href' );
 				if ( ! targetUrl || targetUrl === '#book' ) targetUrl = '/booking/';
-				const url = new URL( targetUrl, window.location.origin );
-				url.searchParams.set( 'room', room );
-				url.searchParams.set( 'checkin', checkin );
-				url.searchParams.set( 'checkout', checkout );
-				url.searchParams.set( 'guests', guests );
+
+				const bookingData = {
+					room: room,
+					checkin: checkin,
+					checkout: checkout,
+					guests: guests
+				};
+				sessionStorage.setItem('cwc_booking_data', JSON.stringify(bookingData));
 				
-				window.location.href = url.toString();
+				window.location.href = targetUrl;
 			} );
 		}
 

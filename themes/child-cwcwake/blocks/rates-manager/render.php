@@ -27,9 +27,23 @@ $wrapper_attributes = get_block_wrapper_attributes(
 	<div class="cwc-rates-manager__inner">
 
 		<div class="cwc-rates-manager__columns">
-
-			<!-- Left Side: Sidebar with Dropdown and Inquiry Card -->
+			<!-- Left Side: Sidebar -->
 			<div class="cwc-rates-manager__sidebar">
+				<!-- Fixed Inquiry Card -->
+				<div class="cwc-rates-manager__inquiry-card">
+					<div class="cwc-rates-manager__inquiry-icon-wrap">
+						<div class="cwc-rates-manager__inquiry-icon">
+							<img src="/wp-content/uploads/2026/04/envelope.svg">
+						</div>
+					</div>
+					<div class="cwc-rates-manager__inquiry-content">
+						<h3 class="cwc-rates-manager__inquiry-title">Inquire about CWC Rates</h3>
+						<p class="cwc-rates-manager__inquiry-desc">Get assistance for booking, packages, or group rates
+						</p>
+					</div>
+					<button type="button" class="cwc-rates-manager__inquiry-btn js-open-inquiry-modal">Send</button>
+					<p class="cwc-rates-manager__inquiry-footer">We'll respond within 24-48 hours</p>
+				</div>
 
 				<!-- Custom Dropdown -->
 				<div class="cwc-rates-manager__dropdown">
@@ -53,24 +67,9 @@ $wrapper_attributes = get_block_wrapper_attributes(
 						<?php endforeach; ?>
 					</ul>
 				</div>
-
-				<!-- Fixed Inquiry Card -->
-				<div class="cwc-rates-manager__inquiry-card">
-					<div class="cwc-rates-manager__inquiry-icon-wrap">
-						<div class="cwc-rates-manager__inquiry-icon">
-							<img src="/wp-content/uploads/2026/04/envelope.svg">
-						</div>
-					</div>
-					<h3 class="cwc-rates-manager__inquiry-title">Inquire about CWC Rates</h3>
-					<p class="cwc-rates-manager__inquiry-desc">Get assistance for booking, packages, or group rates</p>
-					<button type="button" class="cwc-rates-manager__inquiry-btn js-open-inquiry-modal">Send an
-						Inquiry</button>
-					<p class="cwc-rates-manager__inquiry-footer">We'll respond within 24-48 hours</p>
-				</div>
-
 			</div>
 
-			<!-- Right Side: Content -->
+			<!-- Right Side: Content Area -->
 			<div class="cwc-rates-manager__content-area">
 				<?php foreach ($categories as $index => $rate_cat): ?>
 					<div id="cat-<?php echo esc_attr($rate_cat['id']); ?>"
@@ -78,7 +77,10 @@ $wrapper_attributes = get_block_wrapper_attributes(
 						<div class="cwc-rates-manager__accent-bar"></div>
 
 						<div class="cwc-rates-manager__panel-body">
-							<h2 class="cwc-rates-manager__title"><?php echo esc_html($rate_cat['title']); ?></h2>
+							<div class="cwc-rates-manager__panel-header">
+								<h2 class="cwc-rates-manager__title"><?php echo esc_html($rate_cat['title']); ?></h2>
+								<!-- Dropdown will be moved here via CSS/JS on mobile -->
+							</div>
 							<p class="cwc-rates-manager__description"><?php echo esc_html($rate_cat['description']); ?>
 							</p>
 
@@ -95,6 +97,42 @@ $wrapper_attributes = get_block_wrapper_attributes(
 											</tr>
 										<?php endforeach; ?>
 									</table>
+								</div>
+
+								<!-- Mobile Cards View -->
+								<div class="cwc-rates-manager__cards">
+									<?php foreach ($rate_cat['table'] as $r_idx => $row): ?>
+										<div class="cwc-rates-manager__card">
+											<?php if (!empty($row[0])): ?>
+												<div class="cwc-rates-manager__card-header">
+													<?php echo esc_html($row[0]); ?>
+												</div>
+											<?php endif; ?>
+											<div class="cwc-rates-manager__card-body">
+												<?php if (!empty($row[1])): ?>
+													<div class="cwc-rates-manager__card-time">
+														<?php echo esc_html($row[1]); ?>
+													</div>
+												<?php endif; ?>
+
+												<?php if (count($row) > 2): ?>
+													<div class="cwc-rates-manager__card-tags">
+														<?php
+														// Treat the rest of the columns as tags/pills
+														for ($i = 2; $i < count($row); $i++) {
+															if (empty($row[$i]))
+																continue;
+															$tags = explode(',', $row[$i]);
+															foreach ($tags as $tag) {
+																echo '<span class="cwc-rates-manager__tag">' . esc_html(trim($tag)) . '</span>';
+															}
+														}
+														?>
+													</div>
+												<?php endif; ?>
+											</div>
+										</div>
+									<?php endforeach; ?>
 								</div>
 							<?php endif; ?>
 						</div>

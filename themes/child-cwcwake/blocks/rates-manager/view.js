@@ -101,6 +101,7 @@
 			const dropdown = manager.querySelector('.cwc-rates-manager__dropdown');
 			if (!dropdown) return;
 
+			const sidebar = manager.querySelector('.cwc-rates-manager__sidebar');
 			const toggle = dropdown.querySelector('.cwc-rates-manager__dropdown-toggle');
 			const menu = dropdown.querySelector('.cwc-rates-manager__dropdown-menu');
 			const current = dropdown.querySelector('.cwc-rates-manager__dropdown-current');
@@ -108,6 +109,24 @@
 			const panels = manager.querySelectorAll('.cwc-rates-manager__panel');
 
 			if (!toggle || !menu || !items.length || !panels.length) return;
+
+			// Handle Mobile Layout Shift
+			const handleLayout = () => {
+				const isMobile = window.innerWidth <= 900;
+				const activePanel = manager.querySelector('.cwc-rates-manager__panel.is-active');
+
+				if (isMobile && activePanel) {
+					const header = activePanel.querySelector('.cwc-rates-manager__panel-header');
+					if (header && !header.contains(dropdown)) {
+						header.appendChild(dropdown);
+					}
+				} else if (!isMobile && sidebar && !sidebar.contains(dropdown)) {
+					sidebar.appendChild(dropdown);
+				}
+			};
+
+			window.addEventListener('resize', handleLayout);
+			handleLayout();
 
 			// Toggle Menu
 			toggle.addEventListener('click', (e) => {
@@ -147,6 +166,9 @@
 					// Close Menu
 					toggle.setAttribute('aria-expanded', 'false');
 					menu.classList.remove('is-open');
+
+					// Re-handle layout to move dropdown to new active panel
+					handleLayout();
 				});
 			});
 		});

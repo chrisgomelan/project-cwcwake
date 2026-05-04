@@ -11,19 +11,27 @@
 
 .cwc-rates-manager__columns {
 	display: flex;
-	align-items: stretch;
-	gap: clamp(40px, 5vw, 10px);
+	align-items: flex-start;
+	gap: clamp(20px, 4vw, 40px);
+}
+
+@media (max-width: 1200px) {
+	.cwc-rates-manager__columns {
+		gap: 24px;
+	}
 }
 
 .cwc-rates-manager__sidebar {
-	flex: 0 0 clamp(300px, 25vw, 485px);
+	flex: 0 0 clamp(10px, 25vw, 485px);
 	position: sticky;
 	top: calc(var(--cwc-header-h) + 40px);
+	display: flex;
+	flex-direction: column-reverse;
 }
 
 .cwc-rates-manager__content-area {
 	flex: 1;
-	min-width: 0;
+	width: 100% !important;
 }
 
 /* ----------------------------------------
@@ -51,7 +59,7 @@
 	cursor: pointer;
 	font-family: 'Sora', var(--wp--preset--font-family--heading);
 	font-weight: 700;
-	font-size: 24px;
+	font-size: clamp(20px, 1.5vw, 24px);
 	transition: background 0.3s ease;
 	outline: none !important;
 }
@@ -106,7 +114,7 @@
 	padding: 15px 30px;
 	font-family: 'Sora', var(--wp--preset--font-family--heading);
 	font-weight: 600;
-	font-size: 18px;
+	font-size: clamp(16px, 1.2vw, 18px);
 	color: #1A1A1A;
 	cursor: pointer;
 	transition: background 0.2s ease, color 0.2s ease;
@@ -158,7 +166,7 @@
 .cwc-rates-manager__inquiry-title {
 	font-family: 'Sora', var(--wp--preset--font-family--heading);
 	font-weight: 700;
-	font-size: 32px;
+	font-size: clamp(28px, 2.5vw, 32px);
 	line-height: 110%;
 	margin-bottom: 16px !important;
 	color: #FFFFFF !important;
@@ -167,11 +175,11 @@
 .cwc-rates-manager__inquiry-desc {
 	font-family: 'Archivo', var(--wp--preset--font-family--body);
 	font-weight: 400;
-	font-size: 18px;
+	font-size: clamp(16px, 1.1vw, 18px);
 	line-height: 130%;
 	margin-bottom: 32px !important;
 	color: rgba(255, 255, 255, 0.9) !important;
-	max-width: 240px;
+
 }
 
 .cwc-rates-manager__inquiry-btn {
@@ -187,7 +195,7 @@
 	border-radius: 100px;
 	font-family: 'Sora', var(--wp--preset--font-family--heading);
 	font-weight: 700;
-	font-size: 20px;
+	font-size: clamp(18px, 1.3vw, 20px);
 	text-decoration: none;
 	transition: transform 0.2s ease, background 0.2s ease;
 }
@@ -202,14 +210,14 @@
 	margin-top: 32px !important;
 	font-family: 'Archivo', var(--wp--preset--font-family--body);
 	font-weight: 400;
-	font-size: 16px;
+	font-size: clamp(14px, 1vw, 16px);
 	color: rgba(255, 255, 255, 0.7) !important;
 }
 
 .cwc-inquiry-form__label {
 	font-family: 'Sora', var(--wp--preset--font-family--heading);
 	font-weight: 700;
-	font-size: 24px;
+	font-size: clamp(20px, 1.5vw, 24px);
 	color: #0096C7;
 }
 
@@ -226,7 +234,7 @@
 	border: 1.5px solid #0096C7 !important;
 	border-radius: 100px !important;
 	font-family: 'Archivo', var(--wp--preset--font-family--body);
-	font-size: 18px;
+	font-size: clamp(16px, 1.1vw, 18px);
 	color: #0096C7;
 	/* Primary color for input text */
 	transition: all 0.2s ease;
@@ -389,7 +397,7 @@
 	background: transparent;
 	border: none;
 	color: #FFFFFF;
-	font-size: 40px;
+	font-size: clamp(32px, 4vw, 40px);
 	line-height: 1;
 	cursor: pointer;
 	display: flex;
@@ -428,7 +436,7 @@
 	border-radius: 100px;
 	font-family: 'Sora', var(--wp--preset--font-family--heading);
 	font-weight: 700;
-	font-size: 20px;
+	font-size: clamp(18px, 1.3vw, 20px);
 	cursor: pointer;
 	transition: transform 0.2s ease, filter 0.2s ease;
 	margin-top: 10px;
@@ -458,7 +466,7 @@
 	}
 
 	.cwc-inquiry-form__label {
-		font-size: 20px;
+		font-size: clamp(18px, 1.2vw, 20px);
 	}
 
 	.cwc-inquiry-form {
@@ -536,6 +544,11 @@
 	border: 1px solid #5B5B5B;
 	border-radius: 4px;
 	overflow: hidden;
+	display: block;
+}
+
+.cwc-rates-manager__cards {
+	display: none;
 }
 
 .cwc-rates-manager__table {
@@ -570,41 +583,201 @@ th.cwc-rates-manager__cell {
    Responsive
    ---------------------------------------- */
 
-@media (max-width: 1024px) {
+@media (min-width: 901px) and (max-width: 1200px) {
+	.cwc-rates-manager__sidebar {
+		flex: 0 0 320px;
+	}
+}
+
+@media (max-width: 900px) {
+	.cwc-rates-manager.alignfull.wp-block-cwc-rates-manager {
+		margin: 10px !important;
+		width: calc(100% - 20px) !important;
+		border-radius: 30px;
+		overflow: hidden;
+	}
+
 	.cwc-rates-manager__columns {
 		flex-direction: column;
+		gap: 16px;
+		/* Reduced from 32px */
 	}
 
 	.cwc-rates-manager__sidebar {
-		flex: none;
+		order: -1;
+		/* Keep sidebar at top */
+		display: flex;
+		flex-direction: column;
+		gap: 0;
+		/* No gap needed if dropdown is moved */
+		position: static !important;
+		flex: none !important;
+		width: 100% !important;
+	}
+
+	/* Inquiry Card - Horizontal Row Approach */
+	.cwc-rates-manager__inquiry-card {
+		flex-direction: row !important;
+		text-align: left !important;
+		padding: 16px 20px !important;
+		border-radius: 24px !important;
+		/* Branded shape radius */
+		gap: 12px;
+		justify-content: space-between;
+		align-items: center;
 		width: 100%;
-		position: static;
+		box-sizing: border-box;
+		margin-top: 0;
+	}
+
+	.cwc-rates-manager__inquiry-icon-wrap {
+		margin-bottom: 0 !important;
+	}
+
+	.cwc-rates-manager__inquiry-icon {
+		width: 48px !important;
+		height: 48px !important;
+		background: #00B4D8 !important;
+	}
+
+	.cwc-rates-manager__inquiry-icon img {
+		width: 20px;
+	}
+
+	.cwc-rates-manager__inquiry-content {
+		flex: 1;
+		display: flex;
+		flex-direction: column;
+		gap: 0;
+	}
+
+	.cwc-rates-manager__inquiry-title {
+		font-size: clamp(14px, 1.2vw, 16px) !important;
+		margin: 0 !important;
+		line-height: 1.2;
+	}
+
+	.cwc-rates-manager__inquiry-desc {
+		font-size: clamp(11px, 1vw, 13px) !important;
+		margin: 0 !important;
+		max-width: none !important;
+		opacity: 0.7;
+		line-height: 1.2;
+	}
+
+	.cwc-rates-manager__inquiry-btn {
+		width: auto !important;
+		height: 40px !important;
+		padding: 0 16px !important;
+		font-size: clamp(12px, 1.1vw, 14px) !important;
+		background: #00B4D8 !important;
+		border-radius: 12px !important;
+		gap: 5px;
+	}
+
+	.cwc-rates-manager__inquiry-btn::after {
+		content: '↗';
+		font-size: clamp(14px, 1.2vw, 16px);
+	}
+
+	.cwc-rates-manager__inquiry-footer {
+		display: none !important;
+	}
+
+	/* Title + Dropdown Row */
+	.cwc-rates-manager__panel-header {
+		display: flex;
+		flex-direction: column-reverse;
+		align-items: flex-start;
+		gap: 8px;
+		/* Tightened from 20px */
+	}
+
+	.cwc-rates-manager__title {
+		font-size: clamp(20px, 1.5vw, 24px) !important;
+		margin-bottom: 0 !important;
+		width: 100%;
+		color: #0096C7;
 	}
 
 	.cwc-rates-manager__dropdown {
-		max-width: 500px;
-		margin-inline: auto;
+		margin-bottom: 0 !important;
+		width: 100% !important;
+		align-self: stretch;
 	}
 
-	.cwc-rates-manager__inquiry-card {
-		margin-top: 40px;
-		max-width: 500px;
-		margin-inline: auto;
+	.cwc-rates-manager__dropdown-toggle {
+		height: 36px !important;
+		padding: 0 16px !important;
+		font-size: clamp(12px, 1.1vw, 14px) !important;
+		border-radius: 100px !important;
+		/* Branded rounded button */
+		background: #00B4D8 !important;
+		gap: 8px !important;
+	}
+
+	.cwc-rates-manager__dropdown-toggle .cwc-rates-manager__dropdown-current {
+		display: block;
+		/* Show current selection text */
+	}
+
+	.cwc-rates-manager__dropdown-toggle::before {
+		display: none;
+	}
+
+	.cwc-rates-manager__dropdown-chevron {
+		width: 16px !important;
+		height: 16px !important;
+	}
+
+	.cwc-rates-manager__dropdown-menu {
+		width: 100% !important;
+		left: 0 !important;
+		right: 0 !important;
+		top: calc(100% + 8px) !important;
+		border-radius: 16px !important;
+		box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15) !important;
+		border: 1px solid rgba(0, 0, 0, 0.1) !important;
+		background: #FFFFFF !important;
+		/* Reverted to desktop background */
+	}
+
+	.cwc-rates-manager__dropdown-item {
+		padding: 14px 20px !important;
+		font-size: 14px !important;
+		color: #333333 !important;
+		/* Reverted to desktop text color */
+		border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+	}
+
+	.cwc-rates-manager__dropdown-item:last-child {
+		border-bottom: none;
+	}
+
+	.cwc-rates-manager__dropdown-item.is-active {
+		background: rgba(0, 150, 199, 0.1) !important;
+		color: #0096C7 !important;
+	}
+
+	.cwc-rates-manager__description {
+		font-size: clamp(12px, 1.1vw, 14px) !important;
+		margin-bottom: 24px !important;
+		opacity: 0.8;
+	}
+
+	.cwc-rates-manager__panel-body {
+		padding: 0 !important;
+		background: transparent !important;
+	}
+
+	.cwc-rates-manager__panel {
+		border: none !important;
+		background: transparent !important;
+		overflow: visible !important;
 	}
 
 	.cwc-rates-manager__accent-bar {
-		width: 100%;
-		left: 0;
-		transform: none;
-		top: 0;
-		border-radius: 30px 30px 0 0;
-	}
-
-	.cwc-rates-manager__title,
-	.cwc-rates-manager__description {
-		text-align: center !important;
-		margin-left: auto !important;
-		margin-right: auto !important;
+		display: none !important;
 	}
 }
 
@@ -616,5 +789,72 @@ th.cwc-rates-manager__cell {
 	.cwc-rates-manager__cell {
 		height: 60px;
 		padding: 0 12px;
+	}
+
+	/* Stacked Cards for Mobile */
+	.cwc-rates-manager__table-wrap {
+		display: none;
+	}
+
+	.cwc-rates-manager__cards {
+		display: flex;
+		flex-direction: column;
+		gap: 16px;
+	}
+
+	.cwc-rates-manager__card {
+		background: #363636;
+		border: 1px solid #5B5B5B;
+		border-radius: 30px;
+		/* Branded shape radius from image */
+		overflow: hidden;
+		display: flex;
+		flex-direction: column;
+	}
+
+	.cwc-rates-manager__card-header {
+		background: rgba(255, 255, 255, 0.08);
+		padding: 12px 20px;
+		font-family: 'Sora', var(--wp--preset--font-family--heading);
+		font-weight: 700;
+		font-size: clamp(12px, 1.1vw, 14px);
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+		color: #FFFFFF;
+		border-bottom: 1px solid #5B5B5B;
+	}
+
+	.cwc-rates-manager__card-body {
+		padding: 20px;
+		display: flex;
+		flex-direction: column;
+		gap: 12px;
+	}
+
+	.cwc-rates-manager__card-time {
+		font-family: 'Sora', var(--wp--preset--font-family--heading);
+		font-weight: 700;
+		font-size: clamp(20px, 1.5vw, 24px);
+		color: #FFFFFF;
+		line-height: 1.1;
+	}
+
+	.cwc-rates-manager__card-tags {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 8px;
+	}
+
+	.cwc-rates-manager__tag {
+		background: rgba(0, 150, 199, 0.2);
+		border: 1px solid #0096C7;
+		color: #FFFFFF;
+		padding: 4px 12px;
+		border-radius: 100px;
+		font-family: 'Archivo', var(--wp--preset--font-family--body);
+		font-weight: 600;
+		font-size: clamp(10px, 0.9vw, 12px);
+		text-transform: uppercase;
+		white-space: nowrap;
 	}
 }
