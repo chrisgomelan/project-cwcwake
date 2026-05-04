@@ -689,17 +689,47 @@ input.bf-field__input.bf-guest-name {
 	background: #F7F9FB;
 	border: 1px solid rgba(26, 26, 26, 0.5);
 	border-radius: 12px;
-	padding: 36px;
+	padding: clamp(1.5rem, 5vw, 2.25rem);
 	position: sticky;
 	top: 24px;
+}
+
+.bf-summary__header {
+	display: flex;
+	flex-direction: column;
+	margin: 0;
+}
+
+.bf-summary__title-wrap {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
 }
 
 .bf-summary__title {
 	font-family: var(--wp--preset--font-family--heading, 'Sora', sans-serif);
 	font-weight: 600;
-	font-size: 36px;
+	font-size: clamp(1.5rem, 5vw, 2.25rem);
 	color: #0096C7;
-	margin: 0 0 16px;
+	margin: 0;
+}
+
+.bf-summary__mobile-quick {
+	display: none;
+}
+
+.bf-summary__toggle {
+	display: none;
+	background: none;
+	border: none;
+	cursor: pointer;
+	padding: 0;
+	color: #0096C7;
+	transition: transform 0.3s;
+}
+
+.bf-summary__content {
+	display: block;
 }
 
 .bf-summary__divider {
@@ -738,8 +768,8 @@ input.bf-field__input.bf-guest-name {
 .bf-summary__room-name {
 	font-family: var(--wp--preset--font-family--heading, 'Sora', sans-serif);
 	font-weight: 600;
-	font-size: 24px;
-	line-height: 24px;
+	font-size: clamp(1.25rem, 4vw, 1.5rem);
+	line-height: 1.2;
 	color: #2B3037;
 	margin: 0 0 8px;
 }
@@ -747,11 +777,12 @@ input.bf-field__input.bf-guest-name {
 .bf-summary__room-desc {
 	font-family: var(--wp--preset--font-family--body, 'Archivo', sans-serif);
 	font-weight: 500;
-	font-size: 16px;
-	line-height: 150%;
+	font-size: clamp(0.875rem, 3vw, 1rem);
+	line-height: 1.5;
 	color: #1A1A1A;
-	text-transform: capitalize;
 	margin: 0;
+	overflow-wrap: break-word;
+	word-break: break-word;
 }
 
 .bf-summary__section-header {
@@ -764,7 +795,7 @@ input.bf-field__input.bf-guest-name {
 .bf-summary__sub-label {
 	font-family: var(--wp--preset--font-family--heading, 'Sora', sans-serif);
 	font-weight: 600;
-	font-size: 24px;
+	font-size: clamp(1.25rem, 4vw, 1.5rem);
 	color: #1A1A1A;
 	margin: 0;
 }
@@ -787,7 +818,7 @@ input.bf-field__input.bf-guest-name {
 	color: #1A1A1A;
 	font-family: var(--wp--preset--font-family--ui, 'Inter', sans-serif);
 	font-weight: 500;
-	font-size: 20px;
+	font-size: clamp(1rem, 3.5vw, 1.25rem);
 	text-decoration: underline;
 }
 
@@ -824,9 +855,10 @@ input.bf-field__input.bf-guest-name {
 
 .bf-summary__dates {
 	display: flex;
-	gap: 16px;
+	gap: clamp(0.5rem, 2vw, 1rem);
 	align-items: center;
 	margin-bottom: 12px;
+	flex-wrap: wrap;
 }
 
 .bf-summary__date-col {
@@ -841,14 +873,14 @@ input.bf-field__input.bf-guest-name {
 	gap: 6px;
 	font-family: var(--wp--preset--font-family--ui, 'Inter', sans-serif);
 	font-weight: 500;
-	font-size: 18px;
+	font-size: clamp(0.875rem, 3vw, 1.125rem);
 	color: #454C58;
 }
 
 .bf-summary__date-val {
 	font-family: var(--wp--preset--font-family--ui, 'Inter', sans-serif);
 	font-weight: 500;
-	font-size: 24px;
+	font-size: clamp(1.125rem, 4vw, 1.5rem);
 	color: #383E48;
 }
 
@@ -856,6 +888,7 @@ input.bf-field__input.bf-guest-name {
 	width: 1px;
 	height: 15px;
 	background: #1A1A1A80;
+	flex-shrink: 0;
 }
 
 .bf-summary__guests-row {
@@ -869,7 +902,7 @@ input.bf-field__input.bf-guest-name {
 
 .bf-summary__guests-label {
 	font-weight: 500;
-	font-size: 20px;
+	font-size: clamp(1rem, 3.5vw, 1.25rem);
 	color: #1A1A1A;
 }
 
@@ -877,8 +910,10 @@ input.bf-field__input.bf-guest-name {
 	display: flex;
 	align-items: center;
 	gap: 8px;
-	font-size: 18px;
+	font-size: clamp(0.875rem, 3vw, 1.125rem);
 	font-weight: 600;
+	margin: 0;
+}
 }
 
 .bf-summary__room-type {
@@ -925,7 +960,7 @@ input.bf-field__input.bf-guest-name {
 .bf-summary__total-label {
 	font-family: var(--wp--preset--font-family--heading, 'Sora', sans-serif);
 	font-weight: 600;
-	font-size: 20px;
+	font-size: clamp(1rem, 3.5vw, 1.25rem);
 	color: #2B3037;
 }
 
@@ -939,7 +974,7 @@ input.bf-field__input.bf-guest-name {
 .bf-summary__total-price {
 	font-family: var(--wp--preset--font-family--heading, 'Sora', sans-serif);
 	font-weight: 700;
-	font-size: 28px;
+	font-size: clamp(1.5rem, 5vw, 1.75rem);
 	color: #0096C7;
 }
 
@@ -1294,11 +1329,111 @@ input.bf-field__input.bf-guest-name {
 /* ─── Responsive ─── */
 @media (max-width: 1024px) {
 	.bf-layout {
-		grid-template-columns: 1fr;
+		display: flex;
+		flex-direction: column;
+	}
+
+	.bf-panel-wrap {
+		order: 2;
 	}
 
 	.bf-summary {
+		order: 1;
 		position: static;
+		margin-bottom: 24px;
+	}
+
+	.bf-summary__mobile-quick {
+		display: block;
+		width: 100%;
+		margin-top: 12px;
+	}
+
+	.bf-summary__mobile-room {
+		font-family: var(--wp--preset--font-family--heading, 'Sora', sans-serif);
+		font-weight: 600;
+		font-size: 20px;
+		color: #2B3037;
+		margin: 0 0 4px;
+	}
+
+	.bf-summary__mobile-dates,
+	.bf-summary__mobile-total {
+		font-family: var(--wp--preset--font-family--ui, 'Inter', sans-serif);
+		font-weight: 400;
+		font-size: 16px;
+		color: #454C58;
+		margin: 2px 0;
+	}
+
+	.bf-summary__toggle {
+		display: block;
+	}
+
+	.bf-summary__content {
+		display: none;
+	}
+
+	.bf-summary.is-expanded .bf-summary__content {
+		display: block;
+	}
+
+	.bf-summary.is-expanded .bf-summary__mobile-quick {
+		display: none;
+	}
+
+	.bf-summary.is-expanded .bf-summary__toggle {
+		transform: rotate(180deg);
+	}
+
+	.bf-summary__room-preview {
+		flex-direction: column;
+		align-items: center;
+		text-align: center;
+	}
+
+	.bf-summary__dates,
+	.bf-summary__guests-group,
+	.bf-summary__room-type {
+		padding: 0;
+	}
+
+	.bf-summary__dates {
+		flex-direction: column;
+		align-items: center;
+		gap: 12px;
+	}
+
+	.bf-summary__date-divider {
+		display: none;
+	}
+
+	.bf-summary__total {
+		flex-direction: column;
+		align-items: center;
+		text-align: center;
+		gap: 12px;
+	}
+
+	.bf-summary__total-left {
+		align-items: center;
+	}
+
+	.bf-summary__edit-link {
+		font-size: 16px;
+	}
+
+	.bf-summary__amenities {
+		justify-content: center;
+		gap: 12px;
+	}
+
+	.bf-summary__amenity-divider {
+		display: none;
+	}
+
+	.bf-summary__total-price {
+		white-space: nowrap;
 	}
 }
 
@@ -1354,6 +1489,24 @@ input.bf-field__input.bf-guest-name {
 		width: 60px;
 		height: 1px;
 		margin: 4px 0;
+	}
+
+	.bf-guest-row__field-group {
+		align-items: flex-start;
+	}
+
+	.bf-guest-row__input-wrap {
+		flex-direction: column;
+		align-items: stretch;
+	}
+
+	.bf-guest-type-toggle {
+		align-self: flex-start;
+	}
+
+	.bf-guest-row__remove {
+		margin-bottom: 0;
+		margin-top: 16px;
 	}
 }
 

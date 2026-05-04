@@ -43,6 +43,21 @@
 		const summaryAmenities  = block.querySelector( '#bf-summary-amenities' );
 		const summaryCapacity   = block.querySelector( '#bf-summary-capacity' );
 		const summaryPrice      = block.querySelector( '#bf-summary-price' );
+		const summaryRoomImg    = block.querySelector( '.bf-summary__room-img' );
+
+		const summaryMobileRoom     = block.querySelector( '#bf-summary-mobile-room' );
+		const summaryMobileCheckin  = block.querySelector( '#bf-summary-mobile-checkin' );
+		const summaryMobileCheckout = block.querySelector( '#bf-summary-mobile-checkout' );
+		const summaryMobilePrice    = block.querySelector( '#bf-summary-mobile-price' );
+
+		/* Mobile Summary Toggle */
+		const summaryToggleBtn = block.querySelector( '#bf-summary-toggle' );
+		const summaryAside     = block.querySelector( '#bf-summary' );
+		if ( summaryToggleBtn && summaryAside ) {
+			summaryToggleBtn.addEventListener( 'click', () => {
+				summaryAside.classList.toggle( 'is-expanded' );
+			} );
+		}
 
 		/* Form inputs */
 		const fullNameInput = block.querySelector( '#bf-fullname' );
@@ -160,15 +175,58 @@
 			block.querySelectorAll( '.bf-field-error' ).forEach( el => el.textContent = '' );
 		}
 
-		/* ─── URL Params ─── */
-		const urlParams = new URLSearchParams( window.location.search );
-		const initialGuestsStr = urlParams.get( 'guests' ) || '1 Adult, 0 Kids';
+		/* ─── Data Loading ─── */
+		const loadBookingData = () => {
+			let data = null;
+			
+			// Try sessionStorage first
+			const sessionData = sessionStorage.getItem('cwc_booking_data');
+			if (sessionData) {
+				try {
+					data = JSON.parse(sessionData);
+				} catch (e) {
+					console.error('Failed to parse session data', e);
+				}
+			}
+
+			// Fallback to URL params for backward compatibility or direct links
+			if (!data) {
+				const urlParams = new URLSearchParams(window.location.search);
+				if (urlParams.get('room')) {
+					data = {
+						room: urlParams.get('room'),
+						checkin: urlParams.get('checkin'),
+						checkout: urlParams.get('checkout'),
+						guests: urlParams.get('guests') || '1 Adult, 0 Kids'
+					};
+				}
+			}
+
+			return data;
+		};
+
+		const bookingData = loadBookingData();
+		const mainContent = block.querySelector('#bf-main-content');
+		const incompleteMsg = block.querySelector('#bf-incomplete-message');
+
+		if (!bookingData) {
+			if (mainContent) mainContent.style.display = 'none';
+			if (incompleteMsg) incompleteMsg.style.display = 'block';
+			return; // Stop initialization
+		}
+
+		// If we have data, ensure content is visible
+		if (mainContent) mainContent.style.display = 'block';
+		if (incompleteMsg) incompleteMsg.style.display = 'none';
+
+		/* ─── Initial State ─── */
+		const initialGuestsStr = bookingData.guests;
 		let initialAdults = 1;
 		let initialKids = 0;
-		const guestsMatch = initialGuestsStr.match( /(\d+)\s+Adults?,\s+(\d+)\s+Kids?/i );
-		if ( guestsMatch ) {
-			initialAdults = parseInt( guestsMatch[1], 10 );
-			initialKids = parseInt( guestsMatch[2], 10 );
+		const guestsMatch = initialGuestsStr.match(/(\d+)\s+Adults?,\s+(\d+)\s+Kids?/i);
+		if (guestsMatch) {
+			initialAdults = parseInt(guestsMatch[1], 10);
+			initialKids = parseInt(guestsMatch[2], 10);
 		}
 		const totalInitialGuests = initialAdults + initialKids;
 
@@ -552,7 +610,9 @@
 			}
 			if ( nights > 0 && nightlyRate > 0 && summaryPrice ) {
 				const total = nightlyRate * nights;
-				summaryPrice.textContent = `₱ ${ total.toLocaleString( 'en-PH', { minimumFractionDigits: 2 } ) }`;
+				const formatted = `₱ ${ total.toLocaleString( 'en-PH', { minimumFractionDigits: 2 } ) }`;
+				summaryPrice.textContent = formatted;
+				if ( summaryMobilePrice ) summaryMobilePrice.textContent = formatted;
 			}
 		};
 
@@ -639,10 +699,8 @@
 		};
 
 		/* ─── Calendar Logic ─── */
-		const initialCheckinStr = urlParams.get( 'checkin' );
-		const initialCheckoutStr = urlParams.get( 'checkout' );
-		let selectedStart = initialCheckinStr ? new Date( initialCheckinStr ) : new Date( 2026, 7, 14 );
-		let selectedEnd = initialCheckoutStr ? new Date( initialCheckoutStr ) : new Date( 2026, 7, 19 );
+		let selectedStart = bookingData.checkin ? new Date( bookingData.checkin ) : new Date( 2026, 7, 14 );
+		let selectedEnd = bookingData.checkout ? new Date( bookingData.checkout ) : new Date( 2026, 7, 19 );
 		let currentMonth = new Date( selectedStart.getTime() );
 
 		const calendarGrid = block.querySelector( '#bf-calendar-grid' );
@@ -798,14 +856,16 @@
 							const row = document.createElement( 'div' );
 							row.className = 'bf-modal__guest-row';
 							row.innerHTML = `
-								<div class="bf-modal__guest-row-header">
-									<span class="bf-modal__guest-row-label">Full Name</span>
-									<button class="bf-modal__guest-edit" type="button">
-										<img src="/wp-content/uploads/2026/04/pencil-edit.svg" alt="" width="14" height="14">
-										Edit
-									</button>
+								<div class="bf-modal__guest-row-inner">
+									<div class="bf-modal__guest-row-header">
+										<span class="bf-modal__guest-row-label">Full Name</span>
+										<button class="bf-modal__guest-edit" type="button">
+											<img src="/wp-content/uploads/2026/04/pencil-edit.svg" alt="" width="14" height="14">
+											Edit
+										</button>
+									</div>
+									<input type="text" class="bf-field__input bf-modal-guest-name" data-idx="${ idx }" value="${ name || `Additional Guest ${ idx + 1 }` }">
 								</div>
-								<input type="text" class="bf-field__input bf-modal-guest-name" data-idx="${ idx }" value="${ name || `Additional Guest ${ idx + 1 }` }">
 							`;
 							list.appendChild( row );
 						} );
@@ -827,10 +887,14 @@
 				/* Trip Summary save */
 				if ( modal.id === 'bf-modal-trip-summary' ) {
 					if ( selectedStart && summaryCheckin ) {
-						summaryCheckin.textContent = formatDate( selectedStart.toISOString().split( 'T' )[ 0 ] );
+						const dateStr = formatDate( selectedStart.toISOString().split( 'T' )[ 0 ] );
+						summaryCheckin.textContent = dateStr;
+						if ( summaryMobileCheckin ) summaryMobileCheckin.textContent = dateStr;
 					}
 					if ( selectedEnd && summaryCheckout ) {
-						summaryCheckout.textContent = formatDate( selectedEnd.toISOString().split( 'T' )[ 0 ] );
+						const dateStr = formatDate( selectedEnd.toISOString().split( 'T' )[ 0 ] );
+						summaryCheckout.textContent = dateStr;
+						if ( summaryMobileCheckout ) summaryMobileCheckout.textContent = dateStr;
 					}
 					updateNightsAndPrice();
 					runAvailabilityCheck();
@@ -861,6 +925,12 @@
 						if ( summaryRoomName ) summaryRoomName.textContent = `${ roomName } Room`;
 						if ( summaryRoomType ) summaryRoomType.textContent = `${ roomName } Room`;
 						if ( summaryRoomDesc ) summaryRoomDesc.textContent = excerpt;
+						if ( summaryMobileRoom ) summaryMobileRoom.textContent = `${ roomName } Room`;
+						
+						if ( summaryRoomImg ) {
+							summaryRoomImg.src = checked.dataset.image || '';
+							summaryRoomImg.alt = `${ roomName } Room`;
+						}
 						
 						if ( summaryAmenities ) {
 							let amenitiesHtml = '';
@@ -879,18 +949,14 @@
 									Max <span id="bf-summary-capacity">${ cap }</span> People
 								</span>
 							`;
+
 							summaryAmenities.innerHTML = amenitiesHtml;
 						}
 
-						nightlyRate = parseFloat( price.replace( /[^0-9.]/g, '' ) ) || 0;
-						const nights = calculateNights();
-						if ( nights > 0 && nightlyRate > 0 ) {
-							const total = nightlyRate * nights;
-							if ( summaryPrice ) summaryPrice.textContent = `₱ ${ total.toLocaleString( 'en-PH', { minimumFractionDigits: 2 } ) }`;
-						} else {
-							if ( summaryPrice ) summaryPrice.textContent = `₱ ${ price.replace( /[^0-9,.\s]/g, '' ).trim() }.00`;
+						if ( price ) {
+							nightlyRate = parseFloat( price.replace( /[^0-9.]/g, '' ) ) || 0;
 						}
-						maxCapacity = parseInt( cap, 10 ) || 4;
+						maxCapacity = newMaxCapacity;
 						updateCapacityUI();
 						updateNightsAndPrice();
 						roomAvailabilityCache = {};
@@ -915,7 +981,7 @@
 				if ( modal.id === 'bf-modal-additional-guests' ) {
 					modal.querySelectorAll( '.bf-modal-guest-name' ).forEach( ( input ) => {
 						const i = parseInt( input.dataset.idx, 10 );
-						additionalGuests[ i ] = input.value;
+						additionalGuests[ i ].name = input.value;
 					} );
 					renderGuestRows();
 				}
@@ -934,46 +1000,62 @@
 		};
 
 		/* ─── Init ─── */
-		const initFromUrl = () => {
-			// Sync Dates
-			if ( selectedStart && summaryCheckin ) {
-				summaryCheckin.textContent = formatDate( selectedStart.toISOString().split( 'T' )[ 0 ] );
-			}
-			if ( selectedEnd && summaryCheckout ) {
-				summaryCheckout.textContent = formatDate( selectedEnd.toISOString().split( 'T' )[ 0 ] );
-			}
-			updateModalPills();
-
-			// Sync Room
-			const roomParam = urlParams.get( 'room' );
-			if ( roomParam ) {
-				const titleMatch = {
-					'villa': 'VILLAS',
-					'villas': 'VILLAS',
-					'cabana': 'CABANAS',
-					'cabanas': 'CABANAS',
-					'dwell': 'DWELL',
-					'cabin': 'CABIN'
-				}[ roomParam.toLowerCase() ] || roomParam.toUpperCase();
-
-				const roomRadio = block.querySelector( `input[name="bf_modal_room"][value="${titleMatch}"]` );
-				if ( roomRadio ) {
+		const syncInitialUI = () => {
+			if (summaryRoomName) {
+				const roomName = bookingData.room.includes('Room') ? bookingData.room : `${bookingData.room} Room`;
+				summaryRoomName.textContent = roomName;
+				if (summaryRoomType) summaryRoomType.textContent = roomName;
+				if (summaryMobileRoom) summaryMobileRoom.textContent = roomName;
+				
+				const roomRadio = block.querySelector(`input[name="bf_modal_room"][value="${bookingData.room}"]`);
+				if (roomRadio) {
 					roomRadio.checked = true;
-					const modal = roomRadio.closest( '.bf-modal' );
-					const saveBtn = modal?.querySelector( '.bf-modal__save' );
-					if ( saveBtn ) {
-						saveBtn.click();
+					const beds = JSON.parse(roomRadio.dataset.beds || '[]');
+					if (summaryRoomDesc) summaryRoomDesc.textContent = roomRadio.dataset.excerpt || '';
+					if (summaryRoomImg) {
+						summaryRoomImg.src = roomRadio.dataset.image || '';
+						summaryRoomImg.alt = roomName;
+					}
+					if (summaryAmenities) {
+						summaryAmenities.innerHTML = beds.map(bed => `
+							<span class="bf-summary__amenity">
+								<img src="${bed.icon_url}" alt="" width="16" height="16">
+								${bed.label}
+							</span>
+							<span class="bf-summary__amenity-divider">|</span>
+						`).join('') + `
+							<span class="bf-summary__amenity">
+								<img src="/wp-content/uploads/2026/04/max-people-icon.svg" alt="" width="16" height="16">
+								Max <span id="bf-summary-capacity">${roomRadio.dataset.capacity}</span> People
+							</span>
+						`;
+					}
+					if (roomRadio.dataset.price) {
+						nightlyRate = parseFloat(roomRadio.dataset.price.replace(/[^0-9.]/g, ''));
 					}
 				}
 			}
 
+			if (summaryCheckin) {
+				summaryCheckin.textContent = bookingData.checkin;
+				if (summaryMobileCheckin) summaryMobileCheckin.textContent = bookingData.checkin;
+			}
+			if (summaryCheckout) {
+				summaryCheckout.textContent = bookingData.checkout;
+				if (summaryMobileCheckout) summaryMobileCheckout.textContent = bookingData.checkout;
+			}
+			if (summaryGuests) {
+				summaryGuests.textContent = bookingData.guests;
+			}
+
+			updateModalPills();
 			updateNightsAndPrice();
 			runAvailabilityCheck();
 		};
 
-		initFromUrl();
-		showStep( 2 );
+		syncInitialUI();
 		updateCapacityUI();
 		renderGuestRows();
+		showStep( 2 );
 	} );
 } )();

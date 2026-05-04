@@ -334,14 +334,15 @@
 			proceedBtn.textContent = origText;
 			proceedBtn.disabled = false;
 
-			const params = new URLSearchParams({
+			const bookingData = {
 				room,
 				checkin,
 				checkout,
 				guests,
-			});
+			};
+			sessionStorage.setItem('cwc_booking_data', JSON.stringify(bookingData));
 
-			window.location.href = `/booking/?${params.toString()}`;
+			window.location.href = '/booking/';
 		});
 
 		// ─── Sticky Booking Bar Logic ───

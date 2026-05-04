@@ -26,26 +26,10 @@ $wrapper_attrs = get_block_wrapper_attributes(array(
 	'data-theme-url' => get_stylesheet_directory_uri()
 ));
 
-$room_val = isset($_GET['room']) ? sanitize_text_field($_GET['room']) : '';
-$checkin_val = isset($_GET['checkin']) ? sanitize_text_field($_GET['checkin']) : '';
+$booking_data_source = 'session';
+$room_val     = isset($_GET['room']) ? sanitize_text_field($_GET['room']) : '';
+$checkin_val  = isset($_GET['checkin']) ? sanitize_text_field($_GET['checkin']) : '';
 $checkout_val = isset($_GET['checkout']) ? sanitize_text_field($_GET['checkout']) : '';
-$guests_val = isset($_GET['guests']) ? sanitize_text_field($_GET['guests']) : '';
-
-if (empty($room_val) || $room_val === 'Choose Room' || empty($checkin_val) || $checkin_val === 'Add date' || empty($checkout_val) || $checkout_val === 'Add date' || empty($guests_val) || $guests_val === '0 Adult, 0 Kids') {
-	?>
-	<div <?php echo $wrapper_attrs; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
-		<div class="bf-inner-container" style="text-align: center; padding: 100px 20px;">
-			<h2 style="margin-bottom: 16px;">Incomplete Booking Selection</h2>
-			<p style="margin-bottom: 24px; color: #666;">Please complete your booking selection (dates, room, and guests)
-				before proceeding.</p>
-			<a href="<?php echo esc_url(home_url('/accommodations/')); ?>" class="bf-btn-primary"
-				style="display: inline-block; text-decoration: none; padding: 12px 24px; border-radius: 8px;">Back to
-				Accommodations</a>
-		</div>
-	</div>
-	<?php
-	return;
-}
 
 /* Fetch rooms for the Selected Room modal */
 $query = new WP_Query(
@@ -110,8 +94,16 @@ $first_room = $selected_room;
 $first_room_price = $first_room['price'];
 ?>
 
-<div <?php echo $wrapper_attrs; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
-	<div class="bf-inner-container">
+<div <?php echo $wrapper_attrs; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?> data-source="<?php echo esc_attr($booking_data_source); ?>">
+	<!-- ─── Incomplete Selection Message (Hidden by default) ─── -->
+	<div id="bf-incomplete-message" class="bf-inner-container" style="display: none; text-align: center; padding: 100px 20px;">
+		<h2 style="margin-bottom: 16px;">Incomplete Booking Selection</h2>
+		<p style="margin-bottom: 24px; color: #666;">Please complete your booking selection (dates, room, and guests) before proceeding.</p>
+		<a href="<?php echo esc_url(home_url('/accommodations/')); ?>" class="bf-btn-primary" style="display: inline-block; text-decoration: none; padding: 12px 24px; border-radius: 8px;">Back to Accommodations</a>
+	</div>
+
+	<div class="bf-main-content" id="bf-main-content">
+		<div class="bf-inner-container">
 
 		<!-- ─── Progress Bar ─── -->
 		<div class="bf-progress">
@@ -308,8 +300,29 @@ $first_room_price = $first_room['price'];
 
 			<!-- ════════ RIGHT PANEL: Booking Summary ════════ -->
 			<aside class="bf-summary" id="bf-summary">
-				<h2 class="bf-summary__title">Booking Summary</h2>
-				<div class="bf-summary__divider"></div>
+				<!-- Mobile Collapsed Header -->
+				<div class="bf-summary__header">
+					<div class="bf-summary__title-wrap">
+						<h2 class="bf-summary__title">Booking Summary</h2>
+						<button class="bf-summary__toggle" id="bf-summary-toggle" type="button">
+							<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+								<path d="M6 9l6 6 6-6"/>
+							</svg>
+						</button>
+					</div>
+					<div class="bf-summary__mobile-quick" id="bf-summary-mobile-quick">
+						<h3 class="bf-summary__mobile-room" id="bf-summary-mobile-room"><?php echo esc_html($first_room['title']); ?> Room</h3>
+						<div class="bf-summary__mobile-dates">
+							<span id="bf-summary-mobile-checkin"><?php echo esc_html($checkin_val ?: '08/14/2026'); ?></span> — <span id="bf-summary-mobile-checkout"><?php echo esc_html($checkout_val ?: '08/19/2026'); ?></span>
+						</div>
+						<div class="bf-summary__mobile-total">
+							Total: <span id="bf-summary-mobile-price">₱ <?php echo esc_html(number_format($total_price, 2)); ?></span>
+						</div>
+					</div>
+				</div>
+
+				<div class="bf-summary__content" id="bf-summary-content">
+					<div class="bf-summary__divider"></div>
 
 				<!-- Room preview -->
 				<div class="bf-summary__room-preview">
@@ -455,12 +468,13 @@ $first_room_price = $first_room['price'];
 					<span class="bf-summary__total-price" id="bf-summary-price">₱
 						<?php echo esc_html(number_format($total_price, 2)); ?></span>
 				</div>
+				</div><!-- .bf-summary__content -->
 			</aside>
 
 		</div><!-- .bf-layout -->
 
-	</div><!-- .bf-inner-container -->
-
+	</div><!-- .bf-main-content -->
+</div>
 	<!-- ─── MODALS ─── -->
 	<div class="bf-modal-backdrop" id="bf-modal-backdrop"></div>
 
