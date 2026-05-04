@@ -37,6 +37,10 @@ plugins/*
 !plugins/.gitkeep
 !plugins/cwc-accommodations/
 !plugins/cwc-accommodations/**
+!plugins/wordpress-importer/
+!plugins/wordpress-importer/**
+!plugins/wp-mail-smtp/
+!plugins/wp-mail-smtp/**
 
 # --- Dependency & build artifacts ---
 node_modules/
