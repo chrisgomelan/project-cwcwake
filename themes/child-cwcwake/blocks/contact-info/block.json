@@ -9,7 +9,9 @@
 	"description": "Get In Touch and Visit Us information panel with side image and embedded map. Used on the Contact page.",
 	"textdomain": "child-cwcwake",
 	"supports": {
-		"align": ["full"],
+		"align": [
+			"full"
+		],
 		"html": false,
 		"anchor": true
 	},
@@ -36,7 +38,7 @@
 		},
 		"phone": {
 			"type": "string",
-			"default": "(+63) 63 912 345 6789"
+			"default": "(+63) 912 345 6789"
 		},
 		"visitUsTitle": {
 			"type": "string",

@@ -39,6 +39,11 @@ if ($query->have_posts()) {
 			$capacity = sprintf('Maximum %s %s', $capacity, 1 === (int) $capacity ? 'person' : 'persons');
 		}
 
+		$room_availability = 'available';
+		if (function_exists('cwc_accommodation_availability')) {
+			$room_availability = cwc_accommodation_availability($current_post_id);
+		}
+
 		$rooms[] = array(
 			'title' => get_the_title(),
 			'image' => get_the_post_thumbnail_url($current_post_id, 'large'),
@@ -47,6 +52,7 @@ if ($query->have_posts()) {
 			'capacity' => $capacity,
 			'raw_capacity' => empty(get_post_meta($current_post_id, '_cwc_capacity', true)) ? 4 : (int) get_post_meta($current_post_id, '_cwc_capacity', true),
 			'inclusions' => function_exists('cwc_accommodation_inclusions') ? cwc_accommodation_inclusions($current_post_id) : [],
+			'availability' => $room_availability,
 		);
 	}
 	wp_reset_postdata();
@@ -192,15 +198,21 @@ if ($query->have_posts()) {
 		<div class="cwc-booking-modal__content">
 			<h3 class="cwc-booking-modal__title">Room Type</h3>
 			<div class="cwc-booking-modal__options">
-				<?php foreach ($rooms as $room): ?>
-					<label class="cwc-booking-modal__option">
+				<?php foreach ($rooms as $room): 
+					$is_room_booked = ( $room['availability'] === 'fully-booked' );
+				?>
+					<label class="cwc-booking-modal__option<?php echo $is_room_booked ? ' cwc-booking-modal__option--booked' : ''; ?>" style="<?php echo $is_room_booked ? 'opacity: 0.6; position: relative; cursor: not-allowed; pointer-events: none; filter: grayscale(100%);' : ''; ?>">
 						<div class="cwc-booking-modal__option-text">
 							<span class="cwc-booking-modal__label"><?php echo esc_html($room['title']); ?></span>
 							<span class="cwc-booking-modal__sublabel"><?php echo esc_html($room['capacity']); ?></span>
+							<?php if ($is_room_booked): ?>
+								<span style="display:inline-block;margin-top:4px;padding:2px 8px;border-radius:4px;background:#fef2f2;color:#dc2626;font-size:11px;font-weight:600;">Fully Booked</span>
+							<?php endif; ?>
 						</div>
 						<input type="radio" name="cwc_room_type" class="cwc-booking-modal__radio"
 							value="<?php echo esc_attr($room['title']); ?>"
-							data-capacity="<?php echo esc_attr($room['raw_capacity']); ?>">
+							data-capacity="<?php echo esc_attr($room['raw_capacity']); ?>"
+							<?php echo $is_room_booked ? ' disabled' : ''; ?>>
 					</label>
 				<?php endforeach; ?>
 			</div>

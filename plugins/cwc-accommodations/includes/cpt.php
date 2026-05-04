@@ -38,7 +38,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 function cwc_get_room_inventory( $post_id ) {
 	$physical_rooms = cwc_get_physical_rooms( $post_id );
 	if ( ! empty( $physical_rooms ) ) {
-		return count( $physical_rooms );
+		$count = 0;
+		foreach ( $physical_rooms as $room ) {
+			if ( 'available' === ( $room['status'] ?? 'available' ) ) {
+				$count++;
+			}
+		}
+		return $count;
 	}
 	$inventory = get_post_meta( $post_id, '_cwc_inventory', true );
 	return $inventory !== '' ? intval( $inventory ) : 1; // Default to 1 if not set

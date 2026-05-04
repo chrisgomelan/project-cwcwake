@@ -345,6 +345,12 @@ $icon = static function ( $slug ) {
 							</svg>
 						</div>
 
+						<?php if ( '' !== $state['notice'] ) : ?>
+							<div class="cwc-room-info__notice" style="background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; padding: 10px 16px; border-radius: 8px; font-size: 13px; font-weight: 600; text-align: center; margin-bottom: 16px;">
+								<?php echo esc_html( $state['notice'] ); ?> for selected dates.
+							</div>
+						<?php endif; ?>
+
 						<?php if ( $state['show_button'] && '' !== $state['button_label'] ) : ?>
 							<a class="cwc-room-info__book-button" id="cwc-book-btn"
 								href="<?php echo esc_url( '' !== $state['button_url'] ? $state['button_url'] : '#book' ); ?>"

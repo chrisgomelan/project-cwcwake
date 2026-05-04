@@ -633,7 +633,8 @@ function cwc_render_dash_room_tracking( $bookings ) {
 			} );
 
 			$occupied_count  = count( $active_bookings_for_room );
-			$available_count = max( 0, $total_units - $occupied_count );
+			$bookable_units  = cwc_get_room_inventory( $room_post->ID );
+			$available_count = max( 0, $bookable_units - $occupied_count );
 			$is_fully_booked = ( $available_count <= 0 );
 			?>
 			<div class="cwc-dash__room-tracking-section" style="margin-bottom: 32px; padding: 20px; background: #f8fafc; border-radius: 12px; border: 1px solid #e2e8f0;">
@@ -666,13 +667,18 @@ function cwc_render_dash_room_tracking( $bookings ) {
 								</tr>
 							</thead>
 							<tbody>
-								<?php foreach ( $physical_rooms as $idx => $unit ) :
-									$unit_booking = null;
-									foreach ( $active_bookings_for_room as $ab ) {
-										$unit_booking = $ab;
-										break;
-									}
+								<?php 
+								$unassigned_bookings = $active_bookings_for_room;
+								foreach ( $physical_rooms as $idx => $unit ) :
 									$unit_status = ( $unit['status'] ?? 'available' );
+									$unit_booking = null;
+									if ( $unit_status !== 'booked' ) {
+										foreach ( $unassigned_bookings as $key => $ab ) {
+											$unit_booking = $ab;
+											unset( $unassigned_bookings[$key] );
+											break;
+										}
+									}
 									$is_occupied = ( $unit_status === 'booked' || $unit_booking );
 									?>
 									<tr>

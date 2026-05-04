@@ -535,7 +535,7 @@ $first_room_price = $first_room['price'];
 					<?php foreach ($rooms as $index => $room):
 						$is_room_booked = ( $room['availability'] === 'fully-booked' );
 						?>
-						<label class="bf-modal__room-option<?php echo $is_room_booked ? ' bf-modal__room-option--booked' : ''; ?>" style="<?php echo $is_room_booked ? 'opacity: 0.6; position: relative;' : ''; ?>">
+						<label class="bf-modal__room-option<?php echo $is_room_booked ? ' bf-modal__room-option--booked' : ''; ?>" style="<?php echo $is_room_booked ? 'opacity: 0.6; position: relative; cursor: not-allowed; pointer-events: none; filter: grayscale(100%);' : ''; ?>">
 							<div class="bf-modal__room-option-text">
 								<span class="bf-modal__room-option-name"><?php echo esc_html($room['title']); ?></span>
 								<span class="bf-modal__room-option-cap">Max <?php echo esc_html($room['capacity']); ?>

@@ -607,18 +607,14 @@
 				indicator.style.background = '#fef2f2';
 				indicator.style.color = '#dc2626';
 				indicator.style.border = '1px solid #fecaca';
-				indicator.innerHTML = '⚠ This room type is fully booked for your selected dates.';
+				indicator.innerHTML = 'This room type is fully booked for your selected dates.';
 				if ( btnConfirmPay ) {
 					btnConfirmPay.disabled = true;
 					btnConfirmPay.style.opacity = '0.5';
 					btnConfirmPay.style.cursor = 'not-allowed';
 				}
 			} else {
-				indicator.style.display = 'block';
-				indicator.style.background = '#f0fdf4';
-				indicator.style.color = '#16a34a';
-				indicator.style.border = '1px solid #bbf7d0';
-				indicator.innerHTML = `✓ ${ data.available_units } unit${ data.available_units !== 1 ? 's' : '' } available`;
+				indicator.style.display = 'none';
 				if ( btnConfirmPay ) {
 					btnConfirmPay.disabled = false;
 					btnConfirmPay.style.opacity = '1';
