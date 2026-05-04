@@ -180,6 +180,39 @@ function cwc_update_booking_status() {
 		'email_sent' => $send_email,
 	] );
 
+	// Auto-release physical room if cancelled or completed
+	if ( in_array( $new_status, [ 'completed', 'cancelled' ], true ) && ! in_array( $old_status, [ 'completed', 'cancelled' ], true ) ) {
+		$assigned_room_name = get_post_meta( $booking_id, '_cwc_bk_assigned_room', true );
+		$room_name          = get_post_meta( $booking_id, '_cwc_bk_room', true );
+
+		if ( $assigned_room_name && $room_name && function_exists('cwc_get_physical_rooms') ) {
+			$room_clean = preg_replace( '/\s+Room$/i', '', trim( $room_name ) );
+			$room_posts = get_posts( [
+				'post_type'      => 'accommodation',
+				'post_status'    => 'publish',
+				'posts_per_page' => -1,
+			] );
+
+			foreach ( $room_posts as $rp ) {
+				if ( strtolower( trim( $rp->post_title ) ) === strtolower( $room_clean ) ) {
+					$physical_rooms = cwc_get_physical_rooms( $rp->ID );
+					$updated = false;
+					foreach ( $physical_rooms as &$p_room ) {
+						if ( ( $p_room['name'] ?? '' ) === $assigned_room_name && ( $p_room['status'] ?? '' ) === 'booked' ) {
+							$p_room['status'] = 'available';
+							$updated = true;
+							break;
+						}
+					}
+					if ( $updated ) {
+						update_post_meta( $rp->ID, '_cwc_physical_rooms', wp_json_encode( $physical_rooms ) );
+					}
+					break;
+				}
+			}
+		}
+	}
+
 	// Send email if requested
 	$email_result = false;
 	if ( $send_email && $old_status !== $new_status ) {
@@ -398,6 +431,7 @@ function cwc_send_booking_status_email( $booking_id, $status, $admin_note = '' )
 	$email    = get_post_meta( $booking_id, '_cwc_bk_email', true );
 	$name     = get_post_meta( $booking_id, '_cwc_bk_name', true );
 	$room     = get_post_meta( $booking_id, '_cwc_bk_room', true );
+	$assigned_room = get_post_meta( $booking_id, '_cwc_bk_assigned_room', true );
 	$checkin  = get_post_meta( $booking_id, '_cwc_bk_checkin', true );
 	$checkout = get_post_meta( $booking_id, '_cwc_bk_checkout', true );
 	$price    = get_post_meta( $booking_id, '_cwc_bk_price', true );
@@ -454,53 +488,59 @@ function cwc_send_booking_status_email( $booking_id, $status, $admin_note = '' )
 	<p>Hi <strong><?php echo esc_html( $name ); ?></strong>,</p>
 	<p><?php echo esc_html( $tpl['message'] ); ?></p>
 
-	<table style="width: 100%; border-collapse: collapse; margin: 24px 0; background: #fafafa; border: 1px solid #e4e4e7; border-radius: 8px; overflow: hidden;">
+	<table class="details-table">
 		<?php if ( $ref ) : ?>
 		<tr>
-			<td style="padding: 12px 16px; border-bottom: 1px solid #e4e4e7; font-weight: 600; width: 40%; color: #18181b;">Booking Reference</td>
-			<td style="padding: 12px 16px; border-bottom: 1px solid #e4e4e7; color: #0056FF; font-weight: 700;"><?php echo esc_html( $ref ); ?></td>
+			<td class="details-label">Booking Reference</td>
+			<td class="details-value details-highlight"><?php echo esc_html( $ref ); ?></td>
 		</tr>
 		<?php endif; ?>
 		<tr>
-			<td style="padding: 12px 16px; border-bottom: 1px solid #e4e4e7; font-weight: 600; color: #18181b;">Room</td>
-			<td style="padding: 12px 16px; border-bottom: 1px solid #e4e4e7; color: #3f3f46;"><?php echo esc_html( $room ); ?></td>
+			<td class="details-label">Room</td>
+			<td class="details-value"><?php echo esc_html( $room ); ?></td>
+		</tr>
+		<?php if ( $assigned_room ) : ?>
+		<tr>
+			<td class="details-label">Room Number</td>
+			<td class="details-value details-highlight"><?php echo esc_html( $assigned_room ); ?></td>
+		</tr>
+		<?php endif; ?>
+		<tr>
+			<td class="details-label">Check-in</td>
+			<td class="details-value"><?php echo esc_html( $checkin ); ?></td>
 		</tr>
 		<tr>
-			<td style="padding: 12px 16px; border-bottom: 1px solid #e4e4e7; font-weight: 600; color: #18181b;">Check-in</td>
-			<td style="padding: 12px 16px; border-bottom: 1px solid #e4e4e7; color: #3f3f46;"><?php echo esc_html( $checkin ); ?></td>
-		</tr>
-		<tr>
-			<td style="padding: 12px 16px; border-bottom: 1px solid #e4e4e7; font-weight: 600; color: #18181b;">Check-out</td>
-			<td style="padding: 12px 16px; border-bottom: 1px solid #e4e4e7; color: #3f3f46;"><?php echo esc_html( $checkout ); ?></td>
+			<td class="details-label">Check-out</td>
+			<td class="details-value"><?php echo esc_html( $checkout ); ?></td>
 		</tr>
 		<?php if ( $nights > 0 ) : ?>
 		<tr>
-			<td style="padding: 12px 16px; border-bottom: 1px solid #e4e4e7; font-weight: 600; color: #18181b;">Duration</td>
-			<td style="padding: 12px 16px; border-bottom: 1px solid #e4e4e7; color: #3f3f46;"><?php echo esc_html( $nights ); ?> night<?php echo $nights > 1 ? 's' : ''; ?></td>
+			<td class="details-label">Duration</td>
+			<td class="details-value"><?php echo esc_html( $nights ); ?> night<?php echo $nights > 1 ? 's' : ''; ?></td>
 		</tr>
 		<?php endif; ?>
 		<tr>
-			<td style="padding: 12px 16px; border-bottom: 1px solid #e4e4e7; font-weight: 600; color: #18181b;">Amount</td>
-			<td style="padding: 12px 16px; border-bottom: 1px solid #e4e4e7; color: #3f3f46;"><?php echo esc_html( $price ); ?></td>
+			<td class="details-label">Amount</td>
+			<td class="details-value details-highlight"><?php echo esc_html( $price ); ?></td>
 		</tr>
 		<tr>
-			<td style="padding: 12px 16px; border-bottom: 1px solid #e4e4e7; font-weight: 600; color: #18181b;">Payment</td>
-			<td style="padding: 12px 16px; border-bottom: 1px solid #e4e4e7; color: #3f3f46; text-transform: capitalize;"><?php echo esc_html( $pay_status ); ?> (<?php echo esc_html( strtoupper( $pay_method ) ); ?>)</td>
+			<td class="details-label">Payment</td>
+			<td class="details-value" style="text-transform: capitalize;"><?php echo esc_html( $pay_status ); ?> (<?php echo esc_html( strtoupper( $pay_method ) ); ?>)</td>
 		</tr>
 		<tr>
-			<td style="padding: 12px 16px; font-weight: 600; color: #18181b;">Booking Status</td>
-			<td style="padding: 12px 16px; color: #0056FF; font-weight: 700; text-transform: capitalize;"><?php echo esc_html( $status ); ?></td>
+			<td class="details-label">Booking Status</td>
+			<td class="details-value details-highlight" style="text-transform: capitalize;"><?php echo esc_html( $status ); ?></td>
 		</tr>
 	</table>
 
 	<?php if ( ! empty( $admin_note ) ) : ?>
-	<div style="background: #f0f4ff; border-left: 4px solid #0056FF; padding: 16px 20px; margin: 24px 0; border-radius: 0 8px 8px 0;">
-		<p style="margin: 0 0 4px; font-weight: 700; color: #1e293b; font-size: 14px;">Note from CWC Team:</p>
-		<p style="margin: 0; color: #334155; line-height: 1.6;"><?php echo nl2br( esc_html( $admin_note ) ); ?></p>
+	<div class="admin-note">
+		<p class="note-title">Note from CWC Team:</p>
+		<p><?php echo nl2br( esc_html( $admin_note ) ); ?></p>
 	</div>
 	<?php endif; ?>
 
-	<p style="margin-top: 24px; color: #64748b; font-size: 14px;">If you have any questions, feel free to reply to this email or contact us at <a href="mailto:info@cwcwake.com" style="color: #0056FF;">info@cwcwake.com</a>.</p>
+	<p style="margin-top: 24px; color: #64748b; font-size: 14px;">If you have any questions, feel free to reply to this email or contact us at <a href="mailto:info@cwcwake.com" style="color: #0096C7;">info@cwcwake.com</a>.</p>
 	<?php
 	$body = ob_get_clean();
 
@@ -518,4 +558,87 @@ function cwc_send_booking_status_email( $booking_id, $status, $admin_note = '' )
 	cwc_log_email( $booking_id, 'status_' . $status, $email, $sent, $admin_note );
 
 	return $sent;
+}
+
+/* ────────────────────────────────────────────
+   Automated Checkout Processing
+   ──────────────────────────────────────────── */
+
+if ( ! wp_next_scheduled( 'cwc_daily_checkout_processor' ) ) {
+	wp_schedule_event( time(), 'daily', 'cwc_daily_checkout_processor' );
+}
+
+add_action( 'cwc_daily_checkout_processor', 'cwc_process_past_checkouts' );
+
+/**
+ * Automatically set bookings to 'completed' and release physical rooms
+ * if the check-out date has passed.
+ */
+function cwc_process_past_checkouts() {
+	$today = date( 'Y-m-d' );
+	
+	// Find bookings that have checked out
+	$bookings = get_posts( [
+		'post_type'      => 'cwc_booking',
+		'post_status'    => 'publish',
+		'posts_per_page' => -1,
+		'meta_query'     => [
+			'relation' => 'AND',
+			[
+				'key'     => '_cwc_bk_status',
+				'value'   => [ 'pending', 'confirmed' ],
+				'compare' => 'IN',
+			],
+			[
+				'key'     => '_cwc_bk_checkout',
+				'value'   => $today,
+				'compare' => '<',
+				'type'    => 'DATE'
+			]
+		]
+	] );
+
+	foreach ( $bookings as $booking ) {
+		$booking_id = $booking->ID;
+		$old_status = get_post_meta( $booking_id, '_cwc_bk_status', true );
+		$new_status = 'completed';
+
+		update_post_meta( $booking_id, '_cwc_bk_status', $new_status );
+		cwc_add_audit_log( $booking_id, 'status_changed', [
+			'from'       => $old_status,
+			'to'         => $new_status,
+			'note'       => 'Auto-completed via daily checkout processor',
+			'email_sent' => false,
+		] );
+
+		$assigned_room_name = get_post_meta( $booking_id, '_cwc_bk_assigned_room', true );
+		$room_name          = get_post_meta( $booking_id, '_cwc_bk_room', true );
+
+		if ( $assigned_room_name && $room_name && function_exists( 'cwc_get_physical_rooms' ) ) {
+			$room_clean = preg_replace( '/\s+Room$/i', '', trim( $room_name ) );
+			$room_posts = get_posts( [
+				'post_type'      => 'accommodation',
+				'post_status'    => 'publish',
+				'posts_per_page' => -1,
+			] );
+
+			foreach ( $room_posts as $rp ) {
+				if ( strtolower( trim( $rp->post_title ) ) === strtolower( $room_clean ) ) {
+					$physical_rooms = cwc_get_physical_rooms( $rp->ID );
+					$updated = false;
+					foreach ( $physical_rooms as &$p_room ) {
+						if ( ( $p_room['name'] ?? '' ) === $assigned_room_name && ( $p_room['status'] ?? '' ) === 'booked' ) {
+							$p_room['status'] = 'available';
+							$updated = true;
+							break;
+						}
+					}
+					if ( $updated ) {
+						update_post_meta( $rp->ID, '_cwc_physical_rooms', wp_json_encode( $physical_rooms ) );
+					}
+					break;
+				}
+			}
+		}
+	}
 }

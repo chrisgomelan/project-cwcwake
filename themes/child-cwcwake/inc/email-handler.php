@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @return string The full HTML email payload.
  */
 function cwc_get_email_template( $title, $content ) {
-	$logo_url = home_url( '/wp-content/themes/child-cwcwake/assets/images/logo.png' ); // Assuming a logo exists
+	$logo_url = home_url( '/wp-content/themes/child-cwcwake/assets/images/logo.svg' ); // Try SVG first if possible, but fallback to text if broken
 
 	ob_start();
 	?>
@@ -29,60 +29,134 @@ function cwc_get_email_template( $title, $content ) {
 		<title><?php echo esc_html( $title ); ?></title>
 		<style>
 			body {
-				font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-				background-color: #f4f4f5;
+				font-family: 'Inter', 'Roboto', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+				background-color: #F8FAFC;
 				margin: 0;
 				padding: 0;
-				color: #18181b;
+				color: #334155;
 			}
 			.email-wrapper {
 				width: 100%;
-				background-color: #f4f4f5;
+				background-color: #F8FAFC;
 				padding: 40px 20px;
 			}
 			.email-container {
-				max-width: 600px;
+				max-width: 640px;
 				margin: 0 auto;
 				background-color: #ffffff;
 				border-radius: 12px;
 				overflow: hidden;
-				box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+				box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
 			}
 			.email-header {
-				background-color: #0056FF;
-				padding: 30px;
+				background-color: #0096C7;
+				padding: 40px 30px;
 				text-align: center;
 			}
 			.email-header img {
-				max-width: 150px;
-				height: auto;
+				max-height: 48px;
+				width: auto;
+				display: block;
+				margin: 0 auto;
+			}
+			.email-header h1 {
+				color: #ffffff;
+				margin: 0;
+				font-size: 24px;
+				letter-spacing: 3px;
+				font-weight: 800;
+				text-transform: uppercase;
 			}
 			.email-body {
-				padding: 40px 30px;
+				padding: 40px 40px 30px 40px;
 			}
 			.email-title {
-				font-size: 24px;
-				font-weight: 700;
+				font-size: 22px;
+				font-weight: 800;
 				margin-top: 0;
 				margin-bottom: 24px;
-				color: #18181b;
+				color: #0F172A;
 			}
 			.email-content {
-				font-size: 16px;
+				font-size: 15px;
 				line-height: 1.6;
-				color: #3f3f46;
+				color: #475569;
+			}
+			.details-table {
+				width: 100%;
+				border-collapse: separate;
+				border-spacing: 0;
+				margin: 32px 0;
+				border-radius: 8px;
+				overflow: hidden;
+				border: 1px solid #E2E8F0;
+			}
+			.details-table th,
+			.details-table td {
+				padding: 16px 24px;
+				border-bottom: 1px solid #E2E8F0;
+				text-align: left;
+			}
+			.details-table tr:last-child td {
+				border-bottom: none;
+			}
+			.details-table tr:nth-child(even) {
+				background-color: #F8FAFC;
+			}
+			.details-label {
+				font-weight: 600;
+				color: #64748B;
+				width: 40%;
+				font-size: 13px;
+				text-transform: uppercase;
+				letter-spacing: 0.5px;
+			}
+			.details-value {
+				font-weight: 600;
+				color: #0F172A;
+				font-size: 15px;
+			}
+			.details-highlight {
+				color: #0096C7;
+				font-weight: 800;
+			}
+			.admin-note {
+				background-color: #E5F4FA;
+				border-left: 4px solid #0096C7;
+				padding: 20px 24px;
+				margin: 32px 0;
+				border-radius: 0 8px 8px 0;
+			}
+			.admin-note p {
+				margin: 0;
+				color: #334155;
+				line-height: 1.6;
+			}
+			.admin-note .note-title {
+				font-weight: 800;
+				color: #0F172A;
+				margin-bottom: 8px;
+				font-size: 13px;
+				text-transform: uppercase;
+				letter-spacing: 0.5px;
 			}
 			.email-footer {
-				background-color: #fafafa;
-				padding: 24px 30px;
+				background-color: #F1F5F9;
+				padding: 32px 40px;
 				text-align: center;
 				font-size: 14px;
-				color: #71717a;
-				border-top: 1px solid #e4e4e7;
+				color: #64748B;
+			}
+			.email-footer p {
+				margin: 8px 0;
 			}
 			.email-footer a {
-				color: #0056FF;
+				color: #0096C7;
 				text-decoration: none;
+				font-weight: 600;
+			}
+			.email-footer a:hover {
+				text-decoration: underline;
 			}
 		</style>
 	</head>
@@ -90,7 +164,7 @@ function cwc_get_email_template( $title, $content ) {
 		<div class="email-wrapper">
 			<div class="email-container">
 				<div class="email-header">
-					<h1 style="color: #ffffff; margin: 0; font-size: 28px; letter-spacing: 2px;">CWC WAKE PARK</h1>
+					<h1>CWC WAKE PARK</h1>
 				</div>
 				<div class="email-body">
 					<h2 class="email-title"><?php echo esc_html( $title ); ?></h2>
@@ -100,7 +174,7 @@ function cwc_get_email_template( $title, $content ) {
 				</div>
 				<div class="email-footer">
 					<p>&copy; <?php echo date('Y'); ?> CWC Wake Park. All rights reserved.</p>
-					<p><a href="<?php echo esc_url( home_url() ); ?>">Visit our website</a> | <a href="mailto:info@cwcwake.com">Contact Support</a></p>
+					<p><a href="<?php echo esc_url( home_url() ); ?>">Visit our website</a> &nbsp;&bull;&nbsp; <a href="mailto:info@cwcwake.com">Contact Support</a></p>
 				</div>
 			</div>
 		</div>
@@ -202,10 +276,28 @@ function cwc_submit_booking() {
 		update_post_meta( $booking_id, '_cwc_bk_nights',    $nights );
 		$price_num = (float) preg_replace( '/[^0-9.]/', '', $price );
 		update_post_meta( $booking_id, '_cwc_bk_price_num', $price_num );
+
+		// Automatically mark an available physical room as booked
+		if ( isset( $room_post_id ) && $room_post_id && function_exists( 'cwc_get_physical_rooms' ) ) {
+			$physical_rooms = cwc_get_physical_rooms( $room_post_id );
+			$updated = false;
+			foreach ( $physical_rooms as &$p_room ) {
+				if ( ( $p_room['status'] ?? 'available' ) === 'available' ) {
+					$p_room['status'] = 'booked';
+					$updated = true;
+					update_post_meta( $booking_id, '_cwc_bk_assigned_room', $p_room['name'] ?? '' );
+					break;
+				}
+			}
+			if ( $updated ) {
+				update_post_meta( $room_post_id, '_cwc_physical_rooms', wp_json_encode( $physical_rooms ) );
+			}
+		}
 	}
 
 	// Retrieve auto-generated reference from the insert hook
 	$ref = get_post_meta( $booking_id, '_cwc_bk_ref', true );
+	$assigned_room = get_post_meta( $booking_id, '_cwc_bk_assigned_room', true );
 
 	// Build the email content
 	ob_start();
@@ -213,48 +305,54 @@ function cwc_submit_booking() {
 	<p>Hi <strong><?php echo esc_html( $name ); ?></strong>,</p>
 	<p>Thank you for choosing CWC Wake Park! We have received your booking request. Here are the details of your reservation:</p>
 	
-	<table style="width: 100%; border-collapse: collapse; margin: 24px 0; background: #fafafa; border: 1px solid #e4e4e7; border-radius: 8px; overflow: hidden;">
+	<table class="details-table">
 		<?php if ( $ref ) : ?>
 		<tr>
-			<td style="padding: 12px 16px; border-bottom: 1px solid #e4e4e7; font-weight: 600; width: 40%; color: #18181b;">Booking Reference</td>
-			<td style="padding: 12px 16px; border-bottom: 1px solid #e4e4e7; color: #0056FF; font-weight: 700;"><?php echo esc_html( $ref ); ?></td>
+			<td class="details-label">Booking Reference</td>
+			<td class="details-value details-highlight"><?php echo esc_html( $ref ); ?></td>
 		</tr>
 		<?php endif; ?>
 		<tr>
-			<td style="padding: 12px 16px; border-bottom: 1px solid #e4e4e7; font-weight: 600; width: 40%; color: #18181b;">Room Type</td>
-			<td style="padding: 12px 16px; border-bottom: 1px solid #e4e4e7; color: #3f3f46;"><?php echo esc_html( $room ); ?></td>
+			<td class="details-label">Room Type</td>
+			<td class="details-value"><?php echo esc_html( $room ); ?></td>
+		</tr>
+		<?php if ( $assigned_room ) : ?>
+		<tr>
+			<td class="details-label">Room Number</td>
+			<td class="details-value details-highlight"><?php echo esc_html( $assigned_room ); ?></td>
+		</tr>
+		<?php endif; ?>
+		<tr>
+			<td class="details-label">Check-in Date</td>
+			<td class="details-value"><?php echo esc_html( $checkin ); ?></td>
 		</tr>
 		<tr>
-			<td style="padding: 12px 16px; border-bottom: 1px solid #e4e4e7; font-weight: 600; color: #18181b;">Check-in Date</td>
-			<td style="padding: 12px 16px; border-bottom: 1px solid #e4e4e7; color: #3f3f46;"><?php echo esc_html( $checkin ); ?></td>
+			<td class="details-label">Check-out Date</td>
+			<td class="details-value"><?php echo esc_html( $checkout ); ?></td>
 		</tr>
 		<tr>
-			<td style="padding: 12px 16px; border-bottom: 1px solid #e4e4e7; font-weight: 600; color: #18181b;">Check-out Date</td>
-			<td style="padding: 12px 16px; border-bottom: 1px solid #e4e4e7; color: #3f3f46;"><?php echo esc_html( $checkout ); ?></td>
+			<td class="details-label">Duration</td>
+			<td class="details-value"><?php echo esc_html( $nights ); ?> night<?php echo $nights > 1 ? 's' : ''; ?></td>
 		</tr>
 		<tr>
-			<td style="padding: 12px 16px; border-bottom: 1px solid #e4e4e7; font-weight: 600; color: #18181b;">Duration</td>
-			<td style="padding: 12px 16px; border-bottom: 1px solid #e4e4e7; color: #3f3f46;"><?php echo esc_html( $nights ); ?> night<?php echo $nights > 1 ? 's' : ''; ?></td>
+			<td class="details-label">Phone Number</td>
+			<td class="details-value"><?php echo esc_html( $phone ); ?></td>
 		</tr>
 		<tr>
-			<td style="padding: 12px 16px; border-bottom: 1px solid #e4e4e7; font-weight: 600; color: #18181b;">Phone Number</td>
-			<td style="padding: 12px 16px; border-bottom: 1px solid #e4e4e7; color: #3f3f46;"><?php echo esc_html( $phone ); ?></td>
+			<td class="details-label">Payment Method</td>
+			<td class="details-value" style="text-transform: uppercase;"><?php echo esc_html( $payment_method ); ?></td>
 		</tr>
 		<tr>
-			<td style="padding: 12px 16px; border-bottom: 1px solid #e4e4e7; font-weight: 600; color: #18181b;">Payment Method</td>
-			<td style="padding: 12px 16px; border-bottom: 1px solid #e4e4e7; color: #3f3f46; text-transform: uppercase;"><?php echo esc_html( $payment_method ); ?></td>
-		</tr>
-		<tr>
-			<td style="padding: 12px 16px; font-weight: 600; color: #18181b;">Total Price</td>
-			<td style="padding: 12px 16px; color: #3f3f46; font-weight: 600; color: #0056FF;"><?php echo esc_html( $price ); ?></td>
+			<td class="details-label">Total Price</td>
+			<td class="details-value details-highlight"><?php echo esc_html( $price ); ?></td>
 		</tr>
 	</table>
 
 	<?php if ( ! empty( $guests ) && is_array( $guests ) ) : ?>
-		<h3 style="font-size: 18px; margin-top: 32px; margin-bottom: 16px; color: #18181b;">Additional Guests</h3>
-		<ul style="padding-left: 20px; color: #3f3f46; line-height: 1.6;">
+		<h3 class="email-title" style="font-size: 18px; margin-top: 32px; margin-bottom: 16px;">Additional Guests</h3>
+		<ul style="padding-left: 20px; color: #475569; line-height: 1.6;">
 			<?php foreach ( $guests as $guest ) : ?>
-				<li><?php echo esc_html( $guest['name'] ); ?> (<?php echo esc_html( ucfirst( $guest['type'] ) ); ?>)</li>
+				<li><strong><?php echo esc_html( $guest['name'] ); ?></strong> (<?php echo esc_html( ucfirst( $guest['type'] ) ); ?>)</li>
 			<?php endforeach; ?>
 		</ul>
 	<?php endif; ?>
@@ -303,18 +401,18 @@ function cwc_submit_inquiry() {
 	?>
 	<p>You have received a new inquiry from the <strong>Rates & Park Hours</strong> page.</p>
 	
-	<table style="width: 100%; border-collapse: collapse; margin: 24px 0; background: #fafafa; border: 1px solid #e4e4e7; border-radius: 8px; overflow: hidden;">
+	<table class="details-table">
 		<tr>
-			<td style="padding: 12px 16px; border-bottom: 1px solid #e4e4e7; font-weight: 600; width: 30%; color: #18181b;">From</td>
-			<td style="padding: 12px 16px; border-bottom: 1px solid #e4e4e7; color: #3f3f46;"><?php echo esc_html( $email ); ?></td>
+			<td class="details-label" style="width: 30%;">From</td>
+			<td class="details-value"><?php echo esc_html( $email ); ?></td>
 		</tr>
 		<tr>
-			<td style="padding: 12px 16px; border-bottom: 1px solid #e4e4e7; font-weight: 600; color: #18181b;">Subject</td>
-			<td style="padding: 12px 16px; border-bottom: 1px solid #e4e4e7; color: #3f3f46;"><?php echo esc_html( $subject ); ?></td>
+			<td class="details-label" style="width: 30%;">Subject</td>
+			<td class="details-value"><?php echo esc_html( $subject ); ?></td>
 		</tr>
 		<tr>
-			<td style="padding: 12px 16px; font-weight: 600; color: #18181b; vertical-align: top;">Message</td>
-			<td style="padding: 12px 16px; color: #3f3f46; line-height: 1.6;"><?php echo nl2br( esc_html( $message ) ); ?></td>
+			<td class="details-label" style="width: 30%; vertical-align: top;">Message</td>
+			<td class="details-value" style="font-weight: 400; line-height: 1.6;"><?php echo nl2br( esc_html( $message ) ); ?></td>
 		</tr>
 	</table>
 

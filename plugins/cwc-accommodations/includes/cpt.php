@@ -542,7 +542,17 @@ function cwc_icon_url_for_slug( $slug ) {
 		return get_stylesheet_directory_uri() . '/assets/images/' . rawurlencode( $val );
 	}
 
-	// 2. Fallback to hardcoded legacy filenames for backward compatibility
+	// 2. Special icons from uploads
+	$upload_icons = [
+		'king-bed'  => '/2026/04/king-bed.svg',
+		'queen-bed' => '/2026/04/queen-bed.svg',
+	];
+	if ( isset( $upload_icons[ $slug ] ) ) {
+		$upload_dir = wp_upload_dir();
+		return $upload_dir['baseurl'] . $upload_icons[ $slug ];
+	}
+
+	// 3. Fallback to hardcoded legacy filenames for backward compatibility
 	$legacy_map = [
 		'wifi'       => 'free-wifi.svg',
 		'parking'    => 'free-parking.svg',

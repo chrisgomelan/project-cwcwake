@@ -249,7 +249,7 @@ img {
 	background: none;
 	border: none;
 	color: #fff;
-	font-size: 48px;
+	font-size: clamp(32px, 5vw, 48px);
 	cursor: pointer;
 	z-index: 2;
 	line-height: 1;
@@ -269,8 +269,8 @@ img {
 	background: rgba(255, 255, 255, 0.1);
 	border: none;
 	color: #fff;
-	width: 60px;
-	height: 60px;
+	width: clamp(40px, 6vw, 60px);
+	height: clamp(40px, 6vw, 60px);
 	border-radius: 50%;
 	font-size: 24px;
 	cursor: pointer;
@@ -774,7 +774,7 @@ input[type="date"]::after {
 	bottom: 24px;
 	left: 50%;
 	transform: translateX(-50%);
-	z-index: 99999;
+	z-index: 200000;
 	display: flex;
 	flex-direction: column;
 	gap: 12px;
@@ -786,8 +786,8 @@ input[type="date"]::after {
 	color: #ffffff;
 	font-family: var(--wp--preset--font-family--inter, 'Inter', sans-serif);
 	font-weight: 500;
-	font-size: 16px;
-	padding: 16px 24px;
+	font-size: clamp(14px, 1.2vw, 16px);
+	padding: clamp(12px, 1.5vw, 16px) clamp(16px, 2vw, 24px);
 	border-radius: 8px;
 	box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
 	display: flex;
@@ -813,4 +813,17 @@ input[type="date"]::after {
 .cwc-toast--success {
 	background: #395144;
 	color: #F5F1EB;
+}
+
+@media (max-width: 600px) {
+	.cwc-toast-container {
+		bottom: 16px;
+		width: calc(100% - 32px);
+	}
+
+	.cwc-toast {
+		width: 100%;
+		justify-content: center;
+		text-align: center;
+	}
 }

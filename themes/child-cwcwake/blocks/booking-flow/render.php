@@ -439,7 +439,7 @@ $first_room_price = $first_room['price'];
 						<span>₱ <?php echo esc_html(number_format($nightly_rate, 2)); ?></span>
 					</div>
 					<?php if ($nights_count > 0): ?>
-					<div style="display:flex;justify-content:space-between;margin-bottom:4px;">
+					<div id="bf-summary-nights" class="bf-summary__nights-row" style="display:flex;justify-content:space-between;margin-bottom:4px;">
 						<span>Duration</span>
 						<strong><?php echo esc_html($nights_count); ?> night<?php echo $nights_count > 1 ? 's' : ''; ?></strong>
 					</div>

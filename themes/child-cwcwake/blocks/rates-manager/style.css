@@ -227,16 +227,18 @@
 	border-radius: 100px !important;
 	font-family: 'Archivo', var(--wp--preset--font-family--body);
 	font-size: 18px;
-	color: #0096C7; /* Primary color for input text */
+	color: #0096C7;
+	/* Primary color for input text */
 	transition: all 0.2s ease;
 	background: #FFFFFF !important;
-	appearance: none; 
+	appearance: none;
 }
 
 /* Placeholder styling */
 .cwc-inquiry-form__input::placeholder,
 .cwc-inquiry-form__textarea::placeholder {
-	color: #A0A0A0; /* Matching standard placeholder color */
+	color: #A0A0A0;
+	/* Matching standard placeholder color */
 	opacity: 1;
 }
 
@@ -249,12 +251,13 @@
 
 /* Ensure selected options (real values) use the primary color */
 .cwc-inquiry-form__select option {
-	color: #0096C7; /* Using primary color for options too */
+	color: #0096C7;
+	/* Using primary color for options too */
 	background-color: #FFFFFF;
 }
 
 .cwc-inquiry-form__select:not(:invalid) {
-	color: #0096C7 !important; 
+	color: #0096C7 !important;
 }
 
 .cwc-inquiry-form__select-wrap {
@@ -373,6 +376,7 @@
 	height: 180px;
 	background-size: cover;
 	background-position: center;
+	background: #00000033;
 	position: relative;
 	display: flex;
 	justify-content: flex-end;

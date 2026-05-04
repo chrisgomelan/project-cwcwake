@@ -43,7 +43,7 @@
 	left: 0;
 	width: 100%;
 	height: var(--cwc-header-h);
-	z-index: 100;
+	z-index: 100000;
 	background: transparent;
 	border: 1px solid rgba(245, 241, 235, 0.3);
 	border-left: none;
@@ -426,7 +426,7 @@ body.admin-bar {
 	background: rgba(15, 23, 32, 0.45);
 	backdrop-filter: blur(2px);
 	-webkit-backdrop-filter: blur(2px);
-	z-index: 99;
+	z-index: 100001;
 	opacity: 0;
 	pointer-events: none;
 	transition: opacity 0.4s ease;
@@ -520,7 +520,7 @@ body.admin-bar {
 		flex-direction: column !important;
 		gap: 0 !important;
 		padding: 80px 16px 40px !important;
-		z-index: 110;
+		z-index: 100002;
 		transform: translateX(100%);
 		transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
 		overflow-y: auto;

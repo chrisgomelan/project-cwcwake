@@ -524,14 +524,17 @@
 			nightlyRate = parseFloat( priceMatch[0] );
 		}
 
-		const nightsDisplay = document.createElement( 'div' );
-		nightsDisplay.className = 'bf-summary__nights-row';
-		nightsDisplay.id = 'bf-summary-nights';
-		nightsDisplay.style.cssText = 'display:flex;justify-content:space-between;align-items:center;padding:8px 0;font-size:14px;color:#475569;';
+		let nightsDisplay = block.querySelector( '#bf-summary-nights' );
+		if ( ! nightsDisplay ) {
+			nightsDisplay = document.createElement( 'div' );
+			nightsDisplay.className = 'bf-summary__nights-row';
+			nightsDisplay.id = 'bf-summary-nights';
+			nightsDisplay.style.cssText = 'display:flex;justify-content:space-between;align-items:center;padding:8px 0;font-size:14px;color:#475569;';
 
-		const totalPriceSection = block.querySelector( '.bf-summary__total' );
-		if ( totalPriceSection ) {
-			totalPriceSection.parentNode.insertBefore( nightsDisplay, totalPriceSection );
+			const totalPriceSection = block.querySelector( '.bf-summary__total' );
+			if ( totalPriceSection ) {
+				totalPriceSection.parentNode.insertBefore( nightsDisplay, totalPriceSection );
+			}
 		}
 
 		const calculateNights = () => {
