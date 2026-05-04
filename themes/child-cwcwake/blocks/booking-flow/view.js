@@ -346,6 +346,7 @@
 			formData.append( 'checkout', summaryCheckout?.textContent || '' );
 			formData.append( 'room', summaryRoomName?.textContent || '' );
 			formData.append( 'price', summaryPrice?.textContent || '' );
+			formData.append( 'nights', String( calculateNights() ) );
 			
 			const paymentMethod = block.querySelector( 'input[name="bf_payment_method"]:checked' )?.value || '';
 			formData.append( 'payment_method', paymentMethod );
@@ -357,15 +358,29 @@
 			} )
 			.then( response => response.json() )
 			.then( result => {
-				openModal( 'success' );
-				setTimeout( () => {
-					window.location.href = '/';
-				}, 5000 );
+				if ( result.success ) {
+					openModal( 'success' );
+					setTimeout( () => {
+						window.location.href = '/';
+					}, 5000 );
+				} else {
+					btnConfirmPay.disabled = false;
+					btnConfirmPay.textContent = 'Confirm and Pay';
+					const msg = result.data?.message || 'There was an issue processing your booking. Please try again.';
+					if ( result.data?.fully_booked ) {
+						showAvailabilityStatus( { fully_booked: true, available_units: 0 } );
+					}
+					if ( window.cwcToast ) {
+						window.cwcToast.show( msg, 'error' );
+					} else {
+						alert( msg );
+					}
+				}
 			} )
 			.catch( error => {
 				console.error( 'Booking Error:', error );
 				btnConfirmPay.disabled = false;
-				btnConfirmPay.textContent = 'Confirm Pay';
+				btnConfirmPay.textContent = 'Confirm and Pay';
 				if ( window.cwcToast ) {
 					window.cwcToast.show( 'There was an issue processing your booking. Please try again.', 'error' );
 				} else {
@@ -500,6 +515,129 @@
 			radio.addEventListener( 'change', togglePaymentUI );
 		} );
 		togglePaymentUI();
+
+		/* ─── Nights Calculation & Price ─── */
+		let nightlyRate = 0;
+		const priceText = summaryPrice?.textContent || '';
+		const priceMatch = priceText.replace( /,/g, '' ).match( /[\d.]+/ );
+		if ( priceMatch ) {
+			nightlyRate = parseFloat( priceMatch[0] );
+		}
+
+		const nightsDisplay = document.createElement( 'div' );
+		nightsDisplay.className = 'bf-summary__nights-row';
+		nightsDisplay.id = 'bf-summary-nights';
+		nightsDisplay.style.cssText = 'display:flex;justify-content:space-between;align-items:center;padding:8px 0;font-size:14px;color:#475569;';
+
+		const totalPriceSection = block.querySelector( '.bf-summary__total' );
+		if ( totalPriceSection ) {
+			totalPriceSection.parentNode.insertBefore( nightsDisplay, totalPriceSection );
+		}
+
+		const calculateNights = () => {
+			if ( ! selectedStart || ! selectedEnd ) return 0;
+			const diffMs = selectedEnd.getTime() - selectedStart.getTime();
+			return Math.max( 0, Math.round( diffMs / ( 1000 * 60 * 60 * 24 ) ) );
+		};
+
+		const updateNightsAndPrice = () => {
+			const nights = calculateNights();
+			if ( nightsDisplay ) {
+				nightsDisplay.innerHTML = nights > 0
+					? `<span>Duration</span><strong>${ nights } night${ nights !== 1 ? 's' : '' }</strong>`
+					: '';
+			}
+			if ( nights > 0 && nightlyRate > 0 && summaryPrice ) {
+				const total = nightlyRate * nights;
+				summaryPrice.textContent = `₱ ${ total.toLocaleString( 'en-PH', { minimumFractionDigits: 2 } ) }`;
+			}
+		};
+
+		/* ─── Availability Check ─── */
+		let roomAvailabilityCache = {};
+
+		const checkRoomAvailability = async ( roomName, checkinDate, checkoutDate ) => {
+			const cacheKey = `${ roomName }|${ checkinDate }|${ checkoutDate }`;
+			if ( roomAvailabilityCache[ cacheKey ] !== undefined ) {
+				return roomAvailabilityCache[ cacheKey ];
+			}
+
+			try {
+				const formData = new URLSearchParams();
+				formData.append( 'action', 'cwc_check_room_availability' );
+				formData.append( 'room', roomName );
+				formData.append( 'checkin', checkinDate );
+				formData.append( 'checkout', checkoutDate );
+
+				const response = await fetch( '/wp-admin/admin-ajax.php', {
+					method: 'POST',
+					body: formData,
+				} );
+				const result = await response.json();
+
+				if ( result.success ) {
+					roomAvailabilityCache[ cacheKey ] = result.data;
+					return result.data;
+				}
+			} catch ( e ) {
+				console.error( 'Availability check failed', e );
+			}
+			return null;
+		};
+
+		const showAvailabilityStatus = ( data ) => {
+			let indicator = block.querySelector( '#bf-availability-indicator' );
+			if ( ! indicator ) {
+				indicator = document.createElement( 'div' );
+				indicator.id = 'bf-availability-indicator';
+				indicator.style.cssText = 'padding:10px 16px;border-radius:8px;font-size:13px;font-weight:600;margin-top:8px;text-align:center;';
+				const priceEl = block.querySelector( '.bf-summary__total' );
+				if ( priceEl ) {
+					priceEl.parentNode.insertBefore( indicator, priceEl );
+				}
+			}
+
+			if ( ! data ) {
+				indicator.style.display = 'none';
+				return;
+			}
+
+			if ( data.fully_booked ) {
+				indicator.style.display = 'block';
+				indicator.style.background = '#fef2f2';
+				indicator.style.color = '#dc2626';
+				indicator.style.border = '1px solid #fecaca';
+				indicator.innerHTML = '⚠ This room type is fully booked for your selected dates.';
+				if ( btnConfirmPay ) {
+					btnConfirmPay.disabled = true;
+					btnConfirmPay.style.opacity = '0.5';
+					btnConfirmPay.style.cursor = 'not-allowed';
+				}
+			} else {
+				indicator.style.display = 'block';
+				indicator.style.background = '#f0fdf4';
+				indicator.style.color = '#16a34a';
+				indicator.style.border = '1px solid #bbf7d0';
+				indicator.innerHTML = `✓ ${ data.available_units } unit${ data.available_units !== 1 ? 's' : '' } available`;
+				if ( btnConfirmPay ) {
+					btnConfirmPay.disabled = false;
+					btnConfirmPay.style.opacity = '1';
+					btnConfirmPay.style.cursor = 'pointer';
+				}
+			}
+		};
+
+		const runAvailabilityCheck = async () => {
+			if ( ! selectedStart || ! selectedEnd ) return;
+			const roomName = summaryRoomName?.textContent?.replace( / Room$/i, '' ).trim() || '';
+			if ( ! roomName ) return;
+
+			const ciStr = selectedStart.toISOString().split( 'T' )[0];
+			const coStr = selectedEnd.toISOString().split( 'T' )[0];
+
+			const data = await checkRoomAvailability( roomName, ciStr, coStr );
+			showAvailabilityStatus( data );
+		};
 
 		/* ─── Calendar Logic ─── */
 		const initialCheckinStr = urlParams.get( 'checkin' );
@@ -695,6 +833,8 @@
 					if ( selectedEnd && summaryCheckout ) {
 						summaryCheckout.textContent = formatDate( selectedEnd.toISOString().split( 'T' )[ 0 ] );
 					}
+					updateNightsAndPrice();
+					runAvailabilityCheck();
 				}
 
 				/* Selected Room save */
@@ -743,9 +883,19 @@
 							summaryAmenities.innerHTML = amenitiesHtml;
 						}
 
-						if ( summaryPrice )    summaryPrice.textContent    = `₱ ${ price.replace( /[^0-9,.\s]/g, '' ).trim() }.00`;
+						nightlyRate = parseFloat( price.replace( /[^0-9.]/g, '' ) ) || 0;
+						const nights = calculateNights();
+						if ( nights > 0 && nightlyRate > 0 ) {
+							const total = nightlyRate * nights;
+							if ( summaryPrice ) summaryPrice.textContent = `₱ ${ total.toLocaleString( 'en-PH', { minimumFractionDigits: 2 } ) }`;
+						} else {
+							if ( summaryPrice ) summaryPrice.textContent = `₱ ${ price.replace( /[^0-9,.\s]/g, '' ).trim() }.00`;
+						}
 						maxCapacity = parseInt( cap, 10 ) || 4;
 						updateCapacityUI();
+						updateNightsAndPrice();
+						roomAvailabilityCache = {};
+						runAvailabilityCheck();
 					}
 				}
 
@@ -817,6 +967,9 @@
 					}
 				}
 			}
+
+			updateNightsAndPrice();
+			runAvailabilityCheck();
 		};
 
 		initFromUrl();

@@ -69,6 +69,11 @@ if ($query->have_posts()) {
 			$capacity = '4';
 		}
 
+		$room_availability = 'available';
+		if (function_exists('cwc_accommodation_availability')) {
+			$room_availability = cwc_accommodation_availability($current_post_id);
+		}
+
 		$rooms[] = array(
 			'title' => get_the_title(),
 			'image' => get_the_post_thumbnail_url($current_post_id, 'medium'),
@@ -76,6 +81,7 @@ if ($query->have_posts()) {
 			'capacity' => $capacity,
 			'excerpt' => get_the_excerpt($current_post_id),
 			'beds' => function_exists('cwc_get_room_beds') ? cwc_get_room_beds($current_post_id) : [],
+			'availability' => $room_availability,
 		);
 	}
 	wp_reset_postdata();
@@ -414,6 +420,32 @@ $first_room_price = $first_room['price'];
 				</div>
 				<div class="bf-summary__divider"></div>
 
+				<!-- Price Breakdown -->
+				<?php
+				$nights_count = 0;
+				if (!empty($checkin_val) && !empty($checkout_val)) {
+					$ci_ts = strtotime($checkin_val);
+					$co_ts = strtotime($checkout_val);
+					if ($ci_ts && $co_ts && $co_ts > $ci_ts) {
+						$nights_count = (int)(($co_ts - $ci_ts) / DAY_IN_SECONDS);
+					}
+				}
+				$nightly_rate = (float) preg_replace('/[^0-9.]/', '', $first_room_price);
+				$total_price = $nights_count > 0 ? $nightly_rate * $nights_count : $nightly_rate;
+				?>
+				<div class="bf-summary__price-breakdown" style="padding: 8px 0; font-size: 14px; color: #475569;">
+					<div style="display:flex;justify-content:space-between;margin-bottom:4px;">
+						<span>Rate per night</span>
+						<span>₱ <?php echo esc_html(number_format($nightly_rate, 2)); ?></span>
+					</div>
+					<?php if ($nights_count > 0): ?>
+					<div style="display:flex;justify-content:space-between;margin-bottom:4px;">
+						<span>Duration</span>
+						<strong><?php echo esc_html($nights_count); ?> night<?php echo $nights_count > 1 ? 's' : ''; ?></strong>
+					</div>
+					<?php endif; ?>
+				</div>
+
 				<!-- Total Price -->
 				<div class="bf-summary__total">
 					<div class="bf-summary__total-left">
@@ -421,7 +453,7 @@ $first_room_price = $first_room['price'];
 						<span class="bf-summary__total-sub">Taxes &amp; fees included</span>
 					</div>
 					<span class="bf-summary__total-price" id="bf-summary-price">₱
-						<?php echo esc_html(preg_replace('/[^0-9,.]/', '', $first_room_price)); ?>.00</span>
+						<?php echo esc_html(number_format($total_price, 2)); ?></span>
 				</div>
 			</aside>
 
@@ -500,12 +532,17 @@ $first_room_price = $first_room['price'];
 			</div>
 			<div class="bf-modal__body">
 				<div class="bf-modal__room-options">
-					<?php foreach ($rooms as $index => $room): ?>
-						<label class="bf-modal__room-option">
+					<?php foreach ($rooms as $index => $room):
+						$is_room_booked = ( $room['availability'] === 'fully-booked' );
+						?>
+						<label class="bf-modal__room-option<?php echo $is_room_booked ? ' bf-modal__room-option--booked' : ''; ?>" style="<?php echo $is_room_booked ? 'opacity: 0.6; position: relative;' : ''; ?>">
 							<div class="bf-modal__room-option-text">
 								<span class="bf-modal__room-option-name"><?php echo esc_html($room['title']); ?></span>
 								<span class="bf-modal__room-option-cap">Max <?php echo esc_html($room['capacity']); ?>
 									persons</span>
+								<?php if ($is_room_booked): ?>
+									<span style="display:inline-block;margin-top:4px;padding:2px 8px;border-radius:4px;background:#fef2f2;color:#dc2626;font-size:11px;font-weight:600;">Fully Booked</span>
+								<?php endif; ?>
 							</div>
 							<input type="radio" name="bf_modal_room" class="bf-modal__radio"
 								value="<?php echo esc_attr($room['title']); ?>"
@@ -513,7 +550,10 @@ $first_room_price = $first_room['price'];
 								data-capacity="<?php echo esc_attr($room['capacity']); ?>"
 								data-excerpt="<?php echo esc_attr($room['excerpt']); ?>"
 								data-beds="<?php echo esc_attr(wp_json_encode($room['beds'])); ?>"
-								data-image="<?php echo esc_url($room['image']); ?>" <?php echo 0 === $index ? ' checked' : ''; ?>>
+								data-image="<?php echo esc_url($room['image']); ?>"
+								data-availability="<?php echo esc_attr($room['availability']); ?>"
+								<?php echo $is_room_booked ? ' disabled' : ''; ?>
+								<?php echo 0 === $index && ! $is_room_booked ? ' checked' : ''; ?>>
 						</label>
 					<?php endforeach; ?>
 				</div>

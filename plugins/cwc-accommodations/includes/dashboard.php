@@ -69,6 +69,19 @@ function cwc_get_all_bookings( $args = [] ) {
 	$bookings = [];
 
 	foreach ( $query->posts as $post ) {
+		$nights = (int) get_post_meta( $post->ID, '_cwc_bk_nights', true );
+		$checkin_raw  = get_post_meta( $post->ID, '_cwc_bk_checkin', true );
+		$checkout_raw = get_post_meta( $post->ID, '_cwc_bk_checkout', true );
+
+		// Calculate nights from dates if not stored
+		if ( ! $nights && $checkin_raw && $checkout_raw ) {
+			$ci_ts = strtotime( $checkin_raw );
+			$co_ts = strtotime( $checkout_raw );
+			if ( $ci_ts && $co_ts && $co_ts > $ci_ts ) {
+				$nights = (int) ( ( $co_ts - $ci_ts ) / DAY_IN_SECONDS );
+			}
+		}
+
 		$bookings[] = [
 			'id'             => $post->ID,
 			'ref'            => get_post_meta( $post->ID, '_cwc_bk_ref', true ) ?: '#' . $post->ID,
@@ -76,8 +89,9 @@ function cwc_get_all_bookings( $args = [] ) {
 			'name'           => get_post_meta( $post->ID, '_cwc_bk_name', true ),
 			'email'          => get_post_meta( $post->ID, '_cwc_bk_email', true ),
 			'phone'          => get_post_meta( $post->ID, '_cwc_bk_phone', true ),
-			'checkin'        => get_post_meta( $post->ID, '_cwc_bk_checkin', true ),
-			'checkout'       => get_post_meta( $post->ID, '_cwc_bk_checkout', true ),
+			'checkin'        => $checkin_raw,
+			'checkout'       => $checkout_raw,
+			'nights'         => $nights,
 			'room'           => get_post_meta( $post->ID, '_cwc_bk_room', true ),
 			'price'          => get_post_meta( $post->ID, '_cwc_bk_price', true ),
 			'price_num'      => (float) get_post_meta( $post->ID, '_cwc_bk_price_num', true ),
@@ -133,11 +147,12 @@ function cwc_render_booking_dashboard() {
 		<nav class="cwc-dash__tabs">
 			<?php
 			$tabs = [
-				'bookings'     => 'Bookings',
-				'guests'       => 'Guests',
-				'payments'     => 'Payments',
-				'availability' => 'Availability',
-				'analytics'    => 'Analytics',
+				'bookings'      => 'Bookings',
+				'guests'        => 'Guests',
+				'payments'      => 'Payments',
+				'room-tracking' => 'Room Tracking',
+				'availability'  => 'Availability',
+				'analytics'     => 'Analytics',
 			];
 			$base_url = admin_url( 'edit.php?post_type=accommodation&page=cwc-booking-dashboard' );
 			foreach ( $tabs as $slug => $label ) :
@@ -173,23 +188,26 @@ function cwc_render_booking_dashboard() {
 		<!-- Tab Content -->
 		<div class="cwc-dash__content">
 			<?php
-			switch ( $active_tab ) {
-				case 'guests':
-					cwc_render_dash_guests( $bookings );
-					break;
-				case 'payments':
-					cwc_render_dash_payments( $bookings );
-					break;
-				case 'availability':
-					cwc_render_dash_availability( $bookings );
-					break;
-				case 'analytics':
-					cwc_render_dash_analytics( $bookings, $room_counts, $room_revenue, $total_revenue );
-					break;
-				default:
-					cwc_render_dash_bookings( $bookings );
-					break;
-			}
+		switch ( $active_tab ) {
+			case 'guests':
+				cwc_render_dash_guests( $bookings );
+				break;
+			case 'payments':
+				cwc_render_dash_payments( $bookings );
+				break;
+			case 'room-tracking':
+				cwc_render_dash_room_tracking( $bookings );
+				break;
+			case 'availability':
+				cwc_render_dash_availability( $bookings );
+				break;
+			case 'analytics':
+				cwc_render_dash_analytics( $bookings, $room_counts, $room_revenue, $total_revenue );
+				break;
+			default:
+				cwc_render_dash_bookings( $bookings );
+				break;
+		}
 			?>
 		</div>
 
@@ -282,7 +300,8 @@ function cwc_render_dash_bookings( $bookings ) {
 							<th>Ref ID</th>
 							<th>Guest</th>
 							<th>Room</th>
-							<th>Dates</th>
+							<th>Check-in / Check-out</th>
+							<th>Nights</th>
 							<th>Amount</th>
 							<th>Booking Status</th>
 							<th>Payment Status</th>
@@ -314,6 +333,9 @@ function cwc_render_dash_bookings( $bookings ) {
 										<span class="cwc-dash__date-sep">→</span>
 										<span class="cwc-dash__date-out"><?php echo esc_html( date( 'M j', strtotime( $b['checkout'] ) ) ); ?></span>
 									</div>
+								</td>
+								<td style="text-align: center; font-weight: 600;">
+									<?php echo $b['nights'] ? esc_html( $b['nights'] ) : '—'; ?>
 								</td>
 								<td class="cwc-dash__td-price"><?php echo esc_html( $b['price'] ); ?></td>
 								
@@ -576,6 +598,153 @@ function cwc_render_dash_payments( $bookings ) {
 	<?php
 }
 
+/* ─── TAB: Room Tracking ─── */
+function cwc_render_dash_room_tracking( $bookings ) {
+	$rooms = get_posts( [
+		'post_type'      => 'accommodation',
+		'post_status'    => 'publish',
+		'posts_per_page' => -1,
+		'orderby'        => 'menu_order',
+		'order'          => 'ASC',
+	] );
+
+	$today = date( 'Y-m-d' );
+	?>
+	<div class="cwc-dash__card">
+		<div class="cwc-dash__card-header">
+			<div class="cwc-dash__header-title">
+				<h2>Room Tracking</h2>
+				<span class="cwc-dash__badge"><?php echo count( $rooms ); ?> room types</span>
+			</div>
+		</div>
+
+		<?php foreach ( $rooms as $room_post ) :
+			$physical_rooms = cwc_get_physical_rooms( $room_post->ID );
+			$capacity       = (int) get_post_meta( $room_post->ID, '_cwc_capacity', true );
+			$total_units    = max( count( $physical_rooms ), 1 );
+
+			$active_bookings_for_room = array_filter( $bookings, function( $b ) use ( $room_post, $today ) {
+				if ( strtolower( $b['room'] ) !== strtolower( $room_post->post_title ) ) return false;
+				if ( in_array( $b['status'], [ 'cancelled', 'completed' ], true ) ) return false;
+				$ci = $b['checkin'] ? date( 'Y-m-d', strtotime( $b['checkin'] ) ) : '';
+				$co = $b['checkout'] ? date( 'Y-m-d', strtotime( $b['checkout'] ) ) : '';
+				if ( ! $ci || ! $co ) return false;
+				return ( $ci <= $today && $co >= $today );
+			} );
+
+			$occupied_count  = count( $active_bookings_for_room );
+			$available_count = max( 0, $total_units - $occupied_count );
+			$is_fully_booked = ( $available_count <= 0 );
+			?>
+			<div class="cwc-dash__room-tracking-section" style="margin-bottom: 32px; padding: 20px; background: #f8fafc; border-radius: 12px; border: 1px solid #e2e8f0;">
+				<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+					<div>
+						<h3 style="margin: 0 0 4px; font-size: 18px; font-weight: 700;"><?php echo esc_html( $room_post->post_title ); ?></h3>
+						<span style="font-size: 13px; color: #64748b;">Max <?php echo esc_html( $capacity ); ?> guests · <?php echo esc_html( $total_units ); ?> unit<?php echo $total_units > 1 ? 's' : ''; ?></span>
+					</div>
+					<div style="display: flex; gap: 12px; align-items: center;">
+						<span style="padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; background: <?php echo $is_fully_booked ? '#fef2f2' : '#f0fdf4'; ?>; color: <?php echo $is_fully_booked ? '#dc2626' : '#16a34a'; ?>;">
+							<?php echo $is_fully_booked ? 'Fully Booked' : $available_count . ' Available'; ?>
+						</span>
+						<span style="padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; background: #eff6ff; color: #2563eb;">
+							<?php echo esc_html( $occupied_count ); ?> Occupied Today
+						</span>
+					</div>
+				</div>
+
+				<?php if ( ! empty( $physical_rooms ) ) : ?>
+					<div class="cwc-dash__table-wrap">
+						<table class="cwc-dash__table" style="margin: 0;">
+							<thead>
+								<tr>
+									<th>Unit Name</th>
+									<th>Status</th>
+									<th>Current Booking</th>
+									<th>Check-in</th>
+									<th>Check-out</th>
+									<th>Guest</th>
+								</tr>
+							</thead>
+							<tbody>
+								<?php foreach ( $physical_rooms as $idx => $unit ) :
+									$unit_booking = null;
+									foreach ( $active_bookings_for_room as $ab ) {
+										$unit_booking = $ab;
+										break;
+									}
+									$unit_status = ( $unit['status'] ?? 'available' );
+									$is_occupied = ( $unit_status === 'booked' || $unit_booking );
+									?>
+									<tr>
+										<td><strong><?php echo esc_html( $unit['name'] ); ?></strong></td>
+										<td>
+											<span class="cwc-dash__status-dot cwc-dash__status-dot--<?php echo $is_occupied ? 'pending' : 'confirmed'; ?>">
+												<?php echo $is_occupied ? 'Occupied' : 'Available'; ?>
+											</span>
+										</td>
+										<td>
+											<?php if ( $unit_booking ) : ?>
+												<strong><?php echo esc_html( $unit_booking['ref'] ); ?></strong>
+											<?php else : ?>
+												<span style="color: #94a3b8;">—</span>
+											<?php endif; ?>
+										</td>
+										<td>
+											<?php if ( $unit_booking ) : ?>
+												<?php echo esc_html( date( 'M j, Y', strtotime( $unit_booking['checkin'] ) ) ); ?>
+											<?php else : ?>
+												<span style="color: #94a3b8;">—</span>
+											<?php endif; ?>
+										</td>
+										<td>
+											<?php if ( $unit_booking ) : ?>
+												<?php echo esc_html( date( 'M j, Y', strtotime( $unit_booking['checkout'] ) ) ); ?>
+											<?php else : ?>
+												<span style="color: #94a3b8;">—</span>
+											<?php endif; ?>
+										</td>
+										<td>
+											<?php if ( $unit_booking ) : ?>
+												<?php echo esc_html( $unit_booking['name'] ); ?>
+											<?php else : ?>
+												<span style="color: #94a3b8;">—</span>
+											<?php endif; ?>
+										</td>
+									</tr>
+								<?php endforeach; ?>
+							</tbody>
+						</table>
+					</div>
+				<?php else : ?>
+					<div style="padding: 16px; text-align: center; color: #94a3b8; font-size: 14px;">
+						<p>No physical rooms defined. Add units in the room editor to track individual availability.</p>
+					</div>
+				<?php endif; ?>
+
+				<?php if ( ! empty( $active_bookings_for_room ) ) : ?>
+					<div style="margin-top: 16px;">
+						<h4 style="font-size: 14px; font-weight: 600; margin: 0 0 8px; color: #475569;">Active Bookings for Today</h4>
+						<div class="cwc-dash__schedule-list">
+							<?php foreach ( $active_bookings_for_room as $ab ) : ?>
+								<div class="cwc-dash__schedule-item" style="padding: 8px 12px;">
+									<div class="cwc-dash__schedule-info" style="flex: 1;">
+										<strong><?php echo esc_html( $ab['name'] ); ?></strong>
+										<small><?php echo esc_html( $ab['ref'] ); ?> · <?php echo esc_html( $ab['checkin'] ); ?> → <?php echo esc_html( $ab['checkout'] ); ?></small>
+									</div>
+									<span class="cwc-dash__status-dot cwc-dash__status-dot--<?php echo esc_attr( $ab['status'] ); ?>">
+										<?php echo esc_html( ucwords( str_replace( '-', ' ', $ab['status'] ) ) ); ?>
+									</span>
+								</div>
+							<?php endforeach; ?>
+						</div>
+					</div>
+				<?php endif; ?>
+			</div>
+		<?php endforeach; ?>
+	</div>
+	<?php
+}
+
 /* ─── TAB: Availability ─── */
 function cwc_render_dash_availability( $bookings ) {
 	// Get all accommodation posts for room inventory
@@ -619,8 +788,7 @@ function cwc_render_dash_availability( $bookings ) {
 				<?php foreach ( $rooms as $room_post ) :
 					$title    = $room_post->post_title;
 					$capacity = (int) get_post_meta( $room_post->ID, '_cwc_capacity', true );
-					$units    = json_decode( get_post_meta( $room_post->ID, '_cwc_room_units', true ) ?: '[]', true );
-					$total_units = max( count( $units ), 1 );
+					$total_units = cwc_get_room_inventory( $room_post->ID );
 					$active   = $active_per_room[ $title ] ?? 0;
 					$avail    = max( 0, $total_units - $active );
 					$pct      = $total_units > 0 ? round( ( $active / $total_units ) * 100 ) : 0;

@@ -274,7 +274,7 @@
 		} );
 		// Proceed button → navigate to booking flow
 		const proceedBtn = document.querySelector( '.cwc-booking-bar__proceed' );
-		proceedBtn?.addEventListener( 'click', () => {
+		proceedBtn?.addEventListener( 'click', async () => {
 			const room     = document.getElementById( 'cwc-val-room' )?.textContent.trim() || '';
 			const checkin  = document.getElementById( 'cwc-val-checkin' )?.textContent.trim() || '';
 			const checkout = document.getElementById( 'cwc-val-checkout' )?.textContent.trim() || '';
@@ -301,6 +301,38 @@
 				}
 				return;
 			}
+
+			// Check room availability before proceeding
+			const origText = proceedBtn.textContent;
+			proceedBtn.textContent = 'Checking...';
+			proceedBtn.disabled = true;
+
+			try {
+				const formData = new URLSearchParams();
+				formData.append( 'action', 'cwc_check_room_availability' );
+				formData.append( 'room', room );
+				formData.append( 'checkin', checkin );
+				formData.append( 'checkout', checkout );
+
+				const response = await fetch( '/wp-admin/admin-ajax.php', { method: 'POST', body: formData } );
+				const result = await response.json();
+
+				if ( result.success && result.data.fully_booked ) {
+					proceedBtn.textContent = origText;
+					proceedBtn.disabled = false;
+					if ( window.cwcToast ) {
+						window.cwcToast.show( 'Sorry, this room is fully booked for your selected dates. Please choose different dates or another room.', 'error' );
+					} else {
+						alert( 'Sorry, this room is fully booked for your selected dates. Please choose different dates or another room.' );
+					}
+					return;
+				}
+			} catch ( err ) {
+				console.error( 'Availability check failed', err );
+			}
+
+			proceedBtn.textContent = origText;
+			proceedBtn.disabled = false;
 
 			const params = new URLSearchParams( {
 				room,

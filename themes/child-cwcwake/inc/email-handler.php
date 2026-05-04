@@ -123,9 +123,61 @@ function cwc_submit_booking() {
 	$price          = isset( $_POST['price'] ) ? sanitize_text_field( wp_unslash( $_POST['price'] ) ) : '';
 	$payment_method = isset( $_POST['payment_method'] ) ? sanitize_text_field( wp_unslash( $_POST['payment_method'] ) ) : '';
 	$guests         = isset( $_POST['guests'] ) ? json_decode( wp_unslash( $_POST['guests'] ), true ) : [];
+	$nights         = isset( $_POST['nights'] ) ? absint( $_POST['nights'] ) : 0;
 
 	if ( empty( $name ) || empty( $email ) ) {
 		wp_send_json_error( [ 'message' => 'Name and email are required.' ] );
+	}
+
+	if ( empty( $checkin ) || empty( $checkout ) ) {
+		wp_send_json_error( [ 'message' => 'Check-in and check-out dates are required.' ] );
+	}
+
+	if ( empty( $room ) ) {
+		wp_send_json_error( [ 'message' => 'Room selection is required.' ] );
+	}
+
+	// Validate date range
+	$checkin_date  = date( 'Y-m-d', strtotime( $checkin ) );
+	$checkout_date = date( 'Y-m-d', strtotime( $checkout ) );
+
+	if ( $checkout_date <= $checkin_date ) {
+		wp_send_json_error( [ 'message' => 'Check-out date must be after check-in date.' ] );
+	}
+
+	// Calculate nights if not provided
+	if ( ! $nights ) {
+		$nights = (int) ( ( strtotime( $checkout_date ) - strtotime( $checkin_date ) ) / DAY_IN_SECONDS );
+	}
+
+	// Check room availability for the selected dates
+	if ( function_exists( 'cwc_count_overlapping_bookings' ) && function_exists( 'cwc_get_room_inventory' ) ) {
+		$room_clean = preg_replace( '/\s+Room$/i', '', trim( $room ) );
+		$room_posts = get_posts( [
+			'post_type'      => 'accommodation',
+			'post_status'    => 'publish',
+			'posts_per_page' => -1,
+		] );
+		$room_post_id = 0;
+		foreach ( $room_posts as $rp ) {
+			if ( strtolower( trim( $rp->post_title ) ) === strtolower( $room_clean ) ) {
+				$room_post_id = $rp->ID;
+				break;
+			}
+		}
+
+		if ( $room_post_id ) {
+			$total_units     = cwc_get_room_inventory( $room_post_id );
+			$overlapping     = cwc_count_overlapping_bookings( $room, $checkin_date, $checkout_date );
+			$available_units = max( 0, $total_units - $overlapping );
+
+			if ( $available_units <= 0 ) {
+				wp_send_json_error( [
+					'message'      => 'Sorry, this room type is fully booked for your selected dates. Please choose different dates or another room.',
+					'fully_booked' => true,
+				] );
+			}
+		}
 	}
 
 	/* ── Save booking record ── */
@@ -147,6 +199,7 @@ function cwc_submit_booking() {
 		update_post_meta( $booking_id, '_cwc_bk_payment',   $payment_method );
 		update_post_meta( $booking_id, '_cwc_bk_status',    'pending' );
 		update_post_meta( $booking_id, '_cwc_bk_guests',    wp_json_encode( $guests ) );
+		update_post_meta( $booking_id, '_cwc_bk_nights',    $nights );
 		$price_num = (float) preg_replace( '/[^0-9.]/', '', $price );
 		update_post_meta( $booking_id, '_cwc_bk_price_num', $price_num );
 	}
@@ -178,6 +231,10 @@ function cwc_submit_booking() {
 		<tr>
 			<td style="padding: 12px 16px; border-bottom: 1px solid #e4e4e7; font-weight: 600; color: #18181b;">Check-out Date</td>
 			<td style="padding: 12px 16px; border-bottom: 1px solid #e4e4e7; color: #3f3f46;"><?php echo esc_html( $checkout ); ?></td>
+		</tr>
+		<tr>
+			<td style="padding: 12px 16px; border-bottom: 1px solid #e4e4e7; font-weight: 600; color: #18181b;">Duration</td>
+			<td style="padding: 12px 16px; border-bottom: 1px solid #e4e4e7; color: #3f3f46;"><?php echo esc_html( $nights ); ?> night<?php echo $nights > 1 ? 's' : ''; ?></td>
 		</tr>
 		<tr>
 			<td style="padding: 12px 16px; border-bottom: 1px solid #e4e4e7; font-weight: 600; color: #18181b;">Phone Number</td>

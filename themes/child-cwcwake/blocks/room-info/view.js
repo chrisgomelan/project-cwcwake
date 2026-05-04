@@ -437,7 +437,9 @@
 		// ─── Book button ───
 		const bookBtn = document.getElementById( 'cwc-book-btn' );
 		if ( bookBtn ) {
-			bookBtn.addEventListener( 'click', e => {
+			bookBtn.addEventListener( 'click', async ( e ) => {
+				e.preventDefault();
+
 				const checkinEl  = document.getElementById( 'cwc-ri-val-checkin' );
 				const checkoutEl = document.getElementById( 'cwc-ri-val-checkout' );
 				const guestsEl   = document.getElementById( 'cwc-ri-val-guests' );
@@ -454,7 +456,6 @@
 				} else if ( ! guests || guests === '0 Adult, 0 Kids' ) {
 					errorMsg = 'Please select the number of guests.';
 				} else {
-					// Check for at least one adult
 					const adultsMatch = guests.match( /(\d+)\s+Adult/i );
 					const adultsCount = adultsMatch ? parseInt( adultsMatch[1], 10 ) : 0;
 					if ( adultsCount < 1 ) {
@@ -463,7 +464,6 @@
 				}
 
 				if ( errorMsg ) {
-					e.preventDefault();
 					if ( window.cwcToast ) {
 						window.cwcToast.show( errorMsg, 'warning' );
 					} else {
@@ -471,6 +471,41 @@
 					}
 					return;
 				}
+
+				// Check availability before proceeding
+				bookBtn.style.opacity = '0.6';
+				bookBtn.style.pointerEvents = 'none';
+				const origText = bookBtn.textContent;
+				bookBtn.textContent = 'Checking availability...';
+
+				try {
+					const formData = new URLSearchParams();
+					formData.append( 'action', 'cwc_check_room_availability' );
+					formData.append( 'room', room );
+					formData.append( 'checkin', checkin );
+					formData.append( 'checkout', checkout );
+
+					const response = await fetch( '/wp-admin/admin-ajax.php', { method: 'POST', body: formData } );
+					const result = await response.json();
+
+					if ( result.success && result.data.fully_booked ) {
+						bookBtn.style.opacity = '1';
+						bookBtn.style.pointerEvents = 'auto';
+						bookBtn.textContent = origText;
+						if ( window.cwcToast ) {
+							window.cwcToast.show( 'Sorry, this room is fully booked for your selected dates. Please choose different dates.', 'error' );
+						} else {
+							alert( 'Sorry, this room is fully booked for your selected dates. Please choose different dates.' );
+						}
+						return;
+					}
+				} catch ( err ) {
+					console.error( 'Availability check failed', err );
+				}
+
+				bookBtn.style.opacity = '1';
+				bookBtn.style.pointerEvents = 'auto';
+				bookBtn.textContent = origText;
 
 				let targetUrl = bookBtn.getAttribute( 'href' );
 				if ( ! targetUrl || targetUrl === '#book' ) targetUrl = '/booking/';
@@ -480,7 +515,6 @@
 				url.searchParams.set( 'checkout', checkout );
 				url.searchParams.set( 'guests', guests );
 				
-				e.preventDefault();
 				window.location.href = url.toString();
 			} );
 		}

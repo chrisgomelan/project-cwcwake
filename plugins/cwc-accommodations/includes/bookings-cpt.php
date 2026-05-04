@@ -258,6 +258,131 @@ function cwc_resend_booking_email() {
 add_action( 'wp_ajax_cwc_resend_booking_email', 'cwc_resend_booking_email' );
 
 /* ────────────────────────────────────────────
+   AJAX: Check Room Availability by Dates
+   ──────────────────────────────────────────── */
+
+/**
+ * Check if a room type has availability for the given date range.
+ *
+ * Returns the number of available units and whether the room is fully booked
+ * for the requested period. Considers overlapping confirmed/pending bookings
+ * against the physical room inventory.
+ */
+function cwc_check_room_availability() {
+	$room_name = isset( $_POST['room'] ) ? sanitize_text_field( wp_unslash( $_POST['room'] ) ) : '';
+	$checkin   = isset( $_POST['checkin'] ) ? sanitize_text_field( wp_unslash( $_POST['checkin'] ) ) : '';
+	$checkout  = isset( $_POST['checkout'] ) ? sanitize_text_field( wp_unslash( $_POST['checkout'] ) ) : '';
+
+	if ( empty( $room_name ) || empty( $checkin ) || empty( $checkout ) ) {
+		wp_send_json_error( [ 'message' => 'Room, check-in, and check-out dates are required.' ] );
+	}
+
+	$checkin_date  = date( 'Y-m-d', strtotime( $checkin ) );
+	$checkout_date = date( 'Y-m-d', strtotime( $checkout ) );
+
+	if ( ! $checkin_date || ! $checkout_date || $checkout_date <= $checkin_date ) {
+		wp_send_json_error( [ 'message' => 'Invalid date range.' ] );
+	}
+
+	// Normalize room name: strip " Room" suffix for matching with post titles
+	$room_name_clean = preg_replace( '/\s+Room$/i', '', trim( $room_name ) );
+
+	// Find the room post to get inventory
+	$room_posts = get_posts( [
+		'post_type'      => 'accommodation',
+		'post_status'    => 'publish',
+		'posts_per_page' => -1,
+	] );
+	$room_posts = array_filter( $room_posts, function( $p ) use ( $room_name_clean, $room_name ) {
+		$title_lower = strtolower( trim( $p->post_title ) );
+		return $title_lower === strtolower( $room_name_clean )
+			|| $title_lower === strtolower( trim( $room_name ) );
+	} );
+	$room_posts = array_values( $room_posts );
+
+	$total_units = 1;
+	if ( ! empty( $room_posts ) ) {
+		$room_post_id = $room_posts[0]->ID;
+		$total_units  = cwc_get_room_inventory( $room_post_id );
+	}
+
+	// Count overlapping active bookings for this room
+	$overlapping = cwc_count_overlapping_bookings( $room_name, $checkin_date, $checkout_date );
+
+	$available_units = max( 0, $total_units - $overlapping );
+	$is_fully_booked = ( $available_units <= 0 );
+
+	wp_send_json_success( [
+		'room'            => $room_name,
+		'checkin'         => $checkin_date,
+		'checkout'        => $checkout_date,
+		'total_units'     => $total_units,
+		'booked_units'    => $overlapping,
+		'available_units' => $available_units,
+		'fully_booked'    => $is_fully_booked,
+	] );
+}
+add_action( 'wp_ajax_cwc_check_room_availability', 'cwc_check_room_availability' );
+add_action( 'wp_ajax_nopriv_cwc_check_room_availability', 'cwc_check_room_availability' );
+
+/**
+ * Count overlapping active bookings for a room within a date range.
+ *
+ * @param string $room_name    Room title to match.
+ * @param string $checkin_date  Y-m-d format.
+ * @param string $checkout_date Y-m-d format.
+ * @param int    $exclude_id    Optional booking ID to exclude (for edits).
+ * @return int Number of overlapping bookings.
+ */
+function cwc_count_overlapping_bookings( $room_name, $checkin_date, $checkout_date, $exclude_id = 0 ) {
+	$bookings = get_posts( [
+		'post_type'      => 'cwc_booking',
+		'post_status'    => 'publish',
+		'posts_per_page' => -1,
+		'fields'         => 'ids',
+	] );
+
+	// Normalize: strip " Room" suffix for comparison
+	$room_name_clean = strtolower( preg_replace( '/\s+Room$/i', '', trim( $room_name ) ) );
+
+	$count = 0;
+	foreach ( $bookings as $booking_id ) {
+		if ( $exclude_id && $booking_id === $exclude_id ) {
+			continue;
+		}
+
+		$bk_status = get_post_meta( $booking_id, '_cwc_bk_status', true );
+		if ( in_array( $bk_status, [ 'cancelled', 'completed' ], true ) ) {
+			continue;
+		}
+
+		$bk_room = get_post_meta( $booking_id, '_cwc_bk_room', true );
+		$bk_room_clean = strtolower( preg_replace( '/\s+Room$/i', '', trim( $bk_room ) ) );
+		if ( $bk_room_clean !== $room_name_clean ) {
+			continue;
+		}
+
+		$bk_checkin  = get_post_meta( $booking_id, '_cwc_bk_checkin', true );
+		$bk_checkout = get_post_meta( $booking_id, '_cwc_bk_checkout', true );
+
+		if ( empty( $bk_checkin ) || empty( $bk_checkout ) ) {
+			continue;
+		}
+
+		$bk_ci = date( 'Y-m-d', strtotime( $bk_checkin ) );
+		$bk_co = date( 'Y-m-d', strtotime( $bk_checkout ) );
+
+		// Overlap check: booking overlaps if it starts before our checkout
+		// AND ends after our checkin
+		if ( $bk_ci < $checkout_date && $bk_co > $checkin_date ) {
+			$count++;
+		}
+	}
+
+	return $count;
+}
+
+/* ────────────────────────────────────────────
    Status Email Templates
    ──────────────────────────────────────────── */
 
@@ -277,8 +402,17 @@ function cwc_send_booking_status_email( $booking_id, $status, $admin_note = '' )
 	$checkout = get_post_meta( $booking_id, '_cwc_bk_checkout', true );
 	$price    = get_post_meta( $booking_id, '_cwc_bk_price', true );
 	$ref      = get_post_meta( $booking_id, '_cwc_bk_ref', true );
+	$nights   = (int) get_post_meta( $booking_id, '_cwc_bk_nights', true );
 	$pay_status = get_post_meta( $booking_id, '_cwc_bk_payment_status', true ) ?: 'unpaid';
 	$pay_method = get_post_meta( $booking_id, '_cwc_bk_payment', true );
+
+	if ( ! $nights && $checkin && $checkout ) {
+		$ci_ts = strtotime( $checkin );
+		$co_ts = strtotime( $checkout );
+		if ( $ci_ts && $co_ts && $co_ts > $ci_ts ) {
+			$nights = (int) ( ( $co_ts - $ci_ts ) / DAY_IN_SECONDS );
+		}
+	}
 
 	if ( ! $email ) {
 		return false;
@@ -339,6 +473,12 @@ function cwc_send_booking_status_email( $booking_id, $status, $admin_note = '' )
 			<td style="padding: 12px 16px; border-bottom: 1px solid #e4e4e7; font-weight: 600; color: #18181b;">Check-out</td>
 			<td style="padding: 12px 16px; border-bottom: 1px solid #e4e4e7; color: #3f3f46;"><?php echo esc_html( $checkout ); ?></td>
 		</tr>
+		<?php if ( $nights > 0 ) : ?>
+		<tr>
+			<td style="padding: 12px 16px; border-bottom: 1px solid #e4e4e7; font-weight: 600; color: #18181b;">Duration</td>
+			<td style="padding: 12px 16px; border-bottom: 1px solid #e4e4e7; color: #3f3f46;"><?php echo esc_html( $nights ); ?> night<?php echo $nights > 1 ? 's' : ''; ?></td>
+		</tr>
+		<?php endif; ?>
 		<tr>
 			<td style="padding: 12px 16px; border-bottom: 1px solid #e4e4e7; font-weight: 600; color: #18181b;">Amount</td>
 			<td style="padding: 12px 16px; border-bottom: 1px solid #e4e4e7; color: #3f3f46;"><?php echo esc_html( $price ); ?></td>
