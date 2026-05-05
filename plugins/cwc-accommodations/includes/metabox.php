@@ -28,7 +28,7 @@
  * @since   1.0.0
  */
 
-if ( ! defined( 'ABSPATH' ) ) {
+if (!defined('ABSPATH')) {
 	exit;
 }
 
@@ -47,10 +47,11 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @return void
  */
-function cwc_register_accommodation_meta_boxes() {
+function cwc_register_accommodation_meta_boxes()
+{
 	add_meta_box(
 		'cwc_accommodation_pricing',
-		__( 'Pricing & Availability', 'cwc-accommodations' ),
+		__('Pricing & Availability', 'cwc-accommodations'),
 		'cwc_render_accommodation_pricing_box',
 		'accommodation',
 		'side',
@@ -59,7 +60,7 @@ function cwc_register_accommodation_meta_boxes() {
 
 	add_meta_box(
 		'cwc_accommodation_amenities',
-		__( 'Amenities', 'cwc-accommodations' ),
+		__('Amenities', 'cwc-accommodations'),
 		'cwc_render_accommodation_amenities_box',
 		'accommodation',
 		'normal',
@@ -68,7 +69,7 @@ function cwc_register_accommodation_meta_boxes() {
 
 	add_meta_box(
 		'cwc_accommodation_gallery',
-		__( 'Room Gallery', 'cwc-accommodations' ),
+		__('Room Gallery', 'cwc-accommodations'),
 		'cwc_render_accommodation_gallery_box',
 		'accommodation',
 		'normal',
@@ -77,7 +78,7 @@ function cwc_register_accommodation_meta_boxes() {
 
 	add_meta_box(
 		'cwc_accommodation_inclusions',
-		__( 'Inclusions', 'cwc-accommodations' ),
+		__('Inclusions', 'cwc-accommodations'),
 		'cwc_render_accommodation_inclusions_box',
 		'accommodation',
 		'normal',
@@ -86,14 +87,14 @@ function cwc_register_accommodation_meta_boxes() {
 
 	add_meta_box(
 		'cwc_accommodation_beds',
-		__( 'Beds Configuration', 'cwc-accommodations' ),
+		__('Beds Configuration', 'cwc-accommodations'),
 		'cwc_render_accommodation_beds_box',
 		'accommodation',
 		'side',
 		'default'
 	);
 }
-add_action( 'add_meta_boxes_accommodation', 'cwc_register_accommodation_meta_boxes' );
+add_action('add_meta_boxes_accommodation', 'cwc_register_accommodation_meta_boxes');
 
 /* ---------------------------------------------------------
  * Box renderers
@@ -112,79 +113,91 @@ add_action( 'add_meta_boxes_accommodation', 'cwc_register_accommodation_meta_box
  * @param WP_Post $post Current post being edited.
  * @return void
  */
-function cwc_render_accommodation_pricing_box( $post ) {
-	wp_nonce_field( 'cwc_accommodation_meta', 'cwc_accommodation_meta_nonce' );
+function cwc_render_accommodation_pricing_box($post)
+{
+	wp_nonce_field('cwc_accommodation_meta', 'cwc_accommodation_meta_nonce');
 
-	$price        = (string) get_post_meta( $post->ID, '_cwc_price', true );
-	$price_sub    = (string) get_post_meta( $post->ID, '_cwc_price_sub', true );
-	$capacity     = (int) get_post_meta( $post->ID, '_cwc_capacity', true );
-	$availability = (string) get_post_meta( $post->ID, '_cwc_availability', true );
-	if ( '' === $availability ) {
+	$price = (string) get_post_meta($post->ID, '_cwc_price', true);
+	$price_sub = (string) get_post_meta($post->ID, '_cwc_price_sub', true);
+	$capacity = (int) get_post_meta($post->ID, '_cwc_capacity', true);
+	$availability = (string) get_post_meta($post->ID, '_cwc_availability', true);
+	if ('' === $availability) {
 		$availability = 'available';
 	}
 
 	$availability_options = [
-		'available'    => [ 'label' => __( 'Available', 'cwc-accommodations' ),    'help' => __( 'Normal "Book Now" button.', 'cwc-accommodations' ) ],
-		'fully-booked' => [ 'label' => __( 'Fully Booked', 'cwc-accommodations' ), 'help' => __( '"Book Now" replaced with "Fully Booked / Inquire".', 'cwc-accommodations' ) ],
-		'maintenance'  => [ 'label' => __( 'Maintenance', 'cwc-accommodations' ),  'help' => __( 'Pricing box hidden, "Coming Soon" badge shown.', 'cwc-accommodations' ) ],
+		'available' => ['label' => __('Available', 'cwc-accommodations'), 'help' => __('Normal "Book Now" button.', 'cwc-accommodations')],
+		'fully-booked' => ['label' => __('Fully Booked', 'cwc-accommodations'), 'help' => __('"Book Now" replaced with "Fully Booked / Inquire".', 'cwc-accommodations')],
+		'maintenance' => ['label' => __('Maintenance', 'cwc-accommodations'), 'help' => __('Pricing box hidden, "Coming Soon" badge shown.', 'cwc-accommodations')],
 	];
 	?>
 	<p>
-		<label for="cwc_price"><strong><?php esc_html_e( 'Price', 'cwc-accommodations' ); ?></strong></label><br />
-		<input type="text" id="cwc_price" name="cwc_price" value="<?php echo esc_attr( $price ); ?>"
+		<label for="cwc_price"><strong><?php esc_html_e('Price', 'cwc-accommodations'); ?></strong></label><br />
+		<input type="text" id="cwc_price" name="cwc_price" value="<?php echo esc_attr($price); ?>"
 			placeholder="PHP 19,500" class="widefat" />
-		<span class="description"><?php esc_html_e( 'Display value (free-form text).', 'cwc-accommodations' ); ?></span>
+		<span class="description"><?php esc_html_e('Display value (free-form text).', 'cwc-accommodations'); ?></span>
 	</p>
 
 	<p>
-		<label for="cwc_price_sub"><strong><?php esc_html_e( 'Price Sub-label', 'cwc-accommodations' ); ?></strong></label><br />
-		<input type="text" id="cwc_price_sub" name="cwc_price_sub" value="<?php echo esc_attr( $price_sub ); ?>"
+		<label
+			for="cwc_price_sub"><strong><?php esc_html_e('Price Sub-label', 'cwc-accommodations'); ?></strong></label><br />
+		<input type="text" id="cwc_price_sub" name="cwc_price_sub" value="<?php echo esc_attr($price_sub); ?>"
 			placeholder="per night" class="widefat" />
 	</p>
 
 	<table>
 		<tr>
-			<th><label for="cwc_capacity"><?php esc_html_e( 'Max Guests', 'cwc-accommodations' ); ?></label></th>
+			<th><label for="cwc_capacity"><?php esc_html_e('Max Guests', 'cwc-accommodations'); ?></label></th>
 			<td>
-				<input type="number" id="cwc_capacity" name="cwc_capacity" value="<?php echo esc_attr( (string) $capacity ); ?>" class="small-text" min="1" />
-				<p class="description"><?php esc_html_e( 'Maximum number of persons allowed in this room type.', 'cwc-accommodations' ); ?></p>
+				<input type="number" id="cwc_capacity" name="cwc_capacity"
+					value="<?php echo esc_attr((string) $capacity); ?>" class="small-text" min="1" />
+				<p class="description">
+					<?php esc_html_e('Maximum number of persons allowed in this room type.', 'cwc-accommodations'); ?></p>
 			</td>
 		</tr>
 	</table>
 
 	<hr />
 
-	<h3><?php esc_html_e( 'Individual Room Tracking', 'cwc-accommodations' ); ?></h3>
-	<p class="description"><?php esc_html_e( 'Add every physical room here to track its specific availability status.', 'cwc-accommodations' ); ?></p>
+	<h3><?php esc_html_e('Individual Room Units Tracking', 'cwc-accommodations'); ?></h3>
+	<p class="description">
+		<?php esc_html_e('Add every physical room here to track its specific availability status.', 'cwc-accommodations'); ?>
+	</p>
 
 	<div id="cwc-physical-rooms-wrapper">
 		<ul id="cwc-physical-rooms-list" style="margin: 0; padding: 0; list-style: none;">
 			<?php
-			$physical_rooms = cwc_get_physical_rooms( $post->ID );
-			foreach ( $physical_rooms as $idx => $room ) :
+			$physical_rooms = cwc_get_physical_rooms($post->ID);
+			foreach ($physical_rooms as $idx => $room):
 				?>
-				<li class="cwc-physical-room-row" style="display: flex; gap: 10px; align-items: center; margin-bottom: 8px; background: #f9f9f9; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
-					<input type="text" name="cwc_physical_rooms[<?php echo $idx; ?>][name]" value="<?php echo esc_attr( $room['name'] ?? '' ); ?>" placeholder="Room Name (e.g. Villa 101)" class="widefat" />
+				<li class="cwc-physical-room-row"
+					style="display: flex; gap: 10px; align-items: center; margin-bottom: 8px; background: #f9f9f9; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+					<input type="text" name="cwc_physical_rooms[<?php echo $idx; ?>][name]"
+						value="<?php echo esc_attr($room['name'] ?? ''); ?>" placeholder="Room Name (e.g. Villa 101)"
+						class="widefat" />
 					<select name="cwc_physical_rooms[<?php echo $idx; ?>][status]">
-						<option value="available" <?php selected( $room['status'] ?? 'available', 'available' ); ?>><?php esc_html_e( 'Available', 'cwc-accommodations' ); ?></option>
-						<option value="booked" <?php selected( $room['status'] ?? '', 'booked' ); ?>><?php esc_html_e( 'Booked', 'cwc-accommodations' ); ?></option>
+						<option value="available" <?php selected($room['status'] ?? 'available', 'available'); ?>>
+							<?php esc_html_e('Available', 'cwc-accommodations'); ?></option>
+						<option value="booked" <?php selected($room['status'] ?? '', 'booked'); ?>>
+							<?php esc_html_e('Booked', 'cwc-accommodations'); ?></option>
 					</select>
 					<button type="button" class="button cwc-remove-physical-room" title="Remove Room">×</button>
 				</li>
 			<?php endforeach; ?>
 		</ul>
-		<button type="button" class="button" id="cwc-add-physical-room"><?php esc_html_e( '+ Add Physical Room', 'cwc-accommodations' ); ?></button>
+		<button type="button" class="button"
+			id="cwc-add-physical-room"><?php esc_html_e('+ Add Physical Room', 'cwc-accommodations'); ?></button>
 	</div>
 
 	<script>
-	(function($) {
-		$(function() {
-			const $list = $('#cwc-physical-rooms-list');
-			const $addBtn = $('#cwc-add-physical-room');
+		(function ($) {
+			$(function () {
+				const $list = $('#cwc-physical-rooms-list');
+				const $addBtn = $('#cwc-add-physical-room');
 
-			$addBtn.on('click', function() {
-				const idx = $list.find('li').length;
-				const html = `
+				$addBtn.on('click', function () {
+					const idx = $list.find('li').length;
+					const html = `
 					<li class="cwc-physical-room-row" style="display: flex; gap: 10px; align-items: center; margin-bottom: 8px; background: #f9f9f9; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
 						<input type="text" name="cwc_physical_rooms[${idx}][name]" value="" placeholder="Room Name" class="widefat" />
 						<select name="cwc_physical_rooms[${idx}][status]">
@@ -194,14 +207,14 @@ function cwc_render_accommodation_pricing_box( $post ) {
 						<button type="button" class="button cwc-remove-physical-room">×</button>
 					</li>
 				`;
-				$list.append(html);
-			});
+					$list.append(html);
+				});
 
-			$list.on('click', '.cwc-remove-physical-room', function() {
-				$(this).closest('li').remove();
+				$list.on('click', '.cwc-remove-physical-room', function () {
+					$(this).closest('li').remove();
+				});
 			});
-		});
-	})(jQuery);
+		})(jQuery);
 	</script>
 	<?php
 }
@@ -214,24 +227,27 @@ function cwc_render_accommodation_pricing_box( $post ) {
  * @param WP_Post $post Current post being edited.
  * @return void
  */
-function cwc_render_accommodation_beds_box( $post ) {
-	$beds_raw = (string) get_post_meta( $post->ID, '_cwc_beds', true );
-	$beds     = json_decode( $beds_raw, true ) ?: [];
+function cwc_render_accommodation_beds_box($post)
+{
+	$beds_raw = (string) get_post_meta($post->ID, '_cwc_beds', true);
+	$beds = json_decode($beds_raw, true) ?: [];
 	$catalogue = cwc_bed_catalogue();
 	?>
 	<p class="description">
-		<?php esc_html_e( 'Specify the bed types available in this room.', 'cwc-accommodations' ); ?>
+		<?php esc_html_e('Specify the bed types available in this room.', 'cwc-accommodations'); ?>
 	</p>
 
 	<div id="cwc-beds-wrapper">
 		<ul id="cwc-beds-list" style="margin: 0; padding: 0; list-style: none;">
-			<?php foreach ( $beds as $idx => $bed ) : ?>
-				<li class="cwc-bed-row" style="display: flex; gap: 5px; align-items: center; margin-bottom: 8px; background: #f9f9f9; padding: 5px; border: 1px solid #ddd; border-radius: 4px;">
-					<input type="number" name="cwc_beds[<?php echo $idx; ?>][count]" value="<?php echo esc_attr( $bed['count'] ?? 1 ); ?>" style="width: 50px;" min="1" />
+			<?php foreach ($beds as $idx => $bed): ?>
+				<li class="cwc-bed-row"
+					style="display: flex; gap: 5px; align-items: center; margin-bottom: 8px; background: #f9f9f9; padding: 5px; border: 1px solid #ddd; border-radius: 4px;">
+					<input type="number" name="cwc_beds[<?php echo $idx; ?>][count]"
+						value="<?php echo esc_attr($bed['count'] ?? 1); ?>" style="width: 50px;" min="1" />
 					<select name="cwc_beds[<?php echo $idx; ?>][type]" style="flex: 1;">
-						<?php foreach ( $catalogue as $slug => $row ) : ?>
-							<option value="<?php echo esc_attr( $slug ); ?>" <?php selected( $bed['type'] ?? '', $slug ); ?>>
-								<?php echo esc_html( $row['label'] ); ?>
+						<?php foreach ($catalogue as $slug => $row): ?>
+							<option value="<?php echo esc_attr($slug); ?>" <?php selected($bed['type'] ?? '', $slug); ?>>
+								<?php echo esc_html($row['label']); ?>
 							</option>
 						<?php endforeach; ?>
 					</select>
@@ -239,24 +255,25 @@ function cwc_render_accommodation_beds_box( $post ) {
 				</li>
 			<?php endforeach; ?>
 		</ul>
-		<button type="button" class="button" id="cwc-add-bed"><?php esc_html_e( '+ Add Bed', 'cwc-accommodations' ); ?></button>
+		<button type="button" class="button"
+			id="cwc-add-bed"><?php esc_html_e('+ Add Bed', 'cwc-accommodations'); ?></button>
 	</div>
 
 	<script>
-	(function($) {
-		$(function() {
-			const $list = $('#cwc-beds-list');
-			const $addBtn = $('#cwc-add-bed');
-			const catalogue = <?php echo wp_json_encode( $catalogue ); ?>;
+		(function ($) {
+			$(function () {
+				const $list = $('#cwc-beds-list');
+				const $addBtn = $('#cwc-add-bed');
+				const catalogue = <?php echo wp_json_encode($catalogue); ?>;
 
-			$addBtn.on('click', function() {
-				const idx = $list.find('li').length;
-				let options = '';
-				for (const slug in catalogue) {
-					options += `<option value="${slug}">${catalogue[slug].label}</option>`;
-				}
-				
-				const html = `
+				$addBtn.on('click', function () {
+					const idx = $list.find('li').length;
+					let options = '';
+					for (const slug in catalogue) {
+						options += `<option value="${slug}">${catalogue[slug].label}</option>`;
+					}
+
+					const html = `
 					<li class="cwc-bed-row" style="display: flex; gap: 5px; align-items: center; margin-bottom: 8px; background: #f9f9f9; padding: 5px; border: 1px solid #ddd; border-radius: 4px;">
 						<input type="number" name="cwc_beds[${idx}][count]" value="1" style="width: 50px;" min="1" />
 						<select name="cwc_beds[${idx}][type]" style="flex: 1;">
@@ -265,14 +282,14 @@ function cwc_render_accommodation_beds_box( $post ) {
 						<button type="button" class="button cwc-remove-bed">×</button>
 					</li>
 				`;
-				$list.append(html);
-			});
+					$list.append(html);
+				});
 
-			$list.on('click', '.cwc-remove-bed', function() {
-				$(this).closest('li').remove();
+				$list.on('click', '.cwc-remove-bed', function () {
+					$(this).closest('li').remove();
+				});
 			});
-		});
-	})(jQuery);
+		})(jQuery);
 	</script>
 	<?php
 }
@@ -290,31 +307,28 @@ function cwc_render_accommodation_beds_box( $post ) {
  * @param WP_Post $post Current post being edited.
  * @return void
  */
-function cwc_render_accommodation_amenities_box( $post ) {
-	$selected_raw = (string) get_post_meta( $post->ID, '_cwc_amenities', true );
-	$selected     = array_filter( array_map( 'trim', explode( ',', $selected_raw ) ) );
-	$catalogue    = cwc_amenity_catalogue();
+function cwc_render_accommodation_amenities_box($post)
+{
+	$selected_raw = (string) get_post_meta($post->ID, '_cwc_amenities', true);
+	$selected = array_filter(array_map('trim', explode(',', $selected_raw)));
+	$catalogue = cwc_amenity_catalogue();
 	?>
 	<p class="description">
-		<?php esc_html_e( 'Tick every amenity this room offers. Icons and labels come from the shared theme catalogue.', 'cwc-accommodations' ); ?>
+		<?php esc_html_e('Tick every amenity this room offers. Icons and labels come from the shared theme catalogue.', 'cwc-accommodations'); ?>
 	</p>
 	<?php /* Sentinel: confirms this form section was actually rendered and submitted */ ?>
 	<input type="hidden" name="cwc_amenities_submitted" value="1" />
 
-	<ul class="cwc-amenity-checklist" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:.5rem 1rem;margin:0;padding:0;list-style:none;">
-		<?php foreach ( $catalogue as $slug => $row ) :
-			$id = 'cwc_amenity_' . sanitize_html_class( $slug );
+	<ul class="cwc-amenity-checklist"
+		style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:.5rem 1rem;margin:0;padding:0;list-style:none;">
+		<?php foreach ($catalogue as $slug => $row):
+			$id = 'cwc_amenity_' . sanitize_html_class($slug);
 			?>
 			<li>
-				<label for="<?php echo esc_attr( $id ); ?>" style="display:flex;align-items:center;gap:.5rem;">
-					<input
-						type="checkbox"
-						id="<?php echo esc_attr( $id ); ?>"
-						name="cwc_amenities[]"
-						value="<?php echo esc_attr( $slug ); ?>"
-						<?php checked( in_array( $slug, $selected, true ) ); ?>
-					/>
-					<span><?php echo esc_html( $row['label'] ); ?></span>
+				<label for="<?php echo esc_attr($id); ?>" style="display:flex;align-items:center;gap:.5rem;">
+					<input type="checkbox" id="<?php echo esc_attr($id); ?>" name="cwc_amenities[]"
+						value="<?php echo esc_attr($slug); ?>" <?php checked(in_array($slug, $selected, true)); ?> />
+					<span><?php echo esc_html($row['label']); ?></span>
 				</label>
 			</li>
 		<?php endforeach; ?>
@@ -339,81 +353,76 @@ function cwc_render_accommodation_amenities_box( $post ) {
  * @param WP_Post $post Current post being edited.
  * @return void
  */
-function cwc_render_accommodation_gallery_box( $post ) {
+function cwc_render_accommodation_gallery_box($post)
+{
 	wp_enqueue_media();
 
-	$ids_raw = (string) get_post_meta( $post->ID, '_cwc_gallery_ids', true );
-	$ids     = array_filter( array_map( 'intval', explode( ',', $ids_raw ) ) );
+	$ids_raw = (string) get_post_meta($post->ID, '_cwc_gallery_ids', true);
+	$ids = array_filter(array_map('intval', explode(',', $ids_raw)));
 	?>
 	<p class="description">
-		<?php esc_html_e( 'Choose the images shown in the hero gallery on the front-end. The first four are used by default; extra IDs are kept for future "see all" support.', 'cwc-accommodations' ); ?>
+		<?php esc_html_e('Choose the images shown in the hero gallery on the front-end. The first four are used by default; extra IDs are kept for future "see all" support.', 'cwc-accommodations'); ?>
 	</p>
 
 	<p>
-		<input
-			type="text"
-			id="cwc_gallery_ids"
-			name="cwc_gallery_ids"
-			value="<?php echo esc_attr( $ids_raw ); ?>"
-			class="widefat"
-			placeholder="123,124,125,126"
-		/>
+		<input type="text" id="cwc_gallery_ids" name="cwc_gallery_ids" value="<?php echo esc_attr($ids_raw); ?>"
+			class="widefat" placeholder="123,124,125,126" />
 	</p>
 
 	<p>
 		<button type="button" class="button" id="cwc_gallery_pick">
-			<?php esc_html_e( 'Pick from Media Library', 'cwc-accommodations' ); ?>
+			<?php esc_html_e('Pick from Media Library', 'cwc-accommodations'); ?>
 		</button>
 		<button type="button" class="button-link" id="cwc_gallery_clear">
-			<?php esc_html_e( 'Clear', 'cwc-accommodations' ); ?>
+			<?php esc_html_e('Clear', 'cwc-accommodations'); ?>
 		</button>
 	</p>
 
 	<div id="cwc_gallery_preview" style="display:flex;flex-wrap:wrap;gap:.5rem;margin-top:.5rem;">
-		<?php foreach ( $ids as $attachment_id ) :
-			$thumb = wp_get_attachment_image_url( $attachment_id, 'thumbnail' );
-			if ( ! $thumb ) {
+		<?php foreach ($ids as $attachment_id):
+			$thumb = wp_get_attachment_image_url($attachment_id, 'thumbnail');
+			if (!$thumb) {
 				continue;
 			}
 			?>
-			<img src="<?php echo esc_url( $thumb ); ?>" alt="" width="72" height="72"
+			<img src="<?php echo esc_url($thumb); ?>" alt="" width="72" height="72"
 				style="object-fit:cover;border:1px solid #dcdcde;border-radius:4px;" />
 		<?php endforeach; ?>
 	</div>
 
 	<script>
-		( function () {
-			const pickBtn  = document.getElementById( 'cwc_gallery_pick' );
-			const clearBtn = document.getElementById( 'cwc_gallery_clear' );
-			const input    = document.getElementById( 'cwc_gallery_ids' );
-			const preview  = document.getElementById( 'cwc_gallery_preview' );
+		(function () {
+			const pickBtn = document.getElementById('cwc_gallery_pick');
+			const clearBtn = document.getElementById('cwc_gallery_clear');
+			const input = document.getElementById('cwc_gallery_ids');
+			const preview = document.getElementById('cwc_gallery_preview');
 
-			if ( ! pickBtn || ! input || ! preview ) {
+			if (!pickBtn || !input || !preview) {
 				return;
 			}
 
-			const renderPreview = ( attachments ) => {
+			const renderPreview = (attachments) => {
 				preview.innerHTML = '';
-				attachments.forEach( ( att ) => {
+				attachments.forEach((att) => {
 					const thumb = att?.sizes?.thumbnail?.url || att?.url || '';
-					if ( ! thumb ) {
+					if (!thumb) {
 						return;
 					}
-					const img = document.createElement( 'img' );
-					img.src    = thumb;
-					img.alt    = '';
-					img.width  = 72;
+					const img = document.createElement('img');
+					img.src = thumb;
+					img.alt = '';
+					img.width = 72;
 					img.height = 72;
 					img.style.cssText = 'object-fit:cover;border:1px solid #dcdcde;border-radius:4px;';
-					preview.appendChild( img );
-				} );
+					preview.appendChild(img);
+				});
 			};
 
 			let frame;
-			pickBtn.addEventListener( 'click', ( event ) => {
+			pickBtn.addEventListener('click', (event) => {
 				event.preventDefault();
 
-				if ( frame ) {
+				if (frame) {
 					frame.open();
 					return;
 				}
@@ -424,41 +433,41 @@ function cwc_render_accommodation_gallery_box( $post ) {
 				 * having to rebuild the selection from scratch.
 				 */
 				const currentIds = input.value
-					.split( ',' )
-					.map( ( id ) => parseInt( id, 10 ) )
-					.filter( Boolean );
+					.split(',')
+					.map((id) => parseInt(id, 10))
+					.filter(Boolean);
 
-				frame = wp.media( {
-					title: <?php echo wp_json_encode( __( 'Select Room Gallery Images', 'cwc-accommodations' ) ); ?>,
+				frame = wp.media({
+					title: <?php echo wp_json_encode(__('Select Room Gallery Images', 'cwc-accommodations')); ?>,
 					library: { type: 'image' },
-					button: { text: <?php echo wp_json_encode( __( 'Use these images', 'cwc-accommodations' ) ); ?> },
+					button: { text: <?php echo wp_json_encode(__('Use these images', 'cwc-accommodations')); ?> },
 					multiple: 'add',
-				} );
+				});
 
-				frame.on( 'open', () => {
-					const selection = frame.state().get( 'selection' );
-					currentIds.forEach( ( id ) => {
-						const att = wp.media.attachment( id );
+				frame.on('open', () => {
+					const selection = frame.state().get('selection');
+					currentIds.forEach((id) => {
+						const att = wp.media.attachment(id);
 						att.fetch();
-						selection.add( att ? [ att ] : [] );
-					} );
-				} );
+						selection.add(att ? [att] : []);
+					});
+				});
 
-				frame.on( 'select', () => {
-					const attachments = frame.state().get( 'selection' ).toJSON();
-					input.value = attachments.map( ( att ) => att.id ).join( ',' );
-					renderPreview( attachments );
-				} );
+				frame.on('select', () => {
+					const attachments = frame.state().get('selection').toJSON();
+					input.value = attachments.map((att) => att.id).join(',');
+					renderPreview(attachments);
+				});
 
 				frame.open();
-			} );
+			});
 
-			clearBtn?.addEventListener( 'click', ( event ) => {
+			clearBtn?.addEventListener('click', (event) => {
 				event.preventDefault();
 				input.value = '';
 				preview.innerHTML = '';
-			} );
-		} )();
+			});
+		})();
 	</script>
 	<?php
 }
@@ -473,31 +482,28 @@ function cwc_render_accommodation_gallery_box( $post ) {
  * @param WP_Post $post Current post being edited.
  * @return void
  */
-function cwc_render_accommodation_inclusions_box( $post ) {
-	$selected_raw = (string) get_post_meta( $post->ID, '_cwc_inclusions', true );
-	$selected     = array_filter( array_map( 'trim', explode( ',', $selected_raw ) ) );
-	$catalogue    = cwc_inclusion_catalogue();
+function cwc_render_accommodation_inclusions_box($post)
+{
+	$selected_raw = (string) get_post_meta($post->ID, '_cwc_inclusions', true);
+	$selected = array_filter(array_map('trim', explode(',', $selected_raw)));
+	$catalogue = cwc_inclusion_catalogue();
 	?>
 	<p class="description">
-		<?php esc_html_e( 'Tick every inclusion this room offers. These labels come from the shared inclusion catalogue.', 'cwc-accommodations' ); ?>
+		<?php esc_html_e('Tick every inclusion this room offers. These labels come from the shared inclusion catalogue.', 'cwc-accommodations'); ?>
 	</p>
 	<?php /* Sentinel: confirms this form section was actually rendered and submitted */ ?>
 	<input type="hidden" name="cwc_inclusions_submitted" value="1" />
 
-	<ul class="cwc-inclusion-checklist" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:.5rem 1rem;margin:0;padding:0;list-style:none;">
-		<?php foreach ( $catalogue as $slug => $row ) :
-			$id = 'cwc_inclusion_' . sanitize_html_class( $slug );
+	<ul class="cwc-inclusion-checklist"
+		style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:.5rem 1rem;margin:0;padding:0;list-style:none;">
+		<?php foreach ($catalogue as $slug => $row):
+			$id = 'cwc_inclusion_' . sanitize_html_class($slug);
 			?>
 			<li>
-				<label for="<?php echo esc_attr( $id ); ?>" style="display:flex;align-items:center;gap:.5rem;">
-					<input
-						type="checkbox"
-						id="<?php echo esc_attr( $id ); ?>"
-						name="cwc_inclusions[]"
-						value="<?php echo esc_attr( $slug ); ?>"
-						<?php checked( in_array( $slug, $selected, true ) ); ?>
-					/>
-					<span><?php echo esc_html( $row['label'] ); ?></span>
+				<label for="<?php echo esc_attr($id); ?>" style="display:flex;align-items:center;gap:.5rem;">
+					<input type="checkbox" id="<?php echo esc_attr($id); ?>" name="cwc_inclusions[]"
+						value="<?php echo esc_attr($slug); ?>" <?php checked(in_array($slug, $selected, true)); ?> />
+					<span><?php echo esc_html($row['label']); ?></span>
 				</label>
 			</li>
 		<?php endforeach; ?>
@@ -526,61 +532,62 @@ function cwc_render_accommodation_inclusions_box( $post ) {
  * @param int $post_id Post being saved.
  * @return void
  */
-function cwc_save_accommodation_meta( $post_id ) {
-	if ( ! isset( $_POST['cwc_accommodation_meta_nonce'] ) ) {
+function cwc_save_accommodation_meta($post_id)
+{
+	if (!isset($_POST['cwc_accommodation_meta_nonce'])) {
 		return;
 	}
 
-	$nonce = sanitize_text_field( wp_unslash( $_POST['cwc_accommodation_meta_nonce'] ) );
-	if ( ! wp_verify_nonce( $nonce, 'cwc_accommodation_meta' ) ) {
+	$nonce = sanitize_text_field(wp_unslash($_POST['cwc_accommodation_meta_nonce']));
+	if (!wp_verify_nonce($nonce, 'cwc_accommodation_meta')) {
 		return;
 	}
 
-	if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
+	if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
 		return;
 	}
 
-	if ( ! current_user_can( 'edit_post', $post_id ) ) {
+	if (!current_user_can('edit_post', $post_id)) {
 		return;
 	}
 
-	if ( 'accommodation' !== get_post_type( $post_id ) ) {
+	if ('accommodation' !== get_post_type($post_id)) {
 		return;
 	}
 
 	// Handle Physical Rooms (JSON encoded array)
 	$physical_rooms = [];
-	if ( isset( $_POST['cwc_physical_rooms'] ) && is_array( $_POST['cwc_physical_rooms'] ) ) {
-		foreach ( $_POST['cwc_physical_rooms'] as $room ) {
-			$name   = sanitize_text_field( $room['name'] ?? '' );
-			$status = sanitize_key( $room['status'] ?? 'available' );
-			if ( $name ) {
-				$physical_rooms[] = [ 'name' => $name, 'status' => $status ];
+	if (isset($_POST['cwc_physical_rooms']) && is_array($_POST['cwc_physical_rooms'])) {
+		foreach ($_POST['cwc_physical_rooms'] as $room) {
+			$name = sanitize_text_field($room['name'] ?? '');
+			$status = sanitize_key($room['status'] ?? 'available');
+			if ($name) {
+				$physical_rooms[] = ['name' => $name, 'status' => $status];
 			}
 		}
 	}
 
 	$pairs = [
-		'_cwc_price'          => $_POST['cwc_price']        ?? '',
-		'_cwc_price_sub'      => $_POST['cwc_price_sub']    ?? '',
-		'_cwc_capacity'       => $_POST['cwc_capacity']     ?? 0,
-		'_cwc_inventory'      => count( $physical_rooms ),
-		'_cwc_gallery_ids'    => $_POST['cwc_gallery_ids']  ?? '',
-		'_cwc_physical_rooms' => wp_json_encode( $physical_rooms ),
+		'_cwc_price' => $_POST['cwc_price'] ?? '',
+		'_cwc_price_sub' => $_POST['cwc_price_sub'] ?? '',
+		'_cwc_capacity' => $_POST['cwc_capacity'] ?? 0,
+		'_cwc_inventory' => count($physical_rooms),
+		'_cwc_gallery_ids' => $_POST['cwc_gallery_ids'] ?? '',
+		'_cwc_physical_rooms' => wp_json_encode($physical_rooms),
 	];
 
 	// Handle Beds (JSON encoded array)
 	$beds = [];
-	if ( isset( $_POST['cwc_beds'] ) && is_array( $_POST['cwc_beds'] ) ) {
-		foreach ( $_POST['cwc_beds'] as $bed ) {
-			$count = (int) ( $bed['count'] ?? 1 );
-			$type  = sanitize_key( $bed['type'] ?? '' );
-			if ( $type ) {
-				$beds[] = [ 'count' => $count, 'type' => $type ];
+	if (isset($_POST['cwc_beds']) && is_array($_POST['cwc_beds'])) {
+		foreach ($_POST['cwc_beds'] as $bed) {
+			$count = (int) ($bed['count'] ?? 1);
+			$type = sanitize_key($bed['type'] ?? '');
+			if ($type) {
+				$beds[] = ['count' => $count, 'type' => $type];
 			}
 		}
 	}
-	$pairs['_cwc_beds'] = wp_json_encode( $beds );
+	$pairs['_cwc_beds'] = wp_json_encode($beds);
 
 	/*
 	 * Amenities and Inclusions arrive as checkbox arrays.
@@ -593,28 +600,28 @@ function cwc_save_accommodation_meta( $post_id ) {
 	 * Without this guard, a Gutenberg meta-box-loader request that fires
 	 * before the checkbox state is registered would wipe all saved amenities.
 	 */
-	if ( isset( $_POST['cwc_amenities_submitted'] ) ) {
-		$amenities_in            = isset( $_POST['cwc_amenities'] ) && is_array( $_POST['cwc_amenities'] )
-			? array_map( 'sanitize_key', wp_unslash( $_POST['cwc_amenities'] ) )
+	if (isset($_POST['cwc_amenities_submitted'])) {
+		$amenities_in = isset($_POST['cwc_amenities']) && is_array($_POST['cwc_amenities'])
+			? array_map('sanitize_key', wp_unslash($_POST['cwc_amenities']))
 			: [];
-		$pairs['_cwc_amenities'] = implode( ',', $amenities_in );
+		$pairs['_cwc_amenities'] = implode(',', $amenities_in);
 	}
 	// else: no sentinel → section wasn't rendered; preserve existing _cwc_amenities in DB.
 
-	if ( isset( $_POST['cwc_inclusions_submitted'] ) ) {
-		$inclusions_in            = isset( $_POST['cwc_inclusions'] ) && is_array( $_POST['cwc_inclusions'] )
-			? array_map( 'sanitize_key', wp_unslash( $_POST['cwc_inclusions'] ) )
+	if (isset($_POST['cwc_inclusions_submitted'])) {
+		$inclusions_in = isset($_POST['cwc_inclusions']) && is_array($_POST['cwc_inclusions'])
+			? array_map('sanitize_key', wp_unslash($_POST['cwc_inclusions']))
 			: [];
-		$pairs['_cwc_inclusions'] = implode( ',', $inclusions_in );
+		$pairs['_cwc_inclusions'] = implode(',', $inclusions_in);
 	}
 	// else: no sentinel → section wasn't rendered; preserve existing _cwc_inclusions in DB.
 
-	foreach ( $pairs as $key => $raw ) {
-		$raw       = is_string( $raw ) ? wp_unslash( $raw ) : $raw;
-		$sanitizer = cwc_accommodation_meta_sanitizer( $key );
-		$clean     = $sanitizer( $raw );
-		
-		update_post_meta( $post_id, $key, $clean );
+	foreach ($pairs as $key => $raw) {
+		$raw = is_string($raw) ? wp_unslash($raw) : $raw;
+		$sanitizer = cwc_accommodation_meta_sanitizer($key);
+		$clean = $sanitizer($raw);
+
+		update_post_meta($post_id, $key, $clean);
 	}
 }
-add_action( 'save_post_accommodation', 'cwc_save_accommodation_meta' );
+add_action('save_post_accommodation', 'cwc_save_accommodation_meta');

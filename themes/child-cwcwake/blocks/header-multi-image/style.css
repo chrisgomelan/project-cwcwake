@@ -99,4 +99,17 @@
 	.cwc-header-multi-image__header {
 		gap: clamp(2rem, 15vw, 20rem);
 	}
+
+
+}
+
+@media (max-width: 1024px) {
+
+	.cwc-header-multi-image {
+		padding: 0 0 50px 0;
+	}
+
+	img.cwc-land-feature-split__icon {
+		display: none;
+	}
 }

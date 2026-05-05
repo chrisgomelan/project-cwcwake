@@ -98,9 +98,13 @@
 .cwc-dash__guest-cell strong { font-size: 14px; color: #1e293b; }
 .cwc-dash__guest-cell small { font-size: 12px; color: #94a3b8; }
 
-/* ── Pills & Tags ── */
 .cwc-dash__room-pill {
 	display: inline-block; background: #f0f4ff; color: #0056FF;
+	font-size: 12px; font-weight: 600; padding: 4px 10px;
+	border-radius: 6px; white-space: nowrap;
+}
+.cwc-dash__unit-pill {
+	display: inline-block; background: #f0fdf4; color: #16a34a;
 	font-size: 12px; font-weight: 600; padding: 4px 10px;
 	border-radius: 6px; white-space: nowrap;
 }
@@ -422,3 +426,34 @@
 }
 .cwc-dash__modal-footer .button { margin: 0; }
 .cwc-dash__hidden { display: none !important; }
+ 
+ /* ── Pagination ── */
+ .cwc-dash__pagination-wrap {
+	 display: flex; align-items: center; justify-content: space-between;
+	 padding: 16px 24px; background: #fff; border-top: 1px solid #f1f5f9;
+ }
+ .cwc-dash__pagination-per-page {
+	 display: flex; align-items: center; gap: 8px; font-size: 13px; color: #64748b;
+ }
+ .cwc-dash__pagination-select {
+	 padding: 4px 8px; border: 1px solid #e2e8f0; border-radius: 4px;
+	 font-size: 13px; outline: none; cursor: pointer; color: #334155;
+ }
+ .cwc-dash__pagination-controls {
+	 display: flex; align-items: center; gap: 16px;
+ }
+ .cwc-dash__pagination-info {
+	 font-size: 13px; color: #64748b;
+ }
+ .cwc-dash__pagination-btns {
+	 display: flex; gap: 8px;
+ }
+ .cwc-dash__pagination-btns .button {
+	 font-size: 12px; height: 32px; line-height: 30px; padding: 0 12px;
+ }
+ 
+ .cwc-dash__room-tracking-section .cwc-dash__pagination-wrap {
+	 margin-top: -1px; border-radius: 0 0 12px 12px;
+ }
+ 
+ .cwc-dash__hidden-page { display: none !important; }

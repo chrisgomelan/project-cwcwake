@@ -37,12 +37,12 @@ $wrapper_attrs = get_block_wrapper_attributes(
 
 <section <?php echo $wrapper_attrs; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
 	<?php if ( ! empty( $bg_video ) ) : ?>
-		<video class="cwc-hero__video" autoplay muted loop playsinline preload="auto"
+		<video class="cwc-hero__video" autoplay muted loop playsinline preload="none" data-hero-video
 			<?php
 			if ( ! empty( $bg_src ) ) :
 				?>
 				poster="<?php echo esc_url( $bg_src ); ?>"<?php endif; ?>>
-			<source src="<?php echo esc_url( $bg_video ); ?>" type="video/mp4">
+			<source data-src="<?php echo esc_url( $bg_video ); ?>" type="video/mp4">
 		</video>
 	<?php endif; ?>
 

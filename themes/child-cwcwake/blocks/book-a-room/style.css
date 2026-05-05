@@ -237,6 +237,7 @@
 	display: flex;
 	flex-direction: column;
 	gap: 16px;
+	flex: 1;
 }
 
 .cwc-room-card__header {
@@ -301,7 +302,7 @@
 	font-family: var(--wp--preset--font-family--archivo, 'Archivo', sans-serif);
 	font-weight: 500;
 	font-size: clamp(18px, 1.8vw, 22px);
-	margin-top: 20px;
+	margin-top: auto;
 	transition: background-color 0.3s;
 }
 

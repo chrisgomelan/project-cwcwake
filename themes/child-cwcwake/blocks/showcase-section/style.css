@@ -435,6 +435,39 @@
 	background: rgba(255, 255, 255, 0.05);
 }
 
+@media (max-width: 1024px) {
+	.cwc-showcase__card--image:hover {
+		transform: none;
+	}
+
+	.cwc-showcase__card--image:hover .cwc-showcase__card-gif {
+		opacity: 0;
+		transform: scale(1.15);
+	}
+
+	.cwc-showcase__card--image:hover .cwc-showcase__card-btn {
+		background: transparent;
+		border-color: var(--wp--preset--color--background);
+		color: var(--wp--preset--color--background) !important;
+	}
+
+	.cwc-showcase__poster:hover .cwc-showcase__play {
+		transform: none;
+	}
+
+	.cwc-showcase__social-btn:hover {
+		background: var(--wp--preset--color--primary);
+	}
+
+	.cwc-showcase__card--social:hover img {
+		transform: none;
+	}
+
+	.cwc-showcase__card--social:hover .cwc-showcase__social-hover {
+		opacity: 0;
+	}
+}
+
 /* ----------------------------------------
    Responsive
    ---------------------------------------- */

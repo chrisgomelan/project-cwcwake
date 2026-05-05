@@ -1,4 +1,15 @@
 ( () => {
+	// Smart Loading for Hover Videos
+	const hoverVideos = document.querySelectorAll( 'video[data-hover-video]' );
+	hoverVideos.forEach( ( video ) => {
+		if ( window.innerWidth > 1024 ) {
+			if ( video.dataset.src ) {
+				video.src = video.dataset.src;
+				video.load();
+			}
+		}
+	} );
+
 	document.querySelectorAll( '.cwc-showcase--videos' ).forEach( ( section ) => {
 		const grid = section.querySelector( '.cwc-showcase__grid' );
 		const cards = grid ? Array.from( grid.querySelectorAll( '.cwc-showcase__card--video' ) ) : [];

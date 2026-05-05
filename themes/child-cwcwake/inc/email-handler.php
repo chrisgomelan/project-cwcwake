@@ -262,7 +262,11 @@ function cwc_submit_booking()
 		]);
 		$room_post_id = 0;
 		foreach ($room_posts as $rp) {
-			if (strtolower(trim($rp->post_title)) === strtolower($room_clean)) {
+			$rp_title = strtolower(trim($rp->post_title));
+			$room_clean_lower = strtolower(trim($room_clean));
+			$room_full_lower = strtolower(trim($room));
+
+			if ($rp_title === $room_clean_lower || $rp_title === $room_full_lower || preg_replace('/\s+Room$/i', '', $rp_title) === $room_clean_lower) {
 				$room_post_id = $rp->ID;
 				break;
 			}

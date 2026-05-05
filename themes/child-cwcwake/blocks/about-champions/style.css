@@ -114,13 +114,33 @@
 
 /* ── Responsive ── */
 
+@media (max-width: 1024px) {
+	.cwc-champions__phrase-overlay {
+		flex-wrap: wrap;
+		gap: 12px;
+		margin-top: 32px;
+	}
+
+	.cwc-champions__phrase {
+		display: inline-block !important;
+		opacity: 1 !important;
+		transform: none !important;
+		animation: none !important;
+		white-space: normal;
+		font-size: clamp(14px, 2vw, 18px);
+		padding: 8px 16px;
+		border: 1px solid rgba(0, 150, 199, 0.2);
+		border-radius: 6px;
+		background: rgba(0, 150, 199, 0.05);
+	}
+}
+
 @media (max-width: 600px) {
 	.cwc-champions__carousel {
 		height: 260px;
 	}
 
 	.cwc-champions__phrase {
-		white-space: normal;
 		max-width: 90vw;
 	}
 }

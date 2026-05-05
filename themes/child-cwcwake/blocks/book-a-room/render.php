@@ -87,6 +87,14 @@ if ($query->have_posts()) {
 			</div>
 
 			<div class="cwc-booking-bar">
+				<div class="cwc-booking-bar__field cwc-booking-bar__field--room" data-modal-target="room">
+					<img src="/wp-content/uploads/2026/04/room-type.svg" alt="" class="cwc-booking-bar__icon">
+					<div class="cwc-booking-bar__content">
+						<span class="cwc-booking-bar__label">Room Type</span>
+						<span class="cwc-booking-bar__value" id="cwc-val-room">Choose Room</span>
+					</div>
+				</div>
+
 				<div class="cwc-booking-bar__field cwc-booking-bar__field--checkin" data-modal-target="date">
 					<img src="/wp-content/uploads/2026/04/book-check-in.svg" alt="" class="cwc-booking-bar__icon">
 					<div class="cwc-booking-bar__content">
@@ -100,14 +108,6 @@ if ($query->have_posts()) {
 					<div class="cwc-booking-bar__content">
 						<span class="cwc-booking-bar__label">Check Out</span>
 						<span class="cwc-booking-bar__value" id="cwc-val-checkout">Add date</span>
-					</div>
-				</div>
-
-				<div class="cwc-booking-bar__field cwc-booking-bar__field--room" data-modal-target="room">
-					<img src="/wp-content/uploads/2026/04/room-type.svg" alt="" class="cwc-booking-bar__icon">
-					<div class="cwc-booking-bar__content">
-						<span class="cwc-booking-bar__label">Room Type</span>
-						<span class="cwc-booking-bar__value" id="cwc-val-room">Choose Room</span>
 					</div>
 				</div>
 

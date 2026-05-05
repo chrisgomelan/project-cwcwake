@@ -62,7 +62,8 @@
 		const autoRotateSpeed = 0.08; // Sets continuous drift speed
 		function animationLoop() {
 			if (!isDragging) {
-				targetAngle -= autoRotateSpeed; 
+				const isMobile = window.innerWidth <= 1024;
+				targetAngle -= isMobile ? 0 : autoRotateSpeed;
 			}
 			// Apply lerp for buttery smooth swiping and easing into rotation
 			currentAngle += (targetAngle - currentAngle) * 0.1;
@@ -74,6 +75,7 @@
 		if (phrases.length > 0) {
 			phrases.forEach((p, i) => p.classList.toggle('is-active', i === 0));
 			setInterval(() => {
+				if (window.innerWidth <= 1024) return;
 				currentPhraseIdx = (currentPhraseIdx + 1) % phrases.length;
 				phrases.forEach((p, i) => p.classList.toggle('is-active', i === currentPhraseIdx));
 			}, 3000);
