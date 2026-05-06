@@ -64,6 +64,17 @@ Because Git only tracks *files*, we store the WordPress database in a file calle
 3. Activate the **CWC Wake** child theme.
 > The parent theme **Twenty Twenty-Five** must be installed. It ships with WordPress by default.
 
+### 5. Configure PayMongo Keys (Optional)
+If you need to test the booking and payment flow locally, you must add the PayMongo API test keys to your local `wp-config.php` file (located one folder up from `wp-content/`).
+
+Open `app/public/wp-config.php` and add these lines anywhere before `/* That's all, stop editing! Happy publishing. */`:
+
+```php
+define( 'PAYMONGO_PUBLIC_KEY', 'pk_test_your_public_key_here' );
+define( 'PAYMONGO_SECRET_KEY', 'sk_test_your_secret_key_here' );
+```
+*(Ask the lead developer or check the team password manager for the actual test keys).*
+
 ---
 
 ## 🔄 How to Push Your Changes (To Share with Collaborators)
