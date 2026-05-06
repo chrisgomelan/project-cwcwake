@@ -13,8 +13,8 @@
 	justify-content: center;
 	width: 100%;
 	min-height: 100vh;
-	margin-block-start: -115px !important;
-	padding: 115px var(--wp--preset--spacing--40) var(--wp--preset--spacing--60);
+	margin-block-start: calc(clamp(72px, 6vw + 36px, 115px) * -1) !important;
+	padding: clamp(72px, 6vw + 36px, 115px) var(--wp--preset--spacing--40) var(--wp--preset--spacing--60);
 	background: var(--cwc-hero-bg) center / cover no-repeat;
 	overflow: hidden;
 }
@@ -51,7 +51,7 @@
 	position: relative;
 	z-index: 1;
 	text-align: center;
-	max-width: 1024px;
+	max-width: 1200px;
 }
 
 /* ----------------------------------------
@@ -68,6 +68,10 @@
 	margin: 0 0 var(--wp--preset--spacing--30);
 }
 
+.cwc-hero--accommodations .cwc-hero__heading {
+	font-size: clamp(1.75rem, 5vw, 4rem);
+}
+
 .cwc-hero__heading em {
 	font-style: italic;
 }
@@ -78,8 +82,8 @@
 
 .cwc-hero__subtitle {
 	font-family: 'Archivo', var(--wp--preset--font-family--body);
-	font-weight: 600;
-	font-size: 32px;
+	font-weight: 500;
+	font-size: clamp(18px, 3vw, 32px);
 	font-style: normal;
 	line-height: 100%;
 	letter-spacing: 0;
@@ -104,8 +108,8 @@
 	justify-content: center;
 	height: 52px;
 	padding: 15px 20px;
-	gap: 10px;
-	border-radius: 10px;
+	gap: 30px;
+	border-radius: 30px !important;
 	font-family: 'Archivo', var(--wp--preset--font-family--body);
 	font-weight: 600;
 	font-size: clamp(16px, 2vw, 20px);
@@ -122,7 +126,8 @@
 }
 
 .cwc-hero__btn--primary:hover {
-	opacity: 0.9;
+	filter: brightness(0.85);
+	color: #FFFFFF !important;
 }
 
 .cwc-hero__btn--secondary {
@@ -132,7 +137,9 @@
 }
 
 .cwc-hero__btn--secondary:hover {
-	background: rgba(255, 255, 255, 0.1);
+	background-color: var(--wp--preset--color--accent);
+	border-color: var(--wp--preset--color--accent);
+	color: #FFFFFF !important;
 }
 
 /* ----------------------------------------
@@ -171,19 +178,17 @@
 	inset: 0;
 	border-radius: inherit;
 	padding: 1px;
-	background: conic-gradient(
-		from 102.21deg at 52.75% 38.75%,
-		rgba(249, 249, 249, 0.5) -32.95deg,
-		rgba(64, 64, 64, 0.5) 10.52deg,
-		rgba(64, 64, 64, 0.35) 32.12deg,
-		rgba(255, 255, 255, 0.5) 60.28deg,
-		rgba(255, 255, 255, 0.5) 107.79deg,
-		rgba(64, 64, 64, 0.35) 187.59deg,
-		#F9F9F9 207.58deg,
-		rgba(255, 255, 255, 0.5) 287.31deg,
-		rgba(249, 249, 249, 0.5) 327.05deg,
-		rgba(64, 64, 64, 0.5) 370.52deg
-	);
+	background: conic-gradient(from 102.21deg at 52.75% 38.75%,
+			rgba(249, 249, 249, 0.5) -32.95deg,
+			rgba(64, 64, 64, 0.5) 10.52deg,
+			rgba(64, 64, 64, 0.35) 32.12deg,
+			rgba(255, 255, 255, 0.5) 60.28deg,
+			rgba(255, 255, 255, 0.5) 107.79deg,
+			rgba(64, 64, 64, 0.35) 187.59deg,
+			#F9F9F9 207.58deg,
+			rgba(255, 255, 255, 0.5) 287.31deg,
+			rgba(249, 249, 249, 0.5) 327.05deg,
+			rgba(64, 64, 64, 0.5) 370.52deg);
 	-webkit-mask:
 		linear-gradient(#fff 0 0) content-box,
 		linear-gradient(#fff 0 0);
@@ -243,8 +248,54 @@
 }
 
 /* ----------------------------------------
+   Scroll to Dive text
+   ---------------------------------------- */
+
+.cwc-hero__scroll-dive {
+	position: absolute;
+	bottom: clamp(20px, 4vw, 40px);
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 12px;
+	z-index: 10;
+}
+
+.cwc-hero__scroll-dive span {
+	font-family: 'Archivo', var(--wp--preset--font-family--body);
+	font-weight: 500;
+	font-size: clamp(12px, 1.5vw, 16px);
+	line-height: 100%;
+	color: #F5F1EB;
+	text-transform: uppercase;
+}
+
+/* ----------------------------------------
    Responsive
    ---------------------------------------- */
+
+@media (max-width: 1024px) {
+	.cwc-hero__video,
+	.cwc-hero__video-toggle {
+		display: none;
+	}
+}
+
+@media (max-width: 900px) {
+	.cwc-hero__content {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		text-align: center;
+		margin: 0 auto;
+	}
+
+	.cwc-hero__heading,
+	.cwc-hero__subtitle {
+		text-align: center;
+	}
+}
 
 @media (max-width: 600px) {
 	.cwc-hero {

@@ -1,0 +1,45 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "cwc/all-blogs",
+	"version": "1.0.0",
+	"title": "All Blogs",
+	"category": "theme",
+	"icon": "grid-view",
+	"description": "Paginated three-column grid of all published blog posts with a category filter dropdown. Pagination state lives in the `blog_page` query var so links stay bookmarkable without JavaScript.",
+	"textdomain": "child-cwcwake",
+	"supports": {
+		"align": ["full"],
+		"html": false,
+		"anchor": true
+	},
+	"attributes": {
+		"heading": {
+			"type": "string",
+			"default": "ALL"
+		},
+		"headingHighlight": {
+			"type": "string",
+			"default": "BLOGS"
+		},
+		"description": {
+			"type": "string",
+			"default": "Dive into our blog for helpful guides, exciting stories, and the latest updates from our watersports community. Whether you're a beginner or a thrill-seeker, there's always something new to discover."
+		},
+		"perPage": {
+			"type": "number",
+			"default": 6
+		},
+		"readMoreLabel": {
+			"type": "string",
+			"default": "Read More"
+		},
+		"placeholderImage": {
+			"type": "string",
+			"default": "/wp-content/uploads/2026/04/blogs-banner-bg.webp"
+		}
+	},
+	"render": "file:./render.php",
+	"style": "file:./style.css",
+	"viewScript": "file:./view.js"
+}

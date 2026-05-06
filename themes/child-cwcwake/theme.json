@@ -89,6 +89,11 @@
 					"slug": "body",
 					"name": "Archivo",
 					"fontFamily": "'Archivo', system-ui, sans-serif"
+				},
+				{
+					"slug": "ui",
+					"name": "Inter",
+					"fontFamily": "'Inter', system-ui, sans-serif"
 				}
 			],
 			"fontSizes": [
@@ -159,30 +164,70 @@
 		},
 		"spacing": {
 			"spacingSizes": [
-				{ "slug": "10", "name": "1", "size": "0.25rem" },
-				{ "slug": "20", "name": "2", "size": "0.5rem" },
 				{
-					"slug": "30", "name": "3", "size": "1rem",
-					"fluid": { "min": "0.75rem", "max": "1rem" }
+					"slug": "10",
+					"name": "1",
+					"size": "0.25rem"
 				},
 				{
-					"slug": "40", "name": "4", "size": "1.5rem",
-					"fluid": { "min": "1rem", "max": "1.5rem" }
+					"slug": "20",
+					"name": "2",
+					"size": "0.5rem"
 				},
 				{
-					"slug": "50", "name": "5", "size": "2.5rem",
-					"fluid": { "min": "1.5rem", "max": "2.5rem" }
+					"slug": "30",
+					"name": "3",
+					"size": "1rem",
+					"fluid": {
+						"min": "0.75rem",
+						"max": "1rem"
+					}
 				},
 				{
-					"slug": "60", "name": "6", "size": "4rem",
-					"fluid": { "min": "2.5rem", "max": "4rem" }
+					"slug": "40",
+					"name": "4",
+					"size": "1.5rem",
+					"fluid": {
+						"min": "1rem",
+						"max": "1.5rem"
+					}
 				},
 				{
-					"slug": "70", "name": "7", "size": "5rem",
-					"fluid": { "min": "3.5rem", "max": "5rem" }
+					"slug": "50",
+					"name": "5",
+					"size": "2.5rem",
+					"fluid": {
+						"min": "1.5rem",
+						"max": "2.5rem"
+					}
+				},
+				{
+					"slug": "60",
+					"name": "6",
+					"size": "4rem",
+					"fluid": {
+						"min": "2.5rem",
+						"max": "4rem"
+					}
+				},
+				{
+					"slug": "70",
+					"name": "7",
+					"size": "5rem",
+					"fluid": {
+						"min": "3.5rem",
+						"max": "5rem"
+					}
 				}
 			],
-			"units": ["%", "px", "em", "rem", "vh", "vw"]
+			"units": [
+				"%",
+				"px",
+				"em",
+				"rem",
+				"vh",
+				"vw"
+			]
 		},
 		"custom": {
 			"radius": {
@@ -378,27 +423,100 @@
 		{
 			"name": "page-activities",
 			"title": "Activities",
-			"postTypes": ["page"]
+			"postTypes": [
+				"page"
+			]
 		},
 		{
 			"name": "page-accommodations",
 			"title": "Accommodations",
-			"postTypes": ["page"]
+			"postTypes": [
+				"page"
+			]
+		},
+		{
+			"name": "room-detail",
+			"title": "Room Detail",
+			"postTypes": [
+				"page"
+			]
 		},
 		{
 			"name": "page-plan-your-trip",
 			"title": "Plan Your Trip",
-			"postTypes": ["page"]
+			"postTypes": [
+				"page"
+			]
+		},
+		{
+			"name": "page-gallery",
+			"title": "Gallery",
+			"postTypes": [
+				"page"
+			]
 		},
 		{
 			"name": "page-about",
 			"title": "About",
-			"postTypes": ["page"]
+			"postTypes": [
+				"page"
+			]
 		},
 		{
 			"name": "page-child",
 			"title": "Child Page (with breadcrumb)",
-			"postTypes": ["page"]
+			"postTypes": [
+				"page"
+			]
+		},
+		{
+			"name": "page-contact",
+			"title": "Contact",
+			"postTypes": [
+				"page"
+			]
+		},
+		{
+			"name": "page-terms-and-conditions",
+			"title": "Terms & Conditions",
+			"postTypes": [
+				"page"
+			]
+		},
+		{
+			"name": "page-privacy-policy",
+			"title": "Privacy Policy",
+			"postTypes": [
+				"page"
+			]
+		},
+		{
+			"name": "page-blogs",
+			"title": "Blogs",
+			"postTypes": [
+				"page"
+			]
+		},
+		{
+			"name": "page-elite-facilities",
+			"title": "Elite Facilities",
+			"postTypes": [
+				"page"
+			]
+		},
+		{
+			"name": "page-book-now",
+			"title": "Book a Room",
+			"postTypes": [
+				"page"
+			]
+		},
+		{
+			"name": "page-booking",
+			"title": "Booking Flow",
+			"postTypes": [
+				"page"
+			]
 		}
 	],
 	"templateParts": [

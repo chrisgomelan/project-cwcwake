@@ -1,0 +1,48 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "cwc/feature-split",
+	"version": "1.0.0",
+	"title": "Feature Split",
+	"category": "theme",
+	"icon": "columns",
+	"description": "Two-column section: left text with checklist, right overlapping images. Reusable across pages.",
+	"textdomain": "child-cwcwake",
+	"supports": {
+		"align": ["full"],
+		"html": false,
+		"anchor": true
+	},
+	"attributes": {
+		"titleStart": {
+			"type": "string",
+			"default": "PRO-LEVEL 6-"
+		},
+		"titleAccent": {
+			"type": "string",
+			"default": "POINT SYSTEM"
+		},
+		"description": {
+			"type": "string",
+			"default": ""
+		},
+		"checklistItems": {
+			"type": "array",
+			"default": []
+		},
+		"image1": {
+			"type": "string",
+			"default": ""
+		},
+		"image2": {
+			"type": "string",
+			"default": ""
+		},
+		"reversed": {
+			"type": "boolean",
+			"default": false
+		}
+	},
+	"render": "file:./render.php",
+	"style": "file:./style.css"
+}

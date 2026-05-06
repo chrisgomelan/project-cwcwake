@@ -1,0 +1,84 @@
+<!-- wp:template-part {"slug":"header"} /-->
+
+<!--
+	No page banner here.
+
+	The page banner used to land between the header and the
+	breadcrumbs, but on a single accommodation it duplicated the
+	visual job of `cwc/room-gallery` (large hero image up top).
+	Going straight from header → breadcrumbs → gallery is the
+	cleaner layout and matches the design.
+-->
+
+<!-- wp:group {
+	"align": "full",
+	"className": "cwc-tropical-section cwc-room-detail",
+	"style": {
+		"spacing": {
+			"margin": { "top": "0" },
+			"padding": {
+				"top": "var:preset|spacing|60",
+				"bottom": "var:preset|spacing|70"
+			},
+			"blockGap": "var:preset|spacing|60"
+		}
+	},
+	"layout": { "type": "constrained" }
+} -->
+<div class="wp-block-group alignfull cwc-tropical-section cwc-room-detail" style="margin-top:0;padding-top:var(--wp--preset--spacing--60);padding-bottom:var(--wp--preset--spacing--70)">
+
+	<!-- wp:cwc/breadcrumbs /-->
+
+	<!--
+		Room layout (designs/room-landing-page-design.md):
+
+		- cwc/room-gallery → § 1 back link + § 2 image grid + "See All Images" pill.
+		- cwc/room-info    → § 3 title/description/amenities/pricing + § 4 policies.
+		- cwc/other-rooms  → § 5 sibling rooms strip.
+
+		The inner `<main>` uses `layout: { type: "default" }` (NOT
+		"constrained"). That deliberately drops the theme's
+		`contentSize: 720px` clamp so each block fills the full
+		1921px geometry that `.cwc-tropical-section > main` enforces
+		via `assets/css/global.css` — matching the header logo line
+		and the breadcrumbs above. With `constrained` layout the
+		inner cards rendered ~720px wide while the breadcrumbs
+		stretched to ~1921px, which read as a misalignment.
+
+		All three blocks are still rendered with NO attributes — on
+		a singular `accommodation` post each block detects the
+		context via `cwc_is_accommodation_context()` and pulls its
+		data from CPT meta + global policies (the plugin's data
+		layer). Editors only fill in meta fields; the page is rigid
+		on-design across every room.
+	-->
+	<!-- wp:group {
+		"tagName": "main",
+		"style": {
+			"spacing": {
+				"margin": { "top": "0" },
+				"blockGap": "var:preset|spacing|60"
+			}
+		},
+		"layout": { "type": "default" }
+	} -->
+	<main class="wp-block-group" style="margin-top:0">
+		<!-- wp:cwc/room-gallery /-->
+
+		<!-- wp:cwc/room-info /-->
+
+		<!-- wp:cwc/other-rooms /-->
+
+		<!--
+			Optional editor extension point: anything an editor adds to
+			the post body still renders below the standard layout.
+			Useful for one-off promos, video embeds, etc., without
+			cluttering the canonical structure above.
+		-->
+		<!-- wp:post-content {"layout":{"type":"default"}} /-->
+	</main>
+	<!-- /wp:group -->
+</div>
+<!-- /wp:group -->
+
+<!-- wp:template-part {"slug":"footer"} /-->

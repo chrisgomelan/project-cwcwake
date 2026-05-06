@@ -1,0 +1,492 @@
+/**
+ * cwc/room-info block styles.
+ *
+ * Card with blue accent bar containing room title, description,
+ * amenity chips, an inline pricing/booking box, and a policies table.
+ * Designed to mirror the Figma room landing spec.
+ */
+
+/*
+ * Force a real gap above the card. The `!important` overrides
+ * core's reset for blocks that follow a `wp:post-content` boundary,
+ * which would otherwise collapse the margin to zero on the frontend.
+ */
+.cwc-room-info {
+	margin-block-start: var(--wp--preset--spacing--50, 2.5rem) !important;
+}
+
+.cwc-room-info__panel {
+	position: relative;
+	background: #f8f9fa;
+	border: 1px solid rgba(0, 0, 0, 0.5);
+	border-radius: 15px;
+}
+
+.cwc-room-info__accent {
+	display: block;
+	height: 8px;
+	background: var(--wp--preset--color--primary, #0096c7);
+}
+
+.cwc-room-info__body {
+	padding: clamp(1.25rem, 3vw, 2.75rem);
+}
+
+/* ---------- Title ---------- */
+
+.cwc-room-info__title {
+	margin: 0 0 var(--wp--preset--spacing--40);
+	font-family: var(--wp--preset--font-family--heading);
+	font-weight: 700;
+	font-size: clamp(2.25rem, 5.5vw, 4.5rem);
+	line-height: 1;
+	letter-spacing: 0;
+	color: var(--wp--preset--color--primary, #0096c7);
+	text-transform: uppercase;
+}
+
+/* ---------- Two-column layout (main + pricing aside) ---------- */
+
+.cwc-room-info__layout {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) clamp(280px, 28%, 430px);
+	gap: clamp(1.25rem, 2.5vw, 2.5rem);
+	align-items: flex-start;
+}
+
+.cwc-room-info__main {
+	min-width: 0;
+	display: flex;
+	flex-direction: column;
+	gap: clamp(1.25rem, 2vw, 2rem);
+}
+
+.cwc-room-info__section {
+	margin: 0;
+	padding-top: clamp(0.5rem, 1vw, 0.75rem);
+	padding-bottom: clamp(0.5rem, 1vw, 0.75rem);
+}
+
+.cwc-room-info__section--policies {
+	margin-top: clamp(1.5rem, 3vw, 2.5rem);
+}
+
+.cwc-room-info__label {
+	margin: 0 0 0.75rem;
+	font-family: var(--wp--preset--font-family--heading);
+	font-weight: 700;
+	font-size: clamp(1.5rem, 3vw, 3rem);
+	line-height: 1;
+	letter-spacing: 0;
+	text-transform: capitalize;
+	color: #395144;
+}
+
+.cwc-room-info__description {
+	margin: 0;
+	font-family: var(--wp--preset--font-family--body);
+	font-weight: 500;
+	font-size: clamp(1rem, 1.2vw, 1.25rem);
+	line-height: 1.5;
+	color: #1a1a1a;
+}
+
+/* ---------- Amenity chips ----------
+ *
+ * Strict 4-column grid at desktop (per design + editor request).
+ * Steps down to 3 / 2 / 1 columns as viewport narrows so chips
+ * never get cramped or text-clipped at smaller breakpoints.
+ *
+ * `minmax(0, 1fr)` is the safety net: without it a long amenity
+ * label could overflow its grid track and blow out the row width.
+ */
+
+.cwc-room-info__amenities {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.75rem;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+/*
+ * Chip uses `flex` (not `inline-flex`) so it stretches to fill its
+ * grid cell — that's what gives the 4-up row its consistent column
+ * widths. Centered content + uniform padding keeps each chip
+ * visually balanced even when labels vary in length.
+ */
+.cwc-room-info__chip {
+	display: flex;
+	align-items: center;
+	justify-content: flex-start;
+	gap: 0.5em;
+	padding: 0.7em 1.1em;
+	border: 1px solid rgba(0, 0, 0, 0.15);
+	border-radius: 999px;
+	background: #f4f1f8;
+	font-family: var(--wp--preset--font-family--heading);
+	font-weight: 600;
+	font-size: clamp(0.9rem, 1.1vw, 1.125rem);
+	line-height: 1.2;
+	color: #2b3037;
+	min-width: 0;
+}
+
+/*
+ * Allow long amenity labels to wrap to multiple lines
+ * instead of truncating.
+ */
+.cwc-room-info__chip>span {
+	white-space: normal;
+	word-wrap: break-word;
+	min-width: 0;
+}
+
+/*
+ * Icons are rendered as <img> tags pointing at the bundled SVGs in
+ * `assets/images/`. Each SVG has the brand color baked in, so we only
+ * size and align them here.
+ */
+.cwc-room-info__icon {
+	display: inline-block;
+	flex-shrink: 0;
+	width: 1.25em;
+	height: 1.25em;
+	object-fit: contain;
+}
+
+/* ---------- Inclusion chips ---------- */
+
+.cwc-room-info__inclusions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.75rem;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.cwc-room-info__inclusion-chip {
+	display: flex;
+	align-items: center;
+	padding: 0.7rem 1.4rem;
+	border-radius: 999px;
+	background: #f4f1f8;
+	border: 1px solid rgba(0, 0, 0, 0.05);
+	font-family: var(--wp--preset--font-family--heading);
+	font-weight: 600;
+	font-size: clamp(0.9rem, 1.1vw, 1.125rem);
+	line-height: 1.2;
+	color: #2b3037;
+	min-width: 0;
+}
+
+.cwc-room-info__inclusion-chip>span {
+	white-space: normal;
+	word-wrap: break-word;
+	min-width: 0;
+}
+
+/* ---------- Pricing aside ---------- */
+
+.cwc-room-info__pricing {
+	display: flex;
+	flex-direction: column;
+	align-items: stretch;
+	gap: 1.25rem;
+	padding: clamp(1.25rem, 2.2vw, 2rem);
+	background: #f8f9fa;
+	border: 1px solid rgba(0, 0, 0, 0.3);
+	border-radius: 12px;
+	text-align: left;
+}
+
+.cwc-room-info__pricing-title {
+	margin: 0;
+	font-family: var(--wp--preset--font-family--heading);
+	font-weight: 700;
+	font-size: clamp(1.5rem, 2vw, 2rem);
+	line-height: 1.2;
+	color: #1a1a1a;
+}
+
+.cwc-room-info__pricing-dates {
+	display: flex;
+	align-items: stretch;
+	gap: 0.75rem;
+}
+
+.cwc-room-info__pricing-dates .cwc-room-info__pricing-field {
+	flex: 1;
+}
+
+.cwc-room-info__pricing-divider {
+	width: 1px;
+	height: 51px;
+	background: rgba(0, 0, 0, 0.4);
+	margin: auto 0;
+}
+
+.cwc-room-info__pricing-field {
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+	padding: 0.85rem 1rem;
+	min-width: 0;
+	cursor: pointer;
+	border: 1px solid rgba(0, 0, 0, 0.4);
+	border-radius: 6px;
+	background: #F7F9FBff;
+	position: relative;
+}
+
+.cwc-room-info__pricing-field--guests {
+	justify-content: space-between;
+}
+
+.cwc-room-info__pricing-field-inner {
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+}
+
+.cwc-room-info__pricing-icon {
+	width: 24px;
+	height: 24px;
+	flex-shrink: 0;
+}
+
+.cwc-room-info__pricing-chevron {
+	flex-shrink: 0;
+	width: 16px;
+	height: auto;
+}
+
+.cwc-room-info__pricing-content {
+	display: flex;
+	flex-direction: column;
+	min-width: 0;
+}
+
+.cwc-room-info__pricing-label {
+	font-family: var(--wp--preset--font-family--heading);
+	font-weight: 600;
+	font-size: clamp(0.9rem, 1.1vw, 1.1rem);
+	line-height: 1.2;
+	color: #1a1a1a;
+	margin-bottom: 0.2rem;
+}
+
+.cwc-room-info__pricing-val {
+	font-family: var(--wp--preset--font-family--body);
+	font-weight: 400;
+	font-size: clamp(0.85rem, 0.95vw, 0.95rem);
+	line-height: 1.2;
+	color: #1a1a1a;
+}
+
+.cwc-room-info__price,
+.cwc-room-info__price-sub {
+	display: none;
+}
+
+.cwc-room-info__book-button {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 10px;
+	width: 100%;
+	min-height: 56px;
+	padding: 0.5rem 1.25rem;
+	border-radius: 8px;
+	background: #0096C7;
+	color: #ffffff;
+	font-family: var(--wp--preset--font-family--heading);
+	font-weight: 600;
+	font-size: clamp(1.1rem, 1.2vw, 1.25rem);
+	line-height: 1;
+	text-decoration: none;
+	transition: background-color 0.2s ease, transform 0.2s ease;
+	margin-top: 0.5rem;
+}
+
+.cwc-room-info__book-button:hover,
+.cwc-room-info__book-button:focus-visible {
+	background: #007ba3;
+	color: #ffffff;
+	transform: translateY(-1px);
+}
+
+/* ---------- Policies ---------- */
+
+.cwc-room-info__policies-intro {
+	margin: -0.25rem 0 1rem;
+	font-family: var(--wp--preset--font-family--body);
+	font-weight: 500;
+	font-size: clamp(0.9rem, 1vw, 1.125rem);
+	line-height: 1.4;
+	color: #1a1a1a;
+}
+
+.cwc-room-info__policies {
+	display: grid;
+	grid-template-columns: minmax(180px, 280px) minmax(0, 1fr);
+	border: 2px solid rgba(0, 0, 0, 0.4);
+	border-radius: 12px;
+	overflow: hidden;
+}
+
+.cwc-room-info__policy {
+	display: contents;
+}
+
+.cwc-room-info__policy-name,
+.cwc-room-info__policy-desc {
+	padding: 1rem 1.25rem;
+	border-top: 1px solid rgba(0, 0, 0, 0.15);
+}
+
+.cwc-room-info__policy:first-child .cwc-room-info__policy-name,
+.cwc-room-info__policy:first-child .cwc-room-info__policy-desc {
+	border-top: 0;
+}
+
+.cwc-room-info__policy-name {
+	display: flex;
+	align-items: center;
+	gap: 0.6em;
+	font-family: var(--wp--preset--font-family--heading);
+	font-weight: 600;
+	font-size: clamp(1rem, 1.2vw, 1.25rem);
+	line-height: 1.3;
+	color: #1f2226;
+	background: rgba(0, 0, 0, 0.02);
+}
+
+.cwc-room-info__policy-name .cwc-room-info__icon {
+	width: 1.4em;
+	height: 1.4em;
+	margin-top: 0.05em;
+}
+
+.cwc-room-info__policy-desc {
+	font-family: var(--wp--preset--font-family--body);
+	font-weight: 500;
+	font-size: clamp(0.9rem, 1.1vw, 1.125rem);
+	line-height: 1.4;
+	color: #1a1a1a;
+}
+
+.cwc-room-info__policy-desc p {
+	margin: 0 0 0.5em;
+}
+
+.cwc-room-info__policy-desc p:last-child {
+	margin-bottom: 0;
+}
+
+.cwc-room-info__policy-desc ul {
+	margin: 0.4rem 0 0;
+	padding-left: 1.25rem;
+}
+
+/* ---------- Responsive collapse ---------- */
+
+@media (max-width: 991px) {
+	.cwc-room-info__layout {
+		grid-template-columns: minmax(0, 1fr);
+	}
+
+	.cwc-room-info__main {
+		display: contents;
+	}
+
+	.cwc-room-info__section:first-of-type {
+		order: 1;
+	}
+
+	.cwc-room-info__pricing {
+		order: 2;
+		max-width: 430px;
+		justify-self: center;
+	}
+
+	.cwc-room-info__section:not(:first-of-type) {
+		order: 3;
+	}
+
+	.cwc-room-info__title,
+	.cwc-room-info__label,
+	.cwc-room-info__description {
+		text-align: center;
+	}
+
+	.cwc-room-info__policies {
+		grid-template-columns: minmax(0, 1fr);
+	}
+
+	.cwc-room-info__policy-desc {
+		border-top: 0;
+		padding-top: 0;
+		text-align: center;
+	}
+
+	.cwc-room-info__policy-name {
+		justify-content: center;
+		text-align: center;
+	}
+}
+
+/* ---------------------------------------------------------
+ * Availability states
+ *
+ * Pill / notice styling for the three availability behaviors
+ * spec'd in room-management-transition.md § 3:
+ *
+ *   - .cwc-room-info--available    → no extras (default Book Now button).
+ *   - .cwc-room-info--fully-booked → red "Fully Booked" notice over the
+ *                                    Inquire CTA (same pricing layout).
+ *   - .cwc-room-info--maintenance  → amber "Coming Soon" badge next to
+ *                                    the title; pricing aside hidden by
+ *                                    the render template (no CSS needed).
+ *
+ * Colors lean on existing theme presets where possible to stay on
+ * brand and inherit the dark-mode story for free.
+ * --------------------------------------------------------- */
+
+.cwc-room-info__badge {
+	display: inline-block;
+	margin-inline-start: 0.75rem;
+	padding: 0.2rem 0.65rem;
+	border-radius: 999px;
+	background: #f59f00;
+	color: #fff;
+	font-size: clamp(10px, 0.8vw, 12px);
+	font-weight: 700;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	vertical-align: middle;
+}
+
+.cwc-room-info__notice {
+	margin: 0 0 0.5rem;
+	padding: 0.35rem 0.6rem;
+	border-radius: 6px;
+	background: #ffe3e3;
+	color: #c92a2a;
+	font-weight: 700;
+	font-size: clamp(12px, 0.9vw, 14px);
+	letter-spacing: 0.04em;
+	text-transform: uppercase;
+	text-align: center;
+}
+
+.cwc-room-info--fully-booked .cwc-room-info__book-button {
+	background: #adb5bd;
+}
+
+.cwc-room-info--fully-booked .cwc-room-info__book-button:hover,
+.cwc-room-info--fully-booked .cwc-room-info__book-button:focus {
+	background: #868e96;
+}

@@ -30,8 +30,17 @@ themes/twentytwentyfive/
 # --- Third-party plugins (installed via WP admin / composer) ---
 # Ignore everything in plugins/ by default …
 plugins/*
-# … but keep the directory itself and any custom plugins you build.
+# … but keep the directory itself and any custom plugins we build.
+# Note: gitignore re-includes need both the folder AND its contents,
+# otherwise files inside an excluded directory stay excluded even
+# when listed individually. Add a matching pair per custom plugin.
 !plugins/.gitkeep
+!plugins/cwc-accommodations/
+!plugins/cwc-accommodations/**
+!plugins/wordpress-importer/
+!plugins/wordpress-importer/**
+!plugins/wp-mail-smtp/
+!plugins/wp-mail-smtp/**
 
 # --- Dependency & build artifacts ---
 node_modules/
@@ -58,3 +67,7 @@ wp-content-debug.log
 
 # --- WP language files (auto-downloaded per environment) ---
 languages/
+
+project-cwcwake/
+
+/designs

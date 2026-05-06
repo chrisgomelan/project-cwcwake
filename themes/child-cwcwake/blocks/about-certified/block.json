@@ -1,0 +1,22 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "cwc/about-certified",
+  "title": "About — Certified Safe",
+  "category": "theme",
+  "description": "Dark section with 3-column certification cards and doodle background.",
+  "supports": { "html": false },
+  "textdomain": "child-cwcwake",
+  "attributes": {
+    "titleLine1": { "type": "string", "default": "CERTIFIED" },
+    "titleAccent1": { "type": "string", "default": "SAFE" },
+    "titleLine2": { "type": "string", "default": "BUILT for" },
+    "titleAccent2": { "type": "string", "default": "PERFORMANCE" },
+    "description": { "type": "string", "default": "" },
+    "items": { "type": "array", "default": [] },
+    "variant": { "type": "string", "default": "cards" },
+    "accentColor": { "type": "string", "default": "" }
+  },
+  "style": "file:./style.css",
+  "render": "file:./render.php"
+}

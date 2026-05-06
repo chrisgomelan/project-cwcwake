@@ -1,0 +1,72 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "cwc/coaching-section",
+	"version": "1.0.0",
+	"title": "Coaching Section",
+	"category": "theme",
+	"icon": "welcome-learn-more",
+	"description": "Two-column section: image on the left, text + stacked info cards on the right. Reusable for coaching/experience pages.",
+	"textdomain": "child-cwcwake",
+	"supports": {
+		"align": ["full"],
+		"html": false,
+		"anchor": true
+	},
+	"attributes": {
+		"titleStart": {
+			"type": "string",
+			"default": ""
+		},
+		"titleAccent": {
+			"type": "string",
+			"default": ""
+		},
+		"titleEnd": {
+			"type": "string",
+			"default": ""
+		},
+		"unifiedTitle": {
+			"type": "boolean",
+			"default": false
+		},
+		"description": {
+			"type": "string",
+			"default": ""
+		},
+		"subHeading": {
+			"type": "string",
+			"default": ""
+		},
+		"image1": {
+			"type": "string",
+			"default": ""
+		},
+		"image2": {
+			"type": "string",
+			"default": ""
+		},
+		"cards": {
+			"type": "array",
+			"default": []
+		},
+		"reversed": {
+			"type": "boolean",
+			"default": false
+		},
+		"accentColor": {
+			"type": "string",
+			"default": ""
+		},
+		"accentItalic": {
+			"type": "boolean",
+			"default": true
+		},
+		"cardTitleColor": {
+			"type": "string",
+			"default": ""
+		}
+	},
+	"render": "file:./render.php",
+	"style": "file:./style.css"
+}

@@ -1,0 +1,44 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "cwc/room-gallery",
+	"version": "1.0.0",
+	"title": "Room Gallery",
+	"category": "theme",
+	"icon": "format-gallery",
+	"description": "Three-column asymmetric image grid for the room landing page: one large image on the left, one tall image in the center, and two stacked images on the right. Includes an overlaid \"See All Images\" pill on the large image and a right-aligned \"Back to Rooms\" link above the grid.",
+	"textdomain": "child-cwcwake",
+	"supports": {
+		"align": ["full"],
+		"html": false,
+		"anchor": true
+	},
+	"attributes": {
+		"images": {
+			"type": "array",
+			"default": [],
+			"items": {
+				"type": "object"
+			}
+		},
+		"backLinkLabel": {
+			"type": "string",
+			"default": "Back to Accomodations"
+		},
+		"backLinkUrl": {
+			"type": "string",
+			"default": "/accommodations/"
+		},
+		"seeAllLabel": {
+			"type": "string",
+			"default": "See All Images"
+		},
+		"seeAllUrl": {
+			"type": "string",
+			"default": ""
+		}
+	},
+	"render": "file:./render.php",
+	"viewScript": "file:./view.js",
+	"style": "file:./style.css"
+}

@@ -1,0 +1,169 @@
+/*
+ * CWC Wake — About: Empowering the Region
+ */
+
+.cwc-about-empower,
+.cwc-empower {
+	--cwc-empower-bracket: var(--wp--preset--color--primary);
+	--cwc-empower-icon-bg: rgba(0, 175, 185, 0.2);
+	padding: clamp(2rem, 5vw, var(--wp--preset--spacing--60)) 0;
+}
+
+/* Header */
+.cwc-empower__header {
+	margin-bottom: clamp(32px, 4vw, 56px);
+}
+
+.cwc-empower__title {
+	font-family: 'Sora', var(--wp--preset--font-family--heading);
+	font-weight: 700;
+	font-size: clamp(1.8rem, 6vw, 4.5rem);
+	line-height: 1.1;
+	text-transform: uppercase;
+	color: var(--wp--preset--color--text);
+	margin: 0 0 var(--wp--preset--spacing--10);
+}
+
+.cwc-empower__accent {
+	color: var(--wp--preset--color--primary);
+	font-style: italic;
+}
+
+.cwc-empower__desc {
+	font-family: 'Archivo', var(--wp--preset--font-family--body);
+	font-weight: 500;
+	font-size: clamp(16px, 0.5vw + 14px, 20px);
+	line-height: 1.5;
+	color: #1A1A1A;
+	margin: 0;
+	max-width: 740px;
+}
+
+/* Two-column body */
+.cwc-empower__body {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: clamp(32px, 4vw, 64px);
+	align-items: center;
+}
+
+/* Left — image with brackets */
+.cwc-empower__media {
+	position: relative;
+	padding: 30px;
+}
+
+.cwc-empower__image-wrap {
+	position: relative;
+}
+
+.cwc-empower__bracket {
+	position: absolute;
+	width: clamp(50px, 7vw, 100px);
+	height: clamp(60px, 8.5vw, 120px);
+	border: clamp(10px, 15vw, 400px) solid var(--cwc-empower-bracket, var(--wp--preset--color--primary));
+	z-index: 1;
+}
+
+.cwc-empower__bracket--tl {
+	top: 0;
+	left: 0;
+	border-right: none;
+	border-bottom: none;
+}
+
+.cwc-empower__bracket--br {
+	bottom: 0;
+	right: 0;
+	border-left: none;
+	border-top: none;
+}
+
+.cwc-empower__image {
+	position: relative;
+	z-index: 2;
+	width: 100%;
+	height: auto;
+	object-fit: cover;
+	display: block;
+}
+
+/* Right — info cards */
+.cwc-empower__cards {
+	display: flex;
+	flex-direction: column;
+	gap: clamp(16px, 2vw, 24px);
+}
+
+.cwc-empower__card {
+	display: flex;
+	align-items: center;
+	gap: clamp(16px, 2vw, 28px);
+	background: #F9FFFF;
+	box-shadow: 0 4px 6px rgba(0, 0, 0, 0.25);
+	border-radius: 24px;
+	padding: clamp(16px, 2vw, 24px) clamp(20px, 2.5vw, 32px);
+}
+
+.cwc-empower__icon-wrap {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: clamp(72px, 7vw, 100px);
+	height: clamp(72px, 7vw, 100px);
+	flex-shrink: 0;
+	border-radius: 50%;
+	background: var(--cwc-empower-icon-bg, rgba(0, 175, 185, 0.2));
+}
+
+.cwc-empower__icon-wrap img,
+.cwc-empower__icon-img {
+	width: clamp(36px, 4vw, 56px);
+	height: clamp(36px, 4vw, 56px);
+	object-fit: contain;
+}
+
+.cwc-empower__card-text {
+	flex: 1;
+	min-width: 0;
+}
+
+.cwc-empower__card-title {
+	font-family: 'Sora', var(--wp--preset--font-family--heading);
+	font-weight: 700;
+	font-size: clamp(18px, 1.2vw + 8px, 24px);
+	line-height: 120%;
+	color: #000000;
+	margin: 0 0 8px;
+}
+
+.cwc-empower__card-desc {
+	font-family: 'Archivo', var(--wp--preset--font-family--body);
+	font-weight: 400;
+	font-size: clamp(14px, 0.5vw + 12px, 20px);
+	line-height: 150%;
+	color: #000000;
+	margin: 0;
+}
+
+/* ── Responsive ── */
+
+@media (max-width: 1024px) {
+	.cwc-empower__media {
+		display: none;
+	}
+
+	.cwc-empower__body {
+		grid-template-columns: 1fr;
+	}
+
+	.cwc-empower__card {
+		flex-direction: column;
+		text-align: center;
+		padding: 32px 24px;
+	}
+
+	.cwc-empower__icon-wrap {
+		margin-bottom: 8px;
+	}
+}

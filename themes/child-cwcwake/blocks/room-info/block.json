@@ -1,0 +1,86 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "cwc/room-info",
+	"version": "1.0.0",
+	"title": "Room Info",
+	"category": "theme",
+	"icon": "info-outline",
+	"description": "Main room detail card with a blue accent bar, title, description, amenity chips, an inline pricing/booking box, and a policies table. Used on individual room landing pages.",
+	"textdomain": "child-cwcwake",
+	"supports": {
+		"align": ["full"],
+		"html": false,
+		"anchor": true
+	},
+	"attributes": {
+		"title": {
+			"type": "string",
+			"default": ""
+		},
+		"descriptionLabel": {
+			"type": "string",
+			"default": "Room Description"
+		},
+		"description": {
+			"type": "string",
+			"default": ""
+		},
+		"amenitiesLabel": {
+			"type": "string",
+			"default": "Room Amenities"
+		},
+		"amenities": {
+			"type": "array",
+			"default": [],
+			"items": {
+				"type": "object"
+			}
+		},
+		"price": {
+			"type": "string",
+			"default": ""
+		},
+		"priceSubLabel": {
+			"type": "string",
+			"default": "per night"
+		},
+		"bookButtonLabel": {
+			"type": "string",
+			"default": "Book Now"
+		},
+		"bookButtonUrl": {
+			"type": "string",
+			"default": "#book"
+		},
+		"policiesLabel": {
+			"type": "string",
+			"default": "Policies"
+		},
+		"policiesIntro": {
+			"type": "string",
+			"default": "Everything you need to know about your stay policies and house rules."
+		},
+		"policies": {
+			"type": "array",
+			"default": [],
+			"items": {
+				"type": "object"
+			}
+		},
+		"inclusionsLabel": {
+			"type": "string",
+			"default": "Inclusions"
+		},
+		"inclusions": {
+			"type": "array",
+			"default": [],
+			"items": {
+				"type": "string"
+			}
+		}
+	},
+	"render": "file:./render.php",
+	"style": "file:./style.css",
+	"viewScript": "file:./view.js"
+}

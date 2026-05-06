@@ -39,18 +39,20 @@
 }
 
 .cwc-accommodations__header-text {
-	max-width: 550px;
+	max-width: 673px;
 }
 
 .cwc-accommodations__heading {
 	font-family: var(--wp--preset--font-family--body);
 	font-weight: 700;
 	font-style: italic;
-	font-size: var(--wp--preset--font-size--huge);
+	font-size: clamp(36px, 8vw, 64px);
 	line-height: 100%;
 	letter-spacing: 0;
 	color: #395144;
 	margin: 0 0 var(--wp--preset--spacing--20);
+	word-wrap: break-word;
+	overflow-wrap: break-word;
 }
 
 .cwc-accommodations__subtitle {
@@ -68,7 +70,8 @@
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
-	width: 300px;
+	width: 100%;
+	max-width: 300px;
 	height: 60px;
 	gap: 10px;
 	padding: 15px 20px;
@@ -87,6 +90,7 @@
 
 .cwc-accommodations__cta:hover {
 	background: var(--wp--preset--color--primary-dark);
+	color: #F5F1EB !important;
 }
 
 .cwc-accommodations__cta-icon {
@@ -143,11 +147,13 @@
    ---------------------------------------- */
 
 .cwc-accommodations__card-img {
+	position: relative;
 	padding: var(--wp--preset--spacing--20);
 	padding-bottom: 0;
 	overflow: hidden;
 	border-radius: var(--wp--custom--radius--md);
 }
+
 
 .cwc-accommodations__card-img img {
 	width: 100%;
@@ -255,8 +261,7 @@
 }
 
 .cwc-accommodations__card:hover .cwc-accommodations__card-btn {
-	background: #395144;
-	color: #F5F1EB;
+	background: #D6D6D6;
 }
 
 /* ----------------------------------------
@@ -283,9 +288,21 @@
 	.cwc-accommodations__card--odd {
 		margin-top: 0;
 	}
+}
 
+@media (max-width: 900px) {
 	.cwc-accommodations__header {
 		flex-direction: column;
-		align-items: flex-start;
+		align-items: center;
+		text-align: center;
+	}
+
+	.cwc-accommodations__header-text {
+		max-width: none;
+	}
+
+	.cwc-accommodations__heading,
+	.cwc-accommodations__subtitle {
+		text-align: center;
 	}
 }

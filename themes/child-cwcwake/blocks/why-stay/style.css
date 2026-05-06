@@ -1,0 +1,215 @@
+.cwc-why-stay {
+	width: 100%;
+	max-width: 1921px !important;
+	margin-inline: auto !important;
+	padding: var(--wp--preset--spacing--40) clamp(1rem, 4vw, 4rem);
+	background-color: transparent;
+	box-sizing: border-box;
+}
+
+.cwc-why-stay__header {
+	margin-bottom: var(--wp--preset--spacing--30);
+}
+
+.cwc-why-stay__title {
+	margin: 0;
+	color: var(--wp--preset--color--text);
+	font-family: var(--wp--preset--font-family--heading);
+	font-size: clamp(1.5rem, 8vw, 4.5rem);
+	font-weight: 700;
+	line-height: 1.1;
+	text-transform: uppercase;
+	letter-spacing: -0.01em;
+	overflow-wrap: break-word;
+}
+
+.cwc-why-stay__accent {
+	color: var(--wp--preset--color--primary);
+	font-style: italic;
+}
+
+.cwc-why-stay__description {
+	margin: var(--wp--preset--spacing--10) 0 0;
+	color: var(--wp--preset--color--text);
+	font-family: var(--wp--preset--font-family--body);
+	font-size: clamp(1rem, 1.2vw, 1.125rem);
+	font-weight: 500;
+	line-height: 1.3;
+}
+
+.cwc-why-stay__grid {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: var(--wp--preset--spacing--40);
+	width: 100%;
+	margin-top: var(--wp--preset--spacing--30);
+}
+
+.cwc-why-stay__item {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	width: 100%;
+	max-width: 360px;
+	text-align: center;
+}
+
+.cwc-why-stay__icon-wrapper {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 112px;
+	height: 104px;
+	margin-bottom: var(--wp--preset--spacing--20);
+	border-radius: 50%;
+	background-color: rgba(0, 150, 199, 0.15);
+	/* Softened blue */
+	transition: var(--wp--custom--transition--default);
+}
+
+.cwc-why-stay__item:hover .cwc-why-stay__icon-wrapper {
+	transform: scale(1.05);
+	background-color: rgba(0, 150, 199, 0.25);
+}
+
+.cwc-why-stay__icon {
+	width: 64px;
+	height: 64px;
+}
+
+.cwc-why-stay__item-title {
+	margin: 0 0 var(--wp--preset--spacing--10);
+	color: var(--wp--preset--color--primary);
+	font-family: var(--wp--preset--font-family--heading);
+	font-size: clamp(1.5rem, 2vw, 2rem);
+	font-weight: 700;
+	line-height: 1.1;
+}
+
+.cwc-why-stay__item-desc {
+	margin: 0;
+	color: #000000;
+	font-family: var(--wp--preset--font-family--body);
+	font-size: clamp(1rem, 1.2vw, 1.25rem);
+	font-weight: 500;
+	line-height: 1.4;
+}
+
+/* Tablet (768px+) */
+@media (min-width: 768px) {
+	.cwc-why-stay {
+		padding: var(--wp--preset--spacing--60) 0;
+	}
+
+	.cwc-why-stay__header {
+		margin-bottom: var(--wp--preset--spacing--40);
+	}
+
+
+	.cwc-why-stay__grid {
+		flex-direction: row;
+		flex-wrap: wrap;
+		justify-content: space-between;
+		align-items: stretch;
+		margin-top: var(--wp--preset--spacing--20);
+	}
+
+	.cwc-why-stay__item {
+		flex: 1 1 300px;
+		max-width: none;
+	}
+
+	.cwc-why-stay__icon-wrapper {
+		width: 120px;
+		height: 112px;
+	}
+
+	.cwc-why-stay__icon {
+		width: 70px;
+		height: 70px;
+	}
+
+}
+
+/* Desktop (1024px+) */
+@media (min-width: 1024px) {
+	.cwc-why-stay__grid {
+		gap: var(--wp--preset--spacing--50);
+	}
+}
+
+/* Wide (1280px+) */
+@media (min-width: 1280px) {}
+
+@media (max-width: 991px) {
+	.cwc-why-stay__header {
+		text-align: center;
+	}
+}
+
+/* Elite Facilities — Professional Edge (centered, orange accent) */
+
+.cwc-why-stay--elite .cwc-why-stay__header {
+	text-align: center;
+	width: 100%;
+	max-width: none;
+	margin-left: auto;
+	margin-right: auto;
+	padding-left: 0;
+	padding-right: 0;
+}
+
+.cwc-why-stay--elite .cwc-why-stay__title {
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.cwc-why-stay--elite .cwc-why-stay__accent {
+	color: #ed5b26;
+	font-style: normal;
+}
+
+.cwc-why-stay--elite .cwc-why-stay__description {
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.cwc-why-stay--elite .cwc-why-stay__grid {
+	justify-content: space-between;
+}
+
+.cwc-why-stay--elite .cwc-why-stay__icon-wrapper {
+	width: 100px;
+	height: 100px;
+	border-radius: 50%;
+	background-color: rgba(255, 107, 53, 0.5);
+}
+
+.cwc-why-stay--elite .cwc-why-stay__item:hover .cwc-why-stay__icon-wrapper {
+	background-color: rgba(255, 107, 53, 0.65);
+}
+
+.cwc-why-stay--elite .cwc-why-stay__item-title {
+	color: #000000;
+	font-size: clamp(1.25rem, 2vw, 24px);
+	line-height: 100%;
+}
+
+.cwc-why-stay--elite .cwc-why-stay__item-desc {
+	font-weight: 400;
+	font-size: clamp(1rem, 1.2vw, 20px);
+	line-height: 100%;
+}
+
+@media (min-width: 768px) {
+	.cwc-why-stay--elite .cwc-why-stay__grid {
+		justify-content: space-between;
+		gap: var(--wp--preset--spacing--50);
+	}
+
+	.cwc-why-stay--elite .cwc-why-stay__item {
+		flex: 1 1 300px;
+		max-width: none;
+	}
+}

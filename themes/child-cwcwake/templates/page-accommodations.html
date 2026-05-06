@@ -1,116 +1,114 @@
 <!-- wp:template-part {"slug":"header"} /-->
 
-<!-- wp:cover {"dimRatio":60,"overlayColor":"text","isUserOverlayColor":true,"minHeight":40,"minHeightUnit":"vh","align":"full","style":{"spacing":{"padding":{"top":"var:preset|spacing|60","bottom":"var:preset|spacing|60","left":"var:preset|spacing|40","right":"var:preset|spacing|40"}}},"layout":{"type":"constrained"}} -->
-<div class="wp-block-cover alignfull" style="padding-top:var(--wp--preset--spacing--60);padding-right:var(--wp--preset--spacing--40);padding-bottom:var(--wp--preset--spacing--60);padding-left:var(--wp--preset--spacing--40);min-height:40vh">
-	<span aria-hidden="true" class="wp-block-cover__background has-text-background-color has-background-dim-60 has-background-dim"></span>
-	<div class="wp-block-cover__inner-container">
-		<!-- wp:heading {"textAlign":"center","level":1,"style":{"typography":{"fontWeight":"700","textTransform":"uppercase"}},"textColor":"background"} -->
-		<h1 class="wp-block-heading has-text-align-center has-background-color has-text-color" style="font-weight:700;text-transform:uppercase">Accommodations</h1>
-		<!-- /wp:heading -->
+<!-- wp:cwc/hero-section {
+	"className": "cwc-hero--accommodations",
+	"headingLine1": "",
+	"headingEmphasis": "ACCOMMODATIONS",
+	"headingLine2": "",
+	"subtitle": "Stay in comfort at CWC with accommodations for every traveler — from private villas to relaxing spaces — just steps away from world-class wakeboarding and scenic views.",
+	"primaryBtnLabel": "",
+	"primaryBtnUrl": "",
+	"secondaryBtnLabel": "",
+	"secondaryBtnUrl": "",
+	"backgroundImage": "/wp-content/uploads/2026/04/accomodations-banner-bg.webp",
+	"minHeight": "100vh",
+	"showScrollToDive": false,
+	"align": "full"
+} /-->
 
-		<!-- wp:paragraph {"align":"center","style":{"typography":{"fontSize":"1.125rem"}},"textColor":"background"} -->
-		<p class="has-text-align-center has-background-color has-text-color" style="font-size:1.125rem">Rest and recharge right at the heart of the complex.</p>
-		<!-- /wp:paragraph -->
-	</div>
-</div>
-<!-- /wp:cover -->
+<!-- wp:group {
+	"align": "full",
+	"className": "cwc-tropical-section",
+	"style": {
+		"spacing": {
+			"margin": { "top": "0" },
+			"padding": {
+				"top": "var:preset|spacing|40",
+				"bottom": "var:preset|spacing|70"
+			},
+			"blockGap": "var:preset|spacing|40"
+		}
+	},
+	"layout": { "type": "constrained" }
+} -->
+<div class="wp-block-group alignfull cwc-tropical-section"
+	style="margin-top:0;padding-top:var(--wp--preset--spacing--40);padding-bottom:var(--wp--preset--spacing--70)">
+	<!-- wp:cwc/breadcrumbs /-->
 
-<!-- wp:group {"tagName":"main","style":{"spacing":{"margin":{"top":"0"}}},"layout":{"type":"constrained"}} -->
-<main class="wp-block-group" style="margin-top:0">
-	<!-- wp:post-content {"align":"full","layout":{"type":"constrained"}} /-->
-
-	<!-- wp:group {"align":"full","style":{"spacing":{"padding":{"top":"var:preset|spacing|60","bottom":"var:preset|spacing|60","left":"var:preset|spacing|40","right":"var:preset|spacing|40"}}},"layout":{"type":"constrained"}} -->
-	<div class="wp-block-group alignfull" style="padding-top:var(--wp--preset--spacing--60);padding-right:var(--wp--preset--spacing--40);padding-bottom:var(--wp--preset--spacing--60);padding-left:var(--wp--preset--spacing--40)">
-		<!-- wp:columns {"style":{"spacing":{"blockGap":"var:preset|spacing|50"}}} -->
-		<div class="wp-block-columns">
-			<!-- wp:column -->
-			<div class="wp-block-column">
-				<!-- wp:heading {"level":2,"style":{"typography":{"fontWeight":"700"}}} -->
-				<h2 class="wp-block-heading" style="font-weight:700">Villas</h2>
-				<!-- /wp:heading -->
-
-				<!-- wp:paragraph -->
-				<p>Spacious luxury villas for families and groups seeking a premium stay.</p>
-				<!-- /wp:paragraph -->
-
-				<!-- wp:buttons -->
-				<div class="wp-block-buttons">
-					<!-- wp:button {"className":"is-style-outline"} -->
-					<div class="wp-block-button is-style-outline"><a class="wp-block-button__link wp-element-button" href="/accommodations/villas/">View Villas</a></div>
-					<!-- /wp:button -->
-				</div>
-				<!-- /wp:buttons -->
-			</div>
-			<!-- /wp:column -->
-
-			<!-- wp:column -->
-			<div class="wp-block-column">
-				<!-- wp:heading {"level":2,"style":{"typography":{"fontWeight":"700"}}} -->
-				<h2 class="wp-block-heading" style="font-weight:700">Cabanas</h2>
-				<!-- /wp:heading -->
-
-				<!-- wp:paragraph -->
-				<p>Comfortable lakeside cabanas perfect for couples and small groups.</p>
-				<!-- /wp:paragraph -->
-
-				<!-- wp:buttons -->
-				<div class="wp-block-buttons">
-					<!-- wp:button {"className":"is-style-outline"} -->
-					<div class="wp-block-button is-style-outline"><a class="wp-block-button__link wp-element-button" href="/accommodations/cabanas/">View Cabanas</a></div>
-					<!-- /wp:button -->
-				</div>
-				<!-- /wp:buttons -->
-			</div>
-			<!-- /wp:column -->
-		</div>
-		<!-- /wp:columns -->
-
-		<!-- wp:columns {"style":{"spacing":{"blockGap":"var:preset|spacing|50","margin":{"top":"var:preset|spacing|40"}}}} -->
-		<div class="wp-block-columns" style="margin-top:var(--wp--preset--spacing--40)">
-			<!-- wp:column -->
-			<div class="wp-block-column">
-				<!-- wp:heading {"level":2,"style":{"typography":{"fontWeight":"700"}}} -->
-				<h2 class="wp-block-heading" style="font-weight:700">Dwell</h2>
-				<!-- /wp:heading -->
-
-				<!-- wp:paragraph -->
-				<p>Modern shared accommodations ideal for solo travelers and backpackers.</p>
-				<!-- /wp:paragraph -->
-
-				<!-- wp:buttons -->
-				<div class="wp-block-buttons">
-					<!-- wp:button {"className":"is-style-outline"} -->
-					<div class="wp-block-button is-style-outline"><a class="wp-block-button__link wp-element-button" href="/accommodations/dwell/">View Dwell</a></div>
-					<!-- /wp:button -->
-				</div>
-				<!-- /wp:buttons -->
-			</div>
-			<!-- /wp:column -->
-
-			<!-- wp:column -->
-			<div class="wp-block-column">
-				<!-- wp:heading {"level":2,"style":{"typography":{"fontWeight":"700"}}} -->
-				<h2 class="wp-block-heading" style="font-weight:700">Cabin</h2>
-				<!-- /wp:heading -->
-
-				<!-- wp:paragraph -->
-				<p>Cozy cabins surrounded by nature for a rustic retreat experience.</p>
-				<!-- /wp:paragraph -->
-
-				<!-- wp:buttons -->
-				<div class="wp-block-buttons">
-					<!-- wp:button {"className":"is-style-outline"} -->
-					<div class="wp-block-button is-style-outline"><a class="wp-block-button__link wp-element-button" href="/accommodations/cabin/">View Cabin</a></div>
-					<!-- /wp:button -->
-				</div>
-				<!-- /wp:buttons -->
-			</div>
-			<!-- /wp:column -->
-		</div>
-		<!-- /wp:columns -->
-	</div>
+	<!-- wp:group {
+		"tagName": "main",
+		"style": { "spacing": { "margin": { "top": "0" } } },
+		"layout": { "type": "constrained" }
+	} -->
+	<main class="wp-block-group" style="margin-top:0">
+		<!-- wp:cwc/why-stay {
+			"align": "full",
+			"heading": "WHY <span class=\"cwc-why-stay__accent\">STAY</span> AT CWC?",
+			"description": "Enjoy exclusive perks designed to make your stay seamless, from early park access to premium lakeside amenities.",
+			"items": [
+				{
+					"icon": "cozy-lakeside-rooms.svg",
+					"title": "Cozy Lakeside Rooms",
+					"desc": "Rest in cozy, air-con rooms just steps away from the pool, spa, and all the action."
+				},
+				{
+					"icon": "relaxing-spa-and-pools.svg",
+					"title": "Relaxing Spa & Pools",
+					"desc": "Melt the stress away with professional massages and relaxing poolside lounge areas."
+				},
+				{
+					"icon": "full-service-dining.svg",
+					"title": "Full-Service Dining",
+					"desc": "Taste local and global flavors at our restaurant, perfect for day-trippers and guests."
+				}
+			]
+		} /-->
+		<!-- wp:post-content {"align":"full","layout":{"type":"constrained"}} /-->
+	</main>
 	<!-- /wp:group -->
-</main>
+
+	<!-- wp:cwc/cards-section {
+		"variant": "detailed",
+		"headingPrimary": "Rooms",
+		"sectionDescription": "From eco-friendly Dwell units to luxury lakeside villas, find the perfect space to rest after a day on the water.",
+		"dynamicSource": "accommodation",
+		"align": "full"
+	} /-->
+
+	<!-- wp:cwc/cards-section {
+		"variant": "overlay",
+		"headingPrimary": "Leisure",
+		"headingSecondary": "Services",
+		"sectionDescription": "No room? No problem. Access our clubhouse, swimming pools, and massage huts with our flexible leisure service passes.",
+		"items": [
+			{
+				"title": "CLUBHOUSE RESTAURANT & BAR",
+				"image": "/wp-content/uploads/2026/04/clubhouse-resto-bar.webp",
+				"description": "Explore the many wonderful dishes and treats at our Clubhouse. We offer a wide variety of dishes which include cuisines from Korea, Japan, Philippines and even some Western flavor. We also offer a full bar featuring San Miguel beers and some tasty tropical delights.",
+				"span": 7
+			},
+			{
+				"title": "CABANA RENTALS",
+				"image": "/wp-content/uploads/2026/04/cabana-rentals.webp",
+				"description": "If you're looking to have your own little space to chill at CWC, then the cabana rentals are for you. You can have a cabana all day or night to eat, relax or even take a nap. The wait staff will come along to see if you need any food or refreshments.",
+				"span": 5
+			},
+			{
+				"title": "SWIMMING POOL",
+				"image": "/wp-content/uploads/2026/04/swimming-pool.webp",
+				"description": "Getting a little too hot for your liking? Well, splash around in the swimming pool and cool yourself off. Swimming is a great exercise and a lot of fun! Remember to take out your valuables before jumping in!",
+				"span": 5
+			},
+			{
+				"title": "SKATE PARK",
+				"image": "/wp-content/uploads/2026/04/skate-park.webp",
+				"description": "The CamSur Skate Park is open to the public and is currently free. All you need to do is to sign the waiver and you're ready to skate. It features a 6 ft. half pipe, transitions and some street style stuff.",
+				"span": 7
+			}
+		],
+		"align": "full"
+	} /-->
+</div>
 <!-- /wp:group -->
 
 <!-- wp:template-part {"slug":"footer"} /-->

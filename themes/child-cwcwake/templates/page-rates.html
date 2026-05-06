@@ -1,0 +1,139 @@
+<!-- wp:template-part {"slug":"header"} /-->
+
+<!-- wp:cwc/page-banner {
+	"title": "RATES",
+	"backgroundImage": "/wp-content/uploads/2026/04/rates-banner-bg.webp",
+	"overlayOpacity": 40,
+	"size": "default",
+	"minHeight": 397,
+	"paddingTop": 115,
+	"backgroundPosition": "center",
+	"showCorners": false,
+	"useFeaturedImage": true,
+	"align": "full"
+} /-->
+
+<!-- wp:group {
+	"align": "full",
+	"className": "cwc-tropical-section",
+	"style": {
+		"spacing": {
+			"margin": { "top": "0" },
+			"padding": {
+				"top": "var:preset|spacing|40",
+				"bottom": "var:preset|spacing|70"
+			},
+			"blockGap": "var:preset|spacing|60"
+		}
+	},
+	"layout": { "type": "default" }
+} -->
+<div class="wp-block-group alignfull cwc-tropical-section"
+	style="margin-top:0;padding-top:var(--wp--preset--spacing--40);padding-bottom:var(--wp--preset--spacing--70)">
+
+	<!-- wp:cwc/breadcrumbs /-->
+
+	<!-- wp:cwc/rates-manager {
+		"align": "full",
+		"categories": [
+			{
+				"id": "park-hours",
+				"title": "Park Hours",
+				"description": "Operating hours for our world-class cable park and winch park. Plan your sessions accordingly.",
+				"table": [
+					["MONDAY - THURSDAY", "8:00 AM - 6:00 PM", "FULL CABLE, WINCH PARK"],
+					["FRIDAY - SUNDAY", "8:00 AM - 9:00 PM", "FULL CABLE"],
+					["", "8:00 AM - 9:00 PM", "WINCH PARK"]
+				]
+			},
+			{
+				"id": "restaurant-and-happy-endings",
+				"title": "Restaurant and Happy Endings",
+				"description": "Delicious meals and refreshing drinks available daily. Please note Happy Endings bar status below.",
+				"table": [
+					["MONDAY - SUNDAY", "6:00 AM - 11:00 PM", "RESTAURANT"],
+					["", "", "HAPPY ENDINGS CLOSED"]
+				]
+			},
+			{
+				"id": "wakeboarding",
+				"title": "Wakeboarding",
+				"description": "Choose from our flexible riding durations. Rates include wakeboard with slip-on bindings and kneeboards. *Rental of vest and helmet requires Php 500 deposit + Valid ID.",
+				"table": [
+					["1 HOUR", "PHP 250.00", "4.05 USD","3.48 EUR"],
+					["2 HOURS", "PHP 400.00", "6.48 USD","5.56 EUR"],
+					["4 HOURS (HALF DAY)", "PHP 700.00", "11.34 USD","9.73 EUR"],
+					["WHOLE DAY (8AM-6PM)", "PHP 1,250.00", "20.25 USD","17.38 EUR"]
+				]
+			},
+			{
+				"id": "cable-membership-rates",
+				"title": "Cable Membership Rates",
+				"description": "Unlimited wakeboarding for frequent riders. *Not inclusive of rental gear and equipment. Not transferable and non-refundable.",
+				"table": [
+					["1 WEEK MEMBERSHIP", "PHP 6,000.00", "97.20 USD","83.40 EUR"],
+					["2 WEEKS MEMBERSHIP", "PHP 8,000.00", "129.60 USD","111.20 EUR"],
+					["1 MONTH MEMBERSHIP", "PHP 15,000.00", "243.00 USD","208.50 EUR"],
+					["3 MONTHS MEMBERSHIP", "PHP 30,000.00", "486.00 USD","417.00 EUR"],
+					["6 MONTHS MEMBERSHIP", "PHP 40,000.00", "648.00 USD","556.00 EUR"],
+					["1 YEAR MEMBERSHIP", "PHP 50,000.00", "810.00 USD","695.00 EUR"]
+				]
+			},
+			{
+				"id": "massage",
+				"title": "Massage",
+				"description": "9:30 AM - 10:00 PM | Relax with our signature combination of Swedish & Shiatsu massage treatments.",
+				"table": [
+					["LAKE SIDE MASSAGE", "PHP 450.00", "7.29 USD", "6.26 EUR"],
+					["ROOM SERVICE MASSAGE", "PHP 550.00", "8.91 USD", "7.65 EUR"]
+				]
+			},
+			{
+				"id": "swimming-pool",
+				"title": "CWC Swimming Pool",
+				"description": "Monday - Sunday | 8:00 AM - 6:00 PM",
+				"table": [
+					["CHILDREN (TEN YEARS OLD BELOW)", "PHP 130.00", "2.11 USD", "1.81 EUR"],
+					["ADULT", "PHP 150.00", "2.43 USD", "2.09 EUR"]
+				]
+			},
+			{
+				"id": "pickle-ball",
+				"title": "Pickleball",
+				"description": "Court rentals and equipment for pickleball enthusiasts. Peak hours apply in the morning and evening.",
+				"table": [
+					["MORNING PEAK (6AM-8AM)", "PHP 600.00 / HR", "9.72 USD", "8.34 EUR"],
+					["OFF PEAK (8AM-4PM)", "PHP 500.00 / HR", "8.10 USD", "6.95 EUR"],
+					["EVENING PEAK (4PM-10PM)", "PHP 600.00 / HR", "9.72 USD", "8.34 EUR"],
+					["EQUIPMENT: PADDLE (BRANDED)", "PHP 150.00 / 3 HRS", "2.43 USD", "2.09 EUR"],
+					["EQUIPMENT: PADDLE (NON-BRANDED)", "PHP 100.00 / 3 HRS", "1.62 USD", "1.39 EUR"],
+					["EQUIPMENT: BALLS (3PCS)", "PHP 100.00 / HR", "1.62 USD", "1.39 EUR"],
+					["EQUIPMENT: TOWEL", "PHP 50.00", "0.81 USD", "0.70 EUR"],
+					["EQUIPMENT: BALL MACHINE", "PHP 600.00 / HR", "9.72 USD", "8.34 EUR"],
+					["EQUIPMENT: LOCKER ACCESS", "PHP 50.00 / 3 HRS", "0.81 USD", "0.70 EUR"],
+					["EQUIPMENT: BALL PICKER", "PHP 100.00 / HR", "1.62 USD", "1.39 EUR"],
+					["PACKAGE: 1 DAY PASS (2HR COURT)", "PHP 400.00", "6.48 USD", "5.56 EUR"],
+					["PACKAGE: 3 DAY PASS (2HR COURT)", "PHP 1,000.00", "16.20 USD", "13.90 EUR"],
+					["PACKAGE: 7 DAY PASS (2HR COURT)", "PHP 2,000.00", "32.40 USD", "27.80 EUR"]
+				]
+			},
+			{
+				"id": "pili-grove-golf-club",
+				"title": "Pili Grove Golf Club",
+				"description": "Executive Golf Course and Driving Range rates.",
+				"table": [
+					["9 HOLE GREEN FEE (REGULAR)", "PHP 650.00", "10.53 USD", "9.04 EUR"],
+					["9 HOLE GREEN FEE (NIGHT)", "PHP 750.00", "12.15 USD", "10.43 EUR"],
+					["18 HOLE GREEN FEE (REGULAR)", "PHP 950.00", "15.39 USD", "13.21 EUR"],
+					["18 HOLE GREEN FEE (NIGHT)", "PHP 1,050.00", "17.01 USD", "14.60 EUR"],
+					["DRIVING RANGE RATE", "PHP 650.00", "10.53 USD", "9.04 EUR"],
+					["GOLF CLUB RENTALS (PER HR)", "PHP 300.00", "4.86 USD", "4.17 EUR"]
+				]
+			}
+		]
+	} /-->
+
+</div>
+<!-- /wp:group -->
+
+<!-- wp:template-part {"slug":"footer"} /-->

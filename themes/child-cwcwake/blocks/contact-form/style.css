@@ -1,0 +1,234 @@
+/**
+ * cwc/contact-form block styles.
+ *
+ * "Send Us A Message" panel: rounded card containing labelled inputs
+ * and a primary submit button. Spec lives at
+ * designs/contact-page-design.md (sections 5.1 and 5.2).
+ */
+
+.cwc-contact-form {
+	margin-block-start: var(--wp--preset--spacing--50, 2.5rem) !important;
+	margin-block-end: var(--wp--preset--spacing--60, 4rem);
+}
+
+.cwc-contact-form__panel {
+	background: #f8f9fa;
+	border: 1px solid #2783A1;
+	border-radius: 30px;
+	padding: clamp(1.5rem, 3.5vw, 3rem);
+	display: flex;
+	flex-direction: column;
+	gap: clamp(1rem, 2vw, 1.75rem);
+}
+
+/* ---------- Header ---------- */
+
+.cwc-contact-form__header {
+	display: flex;
+	align-items: center;
+	gap: 1rem;
+	margin: 0;
+}
+
+.cwc-contact-form__icon-wrap {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 64px;
+	height: 64px;
+	background: rgba(0, 150, 199, 0.2);
+	border-radius: 50%;
+	flex-shrink: 0;
+}
+
+.cwc-contact-form__icon {
+	width: 32px;
+	height: 32px;
+	object-fit: contain;
+}
+
+.cwc-contact-form__title {
+	margin: 0;
+	font-family: var(--wp--preset--font-family--heading, 'Sora', sans-serif);
+	font-weight: 700;
+	font-size: clamp(2rem, 4vw, 4rem);
+	line-height: 1;
+	color: var(--wp--preset--color--primary, #0096c7);
+}
+
+/* ---------- Banners ---------- */
+
+.cwc-contact-form__banner {
+	padding: 0.85rem 1.25rem;
+	border-radius: 12px;
+	font-family: var(--wp--preset--font-family--body, 'Archivo', sans-serif);
+	font-weight: 500;
+	font-size: 1rem;
+	line-height: 1.4;
+	border: 1px solid transparent;
+}
+
+.cwc-contact-form__banner:focus {
+	outline: 2px solid currentColor;
+	outline-offset: 2px;
+}
+
+.cwc-contact-form__banner--success {
+	background: #e6f6ec;
+	color: #155724;
+	border-color: rgba(22, 163, 74, 0.3);
+}
+
+.cwc-contact-form__banner--error {
+	background: #fdecec;
+	color: #8a1f23;
+	border-color: rgba(220, 38, 38, 0.3);
+}
+
+/* ---------- Form ---------- */
+
+.cwc-contact-form__form {
+	display: flex;
+	flex-direction: column;
+	gap: clamp(0.85rem, 1.5vw, 1.25rem);
+	margin: 0;
+}
+
+/*
+ * Honeypot trick: visible to scripted bots that read the DOM but
+ * removed from layout for sighted/keyboard users. Submissions where
+ * this field is filled are silently rejected server-side.
+ */
+.cwc-contact-form__honeypot {
+	position: absolute;
+	left: -9999px;
+	width: 1px;
+	height: 1px;
+	overflow: hidden;
+}
+
+.cwc-contact-form__field {
+	display: flex;
+	flex-direction: column;
+	gap: 0.65rem;
+}
+
+.cwc-contact-form__label {
+	font-family: var(--wp--preset--font-family--body, 'Archivo', sans-serif);
+	font-weight: 600;
+	font-size: clamp(1rem, 1.2vw, 1.375rem);
+	line-height: 1;
+	color: #000000;
+}
+
+.cwc-contact-form__required {
+	color: #ca0003;
+	margin-left: 0.15em;
+}
+
+.cwc-contact-form__input {
+	width: 100%;
+	min-height: 60px;
+	padding: 0.85rem 1.15rem;
+	border: 1px solid rgba(0, 0, 0, 0.1);
+	border-radius: 15px;
+	background: rgba(0, 150, 199, 0.05);
+	font-family: var(--wp--preset--font-family--body, 'Archivo', sans-serif);
+	font-weight: 600;
+	font-size: clamp(1rem, 1.2vw, 1.375rem);
+	line-height: 1.3;
+	color: #000000;
+	transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+.cwc-contact-form__input::placeholder {
+	color: rgba(0, 0, 0, 0.5);
+	font-weight: 600;
+}
+
+.cwc-contact-form__input:focus {
+	outline: none;
+	border-color: var(--wp--preset--color--primary, #0096c7);
+	background: #ffffff;
+	box-shadow: 0 0 0 3px rgba(0, 150, 199, 0.2);
+}
+
+.cwc-contact-form__input--textarea {
+	min-height: 160px;
+	resize: vertical;
+	padding-top: 1rem;
+	padding-bottom: 1rem;
+	line-height: 1.5;
+}
+
+/*
+ * Validation styling — matches both server-rendered errors
+ * (`aria-invalid="true"` set by render.php) and the live invalid
+ * state produced by the browser after a blur on the offending input
+ * (toggled by view.js).
+ */
+.cwc-contact-form__input[aria-invalid="true"],
+.cwc-contact-form__input.is-invalid {
+	border-color: #ca0003;
+	background: #fff5f5;
+	box-shadow: 0 0 0 3px rgba(202, 0, 3, 0.12);
+}
+
+.cwc-contact-form__error {
+	display: none;
+	margin: 0;
+	font-family: var(--wp--preset--font-family--body, 'Archivo', sans-serif);
+	font-size: 0.9rem;
+	color: #ca0003;
+}
+
+.cwc-contact-form__field.is-invalid .cwc-contact-form__error {
+	display: block;
+}
+
+/* ---------- Submit ---------- */
+
+.cwc-contact-form__submit {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 10px;
+	width: 100%;
+	min-height: 64px;
+	margin-top: 1rem;
+	padding: 1.1rem 1.5rem;
+	border: 0;
+	border-radius: 30px;
+	background: var(--wp--preset--color--primary, #0096c7);
+	color: #f5f1eb;
+	font-family: var(--wp--preset--font-family--body, 'Archivo', sans-serif);
+	font-weight: 500;
+	font-size: clamp(1.1rem, 1.4vw, 1.375rem);
+	line-height: 1;
+	cursor: pointer;
+	transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.cwc-contact-form__submit:hover,
+.cwc-contact-form__submit:focus-visible {
+	background: var(--wp--preset--color--primary-dark, #007ba3);
+	color: #ffffff;
+	transform: translateY(-1px);
+}
+
+.cwc-contact-form__submit[disabled] {
+	opacity: 0.7;
+	cursor: progress;
+	transform: none;
+}
+
+@media (max-width: 540px) {
+	.cwc-contact-form__icon-wrap {
+		width: 52px;
+		height: 52px;
+	}
+	.cwc-contact-form__icon {
+		width: 26px;
+		height: 26px;
+	}
+}

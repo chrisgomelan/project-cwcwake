@@ -1,0 +1,40 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "cwc/featured-blogs",
+	"version": "1.0.0",
+	"title": "Featured Blogs",
+	"category": "theme",
+	"icon": "layout",
+	"description": "Asymmetric 5-card grid for the Blogs page Featured section. Pulls posts flagged with `_cwc_blog_featured = 1` and falls back to the latest published posts when fewer than 5 are flagged.",
+	"textdomain": "child-cwcwake",
+	"supports": {
+		"align": ["full"],
+		"html": false,
+		"anchor": true
+	},
+	"attributes": {
+		"heading": {
+			"type": "string",
+			"default": "FEATURED"
+		},
+		"headingHighlight": {
+			"type": "string",
+			"default": "BLOGS"
+		},
+		"description": {
+			"type": "string",
+			"default": "Explore our featured blogs and dive into the best of CWC—from thrilling wakeboarding experiences to travel tips and local highlights. Discover stories, insights, and inspiration to help you make the most of every visit."
+		},
+		"readMoreLabel": {
+			"type": "string",
+			"default": "Read More"
+		},
+		"placeholderImage": {
+			"type": "string",
+			"default": "/wp-content/uploads/2026/04/blogs-banner-bg.webp"
+		}
+	},
+	"render": "file:./render.php",
+	"style": "file:./style.css"
+}

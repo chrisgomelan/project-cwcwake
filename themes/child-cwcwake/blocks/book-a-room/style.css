@@ -1,0 +1,703 @@
+.wp-block-cwc-book-a-room {
+	display: flex;
+	flex-direction: column;
+	gap: 60px;
+}
+
+.cwc-book-hero {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	position: relative;
+	width: 100%;
+	max-width: 1921px;
+	margin: 0 auto;
+	padding-left: clamp(1rem, 4vw, 4rem);
+	padding-right: clamp(1rem, 4vw, 4rem);
+}
+
+.cwc-book-hero__title {
+	font-family: var(--wp--preset--font-family--sora, 'Sora', sans-serif);
+	font-weight: 700;
+	font-size: clamp(32px, 5vw, 72px);
+	line-height: 1.1;
+	color: #0096C7;
+	text-align: left;
+	margin-top: 40px;
+	margin-bottom: 24px;
+	text-transform: uppercase;
+}
+
+.cwc-book-hero__desc {
+	font-family: var(--wp--preset--font-family--archivo, 'Archivo', sans-serif);
+	font-weight: 500;
+	font-size: clamp(16px, 1.5vw, 20px);
+	line-height: 1.5;
+	color: #1A1A1A;
+	text-align: left;
+	max-width: 1154px;
+	margin: 0 0 60px;
+}
+
+.cwc-book-hero__images-wrap {
+	position: relative;
+	width: 100%;
+	max-width: 100%;
+	margin: 0 auto;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+.cwc-book-hero__images {
+	display: flex;
+	width: 100%;
+}
+
+.cwc-book-hero__image-tile {
+	flex: 1;
+	height: 620px;
+	position: relative;
+	overflow: hidden;
+}
+
+.cwc-book-hero__image {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background-size: cover;
+	background-position: center;
+}
+
+.cwc-book-hero__image-overlay {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background: rgba(0, 0, 0, 0.2);
+}
+
+/* Booking Bar */
+.cwc-booking-bar {
+	position: absolute;
+	bottom: -77px;
+	width: 100%;
+	max-width: 1429px;
+	height: 154px;
+	border-radius: 30px;
+	background: #F8F9FA;
+	box-shadow: 0px 4px 15px 0px rgba(0, 0, 0, 0.25);
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 0 40px;
+	z-index: 10001;
+	gap: 15px;
+}
+
+@media (min-width: 1025px) {
+	.cwc-booking-bar.is-sticky {
+		position: fixed;
+		left: 50%;
+		transform: translateX(-50%);
+		z-index: 10001;
+		width: calc(100% - 2 * clamp(1rem, 4vw, 4rem));
+		max-width: 1429px;
+		height: 100px;
+		margin: 0;
+		padding: 0 30px;
+		box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+		border-radius: 0 0 20px 20px;
+	}
+
+	.cwc-booking-bar.is-sticky .cwc-booking-bar__field {
+		height: 70px;
+		padding: 10px 16px;
+	}
+
+	.cwc-booking-bar.is-sticky .cwc-booking-bar__label {
+		font-size: 16px;
+	}
+
+	.cwc-booking-bar.is-sticky .cwc-booking-bar__proceed {
+		height: 54px;
+		width: 140px;
+	}
+
+	.cwc-booking-bar__field--checkout .cwc-booking-modal,
+	.cwc-booking-bar__field--guests .cwc-booking-modal {
+		left: auto;
+		right: 0;
+	}
+}
+
+.cwc-booking-bar__field {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	width: 339px;
+	height: 94px;
+	border-radius: 6px;
+	border: 1px solid rgba(0, 0, 0, 0.4);
+	background: #F7F9FB;
+	padding: 24px 16px;
+	cursor: pointer;
+	transition: border-color 0.3s;
+	position: relative;
+}
+
+.cwc-booking-bar__field:hover {
+	border-color: #0096C7;
+}
+
+.cwc-booking-bar__icon {
+	width: 24px;
+	height: 24px;
+	flex-shrink: 0;
+}
+
+.cwc-booking-bar__content {
+	display: flex;
+	flex-direction: column;
+}
+
+.cwc-booking-bar__label {
+	font-family: var(--wp--preset--font-family--poppins, 'Poppins', sans-serif);
+	font-weight: 600;
+	font-size: clamp(16px, 1.5vw, 20px);
+	line-height: 1.2;
+	color: #0096C7;
+}
+
+.cwc-booking-bar__value {
+	font-family: var(--wp--preset--font-family--inter, 'Inter', sans-serif);
+	font-weight: 400;
+	font-size: 16px;
+	color: #1A1A1A;
+}
+
+.cwc-booking-bar__proceed {
+	width: 168px;
+	height: 64px;
+	border-radius: 30px;
+	background: #ED5B26;
+	color: #F5F1EB;
+	font-family: var(--wp--preset--font-family--archivo, 'Archivo', sans-serif);
+	font-weight: 600;
+	font-size: clamp(18px, 20px, 20px);
+	border: none;
+	cursor: pointer;
+	transition: background-color 0.3s;
+}
+
+.cwc-booking-bar__proceed:hover {
+	background: #d84b1a;
+}
+
+.cwc-book-notice {
+	font-family: var(--wp--preset--font-family--archivo, 'Archivo', sans-serif);
+	font-weight: 400;
+	font-size: clamp(16px, 1.5vw, 20px);
+	color: #1A1A1A;
+	text-align: center;
+	margin-top: 100px;
+	width: 100%;
+	max-width: none;
+}
+
+/* Room Cards Section */
+.cwc-room-cards {
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	gap: 40px;
+	width: 100%;
+	max-width: 1921px;
+	margin: 0 auto;
+	padding-left: clamp(1rem, 4vw, 4rem);
+	padding-right: clamp(1rem, 4vw, 4rem);
+}
+
+.cwc-room-card {
+	display: flex;
+	width: 100%;
+	background: #F8F9FA;
+	box-shadow: -2px 4px 12px 0px rgba(24, 24, 24, 0.08);
+	padding: 32px;
+	border-radius: 8px;
+	flex-direction: column;
+	gap: 20px;
+}
+
+.cwc-room-card__image {
+	width: 100%;
+	height: 246px;
+	border-radius: 4px;
+	background-size: cover;
+	background-position: center;
+}
+
+.cwc-room-card__content {
+	display: flex;
+	flex-direction: column;
+	gap: 16px;
+	flex: 1;
+}
+
+.cwc-room-card__header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+
+.cwc-room-card__title {
+	font-family: var(--wp--preset--font-family--sora, 'Sora', sans-serif);
+	font-weight: 600;
+	font-size: clamp(24px, 3vw, 48px);
+	color: #0096C7;
+	margin: 0;
+	line-height: 1;
+}
+
+.cwc-room-card__price {
+	background: #0096C7;
+	color: #FFF;
+	padding: 8px 16px;
+	border-radius: 4px;
+	font-family: var(--wp--preset--font-family--sora, 'Sora', sans-serif);
+	font-weight: 600;
+	font-size: clamp(16px, 1.5vw, 20px);
+}
+
+.cwc-room-card__inclusions {
+	list-style: none;
+	padding: 0;
+	margin: 0;
+	display: flex;
+	flex-direction: column;
+}
+
+.cwc-room-card__inclusions li {
+	font-family: var(--wp--preset--font-family--archivo, 'Archivo', sans-serif);
+	font-weight: 500;
+	font-size: 14px;
+	color: #474747;
+	position: relative;
+}
+
+.cwc-room-card__inclusion-fallback {
+	display: flex !important;
+	align-items: center;
+	color: rgba(71, 71, 71, 0.7) !important;
+	font-style: italic;
+	margin-top: 4px;
+}
+
+.cwc-room-card__btn {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	width: 100%;
+	height: 64px;
+	background: #395144;
+	color: #F5F1EB;
+	border-radius: 30px;
+	text-decoration: none;
+	font-family: var(--wp--preset--font-family--archivo, 'Archivo', sans-serif);
+	font-weight: 500;
+	font-size: clamp(18px, 1.8vw, 22px);
+	margin-top: auto;
+	transition: background-color 0.3s;
+}
+
+.cwc-room-card__btn:hover {
+	background: #d84b1a;
+	color: #FFF;
+}
+
+/* Modal Styles */
+.cwc-modal-backdrop {
+	position: fixed;
+	inset: 0;
+	background: transparent;
+	display: none;
+	z-index: 10050;
+}
+
+.cwc-modal-backdrop.is-active {
+	display: block;
+}
+
+.cwc-booking-modal {
+	z-index: 10060;
+	display: none;
+	width: max-content;
+	min-width: 100%;
+	max-width: 420px;
+	cursor: default;
+}
+
+@media (min-width: 1025px) {
+	.cwc-booking-modal {
+		position: absolute;
+		top: 100%;
+		left: 0;
+	}
+}
+
+.cwc-booking-modal.is-active {
+	display: block;
+}
+
+.cwc-booking-modal__content {
+	background: #F7F9FB;
+	border-radius: 12px;
+	padding: 40px;
+	box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+}
+
+.cwc-booking-modal__content--calendar {
+	max-width: 420px;
+	padding: 24px;
+}
+
+.cwc-booking-modal__title {
+	font-family: var(--wp--preset--font-family--heading, 'Sora', sans-serif);
+	font-weight: 600;
+	font-size: clamp(24px, 2.5vw, 36px);
+	color: #0096C7;
+	margin: 0 0 24px;
+}
+
+/* Calendar Component */
+.cwc-calendar__header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 24px;
+	padding: 0 10px;
+}
+
+.cwc-calendar__month-year {
+	font-family: var(--wp--preset--font-family--heading, 'Sora', sans-serif);
+	font-size: clamp(18px, 2vw, 24px);
+	font-weight: 600;
+	color: #1A1A1A;
+	margin: 0;
+	text-transform: capitalize;
+}
+
+.cwc-calendar__prev,
+.cwc-calendar__next {
+	background: none;
+	border: none;
+	cursor: pointer;
+	color: #1A1A1A;
+	padding: 5px;
+	display: flex;
+	align-items: center;
+	transition: opacity 0.2s;
+	outline: none;
+}
+
+.cwc-calendar__prev:hover,
+.cwc-calendar__next:hover {
+	opacity: 0.6;
+}
+
+.cwc-calendar__days-labels {
+	display: grid;
+	grid-template-columns: repeat(7, 1fr);
+	text-align: center;
+	margin-bottom: 12px;
+}
+
+.cwc-calendar__days-labels span {
+	font-family: var(--wp--preset--font-family--body, 'Archivo', sans-serif);
+	font-weight: 600;
+	font-size: 18px;
+	color: #454C58;
+}
+
+.cwc-calendar__grid {
+	display: grid;
+	grid-template-columns: repeat(7, 1fr);
+	gap: 2px 0;
+	margin-bottom: 30px;
+}
+
+.cwc-calendar__day {
+	aspect-ratio: 1;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	cursor: pointer;
+	font-family: var(--wp--preset--font-family--body, 'Archivo', sans-serif);
+	font-size: 18px;
+	color: #1A1A1A;
+	transition: all 0.2s;
+	position: relative;
+	z-index: 1;
+}
+
+.cwc-calendar__day--empty {
+	cursor: default;
+}
+
+.cwc-calendar__day--disabled {
+	opacity: 0.2;
+	cursor: not-allowed;
+}
+
+.cwc-calendar__day--selected {
+	background: #0096C7 !important;
+	color: #FFFFFF !important;
+	border-radius: 4px;
+}
+
+.cwc-calendar__day--in-range {
+	background: #89D1E8;
+	color: #1A1A1A;
+}
+
+.cwc-calendar__day--range-start {
+	border-top-left-radius: 4px;
+	border-bottom-left-radius: 4px;
+}
+
+.cwc-calendar__day--range-end {
+	border-top-right-radius: 4px;
+	border-bottom-right-radius: 4px;
+}
+
+.cwc-calendar__day:hover:not(.cwc-calendar__day--empty):not(.cwc-calendar__day--disabled):not(.cwc-calendar__day--selected) {
+	background: #E8EEF2;
+	border-radius: 4px;
+}
+
+.cwc-booking-modal__options {
+	display: flex;
+	flex-direction: column;
+	gap: 16px;
+	margin-bottom: 30px;
+}
+
+.cwc-booking-modal__option {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 16px;
+	border: 1px solid rgba(0, 0, 0, 0.1);
+	border-radius: 8px;
+	cursor: pointer;
+	transition: border-color 0.3s;
+}
+
+.cwc-booking-modal__option:hover {
+	border-color: #0096C7;
+}
+
+.cwc-booking-modal__label {
+	font-family: var(--wp--preset--font-family--sora, 'Sora', sans-serif);
+	font-weight: 600;
+	font-size: clamp(16px, 1.5vw, 20px);
+	color: #2B3037;
+	display: block;
+}
+
+.cwc-booking-modal__sublabel {
+	font-family: var(--wp--preset--font-family--inter, 'Inter', sans-serif);
+	font-weight: 400;
+	font-size: clamp(14px, 1.2vw, 16px);
+	color: rgba(26, 26, 26, 0.5);
+}
+
+.cwc-booking-modal__radio {
+	accent-color: #0096C7;
+	width: 20px;
+	height: 20px;
+	outline: none;
+}
+
+.cwc-booking-modal__confirm {
+	width: 100%;
+	height: 61px;
+	border-radius: 12px;
+	background: #F7F9FB;
+	border: 1px solid #0081A7;
+	color: #0096C7;
+	font-family: var(--wp--preset--font-family--sora, 'Sora', sans-serif);
+	font-weight: 600;
+	font-size: clamp(16px, 1.5vw, 18px);
+	cursor: pointer;
+	transition: background-color 0.3s, color 0.3s;
+}
+
+.cwc-booking-modal__confirm:hover {
+	background: #0096C7;
+	color: #FFF;
+}
+
+.cwc-booking-modal__counter {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 24px;
+	padding-bottom: 16px;
+	border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.cwc-booking-modal__counter-actions {
+	display: flex;
+	align-items: center;
+	gap: 16px;
+}
+
+.cwc-booking-modal__btn-dec,
+.cwc-booking-modal__btn-inc {
+	width: 32px;
+	height: 32px;
+	border-radius: 50%;
+	border: 1px solid #CCC;
+	background: transparent;
+	color: #1A1A1A;
+	font-size: 20px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	cursor: pointer;
+	padding: 0;
+	line-height: 1;
+}
+
+.cwc-booking-modal__btn-inc {
+	border-color: #0096C7;
+	color: #0096C7;
+}
+
+.cwc-booking-modal__val {
+	font-family: var(--wp--preset--font-family--sora, 'Sora', sans-serif);
+	font-weight: 600;
+	font-size: clamp(16px, 1.5vw, 20px);
+	color: #2B3037;
+	min-width: 20px;
+	text-align: center;
+}
+
+@media (max-width: 1400px) {
+	.cwc-booking-bar {
+		flex-wrap: wrap;
+		height: auto;
+		padding: 20px;
+		gap: 20px;
+		justify-content: center;
+		bottom: auto;
+		position: relative;
+		margin-top: 20px;
+		z-index: 10001;
+	}
+
+	.cwc-book-hero__images {
+		flex-wrap: wrap;
+	}
+
+	.cwc-book-hero__image-tile {
+		width: calc(50% - 10px);
+	}
+
+	.cwc-book-notice {
+		margin-top: 40px;
+	}
+}
+
+@media (max-width: 1024px) {
+	.cwc-booking-bar {
+		top: auto !important;
+	}
+
+	.cwc-booking-bar__field {
+		width: calc(50% - 10px);
+	}
+
+	.cwc-book-hero__images {
+		display: none;
+	}
+}
+
+@media (max-width: 1024px) {
+	.cwc-book-hero__image-tile {
+		width: 100%;
+		max-width: none;
+	}
+
+	.cwc-book-hero__title {
+		font-size: clamp(32px, 6vw, 48px);
+		text-align: left;
+	}
+
+	.cwc-book-hero__desc {
+		font-size: clamp(16px, 2.5vw, 18px);
+		margin-bottom: 40px;
+	}
+
+	.cwc-booking-bar__field {
+		width: 100%;
+	}
+
+	.cwc-booking-bar__proceed {
+		width: 100%;
+	}
+
+	.cwc-room-cards {
+		grid-template-columns: 1fr;
+	}
+
+	.cwc-room-card {
+		padding: 20px;
+	}
+
+	.cwc-room-card__image {
+		height: 200px;
+	}
+
+	.cwc-room-card__title {
+		font-size: clamp(22px, 4vw, 32px);
+	}
+
+	.cwc-room-card__header {
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 10px;
+	}
+
+	.cwc-booking-modal {
+		position: relative;
+		width: min(420px, calc(100vw - 40px));
+		min-width: 280px;
+		max-width: 420px;
+		max-height: calc(100vh - 40px);
+		overflow-y: auto;
+		top: auto;
+		left: auto;
+		right: auto;
+	}
+
+	.cwc-booking-modal__content {
+		padding: 30px 20px;
+	}
+
+	.cwc-modal-backdrop {
+		display: none;
+	}
+
+	.cwc-modal-backdrop.is-active {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		padding: 20px;
+		background: rgba(0, 0, 0, 0.5);
+		backdrop-filter: blur(2px);
+	}
+}

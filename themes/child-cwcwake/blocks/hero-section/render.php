@@ -1,4 +1,10 @@
 <?php
+/**
+ * Hero Section block — render template.
+ *
+ * @package CWC_Wake
+ */
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -16,21 +22,27 @@ $secondary_url    = $attributes['secondaryBtnUrl'] ?? '#explore';
 $bg_video         = $attributes['backgroundVideo'] ?? '';
 $video_url        = $attributes['videoUrl'] ?? '';
 $min_height       = $attributes['minHeight'] ?? '100vh';
+$show_scroll      = $attributes['showScrollToDive'] ?? false;
 
 $fallback_image = get_stylesheet_directory_uri() . '/assets/images/hero-fallback.jpg';
 $bg_src         = ! empty( $bg_image ) ? esc_url( $bg_image ) : esc_url( $fallback_image );
 
-$wrapper_attrs = get_block_wrapper_attributes( [
-	'class' => 'cwc-hero',
-	'style' => sprintf( '--cwc-hero-bg:url(%s);--cwc-hero-overlay:%s;min-height:%s;', $bg_src, $overlay_opacity / 100, esc_attr( $min_height ) ),
-] );
+$wrapper_attrs = get_block_wrapper_attributes(
+	array(
+		'class' => 'cwc-hero',
+		'style' => sprintf( '--cwc-hero-bg:url(%s);--cwc-hero-overlay:%s;min-height:%s;', $bg_src, $overlay_opacity / 100, esc_attr( $min_height ) ),
+	)
+);
 ?>
 
-<section <?php echo $wrapper_attrs; ?>>
+<section <?php echo $wrapper_attrs; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
 	<?php if ( ! empty( $bg_video ) ) : ?>
-		<video class="cwc-hero__video" autoplay muted loop playsinline preload="auto"
-			<?php if ( ! empty( $bg_src ) ) : ?>poster="<?php echo $bg_src; ?>"<?php endif; ?>>
-			<source src="<?php echo esc_url( $bg_video ); ?>" type="video/mp4">
+		<video class="cwc-hero__video" autoplay muted loop playsinline preload="none" data-hero-video
+			<?php
+			if ( ! empty( $bg_src ) ) :
+				?>
+				poster="<?php echo esc_url( $bg_src ); ?>"<?php endif; ?>>
+			<source data-src="<?php echo esc_url( $bg_video ); ?>" type="video/mp4">
 		</video>
 	<?php endif; ?>
 
@@ -73,5 +85,14 @@ $wrapper_attrs = get_block_wrapper_attributes( [
 		<a href="<?php echo esc_url( $video_url ); ?>" class="cwc-hero__play" aria-label="Play video" target="_blank" rel="noopener noreferrer">
 			<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg>
 		</a>
+	<?php endif; ?>
+
+	<?php if ( $show_scroll ) : ?>
+		<div class="cwc-hero__scroll-dive">
+			<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#F5F1EB" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+				<path d="M12 5v14M19 12l-7 7-7-7"/>
+			</svg>
+			<span>SCROLL TO DIVE</span>
+		</div>
 	<?php endif; ?>
 </section>

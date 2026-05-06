@@ -1,0 +1,860 @@
+/*
+ * CWC Wake — Rates Manager block
+ */
+
+.cwc-rates-manager__inner {
+	width: 100%;
+	max-width: 1921px;
+	margin-inline: auto;
+	padding-inline: var(--cwc-header-pad-x, clamp(1rem, 4vw, 4rem));
+}
+
+.cwc-rates-manager__columns {
+	display: flex;
+	align-items: flex-start;
+	gap: clamp(20px, 4vw, 40px);
+}
+
+@media (max-width: 1200px) {
+	.cwc-rates-manager__columns {
+		gap: 24px;
+	}
+}
+
+.cwc-rates-manager__sidebar {
+	flex: 0 0 clamp(10px, 25vw, 485px);
+	position: sticky;
+	top: calc(var(--cwc-header-h) + 40px);
+	display: flex;
+	flex-direction: column-reverse;
+}
+
+.cwc-rates-manager__content-area {
+	flex: 1;
+	width: 100% !important;
+}
+
+/* ----------------------------------------
+   Dropdown
+   ---------------------------------------- */
+
+.cwc-rates-manager__dropdown {
+	position: relative;
+	width: 100%;
+	margin-bottom: 24px;
+}
+
+.cwc-rates-manager__dropdown-toggle {
+	width: 100%;
+	height: 60px;
+	padding: 0 30px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 15px;
+	background: #0096C7;
+	color: #FFFFFF;
+	border: none;
+	border-radius: 100px;
+	cursor: pointer;
+	font-family: 'Sora', var(--wp--preset--font-family--heading);
+	font-weight: 700;
+	font-size: clamp(20px, 1.5vw, 24px);
+	transition: background 0.3s ease;
+	outline: none !important;
+}
+
+.cwc-rates-manager__dropdown-toggle:hover {
+	background: #0077A3;
+}
+
+.cwc-rates-manager__dropdown-chevron {
+	transition: transform 0.3s ease;
+}
+
+.cwc-rates-manager__dropdown-toggle[aria-expanded="true"] .cwc-rates-manager__dropdown-chevron {
+	transform: rotate(180deg);
+}
+
+.cwc-rates-manager__dropdown-menu {
+	position: absolute;
+	top: calc(100% + 10px);
+	left: 0;
+	width: 100%;
+	background: #FFFFFF;
+	border: 1px solid rgba(0, 0, 0, 0.1);
+	border-radius: 20px;
+	box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+	list-style: none;
+	padding: 10px 0;
+	margin: 0;
+	z-index: 100;
+	display: none;
+	overflow: hidden;
+}
+
+.cwc-rates-manager__dropdown-menu.is-open {
+	display: block;
+	animation: dropdownFadeIn 0.2s ease-out;
+}
+
+@keyframes dropdownFadeIn {
+	from {
+		opacity: 0;
+		transform: translateY(-10px);
+	}
+
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+.cwc-rates-manager__dropdown-item {
+	padding: 15px 30px;
+	font-family: 'Sora', var(--wp--preset--font-family--heading);
+	font-weight: 600;
+	font-size: clamp(16px, 1.2vw, 18px);
+	color: #1A1A1A;
+	cursor: pointer;
+	transition: background 0.2s ease, color 0.2s ease;
+}
+
+.cwc-rates-manager__dropdown-item:hover {
+	background: #F5F1EB;
+	color: #0096C7;
+}
+
+.cwc-rates-manager__dropdown-item.is-active {
+	background: #0096C7;
+	color: #FFFFFF;
+}
+
+/* ----------------------------------------
+   Inquiry Card
+   ---------------------------------------- */
+
+.cwc-rates-manager__inquiry-card {
+	width: 100%;
+	padding: 40px 30px;
+	background: linear-gradient(180deg, rgba(57, 81, 68, 0.65) 0%, rgba(0, 150, 199, 0.45) 100%), url('/wp-content/uploads/2026/04/pro-level-6-2.webp') center / cover no-repeat;
+	border-radius: 40px;
+	text-align: center;
+	color: #FFFFFF;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	position: relative;
+	overflow: hidden;
+}
+
+.cwc-rates-manager__inquiry-icon-wrap {
+	margin-bottom: 24px;
+}
+
+.cwc-rates-manager__inquiry-icon {
+	width: 100px;
+	height: 100px;
+	background: linear-gradient(270deg, rgba(36, 249, 206, 0.7) 0%, rgba(26, 182, 241, 0.7) 100%);
+	border-radius: 50%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+}
+
+.cwc-rates-manager__inquiry-title {
+	font-family: 'Sora', var(--wp--preset--font-family--heading);
+	font-weight: 700;
+	font-size: clamp(28px, 2.5vw, 32px);
+	line-height: 110%;
+	margin-bottom: 16px !important;
+	color: #FFFFFF !important;
+}
+
+.cwc-rates-manager__inquiry-desc {
+	font-family: 'Archivo', var(--wp--preset--font-family--body);
+	font-weight: 400;
+	font-size: clamp(16px, 1.1vw, 18px);
+	line-height: 130%;
+	margin-bottom: 32px !important;
+	color: rgba(255, 255, 255, 0.9) !important;
+
+}
+
+.cwc-rates-manager__inquiry-btn {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 100%;
+	max-width: 260px;
+	height: 60px;
+	background: linear-gradient(270deg, rgba(36, 249, 206, 0.7) 0%, rgba(26, 182, 241, 0.7) 100%);
+	color: #F5F1EB;
+	border: none;
+	border-radius: 100px;
+	font-family: 'Sora', var(--wp--preset--font-family--heading);
+	font-weight: 700;
+	font-size: clamp(18px, 1.3vw, 20px);
+	text-decoration: none;
+	transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.cwc-rates-manager__inquiry-btn:hover {
+	transform: translateY(-3px);
+	background: #0077A3;
+	color: #FFFFFF;
+}
+
+.cwc-rates-manager__inquiry-footer {
+	margin-top: 32px !important;
+	font-family: 'Archivo', var(--wp--preset--font-family--body);
+	font-weight: 400;
+	font-size: clamp(14px, 1vw, 16px);
+	color: rgba(255, 255, 255, 0.7) !important;
+}
+
+.cwc-inquiry-form__label {
+	font-family: 'Sora', var(--wp--preset--font-family--heading);
+	font-weight: 700;
+	font-size: clamp(20px, 1.5vw, 24px);
+	color: #0096C7;
+}
+
+.cwc-inquiry-form__label .required {
+	color: #FF4D4D;
+}
+
+.cwc-inquiry-form__input,
+.cwc-inquiry-form__select,
+.cwc-inquiry-form__textarea {
+	width: 100%;
+	height: 60px;
+	padding: 0 30px;
+	border: 1.5px solid #0096C7 !important;
+	border-radius: 100px !important;
+	font-family: 'Archivo', var(--wp--preset--font-family--body);
+	font-size: clamp(16px, 1.1vw, 18px);
+	color: #0096C7;
+	/* Primary color for input text */
+	transition: all 0.2s ease;
+	background: #FFFFFF !important;
+	appearance: none;
+}
+
+/* Placeholder styling */
+.cwc-inquiry-form__input::placeholder,
+.cwc-inquiry-form__textarea::placeholder {
+	color: #A0A0A0;
+	/* Matching standard placeholder color */
+	opacity: 1;
+}
+
+/* Make the select's first (placeholder) option match the email placeholder color */
+.cwc-inquiry-form__select:invalid,
+.cwc-inquiry-form__select option[value=""],
+.cwc-inquiry-form__select option:first-child {
+	color: #A0A0A0 !important;
+}
+
+/* Ensure selected options (real values) use the primary color */
+.cwc-inquiry-form__select option {
+	color: #0096C7;
+	/* Using primary color for options too */
+	background-color: #FFFFFF;
+}
+
+.cwc-inquiry-form__select:not(:invalid) {
+	color: #0096C7 !important;
+}
+
+.cwc-inquiry-form__select-wrap {
+	position: relative;
+	width: 100%;
+}
+
+.cwc-inquiry-form__select-wrap::after {
+	content: '';
+	position: absolute;
+	right: 30px;
+	top: 50%;
+	transform: translateY(-50%);
+	width: 16px;
+	height: 16px;
+	background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230096C7' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") no-repeat center;
+	pointer-events: none;
+}
+
+.cwc-inquiry-form__textarea {
+	height: 180px;
+	padding: 20px 30px;
+	border-radius: 30px !important;
+	resize: none;
+}
+
+.cwc-inquiry-form__input:focus,
+.cwc-inquiry-form__select:focus,
+.cwc-inquiry-form__textarea:focus,
+.cwc-inquiry-form__input:active,
+.cwc-inquiry-form__select:active,
+.cwc-inquiry-form__textarea:active {
+	outline: none !important;
+	background: #FFFFFF !important;
+	background-color: #FFFFFF !important;
+	border-color: #0096C7 !important;
+	box-shadow: none !important;
+	color: #0096C7 !important;
+}
+
+/* Aggressively remove any hover background changes */
+.cwc-inquiry-form__input:hover,
+.cwc-inquiry-form__select:hover,
+.cwc-inquiry-form__textarea:hover {
+	background: #FFFFFF !important;
+	background-color: #FFFFFF !important;
+	border-color: #0096C7 !important;
+	color: #0096C7 !important;
+}
+
+/* ----------------------------------------
+   Inquiry Modal
+   ---------------------------------------- */
+
+.cwc-inquiry-modal {
+	position: fixed;
+	inset: 0;
+	z-index: 9999;
+	display: none;
+	align-items: center;
+	justify-content: center;
+	padding: 20px;
+	opacity: 0;
+	transition: opacity 0.3s ease;
+}
+
+.cwc-inquiry-modal.is-open {
+	display: flex;
+	opacity: 1;
+}
+
+.cwc-inquiry-modal__overlay {
+	position: absolute;
+	inset: 0;
+	background: rgba(0, 0, 0, 0.6);
+	backdrop-filter: blur(4px);
+}
+
+.cwc-inquiry-modal__container {
+	position: relative;
+	z-index: 1;
+	width: 100%;
+	max-width: 540px;
+	max-height: calc(100vh - 40px);
+	background: #FFFFFF;
+	border-radius: 30px;
+	overflow-x: hidden;
+	overflow-y: auto;
+	box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+	transform: translateY(20px);
+	transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+
+	/* Custom Scrollbar */
+	scrollbar-width: thin;
+	scrollbar-color: #0096C7 #F5F1EB;
+}
+
+.cwc-inquiry-modal__container::-webkit-scrollbar {
+	width: 6px;
+}
+
+.cwc-inquiry-modal__container::-webkit-scrollbar-track {
+	background: #F5F1EB;
+}
+
+.cwc-inquiry-modal__container::-webkit-scrollbar-thumb {
+	background: #0096C7;
+	border-radius: 10px;
+}
+
+.cwc-inquiry-modal.is-open .cwc-inquiry-modal__container {
+	transform: translateY(0);
+}
+
+.cwc-inquiry-modal__header {
+	height: 180px;
+	background-size: cover;
+	background-position: center;
+	background: #00000033;
+	position: relative;
+	display: flex;
+	justify-content: flex-end;
+	padding: 20px;
+}
+
+.cwc-inquiry-modal__close {
+	width: 40px;
+	height: 40px;
+	background: transparent;
+	border: none;
+	color: #FFFFFF;
+	font-size: clamp(32px, 4vw, 40px);
+	line-height: 1;
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	transition: transform 0.2s ease;
+	outline: none !important;
+}
+
+.cwc-inquiry-modal__close:hover {
+	transform: scale(1.1);
+}
+
+.cwc-inquiry-modal__body {
+	padding: 40px;
+}
+
+.cwc-inquiry-form {
+	display: flex;
+	flex-direction: column;
+	gap: 24px;
+}
+
+.cwc-inquiry-form__group {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+.cwc-inquiry-form__submit {
+	width: 100%;
+	height: 60px;
+	background: linear-gradient(270deg, #24F9CE 0%, #1AB6F1 100%);
+	color: #FFFFFF;
+	border: none;
+	border-radius: 100px;
+	font-family: 'Sora', var(--wp--preset--font-family--heading);
+	font-weight: 700;
+	font-size: clamp(18px, 1.3vw, 20px);
+	cursor: pointer;
+	transition: transform 0.2s ease, filter 0.2s ease;
+	margin-top: 10px;
+}
+
+.cwc-inquiry-form__submit:hover {
+	transform: translateY(-2px);
+	filter: brightness(1.05);
+}
+
+@media (max-width: 600px) {
+	.cwc-inquiry-modal {
+		padding: 10px;
+	}
+
+	.cwc-inquiry-modal__container {
+		border-radius: 20px;
+		max-height: calc(100vh - 20px);
+	}
+
+	.cwc-inquiry-modal__body {
+		padding: 24px;
+	}
+
+	.cwc-inquiry-modal__header {
+		height: 120px;
+	}
+
+	.cwc-inquiry-form__label {
+		font-size: clamp(18px, 1.2vw, 20px);
+	}
+
+	.cwc-inquiry-form {
+		gap: 16px;
+	}
+}
+
+/* ----------------------------------------
+   Panels
+   ---------------------------------------- */
+
+.cwc-rates-manager__panel {
+	display: none;
+	background: #FFFFFF;
+	border: 1px solid rgba(0, 0, 0, 0.1);
+	border-radius: 40px;
+	position: relative;
+	overflow: hidden;
+	animation: fadeIn 0.4s ease-out;
+}
+
+.cwc-rates-manager__panel.is-active {
+	display: flex;
+	flex-direction: column;
+}
+
+@keyframes fadeIn {
+	from {
+		opacity: 0;
+		transform: translateY(10px);
+	}
+
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+.cwc-rates-manager__accent-bar {
+	width: 100%;
+	height: 16px;
+	background: #0096C7;
+}
+
+.cwc-rates-manager__panel-body {
+	padding: clamp(32px, 5vw, 64px);
+}
+
+.cwc-rates-manager__title {
+	font-family: 'Sora', var(--wp--preset--font-family--heading) !important;
+	font-weight: 700 !important;
+	font-size: clamp(32px, 4vw, 64px) !important;
+	line-height: 100% !important;
+	color: #0096C7 !important;
+	margin-bottom: 24px !important;
+}
+
+.cwc-rates-manager__description {
+	font-family: 'Archivo', var(--wp--preset--font-family--body) !important;
+	font-weight: 500 !important;
+	font-size: clamp(16px, 1.1vw, 20px) !important;
+	line-height: 130% !important;
+	color: #000000 !important;
+	margin-bottom: 48px !important;
+	max-width: 900px;
+}
+
+/* ----------------------------------------
+   Table
+   ---------------------------------------- */
+
+.cwc-rates-manager__table-wrap {
+	width: 100%;
+	background: #363636;
+	border: 1px solid #5B5B5B;
+	border-radius: 4px;
+	overflow: hidden;
+	display: block;
+}
+
+.cwc-rates-manager__cards {
+	display: none;
+}
+
+.cwc-rates-manager__table {
+	width: 100%;
+	border-collapse: collapse;
+	border-right: 1px solid #5B5B5B;
+	border-bottom: 1px solid #5B5B5B;
+}
+
+.cwc-rates-manager__cell {
+	height: 72px;
+	padding: 0 24px;
+	border-top: 1px solid #5B5B5B;
+	border-left: 1px solid #5B5B5B;
+
+	/* Typography */
+	font-family: 'Inter', sans-serif;
+	font-weight: 600;
+	font-size: clamp(16px, 1.2vw + 4px, 24px);
+	line-height: 130%;
+	color: #FFFFFF;
+	text-align: left;
+}
+
+th.cwc-rates-manager__cell {
+	background: rgba(255, 255, 255, 0.05);
+	color: #FFFFFF;
+	/* Brand blue for headers */
+}
+
+/* ----------------------------------------
+   Responsive
+   ---------------------------------------- */
+
+@media (min-width: 901px) and (max-width: 1200px) {
+	.cwc-rates-manager__sidebar {
+		flex: 0 0 320px;
+	}
+}
+
+@media (max-width: 900px) {
+	.cwc-rates-manager.alignfull.wp-block-cwc-rates-manager {
+		margin: 10px !important;
+		width: calc(100% - 20px) !important;
+		border-radius: 30px;
+		overflow: hidden;
+	}
+
+	.cwc-rates-manager__columns {
+		flex-direction: column;
+		gap: 16px;
+		/* Reduced from 32px */
+	}
+
+	.cwc-rates-manager__sidebar {
+		order: -1;
+		/* Keep sidebar at top */
+		display: flex;
+		flex-direction: column;
+		gap: 0;
+		/* No gap needed if dropdown is moved */
+		position: static !important;
+		flex: none !important;
+		width: 100% !important;
+	}
+
+	/* Inquiry Card - Horizontal Row Approach */
+	.cwc-rates-manager__inquiry-card {
+		flex-direction: row !important;
+		text-align: left !important;
+		padding: 16px 20px !important;
+		border-radius: 24px !important;
+		/* Branded shape radius */
+		gap: 12px;
+		justify-content: space-between;
+		align-items: center;
+		width: 100%;
+		box-sizing: border-box;
+		margin-top: 0;
+	}
+
+	.cwc-rates-manager__inquiry-icon-wrap {
+		margin-bottom: 0 !important;
+	}
+
+	.cwc-rates-manager__inquiry-icon {
+		width: 48px !important;
+		height: 48px !important;
+		background: #00B4D8 !important;
+	}
+
+	.cwc-rates-manager__inquiry-icon img {
+		width: 20px;
+	}
+
+	.cwc-rates-manager__inquiry-content {
+		flex: 1;
+		display: flex;
+		flex-direction: column;
+		gap: 0;
+	}
+
+	.cwc-rates-manager__inquiry-title {
+		font-size: clamp(14px, 1.2vw, 16px) !important;
+		margin: 0 !important;
+		line-height: 1.2;
+	}
+
+	.cwc-rates-manager__inquiry-desc {
+		font-size: clamp(11px, 1vw, 13px) !important;
+		margin: 0 !important;
+		max-width: none !important;
+		opacity: 0.7;
+		line-height: 1.2;
+	}
+
+	.cwc-rates-manager__inquiry-btn {
+		width: auto !important;
+		height: 40px !important;
+		padding: 0 16px !important;
+		font-size: clamp(12px, 1.1vw, 14px) !important;
+		background: #00B4D8 !important;
+		border-radius: 12px !important;
+		gap: 5px;
+	}
+
+	.cwc-rates-manager__inquiry-btn::after {
+		content: '↗';
+		font-size: clamp(14px, 1.2vw, 16px);
+	}
+
+	.cwc-rates-manager__inquiry-footer {
+		display: none !important;
+	}
+
+	/* Title + Dropdown Row */
+	.cwc-rates-manager__panel-header {
+		display: flex;
+		flex-direction: column-reverse;
+		align-items: flex-start;
+		gap: 8px;
+		/* Tightened from 20px */
+	}
+
+	.cwc-rates-manager__title {
+		font-size: clamp(20px, 1.5vw, 24px) !important;
+		margin-bottom: 0 !important;
+		width: 100%;
+		color: #0096C7;
+	}
+
+	.cwc-rates-manager__dropdown {
+		margin-bottom: 0 !important;
+		width: 100% !important;
+		align-self: stretch;
+	}
+
+	.cwc-rates-manager__dropdown-toggle {
+		height: 36px !important;
+		padding: 0 16px !important;
+		font-size: clamp(12px, 1.1vw, 14px) !important;
+		border-radius: 100px !important;
+		/* Branded rounded button */
+		background: #00B4D8 !important;
+		gap: 8px !important;
+	}
+
+	.cwc-rates-manager__dropdown-toggle .cwc-rates-manager__dropdown-current {
+		display: block;
+		/* Show current selection text */
+	}
+
+	.cwc-rates-manager__dropdown-toggle::before {
+		display: none;
+	}
+
+	.cwc-rates-manager__dropdown-chevron {
+		width: 16px !important;
+		height: 16px !important;
+	}
+
+	.cwc-rates-manager__dropdown-menu {
+		width: 100% !important;
+		left: 0 !important;
+		right: 0 !important;
+		top: calc(100% + 8px) !important;
+		border-radius: 16px !important;
+		box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15) !important;
+		border: 1px solid rgba(0, 0, 0, 0.1) !important;
+		background: #FFFFFF !important;
+		/* Reverted to desktop background */
+	}
+
+	.cwc-rates-manager__dropdown-item {
+		padding: 14px 20px !important;
+		font-size: 14px !important;
+		color: #333333 !important;
+		/* Reverted to desktop text color */
+		border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+	}
+
+	.cwc-rates-manager__dropdown-item:last-child {
+		border-bottom: none;
+	}
+
+	.cwc-rates-manager__dropdown-item.is-active {
+		background: rgba(0, 150, 199, 0.1) !important;
+		color: #0096C7 !important;
+	}
+
+	.cwc-rates-manager__description {
+		font-size: clamp(12px, 1.1vw, 14px) !important;
+		margin-bottom: 24px !important;
+		opacity: 0.8;
+	}
+
+	.cwc-rates-manager__panel-body {
+		padding: 0 !important;
+		background: transparent !important;
+	}
+
+	.cwc-rates-manager__panel {
+		border: none !important;
+		background: transparent !important;
+		overflow: visible !important;
+	}
+
+	.cwc-rates-manager__accent-bar {
+		display: none !important;
+	}
+}
+
+@media (max-width: 600px) {
+	.cwc-rates-manager__panel-body {
+		padding: 24px;
+	}
+
+	.cwc-rates-manager__cell {
+		height: 60px;
+		padding: 0 12px;
+	}
+
+	/* Stacked Cards for Mobile */
+	.cwc-rates-manager__table-wrap {
+		display: none;
+	}
+
+	.cwc-rates-manager__cards {
+		display: flex;
+		flex-direction: column;
+		gap: 16px;
+	}
+
+	.cwc-rates-manager__card {
+		background: #363636;
+		border: 1px solid #5B5B5B;
+		border-radius: 30px;
+		/* Branded shape radius from image */
+		overflow: hidden;
+		display: flex;
+		flex-direction: column;
+	}
+
+	.cwc-rates-manager__card-header {
+		background: rgba(255, 255, 255, 0.08);
+		padding: 12px 20px;
+		font-family: 'Sora', var(--wp--preset--font-family--heading);
+		font-weight: 700;
+		font-size: clamp(12px, 1.1vw, 14px);
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+		color: #FFFFFF;
+		border-bottom: 1px solid #5B5B5B;
+	}
+
+	.cwc-rates-manager__card-body {
+		padding: 20px;
+		display: flex;
+		flex-direction: column;
+		gap: 12px;
+	}
+
+	.cwc-rates-manager__card-time {
+		font-family: 'Sora', var(--wp--preset--font-family--heading);
+		font-weight: 700;
+		font-size: clamp(20px, 1.5vw, 24px);
+		color: #FFFFFF;
+		line-height: 1.1;
+	}
+
+	.cwc-rates-manager__card-tags {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 8px;
+	}
+
+	.cwc-rates-manager__tag {
+		background: rgba(0, 150, 199, 0.2);
+		border: 1px solid #0096C7;
+		color: #FFFFFF;
+		padding: 4px 12px;
+		border-radius: 100px;
+		font-family: 'Archivo', var(--wp--preset--font-family--body);
+		font-weight: 600;
+		font-size: clamp(10px, 0.9vw, 12px);
+		text-transform: uppercase;
+		white-space: nowrap;
+	}
+}

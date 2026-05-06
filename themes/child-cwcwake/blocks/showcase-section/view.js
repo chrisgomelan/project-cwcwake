@@ -1,50 +1,59 @@
-( function () {
-	document.querySelectorAll( '.cwc-showcase--videos' ).forEach( function ( section ) {
-		var grid  = section.querySelector( '.cwc-showcase__grid' );
-		var cards = grid ? Array.from( grid.querySelectorAll( '.cwc-showcase__card--video' ) ) : [];
-		var dots  = Array.from( section.querySelectorAll( '.cwc-showcase__dot' ) );
-		var prev  = section.querySelector( '.cwc-showcase__arrow--prev' );
-		var next  = section.querySelector( '.cwc-showcase__arrow--next' );
+( () => {
+	// Smart Loading for Hover Videos
+	const hoverVideos = document.querySelectorAll( 'video[data-hover-video]' );
+	hoverVideos.forEach( ( video ) => {
+		if ( window.innerWidth > 1024 ) {
+			if ( video.dataset.src ) {
+				video.src = video.dataset.src;
+				video.load();
+			}
+		}
+	} );
 
-		if ( cards.length < 2 ) return;
+	document.querySelectorAll( '.cwc-showcase--videos' ).forEach( ( section ) => {
+		const grid = section.querySelector( '.cwc-showcase__grid' );
+		const cards = grid ? Array.from( grid.querySelectorAll( '.cwc-showcase__card--video' ) ) : [];
+		const dots = Array.from( section.querySelectorAll( '.cwc-showcase__dot' ) );
+		const prev = section.querySelector( '.cwc-showcase__arrow--prev' );
+		const next = section.querySelector( '.cwc-showcase__arrow--next' );
 
-		var current = 0;
+		if ( cards.length <= 3 ) return;
 
-		function goTo( index ) {
-			if ( index < 0 ) index = cards.length - 1;
-			if ( index >= cards.length ) index = 0;
+		let currentPage = 0;
+		const itemsPerPage = 3;
+		const totalPages = Math.ceil( cards.length / itemsPerPage );
 
-			cards[ current ].querySelectorAll( 'video' ).forEach( function ( v ) {
-				v.pause();
+		const goToPage = ( pageIndex ) => {
+			if ( pageIndex < 0 ) pageIndex = totalPages - 1;
+			if ( pageIndex >= totalPages ) pageIndex = 0;
+
+			// Pause videos in previous slide
+			section.querySelectorAll( 'video' ).forEach( ( v ) => v.pause() );
+			section.querySelectorAll( 'iframe' ).forEach( ( f ) => {
+				const src = f.src;
+				f.src = src;
 			} );
 
-			var offset = cards[ index ].offsetLeft - grid.offsetLeft;
+			// Calculate card index to scroll to
+			let cardIndex = pageIndex * itemsPerPage;
+			if ( cardIndex >= cards.length ) cardIndex = cards.length - 1;
+
+			const offset = cards[ cardIndex ].offsetLeft - grid.offsetLeft;
 			grid.scrollTo( { left: offset, behavior: 'smooth' } );
 
-			dots.forEach( function ( d, i ) {
-				d.classList.toggle( 'cwc-showcase__dot--active', i === index );
+			dots.forEach( ( d, i ) => {
+				d.classList.toggle( 'cwc-showcase__dot--active', i === pageIndex );
 			} );
 
-			current = index;
-		}
+			currentPage = pageIndex;
+		};
 
-		if ( prev ) {
-			prev.addEventListener( 'click', function () {
-				goTo( current - 1 );
-			} );
-		}
+		prev?.addEventListener( 'click', () => goToPage( currentPage - 1 ) );
+		next?.addEventListener( 'click', () => goToPage( currentPage + 1 ) );
 
-		if ( next ) {
-			next.addEventListener( 'click', function () {
-				goTo( current + 1 );
-			} );
-		}
-
-		dots.forEach( function ( dot, i ) {
+		dots.forEach( ( dot, i ) => {
 			dot.style.cursor = 'pointer';
-			dot.addEventListener( 'click', function () {
-				goTo( i );
-			} );
+			dot.addEventListener( 'click', () => goToPage( i ) );
 		} );
 	} );
 } )();

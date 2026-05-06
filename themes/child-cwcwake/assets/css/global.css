@@ -9,8 +9,13 @@
  */
 
 /* ----------------------------------------
-   Base
-   ---------------------------------------- */
+	Custom Fonts
+	---------------------------------------- */
+
+
+/* ----------------------------------------
+	Base
+	---------------------------------------- */
 
 *,
 *::before,
@@ -29,9 +34,44 @@ img {
 	display: block;
 }
 
+::selection {
+	background-color: var(--wp--preset--color--accent);
+	color: #ffffff;
+}
+
+/* WordPress generates padding on the site-blocks wrapper from theme.json
+	layout settings. Reset it so full-width blocks own their own insets. 
+	Also implement a flexbox sticky footer solution. */
+.wp-site-blocks {
+	padding-left: 0 !important;
+	padding-right: 0 !important;
+	min-height: 100vh;
+	display: flex;
+	flex-direction: column;
+}
+
+/* Ensure the footer template part sticks to the bottom of short pages */
+.wp-site-blocks>.wp-block-template-part:last-child {
+	margin-top: auto !important;
+}
+
+/* Prevent WordPress core alignfull from using 100vw + negative margins,
+	which shifts content wider than the 100%-based header on viewports
+	with a visible scrollbar. All full-width blocks should use 100% instead.
+	The doubled class (.alignfull.alignfull) and the constrained-layout
+	selector both outweigh the WP-generated rules. */
+.alignfull.alignfull,
+.is-layout-constrained>.alignfull,
+.is-layout-flow>.alignfull {
+	width: 100% !important;
+	max-width: 100% !important;
+	margin-left: 0 !important;
+	margin-right: 0 !important;
+}
+
 /* ----------------------------------------
-   Footer
-   ---------------------------------------- */
+	Footer
+	---------------------------------------- */
 
 .cwc-footer {
 	font-family: var(--wp--preset--font-family--body);
@@ -57,24 +97,31 @@ img {
 }
 
 /* ----------------------------------------
-   Buttons — shared base
-   ---------------------------------------- */
+	Buttons — shared base
+	---------------------------------------- */
 
 .wp-block-button__link {
 	font-family: var(--wp--preset--font-family--heading);
 	border-radius: var(--wp--custom--radius--full);
 	padding: 0.85rem 2rem;
 	transition: var(--wp--custom--transition--default);
+	box-shadow: var(--wp--custom--shadow--sm);
 }
 
 .wp-block-button__link:hover {
-	opacity: 0.9;
+	transform: translateY(-3px);
+	box-shadow: var(--wp--custom--shadow--md);
+	filter: brightness(1.05);
+}
+
+.wp-block-button__link:active {
 	transform: translateY(-1px);
+	box-shadow: var(--wp--custom--shadow--sm);
 }
 
 /* ----------------------------------------
-   Primary (default) — teal bg, white text
-   ---------------------------------------- */
+	Primary (default) — teal bg, white text
+	---------------------------------------- */
 
 .wp-block-button:not([class*="is-style-"]) .wp-block-button__link {
 	background: var(--wp--preset--color--primary);
@@ -86,8 +133,8 @@ img {
 }
 
 /* ----------------------------------------
-   Outline / Secondary — transparent + border
-   ---------------------------------------- */
+	Outline / Secondary — transparent + border
+	---------------------------------------- */
 
 .wp-block-button.is-style-outline .wp-block-button__link {
 	background: transparent;
@@ -101,8 +148,8 @@ img {
 }
 
 /* ----------------------------------------
-   Accent — orange bg
-   ---------------------------------------- */
+	Accent — orange bg
+	---------------------------------------- */
 
 .wp-block-button.is-style-accent .wp-block-button__link {
 	background: var(--wp--preset--color--accent);
@@ -114,8 +161,8 @@ img {
 }
 
 /* ----------------------------------------
-   Light — white bg, dark text
-   ---------------------------------------- */
+	Light — white bg, dark text
+	---------------------------------------- */
 
 .wp-block-button.is-style-light .wp-block-button__link {
 	background: var(--wp--preset--color--background);
@@ -127,8 +174,8 @@ img {
 }
 
 /* ----------------------------------------
-   Dark — secondary (navy) bg, white text
-   ---------------------------------------- */
+	Dark — secondary (navy) bg, white text
+	---------------------------------------- */
 
 .wp-block-button.is-style-dark .wp-block-button__link {
 	background: var(--wp--preset--color--secondary);
@@ -136,13 +183,151 @@ img {
 }
 
 .wp-block-button.is-style-dark .wp-block-button__link:hover {
-	opacity: 0.85;
+	filter: brightness(1.1);
 }
 
 /* ----------------------------------------
-   With arrow icon  (add class "cwc-btn-arrow")
-   Appends the uploaded arrow-up SVG after the label.
-   ---------------------------------------- */
+	Custom Image Modal
+	---------------------------------------- */
+
+.cwc-modal {
+	position: fixed;
+	top: var(--cwc-header-h);
+	left: 0;
+	right: 0;
+	bottom: 0;
+	z-index: 99999;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	opacity: 0;
+	pointer-events: none;
+	transition: opacity 0.3s ease;
+	font-family: var(--wp--preset--font-family--ui);
+}
+
+.admin-bar .cwc-modal {
+	top: calc(var(--cwc-header-h) + var(--cwc-admin-bar-h));
+}
+
+.cwc-modal.is-open {
+	opacity: 1;
+	pointer-events: auto;
+}
+
+.cwc-modal__overlay {
+	position: absolute;
+	inset: 0;
+	background: rgba(0, 0, 0, 0.9);
+	backdrop-filter: blur(4px);
+}
+
+.cwc-modal__content {
+	position: relative;
+	width: 90vw;
+	max-width: 1400px;
+	height: 80vh;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	z-index: 1;
+}
+
+.cwc-modal__image {
+	max-width: 100%;
+	max-height: 100%;
+	object-fit: contain;
+	border-radius: 10px;
+	box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+}
+
+.cwc-modal__caption {
+	color: #fff;
+	margin-top: 20px;
+	font-size: clamp(16px, 1.5vw, 20px);
+	text-align: center;
+}
+
+.cwc-modal__close {
+	position: absolute;
+	top: 30px;
+	right: 30px;
+	background: none;
+	border: none;
+	color: #fff;
+	font-size: clamp(32px, 5vw, 48px);
+	cursor: pointer;
+	z-index: 2;
+	line-height: 1;
+	opacity: 0.7;
+	transition: opacity 0.2s ease;
+}
+
+.cwc-modal__close:hover {
+	opacity: 1;
+}
+
+.cwc-modal__prev,
+.cwc-modal__next {
+	position: absolute;
+	top: 50%;
+	transform: translateY(-50%);
+	background: rgba(255, 255, 255, 0.1);
+	border: none;
+	color: #fff;
+	width: clamp(40px, 6vw, 60px);
+	height: clamp(40px, 6vw, 60px);
+	border-radius: 50%;
+	font-size: 24px;
+	cursor: pointer;
+	z-index: 2;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	transition: background 0.2s ease;
+}
+
+.cwc-modal__prev:hover,
+.cwc-modal__next:hover {
+	background: rgba(255, 255, 255, 0.25);
+}
+
+.cwc-modal__prev {
+	left: 30px;
+}
+
+.cwc-modal__next {
+	right: 30px;
+}
+
+.cwc-modal__counter {
+	position: absolute;
+	bottom: 30px;
+	left: 50%;
+	transform: translateX(-50%);
+	color: #fff;
+	font-size: clamp(12px, 1.2vw, 14px);
+	opacity: 0.6;
+}
+
+.wp-block-gallery img,
+.wp-block-image img,
+.cwc-room-gallery__image {
+	cursor: zoom-in;
+}
+
+.wp-block-gallery img:hover,
+.wp-block-image img:hover,
+.cwc-room-gallery__image:hover {
+	opacity: 0.9;
+	transition: opacity 0.3s ease;
+}
+
+/* ----------------------------------------
+	With arrow icon  (add class "cwc-btn-arrow")
+	Appends the uploaded arrow-up SVG after the label.
+	---------------------------------------- */
 
 .cwc-btn-arrow .wp-block-button__link {
 	display: inline-flex;
@@ -160,8 +345,8 @@ img {
 }
 
 /* ----------------------------------------
-   Hero & Cover blocks
-   ---------------------------------------- */
+	Hero & Cover blocks
+	---------------------------------------- */
 
 .wp-block-cover {
 	font-family: var(--wp--preset--font-family--heading);
@@ -172,8 +357,59 @@ img {
 }
 
 /* ----------------------------------------
-   Cards (reusable pattern)
-   ---------------------------------------- */
+	Tropical-bg section
+	----------------------------------------
+	Shared wrapper used on Gallery, Accommodations, Contact, Terms,
+	and Privacy pages. Sits below the page banner and contains the
+	breadcrumbs + main content.
+
+	Direct children mirror `.cwc-header__inner` (max-width 1921 +
+	horizontal clamp padding) so the breadcrumbs and post-content
+	line up with the header logo. */
+
+.cwc-tropical-section {
+
+	background: linear-gradient(rgba(245, 241, 235, 0.7), rgba(245, 241, 235, 0.7)),
+		url('/wp-content/uploads/2026/04/tropical-bg.webp');
+	background-attachment: fixed;
+	background-size: cover;
+
+	background-position: center;
+	background-repeat: no-repeat;
+	margin-block-start: 0 !important;
+	/* No left/right padding here — children own the inset to mirror
+		the header geometry exactly. */
+	padding-left: 0 !important;
+	padding-right: 0 !important;
+}
+
+.cwc-tropical-section>.cwc-breadcrumbs__wrap,
+.cwc-tropical-section>main,
+.cwc-tropical-section>.wp-block-group,
+.cwc-tropical-section>.wp-block-cwc-gallery-grid,
+.cwc-tropical-section>.wp-block-cwc-cards-section,
+.cwc-tropical-section>.wp-block-cwc-featured-blogs,
+.cwc-tropical-section>.wp-block-cwc-upcoming-events,
+.cwc-tropical-section>.wp-block-cwc-all-blogs,
+.cwc-tropical-section>.wp-block-cwc-faq-section,
+.cwc-tropical-section>.wp-block-cwc-about-timeline,
+.cwc-tropical-section>.wp-block-cwc-about-champions,
+.cwc-tropical-section>.wp-block-cwc-about-empowering,
+.cwc-tropical-section>.wp-block-cwc-feature-split,
+.cwc-tropical-section>.wp-block-cwc-coaching-section,
+.cwc-tropical-section>.wp-block-cwc-land-feature-split,
+.cwc-tropical-section>.wp-block-cwc-header-multi-image,
+.cwc-tropical-section>.wp-block-cwc-feature-banner {
+	width: 100%;
+	max-width: 1921px;
+	margin-inline: auto;
+	padding-left: clamp(1rem, 4vw, 4rem);
+	padding-right: clamp(1rem, 4vw, 4rem);
+}
+
+/* ----------------------------------------
+	Cards (reusable pattern)
+	---------------------------------------- */
 
 .cwc-card {
 	background: var(--wp--preset--color--background);
@@ -199,8 +435,8 @@ img {
 }
 
 /* ----------------------------------------
-   Breadcrumb
-   ---------------------------------------- */
+	Breadcrumb
+	---------------------------------------- */
 
 .cwc-breadcrumb {
 	font-size: var(--wp--preset--font-size--small);
@@ -217,20 +453,618 @@ img {
 }
 
 /* ----------------------------------------
-   Utility classes
-   ---------------------------------------- */
+	Pagination (Shared Component)
+	---------------------------------------- */
 
-.u-text-center { text-align: center; }
-.u-text-uppercase { text-transform: uppercase; }
-.u-font-heading { font-family: var(--wp--preset--font-family--heading); }
-.u-font-body { font-family: var(--wp--preset--font-family--body); }
+.cwc-pagination {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	gap: 0.5rem;
+	margin-top: 2.5rem;
+}
+
+.cwc-page {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 48px;
+	height: 48px;
+	background-color: #ffffff;
+	border-radius: 8px;
+	font-family: var(--wp--preset--font-family--ui);
+	font-weight: 600;
+	font-size: 1.125rem;
+	color: #181818;
+	text-decoration: none;
+	transition: background-color 150ms ease, color 150ms ease;
+	box-shadow: -2px 4px 12px rgba(24, 24, 24, 0.06);
+	cursor: pointer;
+	border: none;
+}
+
+.cwc-page:hover,
+.cwc-page:focus-visible {
+	background-color: var(--wp--preset--color--surface);
+}
+
+.cwc-page--current {
+	background-color: var(--wp--preset--color--secondary);
+	color: #ffffff;
+	pointer-events: none;
+}
+
+.cwc-page--ellipsis {
+	background: transparent;
+	box-shadow: none;
+	color: var(--wp--preset--color--text-muted);
+	pointer-events: none;
+}
+
+.cwc-page--disabled {
+	opacity: 0.4;
+	pointer-events: none;
+	cursor: not-allowed;
+}
+
+@media (max-width: 600px) {
+	.cwc-page {
+		width: 40px;
+		height: 40px;
+		font-size: 1rem;
+	}
+}
 
 /* ----------------------------------------
-   Responsive adjustments
-   ---------------------------------------- */
+	Album Topbar
+	---------------------------------------- */
+
+.cwc-album-topbar {
+	padding-block: var(--wp--preset--spacing--30);
+}
+
+/* ----------------------------------------
+	Utility classes
+	---------------------------------------- */
+
+.u-text-center {
+	text-align: center;
+}
+
+.u-text-uppercase {
+	text-transform: uppercase;
+}
+
+.u-font-heading {
+	font-family: var(--wp--preset--font-family--heading);
+}
+
+.u-font-body {
+	font-family: var(--wp--preset--font-family--body);
+}
+
+/* ----------------------------------------
+	Responsive adjustments
+	---------------------------------------- */
 
 @media (max-width: 767px) {
 	.wp-block-columns {
 		gap: var(--wp--preset--spacing--40);
+	}
+}
+
+/* Hide the first paragraph in the album content area (it's now in the banner) */
+.single-cwc_album .wp-block-post-content>p:first-of-type {
+	display: none !important;
+}
+
+/* ----------------------------------------
+	Scroll to Top
+	---------------------------------------- */
+
+.cwc-scroll-top {
+	position: fixed;
+	bottom: 40px;
+	right: 40px;
+	width: 54px;
+	height: 54px;
+	background-color: var(--wp--preset--color--primary);
+	color: #ffffff;
+	border: none;
+	border-radius: 50%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	cursor: pointer;
+	z-index: 999;
+	opacity: 0;
+	visibility: hidden;
+	transform: translateY(20px);
+	transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+	box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+	overflow: hidden;
+}
+
+.cwc-scroll-top.is-visible {
+	opacity: 1;
+	visibility: visible;
+	transform: translateY(0);
+}
+
+.cwc-scroll-top:hover {
+	background-color: var(--wp--preset--color--primary-dark);
+	transform: translateY(-5px) scale(1.05);
+	box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+}
+
+.cwc-scroll-top:active {
+	transform: translateY(-2px) scale(0.95);
+	transition: all 0.1s ease;
+}
+
+.cwc-scroll-top .cwc-ripple {
+	position: absolute;
+	border-radius: 50%;
+	background-color: rgba(255, 255, 255, 0.4);
+	transform: scale(0);
+	animation: cwc-ripple-effect 0.8s ease-out;
+	pointer-events: none;
+	width: 100%;
+	height: 100%;
+	top: 0;
+	left: 0;
+}
+
+@keyframes cwc-ripple-effect {
+	0% {
+		transform: scale(0);
+		opacity: 0.5;
+	}
+
+	100% {
+		transform: scale(4);
+		opacity: 0;
+	}
+}
+
+@media (max-width: 600px) {
+	.cwc-scroll-top {
+		bottom: 20px;
+		right: 20px;
+		width: 48px;
+		height: 48px;
+	}
+}
+
+/* ----------------------------------------
+	404 Page
+	---------------------------------------- */
+
+.cwc-404-section {
+	display: flex !important;
+	align-items: center;
+	justify-content: center;
+}
+
+.cwc-404__inner {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: clamp(16px, 2vw, 28px);
+	text-align: center;
+	max-width: 640px;
+	padding-inline: clamp(1.5rem, 4vw, 4rem);
+}
+
+.cwc-404__code {
+	font-family: var(--wp--preset--font-family--heading);
+	font-weight: 700;
+	font-size: clamp(120px, 18vw, 240px);
+	line-height: 1;
+	color: var(--wp--preset--color--primary);
+	margin: 0;
+	opacity: 0.3;
+	letter-spacing: -0.04em;
+}
+
+.cwc-404__title {
+	font-family: var(--wp--preset--font-family--heading);
+	font-weight: 700;
+	font-size: clamp(32px, 4vw, 56px);
+	line-height: 1.1;
+	color: var(--wp--preset--color--secondary);
+	margin: 0;
+	margin-top: -3rem;
+}
+
+.cwc-404__message {
+	font-family: var(--wp--preset--font-family--body);
+	font-weight: 500;
+	font-size: clamp(16px, 1.2vw, 20px);
+	line-height: 1.6;
+	color: rgba(0, 0, 0, 0.6);
+	margin: 0;
+}
+
+.cwc-404__btn {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.5em;
+	padding: 0.85em 2.5em;
+	background: var(--wp--preset--color--primary);
+	color: #ffffff;
+	font-family: var(--wp--preset--font-family--heading);
+	font-weight: 600;
+	font-size: clamp(15px, 1vw, 18px);
+	text-decoration: none;
+	border-radius: 999px;
+	box-shadow: 0 4px 16px rgba(0, 150, 199, 0.3);
+	transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+	margin-top: 0.5rem;
+}
+
+.cwc-404__btn:hover {
+	background: var(--wp--preset--color--primary-dark);
+	transform: translateY(-2px);
+	box-shadow: 0 8px 24px rgba(0, 150, 199, 0.4);
+}
+
+/* ----------------------------------------
+	Global Form Styles (Dropdowns & Dates)
+	---------------------------------------- */
+
+select,
+input[type="date"],
+.cwc-custom-select {
+	width: 100%;
+	height: 60px;
+	padding: 0 30px;
+	background: #0096C7 !important;
+	border: none !important;
+	border-radius: 100px !important;
+	font-family: 'Sora', var(--wp--preset--font-family--heading);
+	font-weight: 700;
+	font-size: 18px;
+	color: #FFFFFF !important;
+	appearance: none;
+	cursor: pointer;
+	transition: background 0.3s ease;
+	outline: none !important;
+}
+
+select:hover,
+input[type="date"]:hover {
+	background: #0077A3 !important;
+}
+
+/* Custom White Chevron for standard selects */
+select {
+	background-image: url("data:image/svg+xml,%3Csvg width='14' height='8' viewBox='0 0 14 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L7 7L13 1' stroke='%23FFFFFF' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+	background-repeat: no-repeat;
+	background-position: right 30px center;
+	background-size: 14px 8px;
+	padding-right: 60px;
+}
+
+/* Date input specific adjustments */
+input[type="date"]::-webkit-calendar-picker-indicator {
+	background: transparent;
+	bottom: 0;
+	color: transparent;
+	cursor: pointer;
+	height: auto;
+	left: 0;
+	position: absolute;
+	right: 0;
+	top: 0;
+	width: auto;
+}
+
+input[type="date"]::after {
+	content: "";
+	display: block;
+	width: 20px;
+	height: 20px;
+	background: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M8 2V5M16 2V5M3.5 9.09H20.5M21 8.5V17C21 20 19.5 22 16 22H8C4.5 22 3 20 3 17V8.5C3 5.5 4.5 3.5 8 3.5H16C19.5 3.5 21 5.5 21 8.5Z' stroke='%23FFFFFF' stroke-width='2' stroke-miterlimit='10' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat;
+	position: absolute;
+	right: 30px;
+	top: 50%;
+	transform: translateY(-50%);
+	pointer-events: none;
+}
+
+/* ----------------------------------------
+	Global Toast Notifications
+	---------------------------------------- */
+.cwc-toast-container {
+	position: fixed;
+	bottom: 24px;
+	left: 50%;
+	transform: translateX(-50%);
+	z-index: 200000;
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+	pointer-events: none;
+}
+
+.cwc-toast {
+	background: #1A1A1A;
+	color: #ffffff;
+	font-family: var(--wp--preset--font-family--inter, 'Inter', sans-serif);
+	font-weight: 500;
+	font-size: clamp(14px, 1.2vw, 16px);
+	padding: clamp(12px, 1.5vw, 16px) clamp(16px, 2vw, 24px);
+	border-radius: 8px;
+	box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	pointer-events: auto;
+	opacity: 0;
+	transform: translateY(20px);
+	transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.cwc-toast.is-visible {
+	opacity: 1;
+	transform: translateY(0);
+}
+
+.cwc-toast--warning,
+.cwc-toast--error {
+	background: var(--wp--preset--color--accent, #ED5B26);
+	color: #F5F1EB;
+}
+
+.cwc-toast--success {
+	background: #395144;
+	color: #F5F1EB;
+}
+
+@media (max-width: 600px) {
+	.cwc-toast-container {
+		bottom: 16px;
+		width: calc(100% - 32px);
+	}
+
+	.cwc-toast {
+		width: 100%;
+		justify-content: center;
+		text-align: center;
+	}
+}
+
+/* ----------------------------------------
+	Inquiry Modal & Form (Shared)
+	---------------------------------------- */
+
+.cwc-inquiry-modal {
+	position: fixed;
+	top: var(--cwc-header-h);
+	left: 0;
+	right: 0;
+	bottom: 0;
+	z-index: 99999;
+	display: none;
+	align-items: center;
+	justify-content: center;
+	padding: 20px;
+	opacity: 0;
+	transition: opacity 0.3s ease;
+}
+
+.admin-bar .cwc-inquiry-modal {
+	top: calc(var(--cwc-header-h) + var(--cwc-admin-bar-h));
+}
+
+.cwc-inquiry-modal.is-open {
+	display: flex;
+	opacity: 1;
+}
+
+.cwc-inquiry-modal__overlay {
+	position: absolute;
+	inset: 0;
+	background: rgba(0, 0, 0, 0.6);
+	backdrop-filter: blur(4px);
+}
+
+.cwc-inquiry-modal__container {
+	position: relative;
+	z-index: 1;
+	width: 100%;
+	max-width: 540px;
+	max-height: calc(100vh - 40px - var(--cwc-header-h, 115px));
+	background: #FFFFFF;
+	border-radius: 30px;
+	overflow-x: hidden;
+	overflow-y: auto;
+	box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+	transform: translateY(20px);
+	transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+
+	/* Hide scrollbar but keep scrollability */
+	-ms-overflow-style: none;
+	/* IE and Edge */
+	scrollbar-width: none;
+	/* Firefox */
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.cwc-inquiry-modal__container::-webkit-scrollbar {
+	display: none;
+}
+
+.cwc-inquiry-modal__header {
+	height: 180px;
+	background-size: cover;
+	background-position: center;
+	position: relative;
+	display: flex;
+	justify-content: flex-end;
+	padding: 20px;
+}
+
+.cwc-inquiry-modal__close {
+	width: 40px;
+	height: 40px;
+	background: transparent;
+	border: none;
+	color: #FFFFFF;
+	font-size: 40px;
+	line-height: 1;
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	transition: transform 0.2s ease;
+	outline: none !important;
+}
+
+.cwc-inquiry-modal__close:hover {
+	transform: scale(1.1);
+}
+
+.cwc-inquiry-modal__body {
+	padding: 40px;
+}
+
+.cwc-inquiry-form {
+	display: flex;
+	flex-direction: column;
+	gap: 24px;
+}
+
+.cwc-inquiry-form__group {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+.cwc-inquiry-form__label {
+	font-family: 'Sora', var(--wp--preset--font-family--heading);
+	font-weight: 700;
+	font-size: 24px;
+	color: #0096C7;
+}
+
+.cwc-inquiry-form__label .required {
+	color: #FF4D4D;
+}
+
+.cwc-inquiry-form__input,
+.cwc-inquiry-form__select,
+.cwc-inquiry-form__textarea {
+	width: 100%;
+	height: 60px;
+	padding: 0 30px;
+	border: 1.5px solid #0096C7 !important;
+	border-radius: 100px !important;
+	font-family: 'Archivo', var(--wp--preset--font-family--body);
+	font-size: 18px;
+	color: #0096C7;
+	transition: all 0.2s ease;
+	background: #FFFFFF !important;
+	appearance: none;
+}
+
+.cwc-inquiry-form__input::placeholder,
+.cwc-inquiry-form__textarea::placeholder {
+	color: #A0A0A0;
+	opacity: 1;
+}
+
+.cwc-inquiry-form__select:invalid,
+.cwc-inquiry-form__select option[value=""],
+.cwc-inquiry-form__select option:first-child {
+	color: #A0A0A0 !important;
+}
+
+.cwc-inquiry-form__select option {
+	color: #0096C7;
+	background-color: #FFFFFF;
+}
+
+.cwc-inquiry-form__select:not(:invalid) {
+	color: #0096C7 !important;
+}
+
+.cwc-inquiry-form__select-wrap {
+	position: relative;
+	width: 100%;
+}
+
+.cwc-inquiry-form__select-wrap::after {
+	content: '';
+	position: absolute;
+	right: 30px;
+	top: 50%;
+	transform: translateY(-50%);
+	width: 16px;
+	height: 16px;
+	background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230096C7' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") no-repeat center;
+	pointer-events: none;
+}
+
+.cwc-inquiry-form__textarea {
+	height: 180px;
+	padding: 20px 30px;
+	border-radius: 30px !important;
+	resize: none;
+}
+
+.cwc-inquiry-form__input:focus,
+.cwc-inquiry-form__select:focus,
+.cwc-inquiry-form__textarea:focus {
+	outline: none !important;
+	border-color: #0096C7 !important;
+	color: #0096C7 !important;
+}
+
+.cwc-inquiry-form__submit {
+	width: 100%;
+	height: 60px;
+	background: linear-gradient(270deg, #24F9CE 0%, #1AB6F1 100%);
+	color: #FFFFFF;
+	border: none;
+	border-radius: 100px;
+	font-family: 'Sora', var(--wp--preset--font-family--heading);
+	font-weight: 700;
+	font-size: 20px;
+	cursor: pointer;
+	transition: transform 0.2s ease, filter 0.2s ease;
+	margin-top: 10px;
+}
+
+.cwc-inquiry-form__submit:hover {
+	transform: translateY(-2px);
+	filter: brightness(1.05);
+}
+
+@media (max-width: 600px) {
+	.cwc-inquiry-modal {
+		padding: 10px;
+	}
+
+	.cwc-inquiry-modal__container {
+		border-radius: 20px;
+		max-height: calc(100vh - 20px - var(--cwc-header-h, 115px));
+	}
+
+	.cwc-inquiry-modal__body {
+		padding: 24px;
+	}
+
+	.cwc-inquiry-modal__header {
+		height: 120px;
+	}
+
+	.cwc-inquiry-form__label {
+		font-size: 20px;
+	}
+
+	.cwc-inquiry-form {
+		gap: 16px;
 	}
 }

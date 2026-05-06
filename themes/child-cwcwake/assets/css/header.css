@@ -1,21 +1,59 @@
 /*
  * CWC Wake — Header
  *
- * Fixed header: transparent at top, white on scroll.
- * 3-column layout: Logo | Nav (centered) | Search + Book Now
+ * Fixed header.
+ * - On the home page (body.cwc-home): transparent at top, becomes opaque
+ *   on scroll via the .cwc-header--scrolled class added by header.js.
+ * - On every other page (body:not(.cwc-home)): always rendered in the
+ *   opaque "scrolled" appearance — no transparency, no wave animation.
+ *
+ * Layout:
+ *   • >= 1200px : Logo | Nav (centered) | Search + Book Now
+ *   • <  1200px : Logo | Search + Book Now + Burger
+ *                 The nav slides in as a right-side off-canvas drawer.
+ *
+ * Between 1200px and ~1440px the desktop nav fluidly shrinks (font /
+ * gap / padding) so the Logo + Nav + Actions stay on a single row
+ * without breaking.
  */
 
 /* ----------------------------------------
-   Fixed header bar
-   ---------------------------------------- */
+	Fluid header tokens
+	---------------------------------------- */
+
+:root {
+	--cwc-header-h: clamp(72px, 6vw + 36px, 115px);
+	--cwc-admin-bar-h: 32px;
+}
+
+@media screen and (max-width: 600px) {
+	:root {
+		--cwc-admin-bar-h: 46px;
+	}
+}
+
+.cwc-header {
+	--cwc-header-pad-x: clamp(1rem, 4vw, 4rem);
+	--cwc-nav-fs: clamp(15px, 0.6vw + 12px, 24px);
+	--cwc-nav-gap: clamp(16px, 2vw + 4px, 48px);
+	--cwc-nav-item-pad-x: clamp(8px, 0.6vw + 4px, 16px);
+	--cwc-nav-item-pad-y: clamp(6px, 0.4vw + 4px, 10px);
+	--cwc-book-w: clamp(140px, 12vw + 40px, 212px);
+	--cwc-book-h: clamp(44px, 3vw + 20px, 64px);
+	--cwc-book-fs: clamp(13px, 0.5vw + 10px, 22px);
+}
+
+/* ----------------------------------------
+	Fixed header bar
+	---------------------------------------- */
 
 .cwc-header {
 	position: fixed !important;
 	top: 0;
 	left: 0;
 	width: 100%;
-	height: 115px;
-	z-index: 100;
+	height: var(--cwc-header-h);
+	z-index: 100000;
 	background: transparent;
 	border: 1px solid rgba(245, 241, 235, 0.3);
 	border-left: none;
@@ -24,45 +62,18 @@
 	align-items: center;
 	padding: 0 !important;
 	margin: 0 !important;
-	overflow: hidden;
-	transition: border-color 0.3s ease,
+	transition: background-color 0.3s ease,
+		border-color 0.3s ease,
 		box-shadow 0.3s ease;
 }
 
-.cwc-header::after {
-	content: "";
-	position: absolute;
-	inset: -40px 0 0;
-	z-index: -1;
-	background: var(--wp--preset--color--background);
-	clip-path: ellipse(60% 0% at 50% 100%);
-	transition: clip-path 0.5s ease;
+.cwc-header--scrolled {
+	background: var(--wp--preset--color--background) !important;
+	border-color: var(--wp--preset--color--border);
+	box-shadow: var(--wp--custom--shadow--sm);
 }
 
-.cwc-header--scrolled::after {
-	animation: cwc-wave-flow 0.8s ease forwards;
-}
 
-@keyframes cwc-wave-flow {
-	0% {
-		clip-path: ellipse(60% 0% at 50% 100%);
-	}
-	20% {
-		clip-path: ellipse(70% 35% at 50% 100%);
-	}
-	40% {
-		clip-path: ellipse(80% 60% at 45% 100%);
-	}
-	60% {
-		clip-path: ellipse(90% 80% at 55% 100%);
-	}
-	80% {
-		clip-path: ellipse(100% 95% at 50% 100%);
-	}
-	100% {
-		clip-path: ellipse(150% 100% at 50% 100%);
-	}
-}
 
 .admin-bar .cwc-header {
 	top: 32px;
@@ -74,47 +85,48 @@
 }
 
 body:not(.admin-bar) {
-	padding-top: 115px;
+	padding-top: clamp(72px, 6vw + 36px, 115px);
 }
 
 body.admin-bar {
-	padding-top: 100px;
+	padding-top: clamp(56px, 6vw + 24px, 100px);
 }
 
 /* ----------------------------------------
-   Inner layout — 3-column grid
-   ---------------------------------------- */
+	Inner layout — 3-column grid
+	---------------------------------------- */
 
 .cwc-header__inner {
 	width: 100%;
 	max-width: 1921px;
 	margin: 0 auto !important;
-	padding: 0 clamp(1.5rem, 4vw, 4rem) !important;
-	height: 115px;
+	padding: 0 var(--cwc-header-pad-x) !important;
+	height: var(--cwc-header-h);
 	align-items: center !important;
 	display: grid !important;
 	grid-template-columns: 1fr;
 	gap: 0;
 }
 
-.cwc-header__inner > * {
+.cwc-header__inner>* {
 	grid-row: 1;
 	grid-column: 1;
 }
 
 /* ----------------------------------------
-   Logo — with top & bottom border lines
-   ---------------------------------------- */
+	Logo — with top & bottom border lines
+	---------------------------------------- */
 
 .cwc-header__logo-link {
 	display: flex;
 	align-items: center;
 	justify-self: start;
-	color: var(--wp--preset--color--background);
+	color: #F5F1EB;
 	text-decoration: none;
-	padding: 14px 24px;
+	padding: clamp(8px, 1vw + 2px, 14px) clamp(12px, 1.5vw + 4px, 24px);
 	border-top: 1px solid rgba(245, 241, 235, 0.3);
 	border-bottom: 1px solid rgba(245, 241, 235, 0.3);
+	outline: none;
 	transition: color 0.3s ease, border-color 0.3s ease;
 }
 
@@ -125,13 +137,28 @@ body.admin-bar {
 }
 
 .cwc-header__logo-link svg {
-	height: 28px;
+	height: clamp(18px, 1.4vw + 8px, 28px);
 	width: auto;
 }
 
 /* ----------------------------------------
-   Navigation — always centered
-   ---------------------------------------- */
+	Fluid Narrow Desktop Adjustments (1200px - 1440px)
+	---------------------------------------- */
+@media screen and (min-width: 1200px) and (max-width: 1440px) {
+	.cwc-header {
+		--cwc-header-pad-x: 1.5rem;
+		--cwc-nav-gap: clamp(10px, 5vw - 50px, 32px);
+		--cwc-nav-item-pad-x: clamp(6px, 2vw - 20px, 12px);
+	}
+
+	.cwc-header__actions {
+		gap: 12px !important;
+	}
+}
+
+/* ----------------------------------------
+	Navigation — always centered (desktop)
+	---------------------------------------- */
 
 .cwc-header__nav-center {
 	display: flex !important;
@@ -141,23 +168,53 @@ body.admin-bar {
 }
 
 .cwc-header .wp-block-navigation {
-	gap: 48px;
+	gap: var(--cwc-nav-gap);
 }
 
 .cwc-header .wp-block-navigation .wp-block-navigation-item {
-	gap: 10px;
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	padding: var(--cwc-nav-item-pad-y) var(--cwc-nav-item-pad-x);
+	transition: background-color 0.3s ease, color 0.3s ease;
+	outline: none;
+}
+
+/* ----------------------------------------
+	Desktop Hover & Active States
+	---------------------------------------- */
+@media (min-width: 1200px) {
+	.cwc-header .wp-block-navigation .wp-block-navigation__container>.wp-block-navigation-item:hover {
+		background-color: var(--wp--preset--color--accent);
+	}
+
+	.cwc-header .wp-block-navigation .wp-block-navigation__container>.wp-block-navigation-item.current-menu-item,
+	.cwc-header .wp-block-navigation .wp-block-navigation__container>.wp-block-navigation-item.current-menu-ancestor {
+		background-color: var(--wp--preset--color--primary);
+	}
+
+	/* Ensure hover/active colors are consistent across all page states for navigation items */
+	.cwc-header .wp-block-navigation .wp-block-navigation__container>.wp-block-navigation-item:hover>.wp-block-navigation-item__content,
+	.cwc-header .wp-block-navigation .wp-block-navigation__container>.wp-block-navigation-item:hover>.wp-block-navigation-item__content .wp-block-navigation__submenu-icon svg,
+	.cwc-header .wp-block-navigation .wp-block-navigation__container>.wp-block-navigation-item:hover>.wp-block-navigation__submenu-icon svg,
+	.cwc-header .wp-block-navigation .wp-block-navigation__container>.wp-block-navigation-item.current-menu-item>.wp-block-navigation-item__content,
+	.cwc-header .wp-block-navigation .wp-block-navigation__container>.wp-block-navigation-item.current-menu-ancestor>.wp-block-navigation-item__content,
+	.cwc-header .wp-block-navigation .wp-block-navigation__container>.wp-block-navigation-item.current-menu-item>.wp-block-navigation__submenu-icon svg,
+	.cwc-header .wp-block-navigation .wp-block-navigation__container>.wp-block-navigation-item.current-menu-ancestor>.wp-block-navigation__submenu-icon svg {
+		color: #FFFFFF !important;
+	}
 }
 
 .cwc-header .wp-block-navigation a,
 .cwc-header .wp-block-navigation-item__content {
 	font-family: var(--wp--preset--font-family--body);
 	font-weight: 400;
-	font-size: 24px;
+	font-size: var(--cwc-nav-fs);
 	line-height: 1;
 	color: #F5F1EB !important;
 	text-decoration: none;
-	padding: 8px 16px;
-	transition: color 0.3s ease, background-color 0.3s ease;
+	padding: 0;
+	transition: color 0.3s ease;
 }
 
 .cwc-header--scrolled .wp-block-navigation a,
@@ -169,19 +226,15 @@ body.admin-bar {
 	outline: none;
 }
 
-.cwc-header .wp-block-navigation a:hover {
-	background-color: #FF6B3D;
-	color: #FFFFFF !important;
-}
-
 .cwc-header .wp-block-navigation__submenu-icon {
 	display: contents;
 }
 
 .cwc-header .wp-block-navigation__submenu-icon svg {
 	color: #F5F1EB;
-	width: 20px;
-	height: 20px;
+	width: clamp(14px, 0.8vw + 8px, 20px);
+	height: clamp(14px, 0.8vw + 8px, 20px);
+	margin-left: 5px;
 	transition: color 0.3s ease;
 }
 
@@ -190,24 +243,24 @@ body.admin-bar {
 }
 
 /* ----------------------------------------
-   Right-side actions (Search + Book Now)
-   ---------------------------------------- */
+	Right-side actions (Search + Book Now + Burger)
+	---------------------------------------- */
 
 .cwc-header__actions {
 	display: flex !important;
 	align-items: center !important;
-	gap: var(--wp--preset--spacing--30) !important;
+	gap: clamp(12px, 1vw + 4px, var(--wp--preset--spacing--30)) !important;
 	justify-self: end !important;
 	flex-shrink: 0;
 }
 
 /* ----------------------------------------
-   Search toggle — 44×44
-   ---------------------------------------- */
+	Search toggle
+	---------------------------------------- */
 
 .cwc-header__search-toggle {
-	width: 44px;
-	height: 44px;
+	width: clamp(36px, 2.5vw + 16px, 44px);
+	height: clamp(36px, 2.5vw + 16px, 44px);
 	background: none;
 	border: none;
 	cursor: pointer;
@@ -218,6 +271,11 @@ body.admin-bar {
 	justify-content: center;
 	flex-shrink: 0;
 	transition: color 0.3s ease;
+}
+
+.cwc-header__search-toggle svg {
+	width: clamp(18px, 1.2vw + 10px, 24px);
+	height: clamp(18px, 1.2vw + 10px, 24px);
 }
 
 .cwc-header--scrolled .cwc-header__search-toggle {
@@ -233,21 +291,21 @@ body.admin-bar {
 }
 
 /* ----------------------------------------
-   Book Now CTA — per design specs
-   ---------------------------------------- */
+	Book Now CTA — per design specs
+	---------------------------------------- */
 
 .cwc-header__book-btn {
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
-	width: 212px;
-	height: 64px;
-	padding: 20px;
+	width: var(--cwc-book-w);
+	height: var(--cwc-book-h);
+	padding: 0 clamp(14px, 1.2vw + 8px, 20px);
 	gap: 10px;
 	border-radius: 30px;
 	font-family: 'Archivo', var(--wp--preset--font-family--body);
 	font-weight: 300;
-	font-size: 22px;
+	font-size: var(--cwc-book-fs);
 	line-height: 100%;
 	letter-spacing: 0;
 	text-decoration: none;
@@ -272,8 +330,8 @@ body.admin-bar {
 }
 
 /* ----------------------------------------
-   Dropdown / Submenu
-   ---------------------------------------- */
+	Dropdown / Submenu (desktop)
+	---------------------------------------- */
 
 .cwc-header .wp-block-navigation__submenu-container {
 	background: var(--wp--preset--color--background);
@@ -283,11 +341,14 @@ body.admin-bar {
 	padding: 5px;
 	min-width: 280px;
 	box-shadow: var(--wp--custom--shadow--lg);
+	z-index: 101;
 }
 
 .cwc-header .wp-block-navigation__submenu-container .wp-block-navigation-item {
 	border-bottom: 1px solid var(--wp--preset--color--border);
-	padding-bottom: 5px;
+	padding: 5px;
+	margin: 0;
+	background-color: transparent !important;
 }
 
 .cwc-header .wp-block-navigation__submenu-container .wp-block-navigation-item:last-child {
@@ -313,12 +374,17 @@ body.admin-bar {
 	outline: none;
 }
 
-.cwc-header .wp-block-navigation__submenu-container a:hover {
-	background-color: var(--wp--preset--color--surface);
-	color: var(--wp--preset--color--primary) !important;
+.cwc-header .wp-block-navigation .wp-block-navigation__submenu-container .wp-block-navigation-item:hover>.wp-block-navigation-item__content,
+.cwc-header .wp-block-navigation .wp-block-navigation__submenu-container a:hover {
+	background-color: rgba(0, 0, 0, 0.05);
+	color: #000000 !important;
 }
 
-.cwc-header .wp-block-navigation__submenu-container .wp-block-navigation-item.has-child > a::after {
+.cwc-header .wp-block-navigation__submenu-container .wp-block-navigation__submenu-icon {
+	display: none;
+}
+
+.cwc-header .wp-block-navigation__submenu-container .wp-block-navigation-item.has-child>a::after {
 	content: "\203A";
 	font-size: 1.5em;
 	line-height: 1;
@@ -327,48 +393,530 @@ body.admin-bar {
 }
 
 /* ----------------------------------------
-   Mobile responsive overlay
-   ---------------------------------------- */
+	Burger button — hidden on desktop
+	---------------------------------------- */
 
-.cwc-header .wp-block-navigation__responsive-container-open {
-	color: var(--wp--preset--color--background);
+.cwc-header__burger {
+	display: none;
+	width: 44px;
+	height: 44px;
+	background: none;
+	border: none;
+	cursor: pointer;
+	padding: 0;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 6px;
+	color: inherit;
+	flex-shrink: 0;
 }
 
-.cwc-header--scrolled .wp-block-navigation__responsive-container-open {
-	color: var(--wp--preset--color--text);
+.cwc-header__burger:focus {
+	outline: none;
 }
 
-.cwc-header .wp-block-navigation__responsive-container.is-menu-open {
-	background-color: var(--wp--preset--color--text);
-	padding: var(--wp--preset--spacing--50);
+.cwc-header__burger-bar {
+	display: block;
+	width: 26px;
+	height: 2px;
+	background: var(--wp--preset--color--background);
+	transition: transform 0.3s ease, opacity 0.2s ease, background-color 0.3s ease;
+	transform-origin: center;
 }
 
-.cwc-header .wp-block-navigation__responsive-container.is-menu-open a {
-	color: var(--wp--preset--color--background);
-	font-size: var(--wp--preset--font-size--large);
+.cwc-header--scrolled .cwc-header__burger-bar {
+	background: var(--wp--preset--color--text);
+}
+
+/* Open state — animate to "X" */
+.cwc-header__burger[aria-expanded="true"] .cwc-header__burger-bar:nth-child(1) {
+	transform: translateY(8px) rotate(45deg);
+}
+
+.cwc-header__burger[aria-expanded="true"] .cwc-header__burger-bar:nth-child(2) {
+	opacity: 0;
+}
+
+.cwc-header__burger[aria-expanded="true"] .cwc-header__burger-bar:nth-child(3) {
+	transform: translateY(-8px) rotate(-45deg);
 }
 
 /* ----------------------------------------
-   Mobile: stack to 2-column (logo + hamburger)
-   ---------------------------------------- */
+	Off-canvas backdrop
+	---------------------------------------- */
 
-@media (max-width: 991px) {
+.cwc-header__backdrop {
+	position: fixed;
+	inset: 0;
+	background: rgba(15, 23, 32, 0.45);
+	backdrop-filter: blur(2px);
+	-webkit-backdrop-filter: blur(2px);
+	z-index: 100001;
+	opacity: 0;
+	pointer-events: none;
+	transition: opacity 0.4s ease;
+	margin: 0;
+}
+
+.cwc-header__backdrop.is-visible {
+	opacity: 1;
+	pointer-events: auto;
+}
+
+/* ----------------------------------------
+	Drawer close button — hidden on desktop, visible inside drawer
+	---------------------------------------- */
+
+.cwc-header__nav-close {
+	display: none;
+	position: absolute;
+	top: 32px;
+	right: clamp(20px, 5vw, 40px);
+	width: 56px;
+	height: 56px;
+	background: transparent;
+	border: 1px solid rgba(0, 0, 0, 0.08);
+	border-radius: 50%;
+	cursor: pointer;
+	color: #1A1A1A;
+	padding: 0;
+	align-items: center;
+	justify-content: center;
+	z-index: 2;
+	transition: background 0.3s ease, color 0.3s ease, transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.cwc-header__nav-close:hover {
+	background: var(--wp--preset--color--primary);
+	color: #FFFFFF;
+	transform: rotate(90deg);
+}
+
+.cwc-header__nav-close:focus-visible {
+	outline: 2px solid var(--wp--preset--color--primary);
+	outline-offset: 2px;
+}
+
+/* ----------------------------------------
+	Tablet & below — Premium Light Off-canvas
+	---------------------------------------- */
+
+.cwc-header__nav-logo {
+	display: none;
+}
+
+@media (max-width: 1199px) {
+
+	/* 2-column grid: logo | actions(+burger) */
 	.cwc-header__inner {
 		grid-template-columns: auto 1fr auto;
 	}
 
-	.cwc-header__nav-center {
-		display: none !important;
+	.cwc-header__logo-link {
+		grid-column: 1;
 	}
 
 	.cwc-header__actions {
-		gap: var(--wp--preset--spacing--20) !important;
+		grid-column: 3;
+	}
+
+	/* Burger appears in the actions cluster */
+	.cwc-header__burger {
+		display: inline-flex;
+	}
+
+	/*
+	 * Sidebar Panel (Dashboard Style)
+	 */
+	.cwc-header__nav-center {
+		position: fixed !important;
+		top: 0;
+		right: 0;
+		bottom: 0;
+		width: min(380px, 100vw);
+		height: 100dvh;
+		max-height: 100vh;
+		background: #FFFFFF;
+		border-left: 1px solid rgba(0, 0, 0, 0.05);
+		justify-self: stretch !important;
+		justify-content: flex-start !important;
+		/* Top align */
+		align-items: stretch !important;
+		flex-direction: column !important;
+		gap: 0 !important;
+		padding: 80px 16px 40px !important;
+		z-index: 100002;
+		transform: translateX(100%);
+		transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+		overflow-y: auto;
+		overscroll-behavior: contain;
+		-webkit-overflow-scrolling: touch;
+		box-shadow: -10px 0 40px rgba(0, 0, 0, 0.08);
+	}
+
+	.cwc-header__nav-center.is-open {
+		transform: translateX(0);
+	}
+
+	/* Show the close button inside the drawer */
+	.cwc-header__nav-close {
+		display: inline-flex;
+		top: 16px;
+		right: 16px;
+		width: 40px;
+		height: 40px;
+		background: transparent;
+		border: none;
+		border-radius: 8px;
+		color: #1A1A1A;
+	}
+
+	.cwc-header__nav-close:hover {
+		background: #F3F4F6;
+		transform: none;
+		/* No rotation */
+	}
+
+	/* Show logo inside drawer */
+	.cwc-header__nav-logo {
+		display: block;
+		margin-bottom: 40px;
+		padding-left: 8px;
+		/* Align slightly with links */
+	}
+
+	.cwc-header__nav-logo svg {
+		width: 110px;
+		height: auto;
+		color: #1A1A1A;
+	}
+
+	/* Reset wp:navigation block visuals inside the drawer */
+	.cwc-header__nav-center .wp-block-navigation__responsive-container-content,
+	.cwc-header__nav-center .wp-block-navigation__container {
+		display: flex !important;
+		flex-direction: column !important;
+		align-items: stretch !important;
+		gap: 4px !important;
+		width: 100%;
+		background: transparent !important;
+		padding: 0 !important;
+		list-style: none !important;
+	}
+
+	/* Top-level rows */
+	.cwc-header__nav-center .wp-block-navigation__container>.wp-block-navigation-item {
+		display: flex;
+		flex-direction: column;
+		width: 100%;
+		padding: 0;
+		border: none;
+		border-radius: 6px;
+		background: transparent;
+		justify-content: flex-start;
+		position: relative;
+	}
+
+	/* Disable desktop orange hover for mobile */
+	.cwc-header__nav-center .wp-block-navigation__container>.wp-block-navigation-item:hover {
+		background-color: transparent;
+	}
+
+	/* Top-level links */
+	.cwc-header__nav-center .wp-block-navigation__container>.wp-block-navigation-item>.wp-block-navigation-item__content {
+		width: 100%;
+		display: flex;
+		align-items: center;
+		justify-content: flex-start;
+		padding: 12px 16px !important;
+		font-family: var(--wp--preset--font-family--body);
+		font-size: 16px !important;
+		font-weight: 500;
+		line-height: 1.2;
+		letter-spacing: 0;
+		text-transform: none;
+		color: #374151 !important;
+		background-color: transparent;
+		border-radius: 6px;
+		transition: color 0.2s ease, background-color 0.2s ease;
+	}
+
+	.cwc-header__nav-center .wp-block-navigation__container>.wp-block-navigation-item.is-submenu-open>.wp-block-navigation-item__content {
+		color: #111827 !important;
+		background-color: #F8F9FA;
+	}
+
+	.cwc-header__nav-center .wp-block-navigation__container>.wp-block-navigation-item.current-menu-item>.wp-block-navigation-item__content,
+	.cwc-header__nav-center .wp-block-navigation__container>.wp-block-navigation-item.current-menu-ancestor>.wp-block-navigation-item__content {
+		color: #FFFFFF !important;
+		background-color: var(--wp--preset--color--primary);
+	}
+
+	/*
+	 * Submenu chevron
+	 */
+	.cwc-header__nav-center .wp-block-navigation__submenu-icon {
+		position: absolute;
+		right: 8px;
+		top: 6px;
+		z-index: 10;
+		display: inline-flex !important;
+		align-items: center;
+		justify-content: center;
+		width: 32px;
+		height: 32px;
+		margin: 0 !important;
+		padding: 0 !important;
+		background: transparent;
+		border: none;
+		border-radius: 6px;
+		cursor: pointer;
+		color: #111827 !important;
+		transition: background-color 0.2s ease, color 0.2s ease;
+		flex-shrink: 0;
+		outline: none;
+	}
+
+	.cwc-header__nav-center .wp-block-navigation__submenu-icon:hover {
+		background: #E5E7EB;
+		color: #111827;
+	}
+
+	.cwc-header__nav-center .wp-block-navigation__submenu-icon svg {
+		width: 14px !important;
+		height: 14px !important;
+		margin: 0 !important;
+		color: inherit;
+	}
+
+
+
+	.cwc-header__nav-center .wp-block-navigation-item.current-menu-item>.wp-block-navigation__submenu-icon,
+	.cwc-header__nav-center .wp-block-navigation-item.current-menu-ancestor>.wp-block-navigation__submenu-icon,
+	.cwc-header__nav-center .wp-block-navigation-item.current-menu-item>.wp-block-navigation__submenu-icon svg,
+	.cwc-header__nav-center .wp-block-navigation-item.current-menu-ancestor>.wp-block-navigation__submenu-icon svg {
+		color: #FFFFFF !important;
+	}
+
+	.cwc-header__nav-center .wp-block-navigation-item.current-menu-item>.wp-block-navigation__submenu-icon:hover,
+	.cwc-header__nav-center .wp-block-navigation-item.current-menu-ancestor>.wp-block-navigation__submenu-icon:hover {
+		background: rgba(255, 255, 255, 0.2);
+	}
+
+	/*
+	 * Sub-menu container (Timeline Tree)
+	 */
+	.cwc-header__nav-center .wp-block-navigation__submenu-container {
+		flex: none !important;
+		order: 99;
+		position: relative !important;
+		opacity: 1 !important;
+		visibility: visible !important;
+		pointer-events: auto !important;
+		min-width: 0 !important;
+		width: 100% !important;
+		margin: 0 16px 0 24px !important;
+		padding: 0 !important;
+		background: transparent !important;
+		border: none !important;
+		border-radius: 0 !important;
+		box-shadow: none !important;
+		display: flex !important;
+		flex-direction: column !important;
+		gap: 0 !important;
+		list-style: none !important;
+		max-height: 0;
+		overflow: hidden;
+		transition: max-height 0.4s ease, padding 0.4s ease, margin 0.4s ease;
+	}
+
+	/* The vertical line for the tree */
+	.cwc-header__nav-center .wp-block-navigation__submenu-container::before {
+		content: "";
+		position: absolute;
+		top: 10px;
+		bottom: 24px;
+		left: 0;
+		width: 2px;
+		background: #E5E7EB;
+		z-index: 1;
+	}
+
+	.cwc-header__nav-center .wp-block-navigation-item.is-submenu-open>.wp-block-navigation__submenu-container {
+		max-height: 2000px !important;
+		padding: 4px 0 16px 20px !important;
+		margin-bottom: 8px !important;
+		visibility: visible !important;
+		opacity: 1 !important;
+	}
+
+	.cwc-header__nav-center .wp-block-navigation__submenu-container .wp-block-navigation-item {
+		display: flex !important;
+		opacity: 1 !important;
+		visibility: visible !important;
+		position: relative !important;
+		height: auto !important;
+		width: 100%;
+		padding: 0;
+		margin: 0;
+		border-bottom: none !important;
+		background: transparent !important;
+		justify-content: flex-start;
+	}
+
+	.cwc-header__nav-center .wp-block-navigation__submenu-container .wp-block-navigation-item:hover {
+		background: transparent !important;
+	}
+
+	.cwc-header__nav-center .wp-block-navigation__submenu-container .wp-block-navigation-item__content,
+	.cwc-header__nav-center .wp-block-navigation__submenu-container a {
+		flex: 1;
+		display: flex !important;
+		opacity: 1 !important;
+		visibility: visible !important;
+		position: relative !important;
+		height: auto !important;
+		align-items: center;
+		padding: 10px 12px !important;
+		justify-content: flex-start !important;
+		font-family: var(--wp--preset--font-family--body);
+		font-size: 14.5px !important;
+		font-weight: 400;
+		color: #4B5563 !important;
+		text-transform: none;
+		text-decoration: none;
+		transition: color 0.2s ease;
+	}
+
+	/* The dot on the timeline */
+	.cwc-header__nav-center .wp-block-navigation__submenu-container a::before {
+		content: "";
+		position: absolute;
+		left: -24px;
+		top: 50%;
+		transform: translateY(-50%);
+		width: 8px;
+		height: 8px;
+		border-radius: 50%;
+		background: #E5E7EB;
+		border: 1.5px solid #F8F9FA;
+		z-index: 2;
+		transition: background 0.2s ease, border-color 0.2s ease;
+	}
+
+	.cwc-header__nav-center .wp-block-navigation__submenu-container .wp-block-navigation-item__label {
+		display: flex !important;
+		opacity: 1 !important;
+		visibility: visible !important;
+	}
+
+	.cwc-header__nav-center .wp-block-navigation__submenu-container .wp-block-navigation-item.has-child>a::after {
+		content: none !important;
+	}
+
+	.cwc-header__nav-center .wp-block-navigation__submenu-container .wp-block-navigation-item:hover>.wp-block-navigation-item__content,
+	.cwc-header__nav-center .wp-block-navigation__submenu-container a:hover {
+		color: #111827 !important;
+	}
+
+	.cwc-header__nav-center .wp-block-navigation__submenu-container .current-menu-item>a {
+		color: var(--wp--preset--color--primary) !important;
+	}
+
+	.cwc-header__nav-center .wp-block-navigation__submenu-container a:hover::before,
+	.cwc-header__nav-center .wp-block-navigation__submenu-container .current-menu-item>a::before {
+		background: var(--wp--preset--color--primary) !important;
+		border-color: #FFFFFF !important;
+	}
+}
+
+/* ----------------------------------------
+	Phones — tighten the actions row
+	---------------------------------------- */
+
+@media (max-width: 600px) {
+	.cwc-header__search-toggle {
+		display: none;
 	}
 
 	.cwc-header__book-btn {
 		width: auto;
-		height: auto;
-		padding: 12px 20px;
-		font-size: 14px;
+		min-width: 0;
+		padding: 0 14px;
+		font-size: 10px;
+	}
+
+	.cwc-header__nav-center {
+		width: 100vw;
+	}
+}
+
+/* ----------------------------------------
+	Lock body scroll while the off-canvas is open
+	---------------------------------------- */
+
+body.cwc-nav-open {
+	overflow: hidden;
+}
+
+/* ----------------------------------------
+	Non-home pages — always opaque header
+	----------------------------------------
+	The transparent-at-top + wave-on-scroll behavior is reserved for the
+	home page only. Every other page mirrors the .cwc-header--scrolled
+	appearance permanently and skips the wave animation entirely. */
+
+body:not(.cwc-home) .cwc-header {
+	background: var(--wp--preset--color--background) !important;
+	border-color: var(--wp--preset--color--border);
+	box-shadow: var(--wp--custom--shadow--sm);
+}
+
+body:not(.cwc-home) .cwc-header__logo-link {
+	color: var(--wp--preset--color--text);
+	border-top-color: var(--wp--preset--color--text);
+	border-bottom-color: var(--wp--preset--color--text);
+}
+
+body:not(.cwc-home) .cwc-header .wp-block-navigation a,
+body:not(.cwc-home) .cwc-header .wp-block-navigation-item__content {
+	color: #1A1A1A !important;
+}
+
+body:not(.cwc-home) .cwc-header .wp-block-navigation__submenu-icon svg {
+	color: #1A1A1A;
+}
+
+body:not(.cwc-home) .cwc-header__search-toggle {
+	color: var(--wp--preset--color--text);
+}
+
+body:not(.cwc-home) .cwc-header__book-btn {
+	background: var(--wp--preset--color--primary);
+	color: var(--wp--preset--color--background);
+}
+
+body:not(.cwc-home) .cwc-header__burger-bar {
+	background: var(--wp--preset--color--text);
+}
+
+/*
+ * The off-canvas drawer panel is always rendered with the cream
+ * background + dark text regardless of header state — keep the
+ * top-level link color dark so it stays legible on the panel.
+ */
+@media (max-width: 1199px) {
+	.cwc-header .cwc-header__nav-center .wp-block-navigation__container>.wp-block-navigation-item>.wp-block-navigation-item__content {
+		color: var(--wp--preset--color--text);
+	}
+
+	.cwc-header .cwc-header__nav-center .wp-block-navigation__submenu-container a,
+	.cwc-header .cwc-header__nav-center .wp-block-navigation__submenu-container .wp-block-navigation-item__content {
+		color: rgba(26, 26, 26, 0.78) !important;
+	}
+
+	.cwc-header .cwc-header__nav-center .wp-block-navigation__submenu-icon svg {
+		color: var(--wp--preset--color--text);
 	}
 }

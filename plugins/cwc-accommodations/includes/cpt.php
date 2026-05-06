@@ -1,0 +1,1308 @@
+<?php
+/**
+ * CWC Accommodations — Custom Post Type, meta fields, and catalogues.
+ *
+ * Foundation of the room management system. Owns:
+ *
+ *   - The `accommodation` post type (mounted at
+ *     `/accommodations/<slug>/`).
+ *   - Six per-room meta fields (`_cwc_price`, `_cwc_price_sub`,
+ *     `_cwc_capacity`, `_cwc_availability`, `_cwc_amenities`,
+ *     `_cwc_gallery_ids`) registered with `show_in_rest` so the
+ *     block editor and any future headless surface can read and
+ *     write them through the REST API.
+ *   - The amenity + policy icon catalogues every other module
+ *     reads from. Centralising them here means the meta-box
+ *     checkbox UI, the global-policies admin page, and the
+ *     front-end block renders all share a single source of truth.
+ *
+ * Theme coupling: the icon SVGs themselves live in the active
+ * theme's `assets/images/` folder so the designer can iterate on
+ * them alongside the rest of the brand. `cwc_icon_url_for_slug()`
+ * resolves them via `get_stylesheet_directory_uri()`, so the
+ * plugin is theme-agnostic at the plumbing level — swapping in a
+ * different theme that ships matching SVGs just works.
+ *
+ * @package CWC_Accommodations
+ * @since   1.0.0
+ */
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
+/* ---------------------------------------------------------
+ * CPT registration
+ * --------------------------------------------------------- */
+
+function cwc_normalize_room_title_key( $room_name ) {
+	$room_name = is_string( $room_name ) ? trim( $room_name ) : '';
+	$room_name = preg_replace( '/\s+Room$/i', '', $room_name );
+	return strtolower( $room_name );
+}
+
+function cwc_normalize_physical_room_rows( $rooms ) {
+	if ( ! is_array( $rooms ) ) {
+		return [];
+	}
+
+	$normalized = [];
+	foreach ( $rooms as $room ) {
+		if ( ! is_array( $room ) ) {
+			continue;
+		}
+
+		$name = sanitize_text_field( $room['name'] ?? '' );
+		if ( '' === $name ) {
+			continue;
+		}
+
+		$id = isset( $room['id'] ) ? preg_replace( '/[^a-z0-9_-]/i', '', (string) $room['id'] ) : '';
+		if ( '' === $id ) {
+			$id = 'unit_' . wp_generate_password( 12, false, false );
+		}
+
+		$status = sanitize_key( $room['status'] ?? 'available' );
+		if ( ! in_array( $status, [ 'available', 'booked' ], true ) ) {
+			$status = 'available';
+		}
+
+		$normalized[] = [
+			'id'     => strtolower( $id ),
+			'name'   => $name,
+			'status' => $status,
+		];
+	}
+
+	return $normalized;
+}
+
+function cwc_update_physical_rooms( $post_id, array $rooms ) {
+	$rooms = cwc_normalize_physical_room_rows( $rooms );
+	update_post_meta( $post_id, '_cwc_physical_rooms', wp_json_encode( $rooms ) );
+	update_post_meta( $post_id, '_cwc_inventory', count( $rooms ) );
+	return $rooms;
+}
+
+function cwc_get_physical_rooms( $post_id ) {
+	$rooms_raw = get_post_meta( $post_id, '_cwc_physical_rooms', true );
+	if ( empty( $rooms_raw ) ) {
+		return [];
+	}
+
+	$decoded = json_decode( $rooms_raw, true );
+	if ( ! is_array( $decoded ) ) {
+		return [];
+	}
+
+	$normalized = cwc_normalize_physical_room_rows( $decoded );
+	if ( wp_json_encode( $decoded ) !== wp_json_encode( $normalized ) ) {
+		cwc_update_physical_rooms( $post_id, $normalized );
+	}
+
+	return $normalized;
+}
+
+function cwc_get_room_inventory( $post_id ) {
+	$physical_rooms = cwc_get_physical_rooms( $post_id );
+	if ( ! empty( $physical_rooms ) ) {
+		return count( $physical_rooms );
+	}
+	$inventory = get_post_meta( $post_id, '_cwc_inventory', true );
+	return $inventory !== '' ? intval( $inventory ) : 1;
+}
+
+function cwc_get_room_blocked_unit_count( $post_id ) {
+	$count = 0;
+	foreach ( cwc_get_physical_rooms( $post_id ) as $room ) {
+		if ( 'booked' === ( $room['status'] ?? 'available' ) ) {
+			$count++;
+		}
+	}
+	return $count;
+}
+
+function cwc_find_accommodation_post_by_room_name( $room_name ) {
+	$room_key = cwc_normalize_room_title_key( $room_name );
+	if ( '' === $room_key ) {
+		return null;
+	}
+
+	$room_posts = get_posts( [
+		'post_type'      => 'accommodation',
+		'post_status'    => 'publish',
+		'posts_per_page' => -1,
+	] );
+
+	foreach ( $room_posts as $room_post ) {
+		if ( cwc_normalize_room_title_key( $room_post->post_title ) === $room_key ) {
+			return $room_post;
+		}
+	}
+
+	return null;
+}
+
+function cwc_booking_status_is_active( $status ) {
+	return in_array( $status, [ 'pending', 'confirmed', 'checked-in' ], true );
+}
+
+function cwc_get_booking_room_post_id( $booking_id ) {
+	$booking_id = (int) $booking_id;
+	if ( $booking_id <= 0 ) {
+		return 0;
+	}
+
+	$post_parent = (int) get_post_field( 'post_parent', $booking_id );
+	if ( $post_parent > 0 && 'accommodation' === get_post_type( $post_parent ) ) {
+		return $post_parent;
+	}
+
+	$room_post_id = (int) get_post_meta( $booking_id, '_cwc_bk_room_post_id', true );
+	if ( $room_post_id > 0 && 'accommodation' === get_post_type( $room_post_id ) ) {
+		return $room_post_id;
+	}
+
+	$room_name = (string) get_post_meta( $booking_id, '_cwc_bk_room', true );
+	$room_post = cwc_find_accommodation_post_by_room_name( $room_name );
+	if ( ! $room_post instanceof WP_Post ) {
+		return 0;
+	}
+
+	$room_post_id = (int) $room_post->ID;
+	update_post_meta( $booking_id, '_cwc_bk_room_post_id', $room_post_id );
+	wp_update_post( [
+		'ID'          => $booking_id,
+		'post_parent' => $room_post_id,
+	] );
+
+	return $room_post_id;
+}
+
+function cwc_get_booking_assigned_unit_id( $booking_id ) {
+	$booking_id = (int) $booking_id;
+	if ( $booking_id <= 0 ) {
+		return '';
+	}
+
+	$unit_id = (string) get_post_meta( $booking_id, '_cwc_bk_assigned_unit_id', true );
+	if ( '' !== $unit_id ) {
+		return $unit_id;
+	}
+
+	$assigned_room_name = (string) get_post_meta( $booking_id, '_cwc_bk_assigned_room', true );
+	$room_post_id       = cwc_get_booking_room_post_id( $booking_id );
+	if ( '' === $assigned_room_name || $room_post_id <= 0 ) {
+		return '';
+	}
+
+	foreach ( cwc_get_physical_rooms( $room_post_id ) as $room ) {
+		if ( $assigned_room_name === ( $room['name'] ?? '' ) && ! empty( $room['id'] ) ) {
+			update_post_meta( $booking_id, '_cwc_bk_assigned_unit_id', $room['id'] );
+			return $room['id'];
+		}
+	}
+
+	return '';
+}
+
+function cwc_find_physical_room_by_booking( $booking_id ) {
+	$room_post_id = cwc_get_booking_room_post_id( $booking_id );
+	if ( $room_post_id <= 0 ) {
+		return null;
+	}
+
+	$unit_id             = cwc_get_booking_assigned_unit_id( $booking_id );
+	$assigned_room_name  = (string) get_post_meta( $booking_id, '_cwc_bk_assigned_room', true );
+	$physical_rooms      = cwc_get_physical_rooms( $room_post_id );
+
+	foreach ( $physical_rooms as $index => $room ) {
+		$room_id   = (string) ( $room['id'] ?? '' );
+		$room_name = (string) ( $room['name'] ?? '' );
+		if ( ( '' !== $unit_id && $room_id === $unit_id ) || ( '' === $unit_id && '' !== $assigned_room_name && $room_name === $assigned_room_name ) ) {
+			return [
+				'post_id' => $room_post_id,
+				'index'   => $index,
+				'room'    => $room,
+			];
+		}
+	}
+
+	return null;
+}
+
+function cwc_booking_overlaps_range( $booking_id, $checkin_date, $checkout_date, $exclude_booking_id = 0 ) {
+	$booking_id = (int) $booking_id;
+	if ( $booking_id <= 0 || (int) $exclude_booking_id === $booking_id ) {
+		return false;
+	}
+
+	$status = (string) get_post_meta( $booking_id, '_cwc_bk_status', true );
+	if ( ! cwc_booking_status_is_active( $status ) ) {
+		return false;
+	}
+
+	$bk_checkin  = (string) get_post_meta( $booking_id, '_cwc_bk_checkin', true );
+	$bk_checkout = (string) get_post_meta( $booking_id, '_cwc_bk_checkout', true );
+	if ( '' === $bk_checkin || '' === $bk_checkout ) {
+		return false;
+	}
+
+	$bk_ci = date( 'Y-m-d', strtotime( $bk_checkin ) );
+	$bk_co = date( 'Y-m-d', strtotime( $bk_checkout ) );
+	return $bk_ci < $checkout_date && $bk_co > $checkin_date;
+}
+
+function cwc_get_overlapping_booking_ids_for_room_post( $room_post_id, $checkin_date, $checkout_date, $exclude_booking_id = 0 ) {
+	$room_post_id = (int) $room_post_id;
+	if ( $room_post_id <= 0 ) {
+		return [];
+	}
+
+	$booking_ids = get_posts( [
+		'post_type'      => 'cwc_booking',
+		'post_status'    => 'publish',
+		'posts_per_page' => -1,
+		'fields'         => 'ids',
+	] );
+
+	$matches = [];
+	foreach ( $booking_ids as $booking_id ) {
+		if ( cwc_get_booking_room_post_id( $booking_id ) !== $room_post_id ) {
+			continue;
+		}
+
+		if ( cwc_booking_overlaps_range( $booking_id, $checkin_date, $checkout_date, $exclude_booking_id ) ) {
+			$matches[] = (int) $booking_id;
+		}
+	}
+
+	return $matches;
+}
+
+function cwc_get_room_unit_allocation( $room_post_id, $checkin_date, $checkout_date, $exclude_booking_id = 0 ) {
+	$room_post_id = (int) $room_post_id;
+	$units        = cwc_get_physical_rooms( $room_post_id );
+	$booking_ids  = cwc_get_overlapping_booking_ids_for_room_post( $room_post_id, $checkin_date, $checkout_date, $exclude_booking_id );
+
+	usort(
+		$booking_ids,
+		static function ( $left, $right ) {
+			$left_date  = strtotime( (string) get_post_meta( $left, '_cwc_bk_checkin', true ) ) ?: 0;
+			$right_date = strtotime( (string) get_post_meta( $right, '_cwc_bk_checkin', true ) ) ?: 0;
+			if ( $left_date === $right_date ) {
+				return $left <=> $right;
+			}
+			return $left_date <=> $right_date;
+		}
+	);
+
+	if ( empty( $units ) ) {
+		$total_units = cwc_get_room_inventory( $room_post_id );
+		$occupied    = count( $booking_ids );
+		return [
+			'total_units'          => $total_units,
+			'booking_ids'          => $booking_ids,
+			'booking_to_unit'      => [],
+			'occupied_unit_ids'    => [],
+			'manual_blocked_ids'   => [],
+			'available_unit_ids'   => [],
+			'manual_blocked_count' => 0,
+			'occupied_count'       => $occupied,
+			'available_units'      => max( 0, $total_units - $occupied ),
+			'overflow_booking_ids' => [],
+		];
+	}
+
+	$unit_map           = [];
+	$manual_blocked_ids = [];
+	$available_pool     = [];
+
+	foreach ( $units as $unit ) {
+		$unit_id = (string) ( $unit['id'] ?? '' );
+		if ( '' === $unit_id ) {
+			continue;
+		}
+
+		$unit_map[ $unit_id ] = $unit;
+		if ( 'booked' === ( $unit['status'] ?? 'available' ) ) {
+			$manual_blocked_ids[ $unit_id ] = true;
+		} else {
+			$available_pool[ $unit_id ] = $unit;
+		}
+	}
+
+	$booking_to_unit = [];
+	$pending_ids     = [];
+	$used_unit_ids   = [];
+
+	foreach ( $booking_ids as $booking_id ) {
+		$unit_id = cwc_get_booking_assigned_unit_id( $booking_id );
+		if ( '' !== $unit_id && isset( $unit_map[ $unit_id ] ) && ! isset( $used_unit_ids[ $unit_id ] ) ) {
+			$booking_to_unit[ $booking_id ] = $unit_map[ $unit_id ];
+			$used_unit_ids[ $unit_id ] = true;
+			unset( $available_pool[ $unit_id ] );
+			continue;
+		}
+		$pending_ids[] = $booking_id;
+	}
+
+	foreach ( $pending_ids as $booking_id ) {
+		$next_unit_id = array_key_first( $available_pool );
+		if ( null === $next_unit_id ) {
+			break;
+		}
+
+		$booking_to_unit[ $booking_id ] = $available_pool[ $next_unit_id ];
+		$used_unit_ids[ $next_unit_id ] = true;
+		unset( $available_pool[ $next_unit_id ] );
+	}
+
+	$occupied_unit_ids = [];
+	foreach ( $booking_to_unit as $booking_id => $unit ) {
+		$unit_id = (string) ( $unit['id'] ?? '' );
+		if ( '' !== $unit_id ) {
+			$occupied_unit_ids[ $unit_id ] = true;
+		}
+	}
+
+	$effective_manual_blocks = array_diff_key( $manual_blocked_ids, $occupied_unit_ids );
+	$overflow_booking_ids    = array_values( array_diff( $booking_ids, array_keys( $booking_to_unit ) ) );
+
+	return [
+		'total_units'          => count( $unit_map ),
+		'booking_ids'          => $booking_ids,
+		'booking_to_unit'      => $booking_to_unit,
+		'occupied_unit_ids'    => array_keys( $occupied_unit_ids ),
+		'manual_blocked_ids'   => array_keys( $effective_manual_blocks ),
+		'available_unit_ids'   => array_keys( $available_pool ),
+		'manual_blocked_count' => count( $effective_manual_blocks ),
+		'occupied_count'       => count( $booking_to_unit ),
+		'available_units'      => count( $available_pool ),
+		'overflow_booking_ids' => $overflow_booking_ids,
+	];
+}
+
+function cwc_find_available_unit_for_booking( $room_post_id, $checkin_date, $checkout_date, $exclude_booking_id = 0 ) {
+	$allocation = cwc_get_room_unit_allocation( $room_post_id, $checkin_date, $checkout_date, $exclude_booking_id );
+	if ( empty( $allocation['available_unit_ids'] ) ) {
+		return null;
+	}
+
+	$available_ids = $allocation['available_unit_ids'];
+	$rooms         = cwc_get_physical_rooms( $room_post_id );
+	foreach ( $rooms as $room ) {
+		$room_id = (string) ( $room['id'] ?? '' );
+		if ( in_array( $room_id, $available_ids, true ) ) {
+			return $room;
+		}
+	}
+
+	return null;
+}
+
+/**
+ * Register the `accommodation` post type and flush rewrites once.
+ *
+ * Non-hierarchical because rooms don't nest the way albums do — a
+ * Villas post is never a "child of" Cabanas. We expose the CPT in
+ * REST so the block editor's PluginDocumentSettingPanel and any
+ * future headless integration can read room data without scraping
+ * the rendered HTML.
+ *
+ * The `template` property pre-fills the editor canvas with the three
+ * blocks an editor will almost always want on a room page: the
+ * gallery, the info panel, and the "other rooms" rail. They start
+ * with no attributes so the meta-driven fallbacks take over until
+ * the editor types something into the block UI.
+ *
+ * @since 1.0.0
+ *
+ * @return void
+ */
+function cwc_register_accommodation_cpt() {
+	$labels = [
+		'name'                  => _x( 'Accommodations', 'Post type general name', 'child-cwcwake' ),
+		'singular_name'         => _x( 'Accommodation', 'Post type singular name', 'child-cwcwake' ),
+		'menu_name'             => _x( 'Accommodations', 'Admin Menu text', 'child-cwcwake' ),
+		'name_admin_bar'        => _x( 'Accommodation', 'Add New on Toolbar', 'child-cwcwake' ),
+		'add_new'               => __( 'Add New', 'child-cwcwake' ),
+		'add_new_item'          => __( 'Add New Room', 'child-cwcwake' ),
+		'new_item'              => __( 'New Room', 'child-cwcwake' ),
+		'edit_item'             => __( 'Edit Room', 'child-cwcwake' ),
+		'view_item'             => __( 'View Room', 'child-cwcwake' ),
+		'all_items'             => __( 'All Rooms', 'child-cwcwake' ),
+		'search_items'          => __( 'Search Rooms', 'child-cwcwake' ),
+		'not_found'             => __( 'No rooms found.', 'child-cwcwake' ),
+		'not_found_in_trash'    => __( 'No rooms found in Trash.', 'child-cwcwake' ),
+		'featured_image'        => _x( 'Room Cover Image', 'Featured image label', 'child-cwcwake' ),
+		'set_featured_image'    => _x( 'Set cover image', 'Set featured image label', 'child-cwcwake' ),
+		'remove_featured_image' => _x( 'Remove cover image', 'Remove featured image label', 'child-cwcwake' ),
+		'use_featured_image'    => _x( 'Use as cover image', 'Use as featured image label', 'child-cwcwake' ),
+		'archives'              => _x( 'Room archives', 'Archive label', 'child-cwcwake' ),
+	];
+
+	$args = [
+		'labels'             => $labels,
+		'public'             => true,
+		'publicly_queryable' => true,
+		'show_ui'            => true,
+		'show_in_menu'       => true,
+		'show_in_rest'       => true,
+		'menu_position'      => 6,
+		'menu_icon'          => 'dashicons-admin-home',
+		'show_in_nav_menus'  => true,
+		'capability_type'    => 'post',
+		'hierarchical'       => false,
+		'has_archive'        => false,
+		'rewrite'            => [
+			'slug'       => 'accommodations',
+			'with_front' => false,
+		],
+		'supports'           => [
+			'title',
+			'editor',
+			'thumbnail',
+			'excerpt',
+			'revisions',
+			'custom-fields',
+			'page-attributes',
+		],
+		/*
+		 * Intentionally no block `template` here.
+		 *
+		 * The single-accommodation page template
+		 * (`themes/child-cwcwake/templates/single-accommodation.html`)
+		 * renders `cwc/room-gallery`, `cwc/room-info`, and
+		 * `cwc/other-rooms` directly with no attributes — those blocks
+		 * pull their data from the meta fields registered below via
+		 * `cwc_is_accommodation_context()` fallbacks.
+		 *
+		 * Pre-filling the same blocks into `post_content` would cause
+		 * the room sections to render twice (once from the template,
+		 * once from `core/post-content`), and would create the false
+		 * impression that editors should manage room data inside the
+		 * Gutenberg block canvas instead of through the meta boxes.
+		 *
+		 * `post_content` stays free for genuine per-room overrides
+		 * (promos, embedded videos, etc.) — anything dropped there
+		 * still renders below the standard layout.
+		 */
+	];
+
+	register_post_type( 'accommodation', $args );
+
+	cwc_register_accommodation_meta();
+
+	if ( ! get_option( 'cwc_accommodation_rewrites_flushed' ) ) {
+		flush_rewrite_rules();
+		update_option( 'cwc_accommodation_rewrites_flushed', true );
+	}
+}
+add_action( 'init', 'cwc_register_accommodation_cpt' );
+
+/**
+ * Re-flush rewrites if the CPT registration ever changes.
+ *
+ * Bumping `CWC_ACC_VERSION` after editing the rewrite block above
+ * makes deployed sites re-register the rules on the next request
+ * without an editor having to manually re-save permalinks.
+ *
+ * Falls back gracefully when the constant isn't defined yet (e.g.
+ * during partial-upgrade scenarios where the bootstrap file hasn't
+ * loaded but a CLI script tries to register the CPT directly).
+ *
+ * @since 1.0.0
+ *
+ * @return void
+ */
+function cwc_accommodation_maybe_refresh_rewrites() {
+	$version = defined( 'CWC_ACC_VERSION' ) ? CWC_ACC_VERSION : '0';
+	if ( get_option( 'cwc_accommodation_rewrites_flushed_v' ) === $version ) {
+		return;
+	}
+	flush_rewrite_rules( false );
+	update_option( 'cwc_accommodation_rewrites_flushed_v', $version );
+}
+add_action( 'wp_loaded', 'cwc_accommodation_maybe_refresh_rewrites' );
+
+/* ---------------------------------------------------------
+ * Meta registration
+ * --------------------------------------------------------- */
+
+/**
+ * Register the six per-room meta fields.
+ *
+ * Schema mirrors `room-management-transition.md` § 2.B exactly:
+ *
+ *   - `_cwc_price`         (string)  Display price, e.g. "PHP 19,500".
+ *   - `_cwc_price_sub`     (string)  Sub-label, e.g. "per night".
+ *   - `_cwc_capacity`      (integer) Max occupancy (used for filtering).
+ *   - `_cwc_availability`  (enum)    available | fully-booked | maintenance.
+ *   - `_cwc_amenities`     (string)  Comma-separated amenity slugs. We
+ *                                    store as a string (not array) so
+ *                                    classic meta boxes round-trip
+ *                                    cleanly — the catalogue resolves
+ *                                    each slug to icon + label at render.
+ *   - `_cwc_gallery_ids`   (string)  Comma-separated attachment IDs for
+ *                                    the room-gallery block fallback.
+ *
+ * `show_in_rest` exposes each field to the editor and to any future
+ * headless surface; `single` keeps the API shape `{ key: value }`
+ * instead of `{ key: [ value ] }` for simplicity.
+ *
+ * `auth_callback` checks `edit_post` so REST writes still respect
+ * WordPress capabilities — without this any logged-in user could
+ * PATCH meta via the REST API.
+ *
+ * @since 1.0.0
+ *
+ * @return void
+ */
+function cwc_register_accommodation_meta() {
+	$auth = static function ( $allowed, $meta_key, $post_id ) {
+		return current_user_can( 'edit_post', (int) $post_id );
+	};
+
+	$fields = [
+		'_cwc_price'          => ['type' => 'string', 'rest' => true],
+		'_cwc_price_sub'      => ['type' => 'string', 'rest' => true],
+		'_cwc_capacity'       => ['type' => 'integer','rest' => true],
+		'_cwc_availability'   => ['type' => 'string', 'rest' => true],
+		'_cwc_amenities'      => ['type' => 'string', 'rest' => false],
+		'_cwc_inclusions'     => ['type' => 'string', 'rest' => false],
+		'_cwc_inventory'      => ['type' => 'integer','rest' => true],
+		'_cwc_physical_rooms' => ['type' => 'string', 'rest' => true],
+		'_cwc_gallery_ids'    => ['type' => 'string', 'rest' => true],
+		'_cwc_beds'           => ['type' => 'string', 'rest' => true],
+	];
+
+	foreach ( $fields as $key => $info ) {
+		$type      = $info['type'];
+		$show_rest = $info['rest'];
+		register_post_meta(
+			'accommodation',
+			$key,
+			[
+				'type'              => $type,
+				'single'            => true,
+				'show_in_rest'      => $show_rest,
+				'auth_callback'     => $auth,
+				'sanitize_callback' => cwc_accommodation_meta_sanitizer( $key ),
+				'default'           => 'integer' === $type ? 0 : '',
+			]
+		);
+	}
+}
+
+/**
+ * Resolve a per-key sanitize callback for accommodation meta.
+ *
+ * Each meta field has slightly different cleaning needs (an integer
+ * has to clamp, an enum has to whitelist, a free-form text just
+ * needs HTML stripped). Keeping these in one place — instead of
+ * inline closures during registration — makes the rules easy to
+ * audit and reuse from the meta-box save handler.
+ *
+ * @since 1.0.0
+ *
+ * @param string $key Meta key.
+ * @return callable Sanitizer that takes a raw value and returns the cleaned value.
+ */
+function cwc_accommodation_meta_sanitizer( $key ) {
+	switch ( $key ) {
+		case '_cwc_capacity':
+			return static function ( $value ) {
+				return max( 0, (int) $value );
+			};
+
+		case '_cwc_availability':
+			return static function ( $value ) {
+				$allowed = [ 'available', 'limited', 'booked', 'closed', 'fully-booked', 'maintenance' ];
+				$value   = is_string( $value ) ? $value : '';
+				return in_array( $value, $allowed, true ) ? $value : 'available';
+			};
+
+		case '_cwc_amenities':
+			return static function ( $value ) {
+				return cwc_accommodation_normalize_slug_csv( $value, array_keys( cwc_amenity_catalogue() ) );
+			};
+
+		case '_cwc_inclusions':
+			return static function ( $value ) {
+				return cwc_accommodation_normalize_slug_csv( $value, array_keys( cwc_inclusion_catalogue() ) );
+			};
+
+		case '_cwc_inventory':
+			return static function ( $value ) {
+				return intval( $value );
+			};
+
+		case '_cwc_physical_rooms':
+		case '_cwc_beds':
+			return static function ( $value ) {
+				return sanitize_text_field( $value );
+			};
+
+		case '_cwc_gallery_ids':
+			return static function ( $value ) {
+				/*
+				 * IDs come from the media-library picker as a comma-
+				 * separated string. We split, cast each token to int,
+				 * drop zeros, and rejoin — that way a stray space or
+				 * empty trailing token can't poison the lookup.
+				 */
+				$value = is_string( $value ) ? $value : '';
+				$ids   = array_filter( array_map( 'intval', explode( ',', $value ) ) );
+				return implode( ',', $ids );
+			};
+
+		default:
+			return static function ( $value ) {
+				return is_string( $value ) ? sanitize_text_field( $value ) : '';
+			};
+	}
+}
+
+/**
+ * Clean a comma-separated slug list against an allow-list.
+ *
+ * Helper used by the amenities sanitizer (and reusable for any
+ * future slug-bag meta field). Splits on commas, trims, lowercases,
+ * drops empties, deduplicates, and finally intersects with the
+ * allow-list so a stale or typo'd slug from an older catalogue
+ * version can't slip into the database.
+ *
+ * @since 1.0.0
+ *
+ * @param mixed         $value  Raw value (expected string).
+ * @param array<string> $allowed Whitelist of acceptable slugs.
+ * @return string Cleaned comma-separated slug list (no spaces).
+ */
+function cwc_accommodation_normalize_slug_csv( $value, array $allowed ) {
+	$value = is_string( $value ) ? $value : '';
+	$parts = array_filter( array_map( 'sanitize_key', array_map( 'trim', explode( ',', $value ) ) ) );
+	$parts = array_values( array_unique( $parts ) );
+	$parts = array_values( array_intersect( $parts, $allowed ) );
+	return implode( ',', $parts );
+}
+
+/* ---------------------------------------------------------
+ * Icon catalogues (single source of truth)
+ * --------------------------------------------------------- */
+
+/**
+ * Catalogue of room amenities the site supports.
+ *
+ * Maps a stable slug → display label + bundled SVG filename. The
+ * meta-box checkbox UI iterates this list to render its options;
+ * the front-end `room-info` block iterates the same list (filtered
+ * by the room's saved slugs) to render the chip cloud. Adding a new
+ * amenity is therefore a one-line change here — both UIs pick it up.
+ *
+ * Filterable so a future plugin can extend the list without forking
+ * the theme.
+ *
+ * @since 1.0.0
+ *
+ * @return array<string,array{label:string,icon:string}>
+ */
+function cwc_amenity_catalogue() {
+	$defaults = [
+		'wifi'       => [ 'label' => 'Free Wi-Fi',        'icon' => 'wifi' ],
+		'parking'    => [ 'label' => 'Free Parking',      'icon' => 'parking' ],
+		'pool'       => [ 'label' => 'Pool Access',       'icon' => 'pool' ],
+		'air'        => [ 'label' => 'Air Conditioning',  'icon' => 'air' ],
+		'garden'     => [ 'label' => 'Garden View',       'icon' => 'garden' ],
+		'bar'        => [ 'label' => 'Mini Bar',          'icon' => 'bar' ],
+		'coffee'     => [ 'label' => 'Coffee Maker',      'icon' => 'coffee' ],
+		'smoke-free' => [ 'label' => 'Non-Smoking',       'icon' => 'smoke-free' ],
+	];
+
+	$dynamic = get_option( 'cwc_dynamic_amenities', [] );
+
+	/*
+	 * Always MERGE dynamic entries on top of the hardcoded defaults.
+	 * Using dynamic-only ($catalogue = $dynamic) would cause the
+	 * sanitizer's array_intersect to strip default slugs (wifi, pool,
+	 * etc.) the moment any custom amenity is added, silently wiping
+	 * them from every saved room on the next save.
+	 */
+	$catalogue = is_array( $dynamic ) && ! empty( $dynamic )
+		? array_merge( $defaults, $dynamic )
+		: $defaults;
+
+	/**
+	 * Filter the room amenity catalogue.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param array<string,array{label:string,icon:string}> $catalogue Slug → label + icon.
+	 */
+	return apply_filters( 'cwc_amenity_catalogue', $catalogue );
+}
+
+/**
+ * Catalogue of room inclusions the site supports.
+ *
+ * Maps a stable slug → display label. Like amenities, this drives
+ * the checkbox UI in the admin and the chip cloud on the front-end.
+ *
+ * @since 1.1.0
+ *
+ * @return array<string,array{label:string}>
+ */
+function cwc_inclusion_catalogue() {
+	$defaults = [
+		'wakeboard-4'    => [ 'label' => 'Free Wakeboard for 4 Guests' ],
+		'airport-pick'   => [ 'label' => 'Free Airport Pick Up in Naga Airport' ],
+		'golf-coach'     => [ 'label' => 'Free 18 holes Gold maximum of 4 Guests or One hour with Golf Coach' ],
+		'shuttle-naga'   => [ 'label' => 'Free Shuttle to Naga City' ],
+		'skate-park'     => [ 'label' => 'Free Use of Skate Park' ],
+		'bike-track'     => [ 'label' => 'Free Use of Bike Track' ],
+		'playground'     => [ 'label' => "Free Use of Children's Playground" ],
+		'basketball'     => [ 'label' => 'Free Use of Outdoor Basketball Court' ],
+	];
+
+	$dynamic = get_option( 'cwc_dynamic_inclusions', [] );
+
+	/*
+	 * Always MERGE dynamic entries on top of the hardcoded defaults
+	 * so that default inclusion slugs remain valid even after a
+	 * custom inclusion is added via the Settings page.
+	 */
+	$catalogue = is_array( $dynamic ) && ! empty( $dynamic )
+		? array_merge( $defaults, $dynamic )
+		: $defaults;
+
+	return apply_filters( 'cwc_inclusion_catalogue', $catalogue );
+}
+
+/**
+ * Catalogue of policy icon slugs the site supports.
+ *
+ * Same shape as the amenity catalogue but for the icons that prefix
+ * each row in the Policies table. Keeping the slug list explicit
+ * means the global-policies admin UI can offer a dropdown instead
+ * of asking editors to know the icon filenames.
+ *
+ * @since 1.0.0
+ *
+ * @return array<string,array{label:string,icon:string}>
+ */
+function cwc_policy_icon_catalogue() {
+	$pool = get_option( 'cwc_icon_pool', [] );
+	
+	// If pool is empty, provide the legacy slugs as the starting point
+	if ( empty( $pool ) ) {
+		$catalogue = [
+			'check-in'   => [ 'label' => 'Check-in',        'icon' => 'check-in' ],
+			'check-out'  => [ 'label' => 'Check-out',       'icon' => 'check-out' ],
+			'breakfast'  => [ 'label' => 'Breakfast',       'icon' => 'breakfast' ],
+			'reception'  => [ 'label' => 'Reception Hours', 'icon' => 'reception' ],
+			'children'   => [ 'label' => 'Children & Beds', 'icon' => 'children' ],
+			'no-age'     => [ 'label' => 'Age Restriction', 'icon' => 'no-age' ],
+			'smoking'    => [ 'label' => 'Smoking',         'icon' => 'smoking' ],
+			'smoke-free' => [ 'label' => 'Non-Smoking',     'icon' => 'smoke-free' ],
+			'wifi'       => [ 'label' => 'Wi-Fi',           'icon' => 'wifi' ],
+			'parking'    => [ 'label' => 'Parking',         'icon' => 'parking' ],
+			'pool'       => [ 'label' => 'Pool',            'icon' => 'pool' ],
+		];
+	} else {
+		$catalogue = [];
+		foreach ( $pool as $slug => $val ) {
+			$catalogue[ $slug ] = [ 'label' => ucfirst( str_replace( '-', ' ', $slug ) ), 'icon' => $slug ];
+		}
+	}
+
+	/**
+	 * Filter the policy icon catalogue.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param array<string,array{label:string,icon:string}> $catalogue Slug → label + icon.
+	 */
+	return apply_filters( 'cwc_policy_icon_catalogue', $catalogue );
+}
+
+/**
+ * Catalogue of bed types the site supports.
+ *
+ * @since 1.2.0
+ *
+ * @return array<string,array{label:string,icon:string}>
+ */
+function cwc_bed_catalogue() {
+	$dynamic = get_option( 'cwc_dynamic_beds', [] );
+	
+	if ( empty( $dynamic ) ) {
+		$catalogue = [
+			'queen'  => [ 'label' => __( 'Queen Bed', 'cwc-accommodations' ),  'icon' => 'queen-bed' ],
+			'king'   => [ 'label' => __( 'King Bed', 'cwc-accommodations' ),   'icon' => 'king-bed' ],
+			'twin'   => [ 'label' => __( 'Twin Bed', 'cwc-accommodations' ),   'icon' => 'children-beds' ],
+			'single' => [ 'label' => __( 'Single Bed', 'cwc-accommodations' ), 'icon' => 'check-in' ],
+		];
+	} else {
+		$catalogue = $dynamic;
+	}
+
+	return apply_filters( 'cwc_bed_catalogue', $catalogue );
+}
+
+/**
+ * Resolve an icon slug to the public URL of its SVG file.
+ *
+ * Looks the slug up in the amenity catalogue first, then the policy
+ * catalogue (some slugs like `wifi` appear in both). Returns an
+ * empty string for an unknown slug so the front-end render can
+ * skip the `<img>` cleanly.
+ *
+ * `rawurlencode()` keeps filesystem-safe characters intact while
+ * escaping `&` in `garden&terrace.svg` so the URL survives the
+ * trip from HTML attribute → HTTP request without the `&` being
+ * parsed as a separate query parameter.
+ *
+ * @since 1.0.0
+ *
+ * @param string $slug Icon slug (e.g. `wifi`, `check-in`).
+ * @return string Absolute URL to the SVG, or empty string if unknown.
+ */
+function cwc_icon_url_for_slug( $slug ) {
+	$slug = (string) $slug;
+	if ( '' === $slug ) {
+		return '';
+	}
+
+	// 1. Check Dynamic Icon Pool
+	$pool = get_option( 'cwc_icon_pool', [] );
+	if ( isset( $pool[ $slug ] ) ) {
+		$val = $pool[ $slug ];
+		// Case A: Media ID (Numeric)
+		if ( is_numeric( $val ) ) {
+			return wp_get_attachment_url( (int) $val );
+		}
+		// Case B: Filename (String)
+		return get_stylesheet_directory_uri() . '/assets/images/' . rawurlencode( $val );
+	}
+
+	// 2. Special icons from uploads
+	$upload_icons = [
+		'king-bed'  => '/2026/04/king-bed.svg',
+		'queen-bed' => '/2026/04/queen-bed.svg',
+	];
+	if ( isset( $upload_icons[ $slug ] ) ) {
+		$upload_dir = wp_upload_dir();
+		return $upload_dir['baseurl'] . $upload_icons[ $slug ];
+	}
+
+	// 3. Fallback to hardcoded legacy filenames for backward compatibility
+	$legacy_map = [
+		'wifi'       => 'free-wifi.svg',
+		'parking'    => 'free-parking.svg',
+		'pool'       => 'swimming-pool.svg',
+		'air'        => 'air-conditioning.svg',
+		'garden'     => 'garden&terrace.svg',
+		'bar'        => 'bar.svg',
+		'coffee'     => 'coffee-shop.svg',
+		'smoke-free' => 'smoke-free.svg',
+		'check-in'   => 'check-in.svg',
+		'check-out'  => 'checkout.svg',
+		'breakfast'  => 'breakfast.svg',
+		'reception'  => 'reception-hours.svg',
+		'children'   => 'children-beds.svg',
+		'no-age'     => 'age-restriction.svg',
+		'smoking'    => 'no-smoking.svg',
+	];
+
+	$file = $legacy_map[ $slug ] ?? '';
+	if ( '' === $file ) {
+		return '';
+	}
+
+	return get_stylesheet_directory_uri() . '/assets/images/' . rawurlencode( $file );
+}
+
+/* ---------------------------------------------------------
+ * Per-post helpers
+ * --------------------------------------------------------- */
+
+/**
+ * Test whether the current request is rendering a single accommodation.
+ *
+ * Used by the `room-info`, `room-gallery`, and `other-rooms` blocks
+ * to decide whether to fall back from empty attributes to post-meta.
+ * Falls back to inspecting `get_post()` (not just `is_singular()`)
+ * because blocks can render in REST/preview contexts where the main
+ * query hasn't fully populated yet.
+ *
+ * @since 1.0.0
+ *
+ * @param int|null $post_id Optional explicit post ID.
+ * @return bool
+ */
+function cwc_is_accommodation_context( $post_id = null ) {
+	if ( null === $post_id ) {
+		$post = get_post();
+		if ( ! $post instanceof WP_Post ) {
+			return false;
+		}
+		$post_id = (int) $post->ID;
+	}
+
+	return 'accommodation' === get_post_type( (int) $post_id );
+}
+
+/**
+ * Decode the comma-separated `_cwc_amenities` meta into amenity rows.
+ *
+ * Resolves each saved slug against `cwc_amenity_catalogue()` so the
+ * front-end gets a list of `{ icon, label }` ready to render.
+ * Unknown slugs (catalogue removed since this room was saved) are
+ * silently dropped — they would have rendered as empty chips
+ * otherwise.
+ *
+ * @since 1.0.0
+ *
+ * @param int $post_id Accommodation post ID.
+ * @return array<int,array{icon:string,label:string}>
+ */
+function cwc_accommodation_amenities( $post_id ) {
+	$post_id = (int) $post_id;
+	if ( $post_id <= 0 ) {
+		return [];
+	}
+
+	$raw = (string) get_post_meta( $post_id, '_cwc_amenities', true );
+	if ( '' === $raw ) {
+		return [];
+	}
+
+	$slugs     = array_filter( array_map( 'trim', explode( ',', $raw ) ) );
+	$catalogue = cwc_amenity_catalogue();
+	$out       = [];
+
+	foreach ( $slugs as $slug ) {
+		if ( isset( $catalogue[ $slug ] ) ) {
+			$out[] = [
+				'icon'  => $catalogue[ $slug ]['icon'] ?? '',
+				'label' => $catalogue[ $slug ]['label'],
+			];
+		}
+	}
+
+	return $out;
+}
+
+/**
+ * Decode the comma-separated `_cwc_inclusions` meta into an array of strings.
+ *
+ * Each entry is trimmed and cleaned so it can be rendered directly
+ * as a text pill.
+ *
+ * @since 1.1.0
+ *
+ * @param int $post_id Accommodation post ID.
+ * @return array<int,string>
+ */
+function cwc_accommodation_inclusions( $post_id ) {
+	$post_id = (int) $post_id;
+	if ( $post_id <= 0 ) {
+		return [];
+	}
+
+	$raw = (string) get_post_meta( $post_id, '_cwc_inclusions', true );
+	if ( '' === $raw ) {
+		return [];
+	}
+
+	$slugs     = array_filter( array_map( 'trim', explode( ',', $raw ) ) );
+	$catalogue = cwc_inclusion_catalogue();
+	$out       = [];
+
+	foreach ( $slugs as $slug ) {
+		if ( isset( $catalogue[ $slug ] ) ) {
+			$out[] = $catalogue[ $slug ]['label'];
+		}
+	}
+
+	return $out;
+}
+
+/**
+ * Resolve `_cwc_gallery_ids` meta into URL/alt rows.
+ *
+ * The room-gallery block expects 4 image slots; this returns up to
+ * however many IDs are saved (the block pads / truncates as needed).
+ * Each row is `{ url, alt }` matching the block's existing schema.
+ *
+ * Skips attachments that no longer exist so a deleted media item
+ * can't crash the render.
+ *
+ * @since 1.0.0
+ *
+ * @param int $post_id Accommodation post ID.
+ * @return array<int,array{url:string,alt:string}>
+ */
+function cwc_accommodation_gallery_images( $post_id ) {
+	$post_id = (int) $post_id;
+	if ( $post_id <= 0 ) {
+		return [];
+	}
+
+	$raw = (string) get_post_meta( $post_id, '_cwc_gallery_ids', true );
+	if ( '' === $raw ) {
+		return [];
+	}
+
+	$ids = array_filter( array_map( 'intval', explode( ',', $raw ) ) );
+	$out = [];
+
+	foreach ( $ids as $attachment_id ) {
+		$url = wp_get_attachment_image_url( $attachment_id, 'large' );
+		if ( ! $url ) {
+			continue;
+		}
+		$out[] = [
+			'url' => $url,
+			'alt' => (string) get_post_meta( $attachment_id, '_wp_attachment_image_alt', true ),
+		];
+	}
+
+	return $out;
+}
+
+/**
+ * Inject "Accommodations" between Home and the room title on
+ * single-accommodation breadcrumbs.
+ *
+ * The generic `cwc_build_breadcrumbs()` produces `Home → <Room>` for
+ * any singular CPT. For accommodations we want the landing page to
+ * appear in the trail so visitors can hop back to the rooms grid
+ * with one click.
+ *
+ * Mirrors the same pattern used by the cwc_album breadcrumb filter.
+ *
+ * @since 1.0.0
+ *
+ * @param array<int,array{label:string,url:?string}> $crumbs Existing crumbs.
+ * @return array<int,array{label:string,url:?string}>
+ */
+function cwc_inject_accommodation_breadcrumb( $crumbs ) {
+	if ( ! is_singular( 'accommodation' ) ) {
+		return $crumbs;
+	}
+
+	if ( ! is_array( $crumbs ) || count( $crumbs ) < 2 ) {
+		return $crumbs;
+	}
+
+	$accommodations_page = get_page_by_path( 'accommodations' );
+	$accommodations_url  = $accommodations_page instanceof WP_Post
+		? (string) get_permalink( $accommodations_page )
+		: home_url( '/accommodations/' );
+
+	$home = $crumbs[0];
+	$tail = array_slice( $crumbs, 1 );
+
+	return array_merge(
+		[ $home ],
+		[
+			[
+				'label' => __( 'Accommodations', 'child-cwcwake' ),
+				'url'   => $accommodations_url,
+			],
+		],
+		$tail
+	);
+}
+add_filter( 'cwc_breadcrumbs_items', 'cwc_inject_accommodation_breadcrumb' );
+
+/**
+ * Resolve the current request's accommodation availability.
+ *
+ * Centralised so the front-end blocks (room-info today, plus
+ * anything else later) all read the same value with the same
+ * default. Falls back to `available` so an un-set room never
+ * accidentally renders as "Maintenance".
+ *
+ * @since 1.0.0
+ *
+ * @param int $post_id Accommodation post ID.
+ * @return string `available` | `fully-booked` | `maintenance`.
+ */
+function cwc_accommodation_availability( $post_id ) {
+	$post_id = (int) $post_id;
+	if ( $post_id <= 0 ) {
+		return 'available';
+	}
+
+	$rooms = cwc_get_physical_rooms( $post_id );
+	
+	if ( empty( $rooms ) ) {
+		// Fallback to old meta if no physical rooms are defined
+		$old_value = (string) get_post_meta( $post_id, '_cwc_availability', true );
+		return in_array( $old_value, [ 'available', 'fully-booked', 'maintenance' ], true ) ? $old_value : 'available';
+	}
+
+	$meta_availability = (string) get_post_meta( $post_id, '_cwc_availability', true );
+	if ( 'maintenance' === $meta_availability ) {
+		return 'maintenance';
+	}
+
+	$today = current_time( 'Y-m-d' );
+	$allocation = cwc_get_room_unit_allocation( $post_id, $today, date( 'Y-m-d', strtotime( $today . ' +1 day' ) ) );
+	$available = (int) ( $allocation['available_units'] ?? 0 );
+
+	return $available > 0 ? 'available' : 'fully-booked';
+}
+
+/**
+ * Resolve `_cwc_beds` meta into a list of { icon, label } rows.
+ *
+ * @since 1.2.0
+ *
+ * @param int $post_id Accommodation post ID.
+ * @return array<int,array{icon_url:string,label:string}>
+ */
+function cwc_get_room_beds( $post_id ) {
+	$beds_raw = get_post_meta( $post_id, '_cwc_beds', true );
+	if ( empty( $beds_raw ) ) {
+		return [];
+	}
+
+	$beds_data = json_decode( $beds_raw, true ) ?: [];
+	$catalogue = cwc_bed_catalogue();
+	$out       = [];
+
+	foreach ( $beds_data as $row ) {
+		$type  = $row['type'] ?? '';
+		$count = (int) ( $row['count'] ?? 0 );
+		if ( $count <= 0 || ! isset( $catalogue[ $type ] ) ) {
+			continue;
+		}
+
+		$label = sprintf( _n( '%1$s %2$s', '%1$s %2$ss', $count, 'cwc-accommodations' ), $count, $catalogue[ $type ]['label'] );
+		$out[] = [
+			'icon_url' => cwc_icon_url_for_slug( $catalogue[ $type ]['icon'] ),
+			'label'    => $label,
+		];
+	}
+
+	return $out;
+}
+
+/**
+ * Retrieve global rates for the Rates Manager.
+ *
+ * Checks for the `cwc_global_rates` option. If empty, it seeds the option
+ * with the default categories (Wakeboarding, Golf, etc.) from the theme
+ * template to ensure the dashboard starts with current data.
+ *
+ * @since 1.2.0
+ * @return array The list of rate categories and their tables.
+ */
+function cwc_get_global_rates() {
+	$rates = get_option( 'cwc_global_rates', [] );
+
+	if ( empty( $rates ) || ! is_array( $rates ) ) {
+		$rates = [
+			[
+				'id'          => 'park-hours',
+				'title'       => 'Park Hours',
+				'description' => 'Operating hours for our world-class cable park and winch park. Plan your sessions accordingly.',
+				'table'       => [
+					[ 'MONDAY - THURSDAY', '8:00 AM - 6:00 PM', 'FULL CABLE, WINCH PARK' ],
+					[ 'FRIDAY - SUNDAY', '8:00 AM - 9:00 PM', 'FULL CABLE' ],
+					[ '', '8:00 AM - 9:00 PM', 'WINCH PARK' ],
+				],
+			],
+			[
+				'id'          => 'restaurant-and-happy-endings',
+				'title'       => 'Restaurant and Happy Endings',
+				'description' => 'Delicious meals and refreshing drinks available daily. Please note Happy Endings bar status below.',
+				'table'       => [
+					[ 'MONDAY - SUNDAY', '6:00 AM - 11:00 PM', 'RESTAURANT' ],
+					[ '', '', 'HAPPY ENDINGS CLOSED' ],
+				],
+			],
+			[
+				'id'          => 'wakeboarding',
+				'title'       => 'Wakeboarding',
+				'description' => 'Choose from our flexible riding durations. Rates include wakeboard with slip-on bindings and kneeboards. *Rental of vest and helmet requires Php 500 deposit + Valid ID.',
+				'table'       => [
+					[ '1 HOUR', 'PHP 250.00', '4.05 USD', '3.48 EUR' ],
+					[ '2 HOURS', 'PHP 400.00', '6.48 USD', '5.56 EUR' ],
+					[ '4 HOURS (HALF DAY)', 'PHP 700.00', '11.34 USD', '9.73 EUR' ],
+					[ 'WHOLE DAY (8AM-6PM)', 'PHP 1,250.00', '20.25 USD', '17.38 EUR' ],
+				],
+			],
+			[
+				'id'          => 'cable-membership-rates',
+				'title'       => 'Cable Membership Rates',
+				'description' => 'Unlimited wakeboarding for frequent riders. *Not inclusive of rental gear and equipment. Not transferable and non-refundable.',
+				'table'       => [
+					[ '1 WEEK MEMBERSHIP', 'PHP 6,000.00', '97.20 USD', '83.40 EUR' ],
+					[ '2 WEEKS MEMBERSHIP', 'PHP 8,000.00', '129.60 USD', '111.20 EUR' ],
+					[ '1 MONTH MEMBERSHIP', 'PHP 15,000.00', '243.00 USD', '208.50 EUR' ],
+					[ '3 MONTHS MEMBERSHIP', 'PHP 30,000.00', '486.00 USD', '417.00 EUR' ],
+					[ '6 MONTHS MEMBERSHIP', 'PHP 40,000.00', '648.00 USD', '556.00 EUR' ],
+					[ '1 YEAR MEMBERSHIP', 'PHP 50,000.00', '810.00 USD', '695.00 EUR' ],
+				],
+			],
+			[
+				'id'          => 'massage',
+				'title'       => 'Massage',
+				'description' => '9:30 AM - 10:00 PM | Relax with our signature combination of Swedish & Shiatsu massage treatments.',
+				'table'       => [
+					[ 'LAKE SIDE MASSAGE', 'PHP 450.00', '7.29 USD', '6.26 EUR' ],
+					[ 'ROOM SERVICE MASSAGE', 'PHP 550.00', '8.91 USD', '7.65 EUR' ],
+				],
+			],
+			[
+				'id'          => 'swimming-pool',
+				'title'       => 'CWC Swimming Pool',
+				'description' => 'Monday - Sunday | 8:00 AM - 6:00 PM',
+				'table'       => [
+					[ 'CHILDREN (TEN YEARS OLD BELOW)', 'PHP 130.00', '2.11 USD', '1.81 EUR' ],
+					[ 'ADULT', 'PHP 150.00', '2.43 USD', '2.09 EUR' ],
+				],
+			],
+			[
+				'id'          => 'pickle-ball',
+				'title'       => 'Pickleball',
+				'description' => 'Court rentals and equipment for pickleball enthusiasts. Peak hours apply in the morning and evening.',
+				'table'       => [
+					[ 'MORNING PEAK (6AM-8AM)', 'PHP 600.00 / HR', '9.72 USD', '8.34 EUR' ],
+					[ 'OFF PEAK (8AM-4PM)', 'PHP 500.00 / HR', '8.10 USD', '6.95 EUR' ],
+					[ 'EVENING PEAK (4PM-10PM)', 'PHP 600.00 / HR', '9.72 USD', '8.34 EUR' ],
+					[ 'EQUIPMENT: PADDLE (BRANDED)', 'PHP 150.00 / 3 HRS', '2.43 USD', '2.09 EUR' ],
+					[ 'EQUIPMENT: PADDLE (NON-BRANDED)', 'PHP 100.00 / 3 HRS', '1.62 USD', '1.39 EUR' ],
+					[ 'EQUIPMENT: BALLS (3PCS)', 'PHP 100.00 / HR', '1.62 USD', '1.39 EUR' ],
+					[ 'EQUIPMENT: TOWEL', 'PHP 50.00', '0.81 USD', '0.70 EUR' ],
+					[ 'EQUIPMENT: BALL MACHINE', 'PHP 600.00 / HR', '9.72 USD', '8.34 EUR' ],
+					[ 'EQUIPMENT: LOCKER ACCESS', 'PHP 50.00 / 3 HRS', '0.81 USD', '0.70 EUR' ],
+					[ 'EQUIPMENT: BALL PICKER', 'PHP 100.00 / HR', '1.62 USD', '1.39 EUR' ],
+					[ 'PACKAGE: 1 DAY PASS (2HR COURT)', 'PHP 400.00', '6.48 USD', '5.56 EUR' ],
+					[ 'PACKAGE: 3 DAY PASS (2HR COURT)', 'PHP 1,000.00', '16.20 USD', '13.90 EUR' ],
+					[ 'PACKAGE: 7 DAY PASS (2HR COURT)', 'PHP 2,000.00', '32.40 USD', '27.80 EUR' ],
+				],
+			],
+			[
+				'id'          => 'pili-grove-golf-club',
+				'title'       => 'Pili Grove Golf Club',
+				'description' => 'Executive Golf Course and Driving Range rates.',
+				'table'       => [
+					[ '9 HOLE GREEN FEE (REGULAR)', 'PHP 650.00', '10.53 USD', '9.04 EUR' ],
+					[ '9 HOLE GREEN FEE (NIGHT)', 'PHP 750.00', '12.15 USD', '10.43 EUR' ],
+					[ '18 HOLE GREEN FEE (REGULAR)', 'PHP 950.00', '15.39 USD', '13.21 EUR' ],
+					[ '18 HOLE GREEN FEE (NIGHT)', 'PHP 1,050.00', '17.01 USD', '14.60 EUR' ],
+					[ 'DRIVING RANGE RATE', 'PHP 650.00', '10.53 USD', '9.04 EUR' ],
+					[ 'GOLF CLUB RENTALS (PER HR)', 'PHP 300.00', '4.86 USD', '4.17 EUR' ],
+				],
+			],
+		];
+		update_option( 'cwc_global_rates', $rates );
+	}
+
+	return $rates;
+}

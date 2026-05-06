@@ -1,0 +1,41 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "cwc/upcoming-events",
+	"version": "1.0.0",
+	"title": "Upcoming Events",
+	"category": "theme",
+	"icon": "calendar-alt",
+	"description": "Vertical timeline of upcoming events. Pulls posts that carry the `_cwc_event_date` meta key, sorts by date, and renders the first item as the active (large) circle with its full content card.",
+	"textdomain": "child-cwcwake",
+	"supports": {
+		"align": ["full"],
+		"html": false,
+		"anchor": true
+	},
+	"attributes": {
+		"heading": {
+			"type": "string",
+			"default": "UPCOMING"
+		},
+		"headingHighlight": {
+			"type": "string",
+			"default": "EVENTS"
+		},
+		"description": {
+			"type": "string",
+			"default": "Stay updated with what's happening at CWC—from exciting wakeboarding competitions to vibrant social events. Don't miss out on the moments that bring the park to life and make every visit even more unforgettable."
+		},
+		"limit": {
+			"type": "number",
+			"default": 3
+		},
+		"placeholderImage": {
+			"type": "string",
+			"default": "/wp-content/uploads/2026/04/blogs-banner-bg.webp"
+		}
+	},
+	"render": "file:./render.php",
+	"style": "file:./style.css",
+	"viewScript": "file:./view.js"
+}

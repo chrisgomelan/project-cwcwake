@@ -1,0 +1,62 @@
+<!-- wp:template-part {"slug":"header"} /-->
+
+<!-- wp:cwc/page-banner {
+	"backgroundImage": "/wp-content/uploads/2026/04/gallery-banner-bg.webp",
+	"overlayOpacity": 40,
+	"size": "default",
+	"showCorners": true,
+	"useFeaturedImage": true,
+	"align": "full"
+} /-->
+
+<!-- wp:group {
+	"align": "full",
+	"className": "cwc-tropical-section",
+	"style": {
+		"spacing": {
+			"margin": { "top": "0" },
+			"padding": {
+				"top": "var:preset|spacing|40",
+				"bottom": "var:preset|spacing|70"
+			},
+			"blockGap": "var:preset|spacing|40"
+		}
+	},
+	"layout": { "type": "constrained" }
+} -->
+<div class="wp-block-group alignfull cwc-tropical-section"
+	style="margin-top:0;padding-top:var(--wp--preset--spacing--40);padding-bottom:var(--wp--preset--spacing--70)">
+
+	<!-- wp:group {
+		"className": "cwc-album-topbar",
+		"style": { "spacing": { "blockGap": "var:preset|spacing|30" } },
+		"layout": { "type": "flex", "flexWrap": "wrap", "justifyContent": "space-between", "verticalAlignment": "center" }
+	} -->
+	<div class="wp-block-group cwc-album-topbar">
+		<!-- wp:cwc/breadcrumbs /-->
+		<!-- wp:cwc/album-back-link /-->
+	</div>
+	<!-- /wp:group -->
+
+	<!-- wp:group {
+		"tagName": "main",
+		"style": { "spacing": { "margin": { "top": "0" }, "blockGap": "var:preset|spacing|40" } },
+		"layout": { "type": "constrained" }
+	} -->
+	<main class="wp-block-group" style="margin-top:0">
+		<!-- wp:post-content {"align":"full","layout":{"type":"constrained"}} /-->
+
+		<!-- wp:cwc/albums-grid {
+			"parentId": -1,
+			"showStandardGrid": true,
+			"showMoreSection": false,
+			"countMode": "auto",
+			"align": "full"
+		} /-->
+	</main>
+	<!-- /wp:group -->
+
+</div>
+<!-- /wp:group -->
+
+<!-- wp:template-part {"slug":"footer"} /-->

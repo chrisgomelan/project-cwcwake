@@ -1,0 +1,12 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "cwc/table-of-contents",
+  "title": "Table of Contents",
+  "category": "widgets",
+  "description": "Generates a sticky table of contents with scrollspy dot indicator from H2/H3 headings.",
+  "supports": { "html": false },
+  "textdomain": "child-cwcwake",
+  "style": "file:./style.css",
+  "render": "file:./render.php"
+}

@@ -1,0 +1,24 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "cwc/book-a-room",
+  "title": "Book a Room",
+  "category": "theme",
+  "icon": "building",
+  "description": "Book a room hero, booking bar and rooms list.",
+  "keywords": ["book", "room", "accommodation"],
+  "textdomain": "child-cwcwake",
+  "attributes": {
+    "align": {
+      "type": "string",
+      "default": "full"
+    }
+  },
+  "supports": {
+    "html": false,
+    "align": ["wide", "full"]
+  },
+  "render": "file:./render.php",
+  "style": "file:./style.css",
+  "viewScript": "file:./view.js"
+}

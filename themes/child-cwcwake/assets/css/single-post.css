@@ -1,0 +1,240 @@
+/*
+ * CWC Wake — Single Blog Post
+ *
+ * Covers the title, hero image + metadata bar, the two-column
+ * content + TOC layout, and the content-box typography. Designed
+ * against single-blog-design.md / .png.
+ *
+ * Responsive:
+ *   >= 992px  — side-by-side (content 62 % | sidebar 38 %)
+ *   <  992px  — stacked (TOC hidden, content full-width)
+ */
+
+/* ----------------------------------------
+	Back link
+	---------------------------------------- */
+
+.cwc-single-post__inner {
+	width: 100%;
+	padding-top: clamp(32px, 5vw, 64px);
+	overflow: visible !important; /* Required for sticky TOC */
+}
+
+.cwc-single-post__back-link {
+	display: flex;
+	justify-content: flex-end;
+	margin-bottom: clamp(12px, 2vw, 24px);
+}
+
+.cwc-single-post__back-btn {
+	display: inline-flex;
+	align-items: center;
+	gap: 10px;
+	font-family: 'Sora', var(--wp--preset--font-family--heading);
+	font-weight: 400;
+	font-size: 20px;
+	line-height: 150%;
+	color: #000000CC;
+	text-decoration: none;
+	transition: color 0.3s ease, gap 0.3s ease;
+}
+
+.cwc-single-post__back-btn:hover {
+	color: #000000;
+	gap: 14px;
+}
+
+/* ----------------------------------------
+	Blog title
+	---------------------------------------- */
+
+.cwc-single-post__title {
+	font-family: 'Sora', var(--wp--preset--font-family--heading) !important;
+	font-weight: 700 !important;
+	font-size: clamp(32px, 4vw + 16px, 72px) !important;
+	line-height: 110% !important;
+	letter-spacing: 0 !important;
+	color: #0096C7 !important;
+	margin-bottom: clamp(20px, 3vw, 36px) !important;
+}
+
+/* ----------------------------------------
+	Hero image (featured image) + meta bar
+	---------------------------------------- */
+
+.cwc-single-post__hero {
+	width: 100%;
+	margin-bottom: clamp(20px, 3vw, 36px);
+}
+
+.cwc-single-post__featured-img {
+	width: 100%;
+	max-height: 556px;
+	object-fit: cover;
+	border-radius: 12px;
+	display: block;
+}
+
+.cwc-single-post__meta {
+	display: flex;
+	align-items: center;
+	gap: clamp(16px, 2vw, 32px);
+	flex-wrap: wrap;
+	margin-top: clamp(12px, 1.5vw, 20px);
+}
+
+.cwc-single-post__meta-item {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	font-family: 'Archivo', var(--wp--preset--font-family--body);
+	font-weight: 500;
+	font-size: clamp(14px, 0.5vw + 12px, 20px);
+	line-height: 100%;
+	color: rgba(0, 0, 0, 0.5);
+}
+
+.cwc-single-post__meta-icon {
+	width: clamp(18px, 1.2vw + 10px, 24px);
+	height: clamp(18px, 1.2vw + 10px, 24px);
+	flex-shrink: 0;
+}
+
+/* ----------------------------------------
+	Two-column layout
+	---------------------------------------- */
+
+.cwc-single-post__columns {
+	align-items: stretch !important;
+	gap: clamp(24px, 3vw, 48px) !important;
+}
+
+.cwc-single-post__sidebar-col {
+	position: relative;
+}
+
+/* ----------------------------------------
+	Content box
+	---------------------------------------- */
+
+.cwc-single-post__content-box {
+	background: #F8F9FA;
+	border: 1px solid rgba(0, 0, 0, 0.3);
+	border-radius: 30px;
+	padding: clamp(24px, 4vw, 60px);
+}
+
+/* WordPress applies theme.json contentSize (720px) as a max-width on
+	the post-content block's inner layout. Override it so content and
+	images can fill the full width of our wider 75% column. */
+.cwc-single-post__content-box .wp-block-post-content,
+.cwc-single-post__content-box .wp-block-post-content > *,
+.cwc-single-post__content-box .is-layout-flow > * {
+	max-width: none !important;
+}
+
+/* H2 — section titles */
+.cwc-single-post__content-box h2 {
+	font-family: 'Sora', var(--wp--preset--font-family--heading) !important;
+	font-weight: 700 !important;
+	font-size: clamp(28px, 2.2vw + 12px, 48px) !important;
+	line-height: 110% !important;
+	letter-spacing: 0 !important;
+	color: #0096C7 !important;
+	margin-top: clamp(32px, 4vw, 56px) !important;
+	margin-bottom: clamp(14px, 1.5vw, 24px) !important;
+	transition: color 0.3s ease;
+}
+
+.cwc-single-post__content-box h2:first-child {
+	margin-top: 0 !important;
+}
+
+/* H3 — subsections */
+.cwc-single-post__content-box h3 {
+	font-family: 'Sora', var(--wp--preset--font-family--heading) !important;
+	font-weight: 600 !important;
+	font-size: clamp(20px, 1.2vw + 10px, 24px) !important;
+	line-height: 120% !important;
+	letter-spacing: 0 !important;
+	color: #395144 !important;
+	margin-top: clamp(24px, 3vw, 40px) !important;
+	margin-bottom: clamp(10px, 1vw, 16px) !important;
+	transition: color 0.3s ease;
+}
+
+/* Paragraphs */
+.cwc-single-post__content-box p {
+	font-family: 'Archivo', var(--wp--preset--font-family--body) !important;
+	font-weight: 500 !important;
+	font-size: clamp(15px, 0.5vw + 12px, 20px) !important;
+	line-height: 160% !important;
+	letter-spacing: 0 !important;
+	color: #000000 !important;
+	margin-bottom: clamp(16px, 2vw, 28px) !important;
+}
+
+/* Lists inside the content box */
+.cwc-single-post__content-box ul,
+.cwc-single-post__content-box ol {
+	font-family: 'Archivo', var(--wp--preset--font-family--body) !important;
+	font-weight: 500;
+	font-size: clamp(15px, 0.5vw + 12px, 20px) !important;
+	line-height: 180% !important;
+	color: #000000 !important;
+	padding-left: 24px;
+	margin-bottom: clamp(16px, 2vw, 28px) !important;
+}
+
+.cwc-single-post__content-box li {
+	margin-bottom: 6px;
+}
+
+/* Images inside the content box */
+.cwc-single-post__content-box img {
+	border-radius: 0;
+	margin: clamp(16px, 2vw, 32px) 0;
+	width: 100%;
+	height: 304px;
+	object-fit: cover;
+}
+
+/* Scrollspy passed-state on headings in content */
+.cwc-single-post__content-box h2.passed {
+	color: #007BA3 !important;
+}
+
+.cwc-single-post__content-box h3.passed {
+	color: #2D4237 !important;
+}
+
+/* ----------------------------------------
+	Responsive — stacked at tablet
+	---------------------------------------- */
+
+@media (max-width: 991px) {
+	.cwc-single-post__columns {
+		flex-direction: column !important;
+	}
+
+	.cwc-single-post__content-col,
+	.cwc-single-post__sidebar-col {
+		flex-basis: 100% !important;
+		width: 100% !important;
+	}
+
+	.cwc-single-post__content-box {
+		border-radius: 20px;
+	}
+}
+
+@media (max-width: 600px) {
+	.cwc-single-post__content-box {
+		padding: 20px;
+		border-radius: 16px;
+	}
+
+	.cwc-single-post__featured-img {
+		border-radius: 8px;
+	}
+}

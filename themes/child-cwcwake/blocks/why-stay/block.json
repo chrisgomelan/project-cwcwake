@@ -1,0 +1,51 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "cwc/why-stay",
+	"version": "1.0.0",
+	"title": "Why Stay Content",
+	"category": "theme",
+	"icon": "thumbs-up",
+	"description": "Custom grid section explaining why to stay at CWC.",
+	"textdomain": "child-cwcwake",
+	"supports": {
+		"html": false,
+		"anchor": true
+	},
+	"attributes": {
+		"heading": {
+			"type": "string",
+			"default": "WHY <span class=\"cwc-why-stay__accent\">STAY</span> AT CWC?"
+		},
+		"description": {
+			"type": "string",
+			"default": "Enjoy exclusive perks designed to make your stay seamless, from early park access to premium lakeside amenities."
+		},
+		"tone": {
+			"type": "string",
+			"default": "default"
+		},
+		"items": {
+			"type": "array",
+			"default": [
+				{
+					"icon": "cozy-lakeside-rooms.svg",
+					"title": "Cozy Lakeside Rooms",
+					"desc": "Rest in cozy, air-con rooms just steps away from the pool, spa, and all the action."
+				},
+				{
+					"icon": "relaxing-spa-and-pools.svg",
+					"title": "Relaxing Spa & Pools",
+					"desc": "Melt the stress away with professional massages and relaxing poolside lounge areas."
+				},
+				{
+					"icon": "full-service-dining.svg",
+					"title": "Full-Service Dining",
+					"desc": "Taste local and global flavors at our restaurant, perfect for day-trippers and guests."
+				}
+			]
+		}
+	},
+	"style": "file:./style.css",
+	"render": "file:./render.php"
+}

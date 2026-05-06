@@ -1,0 +1,65 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "cwc/contact-form",
+	"version": "1.0.0",
+	"title": "Contact Form",
+	"category": "theme",
+	"icon": "email-alt",
+	"description": "\"Send Us A Message\" form for the Contact page. Validates Name, Email, Message and emails admin via wp_mail (compatible with WP Mail SMTP).",
+	"textdomain": "child-cwcwake",
+	"supports": {
+		"align": ["full"],
+		"html": false,
+		"anchor": true
+	},
+	"attributes": {
+		"title": {
+			"type": "string",
+			"default": "Send Us A Message"
+		},
+		"nameLabel": {
+			"type": "string",
+			"default": "Name"
+		},
+		"namePlaceholder": {
+			"type": "string",
+			"default": "Enter name"
+		},
+		"emailLabel": {
+			"type": "string",
+			"default": "Email"
+		},
+		"emailPlaceholder": {
+			"type": "string",
+			"default": "Enter email address"
+		},
+		"messageLabel": {
+			"type": "string",
+			"default": "Message"
+		},
+		"messagePlaceholder": {
+			"type": "string",
+			"default": "Enter message"
+		},
+		"submitLabel": {
+			"type": "string",
+			"default": "Send Message"
+		},
+		"successMessage": {
+			"type": "string",
+			"default": "Thanks! Your message has been sent — we will get back to you shortly."
+		},
+		"errorMessage": {
+			"type": "string",
+			"default": "Sorry, something went wrong. Please review the highlighted fields and try again."
+		},
+		"recipientEmail": {
+			"type": "string",
+			"default": ""
+		}
+	},
+	"render": "file:./render.php",
+	"style": "file:./style.css",
+	"viewScript": "file:./view.js"
+}

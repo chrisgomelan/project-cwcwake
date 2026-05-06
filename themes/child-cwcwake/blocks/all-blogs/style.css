@@ -1,0 +1,379 @@
+/**
+ * All Blogs block — frontend + editor styles.
+ *
+ * Implements the paginated three-column blog grid + filter dropdown
+ * from `designs/blogs-design.md` § 3.
+ *
+ * Card target dimensions (design): 556×526 with shadow
+ * `-2px 4px 12px #18181814`. The grid is fluid (3 columns at desktop,
+ * 2 at tablet, 1 at mobile) so the cards scale rather than overflow.
+ */
+
+.cwc-all-blogs {
+	width: 100%;
+	max-width: 1488px;
+	margin: 0 auto;
+	padding: 0 var(--wp--preset--spacing--40);
+	box-sizing: border-box;
+}
+
+.cwc-all-blogs__header {
+	display: flex;
+	justify-content: space-between;
+	align-items: flex-start;
+	flex-direction: column;
+}
+
+.cwc-all-blogs__intro {
+	max-width: 90%;
+}
+
+.cwc-all-blogs__title {
+	font-family: var(--wp--preset--font-family--heading);
+	font-weight: 700;
+	font-size: clamp(2rem, 4vw, 3rem);
+	line-height: 1;
+	letter-spacing: 0;
+	color: #000000;
+	margin: 0 0 0.75rem;
+}
+
+.cwc-all-blogs__title-text {
+	color: #000000;
+}
+
+.cwc-all-blogs__title-highlight {
+	font-style: italic;
+	color: var(--wp--preset--color--primary);
+	margin-left: 0.25em;
+}
+
+.cwc-all-blogs__description {
+	font-family: var(--wp--preset--font-family--body);
+	font-weight: 500;
+	font-size: clamp(0.95rem, 1.2vw, 1.125rem);
+	line-height: 1.5;
+	color: var(--wp--preset--color--text);
+	margin: 0;
+}
+
+/* ---------------------------------------------------------
+ * Filter dropdown
+ * --------------------------------------------------------- */
+
+.cwc-all-blogs__filter {
+	position: relative;
+	align-self: flex-end;
+}
+
+.cwc-all-blogs__filter-trigger {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 1rem;
+	padding: 0.75rem 1.25rem;
+	background: #ffffff;
+	border: 1px solid transparent;
+	border-radius: 12px;
+	box-shadow: var(--wp--custom--shadow--md);
+	font-family: var(--wp--preset--font-family--body);
+	font-size: 1rem;
+	font-weight: 500;
+	color: #1A1A1A;
+	cursor: pointer;
+	min-width: 180px;
+	transition: border-color 0.2s ease;
+	outline: none;
+	/* No focus outline as requested */
+	margin-bottom: 5px;
+}
+
+.cwc-all-blogs__filter-chevron {
+	transition: transform 0.3s ease;
+}
+
+.js-all-blogs-filter.is-open .cwc-all-blogs__filter-chevron {
+	transform: rotate(180deg);
+}
+
+.cwc-all-blogs__filter-dropdown {
+	position: absolute;
+	top: 100%;
+	right: 0;
+	margin-top: 8px;
+	/* Margin between select and dropdown */
+	width: 100%;
+	min-width: 200px;
+	background: #ffffff;
+	border-radius: 20px;
+	/* Large radius on dropdown */
+	box-shadow: var(--wp--custom--shadow--lg);
+	padding: 8px;
+	z-index: 100;
+	opacity: 0;
+	visibility: hidden;
+	transform: translateY(-10px);
+	transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.js-all-blogs-filter.is-open .cwc-all-blogs__filter-dropdown {
+	opacity: 1;
+	visibility: visible;
+	transform: translateY(0);
+}
+
+.cwc-all-blogs__filter-option {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	width: 100%;
+	padding: 10px 16px;
+	background: transparent;
+	border: 1px solid transparent;
+	/* Border for hover/active state */
+	border-radius: 12px;
+	font-family: var(--wp--preset--font-family--body);
+	font-size: 0.95rem;
+	color: #1A1A1A;
+	text-align: left;
+	cursor: pointer;
+	transition: all 0.2s ease;
+	margin-bottom: 2px;
+	outline: none;
+}
+
+/* Hover is like border border reveal */
+.cwc-all-blogs__filter-option:hover {
+	border-color: #1A1A1A;
+}
+
+.cwc-all-blogs__filter-dot {
+	display: block;
+	width: 8px;
+	height: 8px;
+	background-color: var(--wp--preset--color--primary);
+	border-radius: 50%;
+	opacity: 0;
+	transition: opacity 0.2s ease;
+}
+
+.cwc-all-blogs__filter-option.is-active .cwc-all-blogs__filter-dot {
+	opacity: 1;
+}
+
+.cwc-all-blogs__filter-submit {
+	display: none;
+}
+
+/* ---------------------------------------------------------
+ * Card grid
+ * --------------------------------------------------------- */
+
+.cwc-all-blogs__grid {
+	display: grid;
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+	gap: 1.5rem;
+}
+
+.cwc-all-blogs__card {
+	display: flex;
+	flex-direction: column;
+	background-color: #f8f9fa;
+	border-radius: 8px;
+	overflow: hidden;
+	box-shadow: -2px 4px 12px rgba(24, 24, 24, 0.08);
+}
+
+.cwc-all-blogs__card-image-link {
+	display: block;
+	margin: 1rem 1rem 0.75rem;
+	border-radius: 4px;
+	overflow: hidden;
+	aspect-ratio: 524 / 246;
+}
+
+.cwc-all-blogs__card-image {
+	display: block;
+	width: 100%;
+	height: 100%;
+	background-position: center;
+	background-size: cover;
+	background-repeat: no-repeat;
+	transition: transform 200ms ease;
+}
+
+.cwc-all-blogs__card-image-link:hover .cwc-all-blogs__card-image,
+.cwc-all-blogs__card-image-link:focus-visible .cwc-all-blogs__card-image {
+	transform: scale(1.03);
+}
+
+.cwc-all-blogs__card-body {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+	padding: 0 1rem 1rem;
+	flex: 1;
+}
+
+.cwc-all-blogs__card-title {
+	font-family: var(--wp--preset--font-family--heading);
+	font-weight: 600;
+	font-size: 1.5rem;
+	line-height: 1.25;
+	color: #181818;
+	margin: 0;
+}
+
+.cwc-all-blogs__card-title a {
+	color: inherit;
+	text-decoration: none;
+}
+
+.cwc-all-blogs__card-title a:hover,
+.cwc-all-blogs__card-title a:focus-visible {
+	text-decoration: underline;
+}
+
+.cwc-all-blogs__card-excerpt {
+	font-family: var(--wp--preset--font-family--ui);
+	font-weight: 400;
+	font-size: 1rem;
+	line-height: 1.5;
+	color: #474747;
+	margin: 0;
+	display: -webkit-box;
+	-webkit-line-clamp: 3;
+	-webkit-box-orient: vertical;
+	overflow: hidden;
+}
+
+.cwc-all-blogs__card-date {
+	font-family: var(--wp--preset--font-family--ui);
+	font-weight: 400;
+	font-size: 1rem;
+	color: #474747;
+}
+
+.cwc-all-blogs__card-cta {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	margin-top: auto;
+	padding: 0.75rem 1.5rem;
+	background-color: var(--wp--preset--color--primary);
+	color: #ffffff;
+	font-family: var(--wp--preset--font-family--heading);
+	font-weight: 600;
+	font-size: 1rem;
+	border-radius: 30px;
+	text-decoration: none;
+	transition: background-color 150ms ease, color 150ms ease;
+}
+
+.cwc-all-blogs__card-cta:hover,
+.cwc-all-blogs__card-cta:focus-visible {
+	background-color: var(--wp--preset--color--primary-dark);
+	color: #ffffff;
+}
+
+.cwc-all-blogs__empty {
+	font-family: var(--wp--preset--font-family--body);
+	font-size: 1.125rem;
+	color: var(--wp--preset--color--text-muted);
+	text-align: center;
+	padding: 3rem 0;
+}
+
+/* ---------------------------------------------------------
+ * Pagination
+ * --------------------------------------------------------- */
+
+.cwc-all-blogs__pagination {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	gap: 0.5rem;
+	margin-top: 2.5rem;
+}
+
+.cwc-all-blogs__page {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 48px;
+	height: 48px;
+	background-color: #ffffff;
+	border-radius: 8px;
+	font-family: var(--wp--preset--font-family--ui);
+	font-weight: 600;
+	font-size: 1.125rem;
+	color: #181818;
+	text-decoration: none;
+	transition: background-color 150ms ease, color 150ms ease;
+	box-shadow: -2px 4px 12px rgba(24, 24, 24, 0.06);
+}
+
+.cwc-all-blogs__page:hover,
+.cwc-all-blogs__page:focus-visible {
+	background-color: var(--wp--preset--color--surface);
+}
+
+.cwc-all-blogs__page--current {
+	background-color: var(--wp--preset--color--secondary);
+	color: #ffffff;
+	pointer-events: none;
+}
+
+.cwc-all-blogs__page--ellipsis {
+	background: transparent;
+	box-shadow: none;
+	color: var(--wp--preset--color--text-muted);
+	pointer-events: none;
+}
+
+.cwc-all-blogs__page--disabled {
+	opacity: 0.4;
+	pointer-events: none;
+	cursor: not-allowed;
+}
+
+/* ---------------------------------------------------------
+ * Responsive
+ * --------------------------------------------------------- */
+
+@media (max-width: 1024px) {
+	.cwc-all-blogs__grid {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+}
+
+@media (max-width: 720px) {
+	.cwc-all-blogs {
+		padding: 0 var(--wp--preset--spacing--30);
+	}
+
+	.cwc-all-blogs__header {
+		flex-direction: column;
+		align-items: center;
+		text-align: center;
+		gap: 1.5rem;
+	}
+
+	.cwc-all-blogs__intro {
+		max-width: 100%;
+	}
+
+	.cwc-all-blogs__filter {
+		align-self: center;
+	}
+
+	.cwc-all-blogs__grid {
+		grid-template-columns: 1fr;
+	}
+
+	.cwc-all-blogs__page {
+		width: 40px;
+		height: 40px;
+		font-size: 1rem;
+	}
+}

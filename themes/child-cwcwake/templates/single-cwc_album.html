@@ -1,0 +1,201 @@
+<!-- wp:template-part {"slug":"header"} /-->
+
+<!-- wp:cwc/page-banner {
+	"backgroundImage": "/wp-content/uploads/2026/04/gallery-banner-bg.webp",
+	"overlayOpacity": 40,
+	"size": "default",
+	"showCorners": true,
+	"useFeaturedImage": true,
+	"align": "full"
+} /-->
+
+<!-- wp:group {
+	"align": "full",
+	"className": "cwc-tropical-section",
+	"style": {
+		"spacing": {
+			"margin": { "top": "0" },
+			"padding": {
+				"top": "var:preset|spacing|40",
+				"bottom": "var:preset|spacing|70"
+			},
+			"blockGap": "var:preset|spacing|40"
+		}
+	},
+	"layout": { "type": "constrained" }
+} -->
+<div class="wp-block-group alignfull cwc-tropical-section"
+	style="margin-top:0;padding-top:var(--wp--preset--spacing--40);padding-bottom:var(--wp--preset--spacing--70)">
+
+	<!-- wp:group {
+		"className": "cwc-album-topbar",
+		"style": { "spacing": { "blockGap": "var:preset|spacing|30" } },
+		"layout": { "type": "flex", "flexWrap": "wrap", "justifyContent": "space-between", "verticalAlignment": "center" }
+	} -->
+	<div class="wp-block-group cwc-album-topbar">
+		<!-- wp:cwc/breadcrumbs /-->
+		<!-- wp:cwc/album-back-link /-->
+	</div>
+	<!-- /wp:group -->
+
+	<!-- wp:group {
+		"tagName": "main",
+		"style": { "spacing": { "margin": { "top": "0" }, "blockGap": "var:preset|spacing|40" } },
+		"layout": { "type": "constrained" }
+	} -->
+	<main class="wp-block-group" style="margin-top:0">
+		<!-- wp:post-content {"align":"full","layout":{"type":"constrained"}} /-->
+
+		<!-- wp:cwc/albums-grid {
+			"parentId": -1,
+			"showStandardGrid": false,
+			"showMoreSection": true,
+			"moreLimit": 2,
+			"countMode": "auto",
+			"align": "full"
+		} /-->
+
+		<!-- wp:html -->
+		<script>
+			document.addEventListener("DOMContentLoaded", function () {
+				const content = document.querySelector(".cwc-tropical-section .wp-block-post-content");
+				if (!content) return;
+
+				let gallery = content.querySelector(".wp-block-gallery");
+				const looseImages = content.querySelectorAll(":scope > .wp-block-image, :scope > p > .wp-block-image");
+
+				if (looseImages.length > 0) {
+					if (!gallery) {
+						gallery = document.createElement("figure");
+						gallery.className = "wp-block-gallery has-nested-images columns-default is-cropped";
+						content.insertBefore(gallery, looseImages[0].closest('p') || looseImages[0]);
+					}
+
+					looseImages.forEach(function (img) {
+						// If the editor accidentally wrapped it in a P tag, clean it up
+						const p = img.closest('p');
+						gallery.appendChild(img);
+						if (p && p.childElementCount === 0 && p.textContent.trim() === '') {
+							p.remove();
+						}
+					});
+				}
+
+				// --- Pagination Component ---
+				if (gallery) {
+					const items = Array.from(gallery.querySelectorAll(':scope > .wp-block-image'));
+					if (items.length === 0) return;
+
+					const pagination = document.createElement("div");
+					pagination.className = "cwc-pagination";
+					pagination.style.marginBottom = "4rem";
+					gallery.after(pagination);
+
+					let itemsPerPage = 8;
+					let currentPage = 1;
+
+					const updateConfig = () => {
+						const w = window.innerWidth;
+						if (w <= 600) itemsPerPage = 4;      // Mobile (2x2)
+						else if (w <= 1024) itemsPerPage = 6; // Tablet (3x2)
+						else itemsPerPage = 8;               // Desktop (4x2)
+					};
+
+					const goToPage = (page) => {
+						const totalPages = Math.ceil(items.length / itemsPerPage);
+						if (page > totalPages) page = totalPages || 1;
+						if (page < 1) page = 1;
+
+						currentPage = page;
+						const start = (page - 1) * itemsPerPage;
+						const end = start + itemsPerPage;
+
+						items.forEach((item, index) => {
+							item.style.display = (index >= start && index < end) ? "" : "none";
+						});
+
+						renderUI(totalPages);
+
+						// Scroll back to gallery top when changing pages
+						if (page !== 1) {
+							const offset = gallery.getBoundingClientRect().top + window.pageYOffset - 150;
+							window.scrollTo({ top: offset, behavior: 'smooth' });
+						}
+					};
+
+					const renderUI = (totalPages) => {
+						pagination.innerHTML = "";
+						if (totalPages <= 1) {
+							pagination.style.display = "none";
+							return;
+						} else {
+							pagination.style.display = "flex";
+						}
+
+						const createBtn = (html, target, isDisabled, isCurrent) => {
+							const btn = document.createElement("button");
+							btn.className = `cwc-page ${isDisabled ? 'cwc-page--disabled' : ''} ${isCurrent ? 'cwc-page--current' : ''}`;
+							btn.innerHTML = html;
+							if (isDisabled) btn.setAttribute('aria-disabled', 'true');
+							if (isCurrent) btn.setAttribute('aria-current', 'page');
+							btn.onclick = () => { if (!isDisabled && !isCurrent) goToPage(target); };
+							pagination.appendChild(btn);
+						};
+
+						const createEllipsis = () => {
+							const span = document.createElement("span");
+							span.className = "cwc-page cwc-page--ellipsis";
+							span.innerHTML = "…";
+							span.setAttribute('aria-hidden', 'true');
+							pagination.appendChild(span);
+						};
+
+						// Build page list with windowing
+						const windowSize = 1;
+						let pages = [1];
+						for (let i = Math.max(2, currentPage - windowSize); i <= Math.min(totalPages - 1, currentPage + windowSize); i++) {
+							pages.push(i);
+						}
+						if (totalPages > 1) pages.push(totalPages);
+						pages = [...new Set(pages)].sort((a, b) => a - b);
+
+						createBtn("‹", currentPage - 1, currentPage === 1, false);
+
+						let prevPage = 0;
+						pages.forEach(page => {
+							if (prevPage > 0 && (page - prevPage) > 1) {
+								createEllipsis();
+							}
+							createBtn(page, page, false, page === currentPage);
+							prevPage = page;
+						});
+
+						createBtn("›", currentPage + 1, currentPage === totalPages, false);
+					};
+
+					updateConfig();
+					goToPage(1);
+
+					// Update layout on resize (debounced)
+					let resizeTimer;
+					window.addEventListener('resize', () => {
+						clearTimeout(resizeTimer);
+						resizeTimer = setTimeout(() => {
+							const prevLimit = itemsPerPage;
+							updateConfig();
+							if (prevLimit !== itemsPerPage) {
+								goToPage(1); // Reset to page 1 if grid layout changes
+							}
+						}, 200);
+					});
+				}
+			});
+		</script>
+		<!-- /wp:html -->
+	</main>
+	<!-- /wp:group -->
+
+</div>
+<!-- /wp:group -->
+
+<!-- wp:template-part {"slug":"footer"} /-->

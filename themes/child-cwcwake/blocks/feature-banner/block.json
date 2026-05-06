@@ -1,0 +1,48 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "cwc/feature-banner",
+	"version": "1.0.0",
+	"title": "Feature Banner",
+	"category": "theme",
+	"icon": "format-image",
+	"description": "Full-width image card with dark overlay, title, and description. Reusable for feature highlights.",
+	"textdomain": "child-cwcwake",
+	"supports": {
+		"align": ["full"],
+		"html": false,
+		"anchor": true
+	},
+	"attributes": {
+		"backgroundImage": {
+			"type": "string",
+			"default": ""
+		},
+		"titleLine1": {
+			"type": "string",
+			"default": ""
+		},
+		"titleAccent": {
+			"type": "string",
+			"default": ""
+		},
+		"titleLine2": {
+			"type": "string",
+			"default": ""
+		},
+		"accentColor": {
+			"type": "string",
+			"default": ""
+		},
+		"description": {
+			"type": "string",
+			"default": ""
+		},
+		"gridItems": {
+			"type": "array",
+			"default": []
+		}
+	},
+	"render": "file:./render.php",
+	"style": "file:./style.css"
+}

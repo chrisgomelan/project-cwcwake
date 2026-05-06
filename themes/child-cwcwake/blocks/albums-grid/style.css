@@ -1,0 +1,448 @@
+/*
+ * CWC Wake — cwc/albums-grid block styles.
+ *
+ * Implements the spec from `designs/albums-landing-design.md` and
+ * `designs/albums-gallery-design.md`:
+ *
+ *   - Standard card image: 30px radius, 10% black overlay.
+ *   - Standard title:  Sora  / 700 / 48px / #0096C7.
+ *   - Standard count:  Inter / 600 / 24px / rgba(0, 0, 0, 0.7).
+ *   - MORE ALBUMS heading: Sora / 700 / 64px / #000.
+ *   - Featured card: 30px radius, 20% black overlay, decorative
+ *     light-coloured corner brackets.
+ *   - Featured overlay title:  Sora / 700 / 48px / #FFF.
+ *   - Featured overlay count:  Inter / 500 / 20px / #FFF.
+ *
+ * Layout: 2-column grid on desktop, single-column on mobile.
+ * Used on `/gallery/` (top-level albums) and any single album page
+ * that has child albums.
+ */
+
+:root {
+	--album-card-height: 494px;
+	--album-card-width: 796px;
+}
+
+.cwc-albums {
+	display: flex;
+	flex-direction: column;
+	gap: clamp(2.5rem, 5vw, 5rem);
+	margin-block-start: var(--wp--preset--spacing--40);
+	width: 100%;
+}
+
+/* ----------------------------------------
+   Standard grid (top of the listing)
+   ---------------------------------------- */
+
+.cwc-albums__grid {
+	display: grid;
+	gap: clamp(1.5rem, 2.5vw, 2.5rem);
+	grid-template-columns: 1fr;
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+@media (min-width: 1200px) {
+	.cwc-albums__grid {
+		grid-template-columns: repeat(2, 1fr);
+		justify-content: center;
+		width: 100%;
+		max-width: 100%;
+		margin-inline: auto;
+		gap: clamp(1.5rem, 2.5vw, 2.5rem);
+	}
+}
+
+.cwc-albums__item {
+	margin: 0;
+	width: 100%;
+}
+
+@media (min-width: 1200px) {
+	.cwc-albums__item {
+		max-width: var(--album-card-width);
+		width: 100%;
+	}
+
+	.cwc-albums__grid>.cwc-albums__item:only-child {
+		grid-column: 1 / -1;
+		max-width: none;
+		width: 100%;
+	}
+
+	.cwc-albums__grid>.cwc-albums__item:only-child .cwc-albums__media {
+		aspect-ratio: 1622 / 540;
+		height: auto;
+	}
+}
+
+/* ----------------------------------------
+   Single Album Title
+   ---------------------------------------- */
+
+.cwc-albums__card {
+	display: flex;
+	flex-direction: column;
+	gap: clamp(0.75rem, 1.25vw, 1.25rem);
+	color: inherit;
+	text-decoration: none;
+	transition: transform 0.3s ease;
+}
+
+.cwc-albums__card:focus {
+	outline: none;
+}
+
+.cwc-albums__card:focus-visible {
+	outline: 2px solid var(--wp--preset--color--primary);
+	outline-offset: 4px;
+	border-radius: 32px;
+}
+
+.cwc-albums__card:hover .cwc-albums__media {
+	transform: translateY(-4px);
+}
+
+.cwc-albums__card:hover .cwc-albums__overlay {
+	background: rgba(0, 0, 0, 0.2);
+}
+
+.cwc-albums__card:hover .cwc-albums__title {
+	color: var(--wp--preset--color--primary-dark, #007ba3);
+}
+
+.cwc-albums__media {
+	position: relative;
+	width: 100%;
+	aspect-ratio: 796 / 494;
+	overflow: hidden;
+	border-radius: 30px;
+	background: var(--wp--preset--color--surface);
+	transition: transform 0.3s ease;
+}
+
+@media (min-width: 769px) {
+	.cwc-albums__media {
+		height: var(--album-card-height);
+	}
+}
+
+.cwc-albums__img {
+	display: block;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+
+.cwc-albums__overlay {
+	position: absolute;
+	inset: 0;
+	background: rgba(0, 0, 0, 0.1);
+	pointer-events: none;
+	transition: background 0.3s ease;
+}
+
+/* Decorative L-shaped brackets — match the page banner / gallery grid */
+.cwc-albums__corner {
+	position: absolute;
+	width: clamp(20px, 2vw, 32px);
+	height: clamp(20px, 2vw, 32px);
+	border-color: rgba(255, 255, 255, 0.85);
+	border-style: solid;
+	border-width: 0;
+	pointer-events: none;
+	z-index: 1;
+}
+
+.cwc-albums__corner--light {
+	border-color: rgba(255, 255, 255, 0.95);
+}
+
+.cwc-albums__corner--tl {
+	top: clamp(0.75rem, 1.5vw, 1.25rem);
+	left: clamp(0.75rem, 1.5vw, 1.25rem);
+	border-top-width: 2px;
+	border-left-width: 2px;
+}
+
+.cwc-albums__corner--tr {
+	top: clamp(0.75rem, 1.5vw, 1.25rem);
+	right: clamp(0.75rem, 1.5vw, 1.25rem);
+	border-top-width: 2px;
+	border-right-width: 2px;
+}
+
+.cwc-albums__corner--bl {
+	bottom: clamp(0.75rem, 1.5vw, 1.25rem);
+	left: clamp(0.75rem, 1.5vw, 1.25rem);
+	border-bottom-width: 2px;
+	border-left-width: 2px;
+}
+
+.cwc-albums__corner--br {
+	bottom: clamp(0.75rem, 1.5vw, 1.25rem);
+	right: clamp(0.75rem, 1.5vw, 1.25rem);
+	border-bottom-width: 2px;
+	border-right-width: 2px;
+}
+
+.cwc-albums__meta {
+	display: flex;
+	align-items: baseline;
+	justify-content: space-between;
+	gap: var(--wp--preset--spacing--30);
+}
+
+.cwc-albums__title {
+	margin: 0;
+	font-family: 'Sora', system-ui, sans-serif;
+	font-weight: 700;
+	font-size: clamp(1.75rem, 3.2vw, 3rem);
+	line-height: 1;
+	letter-spacing: 0;
+	text-transform: uppercase;
+	color: #0096c7;
+	transition: color 0.2s ease;
+}
+
+.cwc-albums__count {
+	font-family: 'Inter', system-ui, sans-serif;
+	font-weight: 600;
+	font-size: clamp(1rem, 1.4vw, 1.5rem);
+	line-height: 1;
+	letter-spacing: 0;
+	text-transform: uppercase;
+	color: rgba(0, 0, 0, 0.7);
+	white-space: nowrap;
+}
+
+/* ----------------------------------------
+   MORE ALBUMS — featured wide cards
+   ---------------------------------------- */
+
+.cwc-albums,
+.cwc-albums__more {
+	display: flex;
+	flex-direction: column;
+	gap: clamp(1.5rem, 3vw, 3rem);
+	width: 100% !important;
+	max-width: none !important;
+	margin-top: 0 !important;
+}
+
+.cwc-albums__more-section {
+	margin: 0 !important;
+	padding: 0 !important;
+	width: 100% !important;
+	max-width: none !important;
+}
+
+.cwc-albums__more-title {
+	margin: 0 !important;
+	font-family: 'Sora', system-ui, sans-serif;
+	font-weight: 700;
+	font-size: clamp(2.25rem, 5vw, 4rem);
+	line-height: 1;
+	letter-spacing: 0;
+	color: #000;
+	text-align: center;
+}
+
+.cwc-albums__featured-list {
+	margin: 0 !important;
+	padding: 0;
+	list-style: none;
+	display: flex;
+	flex-direction: column;
+	gap: clamp(1.5rem, 2.5vw, 2.5rem);
+	width: 100% !important;
+	max-width: none !important;
+}
+
+.cwc-albums__featured-item {
+	margin: 0;
+}
+
+.cwc-albums__featured-card {
+	position: relative;
+	display: block;
+	width: 100%;
+	aspect-ratio: 1717 / 884;
+	overflow: hidden;
+	border-radius: 30px;
+	background: var(--wp--preset--color--surface);
+	color: #fff;
+	text-decoration: none;
+	transition: transform 0.3s ease;
+}
+
+.cwc-albums__featured-card:focus {
+	outline: none;
+}
+
+.cwc-albums__featured-card:focus-visible {
+	outline: 2px solid var(--wp--preset--color--primary);
+	outline-offset: 4px;
+}
+
+.cwc-albums__featured-card:hover {
+	transform: translateY(-4px);
+}
+
+.cwc-albums__featured-card:hover .cwc-albums__featured-overlay {
+	background: rgba(0, 0, 0, 0.35);
+}
+
+.cwc-albums__featured-img {
+	display: block;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+
+.cwc-albums__featured-overlay {
+	position: absolute;
+	inset: 0;
+	background: rgba(0, 0, 0, 0.2);
+	pointer-events: none;
+	transition: background 0.3s ease;
+}
+
+.cwc-albums__featured-content {
+	position: absolute;
+	inset: 0;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: clamp(0.5rem, 1vw, 0.75rem);
+	text-align: center;
+	padding: clamp(1.5rem, 3vw, 3rem);
+	color: #fff;
+	z-index: 1;
+}
+
+.cwc-albums__featured-title {
+	margin: 0;
+	font-family: 'Sora', system-ui, sans-serif;
+	font-weight: 700;
+	font-size: clamp(1.75rem, 3.2vw, 3rem);
+	line-height: 1;
+	letter-spacing: 0;
+	color: #fff;
+}
+
+.cwc-albums__featured-count {
+	font-family: 'Inter', system-ui, sans-serif;
+	font-weight: 500;
+	font-size: clamp(0.875rem, 1.25vw, 1.25rem);
+	line-height: 1;
+	letter-spacing: 0;
+	color: #fff;
+}
+
+/* ----------------------------------------
+   Responsive
+   ---------------------------------------- */
+
+@media (max-width: 768px) {
+	.cwc-albums__featured-card {
+		aspect-ratio: 16 / 10;
+	}
+
+	.cwc-albums__meta {
+		flex-wrap: wrap;
+	}
+}
+
+/* ----------------------------------------
+   Block Gallery Overrides — make editor galleries match the grid design
+   ---------------------------------------- */
+
+.cwc-tropical-section .wp-block-gallery.has-nested-images {
+	display: grid !important;
+	gap: clamp(1.5rem, 2.5vw, 2.5rem) !important;
+	grid-template-columns: 1fr !important;
+	margin-block: var(--wp--preset--spacing--40) !important;
+}
+
+@media (min-width: 1200px) {
+	.cwc-tropical-section .wp-block-gallery.has-nested-images {
+		grid-template-columns: repeat(2, 1fr) !important;
+		justify-content: center !important;
+		max-width: 1717px !important;
+		margin-inline: auto !important;
+	}
+
+	.cwc-tropical-section .wp-block-gallery.has-nested-images .wp-block-image {
+		max-width: var(--album-card-width) !important;
+		width: 100% !important;
+	}
+}
+
+.cwc-tropical-section .wp-block-gallery .wp-block-image {
+	margin: 0 !important;
+	width: 100% !important;
+}
+
+.cwc-tropical-section .wp-block-gallery .wp-block-image img {
+	aspect-ratio: 796 / 494;
+	border-radius: 0 !important;
+	height: auto;
+	object-fit: cover;
+	width: 100%;
+}
+
+/* Specific override for individual album photos to match the 828x536 landing spec */
+.single-cwc_album .wp-block-gallery .wp-block-image img {
+	aspect-ratio: 828 / 536 !important;
+	border-radius: 0 !important;
+}
+
+@media (min-width: 769px) {
+	.cwc-tropical-section .wp-block-gallery .wp-block-image img {
+		height: var(--album-card-height);
+	}
+}
+
+/* Add the 10% black overlay and corner brackets to gallery images */
+.cwc-tropical-section .wp-block-gallery .wp-block-image {
+	position: relative;
+	--corner-size: clamp(20px, 2.5vw, 30px);
+	--corner-thickness: 2px;
+	--corner-color: rgba(255, 255, 255, 0.8);
+}
+
+.cwc-tropical-section .wp-block-gallery .wp-block-image::after {
+	background: rgba(0, 0, 0, 0.1);
+	border-radius: 0 !important;
+	content: "";
+	inset: 0;
+	pointer-events: none;
+	position: absolute;
+	z-index: 1;
+}
+
+.cwc-tropical-section .wp-block-gallery .wp-block-image::before {
+	content: "";
+	inset: clamp(0.75rem, 1.5vw, 1.25rem);
+	pointer-events: none;
+	position: absolute;
+	z-index: 2;
+	/* Draw 4 corners using multiple linear gradients */
+	background:
+		/* Top Left */
+		linear-gradient(to right, var(--corner-color) var(--corner-thickness), transparent var(--corner-thickness)) 0 0 / var(--corner-size) var(--corner-thickness) no-repeat,
+		linear-gradient(to bottom, var(--corner-color) var(--corner-thickness), transparent var(--corner-thickness)) 0 0 / var(--corner-thickness) var(--corner-size) no-repeat,
+		/* Top Right */
+		linear-gradient(to left, var(--corner-color) var(--corner-thickness), transparent var(--corner-thickness)) 100% 0 / var(--corner-size) var(--corner-thickness) no-repeat,
+		linear-gradient(to bottom, var(--corner-color) var(--corner-thickness), transparent var(--corner-thickness)) 100% 0 / var(--corner-thickness) var(--corner-size) no-repeat,
+		/* Bottom Left */
+		linear-gradient(to right, var(--corner-color) var(--corner-thickness), transparent var(--corner-thickness)) 0 100% / var(--corner-size) var(--corner-thickness) no-repeat,
+		linear-gradient(to top, var(--corner-color) var(--corner-thickness), transparent var(--corner-thickness)) 0 100% / var(--corner-thickness) var(--corner-size) no-repeat,
+		/* Bottom Right */
+		linear-gradient(to left, var(--corner-color) var(--corner-thickness), transparent var(--corner-thickness)) 100% 100% / var(--corner-size) var(--corner-thickness) no-repeat,
+		linear-gradient(to top, var(--corner-color) var(--corner-thickness), transparent var(--corner-thickness)) 100% 100% / var(--corner-thickness) var(--corner-size) no-repeat;
+}

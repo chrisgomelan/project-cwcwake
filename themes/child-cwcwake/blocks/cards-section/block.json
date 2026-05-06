@@ -1,0 +1,68 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "cwc/cards-section",
+	"version": "1.0.0",
+	"title": "Cards Section",
+	"category": "theme",
+	"icon": "grid-view",
+	"description": "Two-tone italic heading followed by a 12-column grid of image cards. The `detailed` variant renders a title + price + capacity + button stack on a dark gradient (used for Rooms). The `overlay` variant renders just an overlaid title on a 30% dim (used for Leisure Services).",
+	"textdomain": "child-cwcwake",
+	"supports": {
+		"align": ["full"],
+		"html": false,
+		"anchor": true
+	},
+	"attributes": {
+		"variant": {
+			"type": "string",
+			"default": "detailed",
+			"enum": ["detailed", "overlay", "static", "staggered"]
+		},
+		"headingPrimary": {
+			"type": "string",
+			"default": ""
+		},
+		"headingSecondary": {
+			"type": "string",
+			"default": ""
+		},
+		"headingSecondaryColor": {
+			"type": "string",
+			"default": ""
+		},
+		"headingTertiary": {
+			"type": "string",
+			"default": ""
+		},
+		"sectionDescription": {
+			"type": "string",
+			"default": ""
+		},
+		"dynamicSource": {
+			"type": "string",
+			"default": ""
+		},
+		"items": {
+			"type": "array",
+			"default": [],
+			"items": {
+				"type": "object",
+				"properties": {
+					"title": { "type": "string" },
+					"image": { "type": "string" },
+					"description": { "type": "string" },
+					"span": { "type": "integer" },
+					"url": { "type": "string" },
+					"price": { "type": "string" },
+					"capacity": { "type": "string" },
+					"buttonLabel": { "type": "string" },
+					"buttonUrl": { "type": "string" },
+					"offset": { "type": "boolean" }
+				}
+			}
+		}
+	},
+	"render": "file:./render.php",
+	"style": "file:./style.css"
+}

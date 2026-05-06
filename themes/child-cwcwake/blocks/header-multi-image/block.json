@@ -1,0 +1,40 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "cwc/header-multi-image",
+	"version": "1.0.0",
+	"title": "Header Multi Image",
+	"category": "theme",
+	"icon": "images-alt2",
+	"description": "Header with title and description, followed by two images side-by-side.",
+	"textdomain": "child-cwcwake",
+	"supports": {
+		"align": ["full"],
+		"html": false,
+		"anchor": true
+	},
+	"attributes": {
+		"titleAccent": {
+			"type": "string",
+			"default": "PICKLEBALL"
+		},
+		"titleEnd": {
+			"type": "string",
+			"default": "& COURT SPORTS"
+		},
+		"description": {
+			"type": "string",
+			"default": ""
+		},
+		"image1": {
+			"type": "string",
+			"default": ""
+		},
+		"image2": {
+			"type": "string",
+			"default": ""
+		}
+	},
+	"render": "file:./render.php",
+	"style": "file:./style.css"
+}

@@ -1,0 +1,1618 @@
+/* ═══════════════════════════════════════════════════════════
+   Booking Flow — cwc/booking-flow
+   ═══════════════════════════════════════════════════════════ */
+
+.wp-block-cwc-booking-flow {
+	width: 100%;
+}
+
+.bf-inner-container button:focus,
+.bf-inner-container input:focus,
+.bf-inner-container textarea:focus {
+	outline: none !important;
+	box-shadow: none !important;
+}
+
+.bf-inner-container {
+	display: flex;
+	flex-direction: column;
+	gap: 48px;
+	width: 100%;
+	max-width: 1921px;
+	margin-inline: auto;
+	padding-left: clamp(1rem, 4vw, 4rem);
+	padding-right: clamp(1rem, 4vw, 4rem);
+}
+
+/* ─── Progress Bar ─── */
+.bf-progress {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0;
+	padding: 0 40px;
+	width: 100%;
+}
+
+.bf-progress__step {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 10px;
+	position: relative;
+	z-index: 2;
+}
+
+.bf-progress__circle {
+	width: 60px;
+	height: 60px;
+	border-radius: 56px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-family: var(--wp--preset--font-family--ui, 'Inter', sans-serif);
+	font-weight: 500;
+	font-size: 18px;
+	line-height: 24px;
+}
+
+.bf-progress__circle--done {
+	background: #1F7A4C;
+	color: #fff;
+}
+
+.bf-progress__circle--active {
+	background: #00AFB9;
+	color: #F7F9FB;
+}
+
+.bf-progress__circle--upcoming {
+	background: #DDDFE3;
+	color: #454C58;
+}
+
+.bf-progress__label {
+	font-family: var(--wp--preset--font-family--ui, 'Inter', sans-serif);
+	font-weight: 500;
+	font-size: 18px;
+	line-height: 24px;
+	color: #454C58;
+	white-space: nowrap;
+}
+
+.bf-progress__line {
+	flex: 1;
+	height: 2px;
+	margin-bottom: 34px;
+	margin-left: -30px;
+	margin-right: -30px;
+	z-index: 1;
+}
+
+.bf-progress__line--done {
+	background: #1F7A4C;
+}
+
+.bf-progress__line--upcoming {
+	background: #DDDFE3;
+}
+
+/* ─── Layout: left + right ─── */
+.bf-layout {
+	display: grid;
+	grid-template-columns: 1fr .7fr;
+	gap: 32px;
+	align-items: stretch;
+}
+
+/* ─── Panel (left column) ─── */
+.bf-panel-wrap {
+	min-width: 0;
+}
+
+.bf-panel {
+	display: none;
+	background: #F7F9FB;
+	border: 1px solid rgba(26, 26, 26, 0.5);
+	border-radius: 12px;
+	padding: 48px;
+}
+
+.bf-panel.is-active {
+	display: flex;
+	gap: 15px;
+	flex-direction: column;
+}
+
+.bf-panel__title {
+	font-family: var(--wp--preset--font-family--heading, 'Sora', sans-serif);
+	font-weight: 600;
+	font-size: 36px;
+	line-height: 32px;
+	color: #0096C7;
+	margin: 0;
+}
+
+.bf-panel__desc {
+	font-family: 'Roboto', var(--wp--preset--font-family--body, sans-serif);
+	font-weight: 400;
+	font-size: 16px;
+	line-height: 24px;
+	color: #8B94A4;
+	margin: 0;
+}
+
+.bf-panel__section-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 20px;
+	margin: 20px 0;
+	flex-wrap: wrap;
+}
+
+.bf-panel__section-controls {
+	display: flex;
+	align-items: center;
+	gap: 16px;
+}
+
+.bf-panel__sub-label {
+	font-family: var(--wp--preset--font-family--heading, 'Sora', sans-serif);
+	font-weight: 600;
+	font-size: 24px;
+	line-height: 24px;
+	color: #2B3037;
+	margin: 0;
+}
+
+.bf-panel__capacity {
+	font-family: var(--wp--preset--font-family--body, 'Archivo', sans-serif);
+	font-weight: 400;
+	font-size: 20px;
+	color: #000;
+}
+
+.bf-panel__add-guest {
+	margin-left: auto;
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	background: none;
+	border: none;
+	cursor: pointer;
+	color: #0096C7;
+	font-family: var(--wp--preset--font-family--ui, 'Inter', sans-serif);
+	font-weight: 500;
+	font-size: 16px;
+}
+
+
+.bf-field-row {
+	display: flex;
+	gap: 20px;
+	margin-bottom: 20px;
+}
+
+.bf-field--half {
+	flex: 1;
+	margin-bottom: 0;
+}
+
+.bf-field__label {
+	display: block;
+	font-family: 'Poppins', var(--wp--preset--font-family--heading, sans-serif);
+	font-weight: 500;
+	font-size: 20px;
+	line-height: 18px;
+	color: #1A1A1A;
+	margin-bottom: 10px;
+}
+
+.bf-field__req {
+	color: #CA0003;
+}
+
+.bf-guest-row {
+	background: none;
+	padding: 15px;
+	border-radius: 8px;
+	margin-bottom: 16px;
+	display: flex;
+	align-items: flex-end;
+	gap: 15px;
+}
+
+.bf-guest-row .bf-field {
+	flex: 1;
+	margin-bottom: 0;
+}
+
+.bf-guest-row:nth-child(even) {
+	background: #F5F5F5;
+}
+
+.bf-guest-row:nth-child(even) input.bf-field__input.bf-guest-name {
+	background: #ececec;
+}
+
+input.bf-field__input.bf-guest-name {
+	background: none;
+}
+
+
+.bf-guest-row__remove {
+	background: transparent;
+	border: none;
+	cursor: pointer;
+	padding: 0;
+	margin-bottom: 5px;
+	opacity: 0.6;
+	transition: opacity 0.2s;
+}
+
+.bf-guest-row__remove:hover {
+	opacity: 1;
+}
+
+.bf-field__input {
+	width: 100%;
+	height: 56px;
+	border-radius: 6px;
+	border: 1px solid rgba(26, 26, 26, 0.4);
+	background: #F7F9FB;
+	padding: 12px;
+	font-family: var(--wp--preset--font-family--ui, 'Inter', sans-serif);
+	font-weight: 400;
+	font-size: 18px;
+	line-height: 20px;
+	color: #1A1A1A;
+	box-sizing: border-box;
+}
+
+.bf-field__input::placeholder {
+	color: rgba(26, 26, 26, 0.6);
+}
+
+.bf-field__input-wrap {
+	position: relative;
+}
+
+.bf-field__input-wrap--icon {
+	display: flex;
+	align-items: center;
+}
+
+.bf-field__icon {
+	position: absolute;
+	left: 14px;
+	top: 50%;
+	transform: translateY(-50%);
+	pointer-events: none;
+}
+
+.bf-field__input--with-icon {
+	padding-left: 44px;
+}
+
+.bf-field__phone-row {
+	display: flex;
+	gap: 8px;
+}
+
+.bf-field__country-code {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	border: 1px solid rgba(26, 26, 26, 0.4);
+	border-radius: 6px;
+	padding: 0 12px;
+	background: #F7F9FB;
+	cursor: pointer;
+	white-space: nowrap;
+	font-family: var(--wp--preset--font-family--ui, 'Inter', sans-serif);
+	font-size: 16px;
+	height: 56px;
+}
+
+.bf-field__flag {
+	font-size: 20px;
+}
+
+.bf-field__input--phone {
+	flex: 1;
+}
+
+/* Country Selector Dropdown */
+.bf-field__country-selector {
+	position: relative;
+}
+
+.bf-country-dropdown {
+	position: absolute;
+	top: calc(100% + 4px);
+	left: 0;
+	width: 250px;
+	max-height: 250px;
+	overflow-y: auto;
+	background: #fff;
+	border: 1px solid rgba(26, 26, 26, 0.1);
+	border-radius: 8px;
+	box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+	z-index: 1000;
+	display: none;
+}
+
+.bf-country-dropdown.is-open {
+	display: block;
+	animation: bfFadeIn 0.2s ease;
+}
+
+@keyframes bfFadeIn {
+	from {
+		opacity: 0;
+		transform: translateY(-5px);
+	}
+
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+.bf-country-item {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	padding: 10px 15px;
+	cursor: pointer;
+	font-family: var(--wp--preset--font-family--ui, 'Inter', sans-serif);
+	font-size: 15px;
+	color: #1A1A1A;
+	transition: background 0.2s;
+}
+
+.bf-country-item:hover {
+	background: #F7F9FB;
+}
+
+.bf-country-item img {
+	border-radius: 2px;
+	flex-shrink: 0;
+}
+
+.bf-field.is-invalid .bf-field__phone-row {
+	outline: 2px solid #CA0003;
+	border-radius: 6px;
+}
+
+.bf-field-error {
+	color: #CA0003;
+	font-size: 14px;
+	margin-top: 6px;
+	font-weight: 500;
+}
+
+.bf-field__note {
+	font-family: 'Roboto', var(--wp--preset--font-family--body, sans-serif);
+	font-weight: 400;
+	font-size: 16px;
+	line-height: 24px;
+	color: #8B94A4;
+	margin: 8px 0 0;
+}
+
+.bf-field__textarea {
+	width: 100%;
+	min-height: 140px;
+	border-radius: 6px;
+	border: 1px solid rgba(26, 26, 26, 0.4);
+	background: #F7F9FB;
+	padding: 12px;
+	font-family: var(--wp--preset--font-family--ui, 'Inter', sans-serif);
+	font-weight: 400;
+	font-size: 18px;
+	color: #1A1A1A;
+	resize: vertical;
+	box-sizing: border-box;
+}
+
+.bf-field__textarea::placeholder {
+	color: rgba(26, 26, 26, 0.6);
+}
+
+/* Additional guest row */
+.bf-guest-row {
+	margin-bottom: 24px;
+}
+
+.bf-guest-row__inner {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	width: 100%;
+}
+
+.bf-guest-row__field-group {
+	display: flex;
+	align-items: center;
+	gap: 16px;
+}
+
+.bf-guest-row__remove {
+	background: none;
+	border: none;
+	padding: 0;
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-shrink: 0;
+	transition: opacity 0.2s;
+}
+
+.bf-guest-row__remove:hover {
+	opacity: 0.7;
+}
+
+.bf-guest-row__input-wrap {
+	flex: 1;
+	display: flex;
+	align-items: center;
+	gap: 12px;
+}
+
+.bf-guest-row__input-wrap .bf-guest-name {
+	flex: 1;
+}
+
+.bf-guest-type-toggle {
+	position: relative;
+	width: 104px;
+	height: 48px;
+	border-radius: 24px;
+	border: 1px solid #0096C7;
+	display: flex;
+	align-items: center;
+	cursor: pointer;
+	font-family: var(--wp--preset--font-family--ui, 'Inter', sans-serif);
+	font-weight: 600;
+	font-size: 14px;
+	transition: background-color 0.3s ease;
+	user-select: none;
+	flex-shrink: 0;
+	padding: 0;
+	overflow: hidden;
+}
+
+.bf-toggle-text {
+	position: absolute;
+	width: 56px;
+	text-align: center;
+	transition: left 0.3s ease, right 0.3s ease, color 0.3s ease;
+}
+
+.bf-toggle-thumb {
+	position: absolute;
+	top: 4px;
+	width: 38px;
+	height: 38px;
+	border-radius: 50%;
+	background: #FFFFFF;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	transition: transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.bf-guest-type-toggle--adult {
+	background: #0096C7;
+}
+
+.bf-guest-type-toggle--adult .bf-toggle-thumb {
+	transform: translateX(60px);
+	/* 104 - 38 - 6 */
+}
+
+.bf-guest-type-toggle--adult .bf-toggle-text {
+	left: 10px;
+	color: #FFFFFF;
+}
+
+.bf-guest-type-toggle--kid {
+	background: #E8F1F9;
+}
+
+.bf-guest-type-toggle--kid .bf-toggle-thumb {
+	transform: translateX(4px);
+}
+
+.bf-guest-type-toggle--kid .bf-toggle-text {
+	left: 44px;
+	/* 4 + 38 + 2 */
+	color: #0096C7;
+}
+
+/* ─── Checkbox ─── */
+.bf-checkbox {
+	display: flex;
+	align-items: center;
+	gap: 14px;
+	margin-bottom: 24px;
+	cursor: pointer;
+}
+
+.bf-checkbox__input {
+	position: absolute;
+	opacity: 0;
+	width: 0;
+	height: 0;
+}
+
+.bf-checkbox__box {
+	width: 32px;
+	height: 32px;
+	border-radius: 6px;
+	border: 3px solid #E6B65C;
+	flex-shrink: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	transition: background 0.2s, border-color 0.2s;
+}
+
+.bf-checkbox__input:checked+.bf-checkbox__box {
+	background: #E6B65C;
+	border-color: #E6B65C;
+}
+
+.bf-checkbox__input:checked+.bf-checkbox__box::after {
+	content: '✓';
+	color: #fff;
+	font-size: 18px;
+	font-weight: 700;
+}
+
+.bf-checkbox__label {
+	font-family: var(--wp--preset--font-family--ui, 'Inter', sans-serif);
+	font-weight: 500;
+	font-size: 18px;
+	color: #000;
+}
+
+/* ─── Primary Button ─── */
+.bf-btn-primary {
+	width: 100%;
+	height: 60px;
+	border-radius: 12px;
+	background: #0096C7;
+	color: #F7F9FB;
+	border: none;
+	cursor: pointer;
+	font-family: 'Poppins', var(--wp--preset--font-family--heading, sans-serif);
+	font-weight: 600;
+	font-size: 16px;
+	text-align: center;
+	box-shadow:
+		0px 2px 5px 0px rgba(0, 0, 0, 0.1),
+		-1px 8px 8px 0px rgba(0, 0, 0, 0.09),
+		-2px 19px 11px 0px rgba(0, 0, 0, 0.05),
+		-4px 34px 14px 0px rgba(0, 0, 0, 0.01),
+		-6px 53px 15px 0px transparent;
+	transition: background 0.3s;
+	margin-bottom: 20px;
+}
+
+.bf-btn-primary:hover {
+	background: #007BA3;
+}
+
+.bf-disclaimer {
+	font-family: var(--wp--preset--font-family--heading, 'Sora', sans-serif);
+	font-weight: 400;
+	font-size: 20px;
+	line-height: 22px;
+	color: rgba(26, 26, 26, 0.8);
+	text-align: center;
+	margin: 0;
+}
+
+/* ─── Payment Methods ─── */
+.bf-payment-methods {
+	display: flex;
+	justify-content: space-between;
+	gap: 12px;
+	flex-wrap: wrap;
+	margin-bottom: 32px;
+}
+
+.bf-payment-methods__option {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 70px;
+	height: 48px;
+	background: #FFFFFF;
+	border: 1px solid #DDDFE3;
+	border-radius: 6px;
+	cursor: pointer;
+	padding: 10px;
+	transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.bf-payment-methods__option:has(input:checked) {
+	border-color: #0096C7;
+	box-shadow: 0 0 0 1px #0096C7;
+}
+
+.bf-payment-methods__option input {
+	position: absolute;
+	opacity: 0;
+	width: 0;
+	height: 0;
+}
+
+.bf-payment-methods__option img {
+	display: block;
+	max-height: 40px;
+	width: auto;
+}
+
+.bf-card-form,
+.bf-gcash-qr {
+	margin-bottom: 32px;
+	display: none;
+}
+
+.bf-card-form.is-visible,
+.bf-gcash-qr.is-visible {
+	display: flex;
+	gap: 15px;
+	flex-direction: column;
+}
+
+.bf-gcash-qr__image {
+	margin: 24px auto;
+	display: flex;
+	justify-content: center;
+}
+
+
+.bf-gcash-qr__image img {
+	width: 338px;
+	height: 340px;
+}
+
+/* ─── Booking Summary (right) ─── */
+.bf-summary {
+	background: #F7F9FB;
+	border: 1px solid rgba(26, 26, 26, 0.5);
+	border-radius: 12px;
+	padding: clamp(1.5rem, 5vw, 2.25rem);
+	position: sticky;
+	top: 24px;
+}
+
+.bf-summary__header {
+	display: flex;
+	flex-direction: column;
+	margin: 0;
+}
+
+.bf-summary__title-wrap {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+
+.bf-summary__title {
+	font-family: var(--wp--preset--font-family--heading, 'Sora', sans-serif);
+	font-weight: 600;
+	font-size: clamp(1.5rem, 5vw, 2.25rem);
+	color: #0096C7;
+	margin: 0;
+}
+
+.bf-summary__mobile-quick {
+	display: none;
+}
+
+.bf-summary__toggle {
+	display: none;
+	background: none;
+	border: none;
+	cursor: pointer;
+	padding: 0;
+	color: #0096C7;
+	transition: transform 0.3s;
+}
+
+.bf-summary__content {
+	display: block;
+}
+
+.bf-summary__divider {
+	border-bottom: 1px solid #DDDFE3;
+	margin: 16px 0;
+}
+
+.bf-summary__room-preview {
+	display: flex;
+	gap: 16px;
+	margin-bottom: 20px;
+}
+
+.wp-block-cwc-booking-flow.bf-step-payment .bf-summary__room-preview {
+	display: none;
+}
+
+.bf-summary__room-img {
+	width: 136px;
+	height: 136px;
+	border-radius: 8px;
+	object-fit: cover;
+	flex-shrink: 0;
+	box-shadow:
+		0px 0px 1px 0px rgba(0, 0, 0, 0.1),
+		0px 2px 2px 0px rgba(0, 0, 0, 0.09),
+		0px 4px 3px 0px rgba(0, 0, 0, 0.05),
+		0px 8px 3px 0px rgba(0, 0, 0, 0.01),
+		0px 12px 3px 0px transparent;
+}
+
+.bf-summary__room-img--empty {
+	background: #ddd;
+}
+
+.bf-summary__room-name {
+	font-family: var(--wp--preset--font-family--heading, 'Sora', sans-serif);
+	font-weight: 600;
+	font-size: clamp(1.25rem, 4vw, 1.5rem);
+	line-height: 1.2;
+	color: #2B3037;
+	margin: 0 0 8px;
+}
+
+.bf-summary__room-desc {
+	font-family: var(--wp--preset--font-family--body, 'Archivo', sans-serif);
+	font-weight: 500;
+	font-size: clamp(0.875rem, 3vw, 1rem);
+	line-height: 1.5;
+	color: #1A1A1A;
+	margin: 0;
+	overflow-wrap: break-word;
+	word-break: break-word;
+}
+
+.bf-summary__section-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 12px;
+}
+
+.bf-summary__sub-label {
+	font-family: var(--wp--preset--font-family--heading, 'Sora', sans-serif);
+	font-weight: 600;
+	font-size: clamp(1.25rem, 4vw, 1.5rem);
+	color: #1A1A1A;
+	margin: 0;
+}
+
+.bf-summary__additional-label {
+	font-family: 'Poppins', sans-serif;
+	font-weight: 400;
+	font-size: 20px;
+	line-height: 18px;
+	color: #1A1A1A;
+}
+
+.bf-summary__edit-link {
+	display: flex;
+	align-items: center;
+	gap: 4px;
+	background: none;
+	border: none;
+	cursor: pointer;
+	color: #1A1A1A;
+	font-family: var(--wp--preset--font-family--ui, 'Inter', sans-serif);
+	font-weight: 500;
+	font-size: clamp(1rem, 3.5vw, 1.25rem);
+	text-decoration: underline;
+}
+
+.bf-summary-padded {
+	padding: 5px 25px;
+}
+
+.bf-summary__detail-text {
+	font-family: var(--wp--preset--font-family--body, 'Archivo', sans-serif);
+	font-weight: 400;
+	font-size: 18px;
+	line-height: 18px;
+	color: #1A1A1AB2;
+	margin: 0 0 8px;
+}
+
+#bf-summary-name {
+	font-family: var(--wp--preset--font-family--heading, 'Sora', sans-serif);
+	font-weight: 400;
+	font-size: 20px;
+	line-height: 18px;
+	color: #1A1A1A;
+	margin-bottom: 6px;
+}
+
+.bf-summary__details {
+	display: none;
+	margin-bottom: 16px;
+}
+
+.bf-summary__details.is-visible {
+	display: block;
+}
+
+.bf-summary__dates {
+	display: flex;
+	gap: clamp(0.5rem, 2vw, 1rem);
+	align-items: center;
+	margin-bottom: 12px;
+	flex-wrap: wrap;
+}
+
+.bf-summary__date-col {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+}
+
+.bf-summary__date-label {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	font-family: var(--wp--preset--font-family--ui, 'Inter', sans-serif);
+	font-weight: 500;
+	font-size: clamp(0.875rem, 3vw, 1.125rem);
+	color: #454C58;
+}
+
+.bf-summary__date-val {
+	font-family: var(--wp--preset--font-family--ui, 'Inter', sans-serif);
+	font-weight: 500;
+	font-size: clamp(1.125rem, 4vw, 1.5rem);
+	color: #383E48;
+}
+
+.bf-summary__date-divider {
+	width: 1px;
+	height: 15px;
+	background: #1A1A1A80;
+	flex-shrink: 0;
+}
+
+.bf-summary__guests-row {
+	display: flex;
+	align-items: start;
+	gap: 8px;
+	font-family: var(--wp--preset--font-family--ui, 'Inter', sans-serif);
+	color: #1A1A1A;
+	flex-direction: column;
+}
+
+.bf-summary__guests-label {
+	font-weight: 500;
+	font-size: clamp(1rem, 3.5vw, 1.25rem);
+	color: #1A1A1A;
+}
+
+.bf-summary__guests-group {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	font-size: clamp(0.875rem, 3vw, 1.125rem);
+	font-weight: 600;
+	margin: 0;
+
+}
+
+.bf-summary__room-type {
+	font-family: var(--wp--preset--font-family--heading, 'Sora', sans-serif);
+	font-weight: 600;
+	font-size: 20px;
+	color: #1A1A1A;
+	margin: 0 0 8px;
+}
+
+.bf-summary__amenities {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	flex-wrap: wrap;
+	font-family: var(--wp--preset--font-family--body, 'Archivo', sans-serif);
+	font-size: 14px;
+	color: #454C58;
+	justify-content: space-evenly;
+}
+
+.bf-summary__amenity {
+	display: flex;
+	align-items: center;
+	gap: 4px;
+	font-size: 18px;
+}
+
+.bf-summary__amenity-divider {
+	color: #DDDFE3;
+}
+
+.bf-summary__total {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+
+.bf-summary__total-left {
+	display: flex;
+	flex-direction: column;
+}
+
+.bf-summary__total-label {
+	font-family: var(--wp--preset--font-family--heading, 'Sora', sans-serif);
+	font-weight: 600;
+	font-size: clamp(1rem, 3.5vw, 1.25rem);
+	color: #2B3037;
+}
+
+.bf-summary__total-sub {
+	font-family: var(--wp--preset--font-family--ui, 'Inter', sans-serif);
+	font-weight: 400;
+	font-size: 18px;
+	color: #000000;
+}
+
+.bf-summary__total-price {
+	font-family: var(--wp--preset--font-family--heading, 'Sora', sans-serif);
+	font-weight: 700;
+	font-size: clamp(1.5rem, 5vw, 1.75rem);
+	color: #0096C7;
+}
+
+/* ─── Modals ─── */
+.bf-modal-backdrop {
+	position: fixed;
+	inset: 0;
+	background: rgba(0, 0, 0, 0.4);
+	z-index: 999;
+	display: none;
+}
+
+.bf-modal-backdrop.is-active {
+	display: block;
+}
+
+.bf-modal {
+	position: fixed;
+	top: 55%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	z-index: 1000;
+	display: none;
+	width: 90%;
+	max-width: 560px;
+	max-height: 90vh;
+}
+
+.bf-modal.is-active {
+	display: block;
+}
+
+.bf-modal__inner {
+	background: #F7F9FB;
+	border-radius: 12px;
+	padding: 40px;
+	box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+	max-height: 90vh;
+	display: flex;
+	flex-direction: column;
+}
+
+.bf-modal__inner--trip {
+	max-width: 520px;
+	padding: 30px;
+}
+
+.bf-modal__header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 28px;
+}
+
+.bf-modal__title {
+	font-family: var(--wp--preset--font-family--heading, 'Sora', sans-serif);
+	font-weight: 600;
+	font-size: 36px;
+	color: #0096C7;
+	margin: 0;
+}
+
+.bf-modal__close {
+	background: none;
+	border: none;
+	font-size: 32px;
+	cursor: pointer;
+	color: #1A1A1A;
+	padding: 0;
+	line-height: 1;
+}
+
+.bf-modal__body {
+	display: flex;
+	justify-content: flex-start;
+	flex-direction: column;
+	margin-bottom: 15px;
+	overflow-y: auto;
+	flex: 1;
+	padding-right: 5px;
+	/* space for scrollbar */
+}
+
+.bf-modal__save {
+	width: 100%;
+	height: 60px;
+	border-radius: 12px;
+	background: #0081A7;
+	color: #F7F9FB;
+	border: none;
+	cursor: pointer;
+	font-family: 'Poppins', var(--wp--preset--font-family--heading, sans-serif);
+	font-weight: 600;
+	font-size: 16px;
+	transition: background 0.3s;
+}
+
+.bf-modal__save:hover {
+	background: #007BA3;
+}
+
+/* Modal: Trip Summary Redesign */
+.bf-modal__date-selection {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 16px;
+	margin-bottom: 24px;
+}
+
+.bf-modal__date-selection-wrapper {
+	display: flex;
+	gap: 25px;
+	justify-content: center;
+	margin-bottom: 24px;
+}
+
+.bf-modal__date-selection-grid {
+	display: flex;
+	align-items: center;
+	gap: 20px;
+	padding: 24px;
+	background: #F7F9FB;
+	border-radius: 12px;
+	border: 1px solid #DDDFE3;
+}
+
+.bf-modal__vertical-divider {
+	width: 1px;
+	background: #DDDFE3;
+	margin: 0;
+	align-self: stretch;
+}
+
+.bf-modal__date-icon-col {
+	padding-top: 4px;
+	height: 21px;
+	width: 21px;
+}
+
+.bf-modal__date-icon-col img {
+	height: 100%;
+}
+
+.bf-modal__date-info-col {
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+	cursor: pointer;
+}
+
+.bf-modal__date-label {
+	font-family: 'Poppins', sans-serif;
+	font-weight: 600;
+	font-size: 24px;
+	line-height: 28px;
+	color: #0096C7;
+	margin: 0;
+}
+
+.bf-modal__date-val {
+	font-family: var(--wp--preset--font-family--ui, 'Inter', sans-serif);
+	font-weight: 400;
+	font-size: 18px;
+	line-height: 14px;
+	color: #1A1A1A;
+	transition: color 0.2s;
+}
+
+.bf-modal__date-info-col:hover .bf-modal__date-val {
+	color: #0081A7;
+}
+
+
+
+/* Custom Calendar Component */
+.bf-calendar {
+	border-top: 1px solid #DDDFE3;
+	padding-top: 24px;
+	margin-top: 24px;
+	display: none;
+}
+
+.bf-calendar.is-open {
+	display: block;
+}
+
+.bf-modal__body:has(.bf-calendar.is-open) .bf-modal__date-selection-wrapper {
+	display: none;
+}
+
+.bf-calendar__header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 20px;
+	padding: 0 10px;
+}
+
+.bf-calendar__month-year {
+	font-family: var(--wp--preset--font-family--heading, 'Sora', sans-serif);
+	font-size: 20px;
+	font-weight: 600;
+	color: #1A1A1A;
+	text-transform: capitalize;
+}
+
+.bf-calendar__prev,
+.bf-calendar__next {
+	background: none;
+	border: none;
+	cursor: pointer;
+	color: #1A1A1A;
+	display: flex;
+	align-items: center;
+	padding: 5px;
+	transition: opacity 0.2s;
+}
+
+.bf-calendar__prev:hover,
+.bf-calendar__next:hover {
+	opacity: 0.6;
+}
+
+.bf-calendar__weekdays {
+	display: grid;
+	grid-template-columns: repeat(7, 1fr);
+	text-align: center;
+	margin-bottom: 10px;
+}
+
+.bf-calendar__weekdays span {
+	font-family: var(--wp--preset--font-family--body, 'Archivo', sans-serif);
+	font-weight: 600;
+	font-size: 14px;
+	color: #454C58;
+}
+
+.bf-calendar__grid {
+	display: grid;
+	grid-template-columns: repeat(7, 1fr);
+	gap: 2px 0;
+}
+
+.bf-calendar__day {
+	aspect-ratio: 1;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	cursor: pointer;
+	font-family: var(--wp--preset--font-family--body, 'Archivo', sans-serif);
+	font-size: 16px;
+	color: #1A1A1A;
+	transition: all 0.2s;
+	position: relative;
+	z-index: 1;
+}
+
+.bf-calendar__day--empty {
+	cursor: default;
+}
+
+.bf-calendar__day--disabled {
+	opacity: 0.2;
+	cursor: not-allowed;
+}
+
+.bf-calendar__day--selected {
+	background: #0096C7 !important;
+	color: #fff !important;
+	border-radius: 50%;
+}
+
+.bf-calendar__day--in-range {
+	background: rgba(0, 150, 199, 0.1);
+}
+
+.bf-calendar__day--range-start {
+	border-radius: 50% 0 0 50%;
+}
+
+.bf-calendar__day--range-end {
+	border-radius: 0 50% 50% 0;
+}
+
+.bf-calendar__day--range-start.bf-calendar__day--range-end {
+	border-radius: 50%;
+}
+
+.bf-calendar__day:hover:not(.bf-calendar__day--empty):not(.bf-calendar__day--disabled) {
+	background: rgba(0, 150, 199, 0.05);
+	border-radius: 50%;
+}
+
+/* Modal: room options */
+.bf-modal__room-options {
+	display: flex;
+	flex-direction: column;
+	gap: 20px;
+}
+
+.bf-modal__room-option {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 16px 0;
+	cursor: pointer;
+	border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.bf-modal__room-option-name {
+	font-family: var(--wp--preset--font-family--heading, 'Sora', sans-serif);
+	font-weight: 600;
+	font-size: 20px;
+	color: #2B3037;
+	display: block;
+}
+
+.bf-modal__room-option-cap {
+	font-family: var(--wp--preset--font-family--ui, 'Inter', sans-serif);
+	font-weight: 400;
+	font-size: 18px;
+	color: rgba(26, 26, 26, 0.5);
+}
+
+.bf-modal__radio {
+	accent-color: #0096C7;
+	width: 24px;
+	height: 24px;
+	outline: none;
+}
+
+/* Modal: additional guest row */
+.bf-modal__guest-row {
+	margin-bottom: 20px;
+}
+
+.bf-modal__guest-row-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 8px;
+}
+
+.bf-modal__guest-row-label {
+	font-family: var(--wp--preset--font-family--heading, 'Sora', sans-serif);
+	font-weight: 600;
+	font-size: 20px;
+	color: #2B3037;
+}
+
+.bf-modal__guest-edit {
+	display: flex;
+	align-items: center;
+	gap: 4px;
+	background: none;
+	border: none;
+	cursor: pointer;
+	font-family: var(--wp--preset--font-family--ui, 'Inter', sans-serif);
+	font-size: 18px;
+	color: #1A1A1A;
+	text-decoration: underline;
+}
+
+/* ─── Responsive ─── */
+@media (max-width: 1024px) {
+	.bf-layout {
+		display: flex;
+		flex-direction: column;
+	}
+
+	.bf-panel-wrap {
+		order: 2;
+	}
+
+	.bf-summary {
+		order: 1;
+		position: static;
+		margin-bottom: 24px;
+	}
+
+	.bf-summary__mobile-quick {
+		display: block;
+		width: 100%;
+		margin-top: 12px;
+	}
+
+	.bf-summary__mobile-room {
+		font-family: var(--wp--preset--font-family--heading, 'Sora', sans-serif);
+		font-weight: 600;
+		font-size: 20px;
+		color: #2B3037;
+		margin: 0 0 4px;
+	}
+
+	.bf-summary__mobile-dates,
+	.bf-summary__mobile-total {
+		font-family: var(--wp--preset--font-family--ui, 'Inter', sans-serif);
+		font-weight: 400;
+		font-size: 16px;
+		color: #454C58;
+		margin: 2px 0;
+	}
+
+	.bf-summary__toggle {
+		display: block;
+	}
+
+	.bf-summary__content {
+		display: none;
+	}
+
+	.bf-summary.is-expanded .bf-summary__content {
+		display: block;
+	}
+
+	.bf-summary.is-expanded .bf-summary__mobile-quick {
+		display: none;
+	}
+
+	.bf-summary.is-expanded .bf-summary__toggle {
+		transform: rotate(180deg);
+	}
+
+	.bf-summary__room-preview {
+		flex-direction: column;
+		align-items: center;
+		text-align: center;
+	}
+
+	.bf-summary__dates,
+	.bf-summary__guests-group,
+	.bf-summary__room-type {
+		padding: 0;
+	}
+
+	.bf-summary__dates {
+		flex-direction: column;
+		align-items: center;
+		gap: 12px;
+	}
+
+	.bf-summary__date-divider {
+		display: none;
+	}
+
+	.bf-summary__total {
+		flex-direction: column;
+		align-items: center;
+		text-align: center;
+		gap: 12px;
+	}
+
+	.bf-summary__total-left {
+		align-items: center;
+	}
+
+	.bf-summary__edit-link {
+		font-size: 16px;
+	}
+
+	.bf-summary__amenities {
+		justify-content: center;
+		gap: 12px;
+	}
+
+	.bf-summary__amenity-divider {
+		display: none;
+	}
+
+	.bf-summary__total-price {
+		white-space: nowrap;
+	}
+}
+
+@media (max-width: 768px) {
+	.bf-panel {
+		padding: 24px;
+	}
+
+	.bf-panel__title {
+		font-size: 28px;
+	}
+
+	.bf-field-row {
+		flex-direction: column;
+		gap: 0;
+	}
+
+	.bf-field--half {
+		margin-bottom: 20px;
+	}
+
+	.bf-progress {
+		padding: 0 16px;
+	}
+
+	.bf-progress__circle {
+		width: 44px;
+		height: 44px;
+		font-size: 14px;
+	}
+
+	.bf-progress__label {
+		font-size: 13px;
+	}
+
+	.bf-summary__title {
+		font-size: 28px;
+	}
+
+	.bf-modal__inner {
+		padding: 20px;
+	}
+
+	.bf-modal__title {
+		font-size: 24px;
+	}
+
+	.bf-modal__room-option-name {
+		font-size: 18px;
+	}
+
+	.bf-modal__room-option-cap {
+		font-size: 14px;
+	}
+
+	.bf-modal__room-option {
+		padding: 12px 0;
+	}
+
+	/* Trip Summary Modal Responsiveness */
+	.bf-modal__inner--trip {
+		padding: 20px;
+	}
+
+	.bf-modal__date-selection-wrapper {
+		flex-direction: column;
+		gap: 12px;
+		margin-bottom: 0;
+	}
+
+	.bf-modal__date-selection-grid {
+		padding: 16px;
+		gap: 12px;
+	}
+
+	.bf-modal__vertical-divider {
+		display: none;
+	}
+
+	.bf-modal__date-label {
+		font-size: 18px;
+		line-height: 1.2;
+	}
+
+	.bf-modal__date-val {
+		font-size: 16px;
+	}
+
+	.bf-calendar__month-year {
+		font-size: 18px;
+	}
+
+	.bf-modal__save {
+		height: 50px;
+		font-size: 14px;
+	}
+
+	.bf-guest-row__field-group {
+		align-items: flex-start;
+	}
+
+	.bf-guest-row__input-wrap {
+		flex-direction: column;
+		align-items: stretch;
+	}
+
+	.bf-guest-type-toggle {
+		align-self: flex-start;
+	}
+
+	.bf-guest-row__remove {
+		margin-bottom: 0;
+		margin-top: 16px;
+	}
+}
+
+/* Success Modal specific */
+.bf-modal--success .bf-modal__inner--success {
+	max-width: 800px;
+	text-align: center;
+	padding: 60px 40px;
+}
+
+.bf-modal__success-icon {
+	width: 80px;
+	height: 80px;
+	background: #0099cc;
+	border-radius: 50%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	margin: 0 auto 30px;
+}
+
+.bf-modal__success-title {
+	color: #0099cc;
+	font-size: 32px;
+	font-weight: 700;
+	margin-bottom: 20px;
+	line-height: 1.2;
+}
+
+.bf-modal__success-desc {
+	font-size: 16px;
+	color: #333;
+	line-height: 1.6;
+	margin-bottom: 30px;
+	max-width: 700px;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.bf-modal__success-redirect {
+	font-style: italic;
+	font-size: 18px;
+	color: #333;
+	margin-bottom: 10px;
+}
+
+.bf-modal__success-home {
+	font-size: 16px;
+	color: #333;
+}
+
+.bf-modal__success-home a {
+	color: #E24F26;
+	text-decoration: underline;
+	font-weight: 600;
+}

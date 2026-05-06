@@ -1,0 +1,146 @@
+/*
+ * CWC Wake — About: Home of World Champions
+ */
+
+.cwc-champions {
+	padding: var(--wp--preset--spacing--60) 0;
+	overflow: hidden;
+}
+
+.cwc-champions__header {
+	text-align: center;
+	margin-bottom: clamp(32px, 4vw, 56px);
+}
+
+.cwc-champions__title {
+	font-family: 'Sora', var(--wp--preset--font-family--heading);
+	font-weight: 700;
+	font-size: clamp(2rem, 4vw, 4rem);
+	line-height: 1.1;
+	text-transform: uppercase;
+	color: var(--wp--preset--color--text);
+	margin: 0 0 var(--wp--preset--spacing--10);
+}
+
+.cwc-champions__accent {
+	color: var(--wp--preset--color--primary);
+	font-style: italic;
+}
+
+.cwc-champions__desc {
+	font-family: 'Archivo', var(--wp--preset--font-family--body);
+	font-weight: 500;
+	font-size: clamp(16px, 0.5vw + 14px, 20px);
+	line-height: 1.5;
+	color: #1A1A1A;
+	margin: 0 auto;
+	max-width: 700px;
+}
+
+/* ── Carousel ── */
+
+.cwc-champions__carousel {
+	position: relative;
+	width: 100%;
+	height: clamp(300px, 40vw, 480px);
+	perspective: 1400px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.cwc-champions__track {
+	position: absolute;
+    top: 50%;
+    left: 50%;
+	width: clamp(230px, 28vw, 380px);
+	height: 100%;
+	transform-style: preserve-3d;
+}
+
+.cwc-champions__slide {
+	position: absolute;
+	left: 0;
+	top: 0;
+	width: 100%;
+	height: 100%;
+	overflow: hidden;
+	box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+}
+
+.cwc-champions__slide img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	display: block;
+}
+
+.cwc-champions__slide.is-active {
+}
+
+/* ── Phrase overlay ── */
+
+.cwc-champions__phrase-overlay {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	margin-top: clamp(24px, 4vw, 48px);
+}
+
+.cwc-champions__phrase {
+	display: none;
+	background: transparent;
+	color: #0096C7;
+	font-family: 'Sora', var(--wp--preset--font-family--heading);
+	font-weight: 700;
+	font-size: clamp(18px, 2vw + 6px, 48px);
+	line-height: 100%;
+	text-align: center;
+	padding: clamp(10px, 1.5vw, 18px) clamp(18px, 3vw, 40px);
+	white-space: nowrap;
+	animation: cwc-phrase-in 0.5s ease forwards;
+}
+
+.cwc-champions__phrase.is-active {
+	display: inline-block;
+}
+
+@keyframes cwc-phrase-in {
+	from { opacity: 0; transform: translateY(10px); }
+	to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Responsive ── */
+
+@media (max-width: 1024px) {
+	.cwc-champions__phrase-overlay {
+		flex-wrap: wrap;
+		gap: 12px;
+		margin-top: 32px;
+	}
+
+	.cwc-champions__phrase {
+		display: inline-block !important;
+		opacity: 1 !important;
+		transform: none !important;
+		animation: none !important;
+		white-space: normal;
+		font-size: clamp(14px, 2vw, 18px);
+		padding: 8px 16px;
+		border: 1px solid rgba(0, 150, 199, 0.2);
+		border-radius: 6px;
+		background: rgba(0, 150, 199, 0.05);
+	}
+}
+
+@media (max-width: 600px) {
+	.cwc-champions__carousel {
+		height: 260px;
+	}
+
+	.cwc-champions__phrase {
+		max-width: 90vw;
+	}
+}
