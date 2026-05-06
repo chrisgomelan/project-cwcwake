@@ -137,32 +137,59 @@ if ( ! function_exists( 'cwc_album_cover_url' ) ) {
  * they don't appear twice. Order strategies map directly onto
  * `WP_Query` ordering primitives.
  */
+
+/*
+ * Resolve the current "context" ID to exclude it from "More" sections.
+ * If we're on a singular album, we don't want to show that album (or its
+ * top-level parent if we're showing root albums) in the featured row.
+ */
+$current_root_id = 0;
+if ( is_singular( 'cwc_album' ) ) {
+	$ancestors = get_post_ancestors( get_the_ID() );
+	if ( ! empty( $ancestors ) ) {
+		$current_root_id = (int) end( $ancestors );
+	} else {
+		$current_root_id = (int) get_the_ID();
+	}
+}
+
 $more_ids = array();
 if ( $show_more_section && $more_limit > 0 ) {
+	// The pool for "More Albums" is either the children (if we have any)
+	// or the top-level albums (fallback).
+	$more_pool_source = ! empty( $albums ) ? $albums : cwc_album_get_children( 0 );
+
+	// Filter out the current context (self or root ancestor) BEFORE slicing,
+	// otherwise we might end up with fewer items than the limit if the
+	// current item was picked in the slice.
+	$more_pool_source = array_filter(
+		$more_pool_source,
+		static function ( $album ) use ( $current_root_id ) {
+			return (int) $album->ID !== $current_root_id;
+		}
+	);
+
 	switch ( $more_order_by ) {
 		case 'random':
-			$pool = ! empty( $albums ) ? $albums : cwc_album_get_children( 0 );
-			shuffle( $pool );
-			$more_ids = array_slice( wp_list_pluck( $pool, 'ID' ), 0, $more_limit );
+			shuffle( $more_pool_source );
 			break;
 
 		case 'menu_order':
-			$pool     = ! empty( $albums ) ? $albums : cwc_album_get_children( 0 );
-			$more_ids = array_slice( wp_list_pluck( $pool, 'ID' ), 0, $more_limit );
+			// Already ordered by menu_order via cwc_album_get_children.
 			break;
 
 		case 'latest':
 		default:
-			$pool = ! empty( $albums ) ? $albums : cwc_album_get_children( 0 );
 			usort(
-				$pool,
+				$more_pool_source,
 				static function ( $a, $b ) {
 					return strtotime( $b->post_date ) <=> strtotime( $a->post_date );
 				}
 			);
-			$more_ids = array_slice( wp_list_pluck( $pool, 'ID' ), 0, $more_limit );
 			break;
 	}
+
+	$more_ids = array_slice( wp_list_pluck( $more_pool_source, 'ID' ), 0, $more_limit );
 }
 
 $more_ids      = array_map( 'intval', $more_ids );
@@ -180,24 +207,11 @@ if ( $standard_limit > 0 ) {
 
 $more_pool = array();
 if ( ! empty( $more_ids ) ) {
-	$current_root_id = 0;
-	if ( is_singular( 'cwc_album' ) ) {
-		$ancestors = get_post_ancestors( get_the_ID() );
-		if ( ! empty( $ancestors ) ) {
-			$current_root_id = (int) end( $ancestors );
-		} else {
-			$current_root_id = (int) get_the_ID();
-		}
-	}
-
 	$all_possible = ! empty( $albums ) ? $albums : cwc_album_get_children( 0 );
 	$more_pool    = array_values(
 		array_filter(
 			$all_possible,
-			static function ( $album ) use ( $more_ids, $current_root_id ) {
-				if ( (int) $album->ID === $current_root_id ) {
-					return false;
-				}
+			static function ( $album ) use ( $more_ids ) {
 				return in_array( (int) $album->ID, $more_ids, true );
 			}
 		)

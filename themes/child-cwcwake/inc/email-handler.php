@@ -16,200 +16,330 @@ if (!defined('ABSPATH')) {
  * @param string $content The main HTML content of the email.
  * @return string The full HTML email payload.
  */
-function cwc_get_email_template($title, $content)
+function cwc_get_email_template($title, $content, $args = [])
 {
-	$logo_url = home_url('/wp-content/themes/child-cwcwake/assets/images/logo.svg'); // Try SVG first if possible, but fallback to text if broken
+	$logo_url = home_url('/wp-content/themes/child-cwcwake/assets/images/logo.png'); // Assuming a logo exists, or fallback to text
+	$ref_code = $args['ref'] ?? '';
+	$banner_title = $args['banner_title'] ?? "You're all set!";
+	$banner_subtitle = $args['banner_subtitle'] ?? "Your booking has been received and is being processed.";
 
 	ob_start();
 	?>
 	<!DOCTYPE html>
-	<html>
-
+	<html lang="en">
 	<head>
-		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<title><?php echo esc_html($title); ?></title>
+		<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Archivo:wght@400;500;600&display=swap" rel="stylesheet" />
 		<style>
+			* { margin: 0; padding: 0; box-sizing: border-box; }
 			body {
-				font-family: 'Inter', 'Roboto', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-				background-color: #F8FAFC;
+				background-color: #EBEBE6;
+				font-family: 'Archivo', sans-serif;
+				color: #1A1A1A;
+				-webkit-font-smoothing: antialiased;
 				margin: 0;
 				padding: 0;
-				color: #334155;
 			}
 
 			.email-wrapper {
-				width: 100%;
-				background-color: #F8FAFC;
-				padding: 40px 20px;
+				max-width: 600px;
+				margin: 40px auto;
+				background: #F5F1E8;
+				box-shadow: 0 20px 50px rgba(0,0,0,0.05);
 			}
 
-			.email-container {
-				max-width: 640px;
-				margin: 0 auto;
-				background-color: #ffffff;
-				border-radius: 12px;
-				overflow: hidden;
-				box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
+			/* Header */
+			.header {
+				background: #1A1A1A;
+				padding: 24px 36px;
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
 			}
-
-			.email-header {
-				background-color: #0096C7;
-				padding: 40px 30px;
-				text-align: center;
+			.logo {
+				font-family: 'Sora', sans-serif;
+				font-size: 14px;
+				font-weight: 700;
+				letter-spacing: 0.2em;
+				color: #F5F1E8;
+				text-transform: uppercase;
+				border: 1.5px solid rgba(255,255,255,0.3);
+				padding: 5px 10px;
+				text-decoration: none;
+				display: inline-block;
 			}
-
-			.email-header img {
-				max-height: 48px;
-				width: auto;
-				display: block;
-				margin: 0 auto;
-			}
-
-			.email-header h1 {
-				color: #ffffff;
-				margin: 0;
-				font-size: 24px;
-				letter-spacing: 3px;
-				font-weight: 800;
+			.header-ref {
+				font-family: 'Archivo', sans-serif;
+				font-size: 11px;
+				letter-spacing: 0.1em;
+				color: rgba(255,255,255,0.35);
 				text-transform: uppercase;
 			}
-
-			.email-body {
-				padding: 40px 40px 30px 40px;
+			.header-ref span {
+				color: #0096C7;
+				font-weight: 600;
 			}
 
-			.email-title {
+			/* Confirmation Banner */
+			.confirm-banner {
+				background: #0096C7;
+				padding: 36px 36px 32px;
+				display: flex;
+				align-items: flex-start;
+				gap: 20px;
+			}
+			.confirm-icon {
+				width: 48px;
+				height: 48px;
+				background: rgba(255,255,255,0.15);
+				border-radius: 50%;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				flex-shrink: 0;
 				font-size: 22px;
-				font-weight: 800;
-				margin-top: 0;
-				margin-bottom: 24px;
-				color: #0F172A;
+				color: #fff;
+			}
+			.confirm-text {}
+			.confirm-label {
+				font-family: 'Archivo', sans-serif;
+				font-size: 11px;
+				letter-spacing: 0.18em;
+				text-transform: uppercase;
+				color: rgba(255,255,255,0.7);
+				margin-bottom: 6px;
+			}
+			.confirm-title {
+				font-family: 'Sora', sans-serif;
+				font-size: 24px;
+				font-weight: 700;
+				color: #FFFFFF;
+				line-height: 1.2;
+			}
+			.confirm-subtitle {
+				font-family: 'Archivo', sans-serif;
+				font-size: 14px;
+				color: rgba(255,255,255,0.75);
+				margin-top: 6px;
+				line-height: 1.5;
 			}
 
-			.email-content {
+			/* Content Body */
+			.email-body {
+				padding: 36px;
+			}
+			.email-body p {
+				font-family: 'Archivo', sans-serif;
 				font-size: 15px;
-				line-height: 1.6;
-				color: #475569;
+				line-height: 1.7;
+				color: #444;
+				margin-bottom: 20px;
+			}
+			.email-body p strong {
+				color: #1A1A1A;
+				font-weight: 600;
 			}
 
+			/* Trip Summary Card (Used in content) */
+			.trip-card {
+				margin: 20px 0;
+				border: 1.5px solid rgba(0,0,0,0.1);
+				background: #fff;
+			}
+			.trip-card-header {
+				background: #1A1A1A;
+				padding: 14px 22px;
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+			}
+			.trip-card-header-label {
+				font-family: 'Sora', sans-serif;
+				font-size: 12px;
+				font-weight: 600;
+				letter-spacing: 0.12em;
+				text-transform: uppercase;
+				color: rgba(255,255,255,0.6);
+			}
+			.trip-card-header-status {
+				font-family: 'Archivo', sans-serif;
+				font-size: 11px;
+				font-weight: 600;
+				letter-spacing: 0.1em;
+				text-transform: uppercase;
+				background: #0096C7;
+				color: #fff;
+				padding: 3px 10px;
+			}
+
+			/* Details Tables */
+			.details-title {
+				font-family: 'Sora', sans-serif;
+				font-size: 13px;
+				font-weight: 700;
+				letter-spacing: 0.1em;
+				text-transform: uppercase;
+				color: #1A1A1A;
+				margin-top: 32px;
+				margin-bottom: 12px;
+			}
 			.details-table {
 				width: 100%;
-				border-collapse: separate;
-				border-spacing: 0;
-				margin: 32px 0;
-				border-radius: 8px;
-				overflow: hidden;
-				border: 1px solid #E2E8F0;
+				border-collapse: collapse;
+				margin-bottom: 24px;
 			}
-
-			.details-table th,
+			.details-table tr {
+				border-bottom: 1px solid rgba(0,0,0,0.06);
+			}
+			.details-table tr:last-child { border-bottom: none; }
 			.details-table td {
-				padding: 16px 24px;
-				border-bottom: 1px solid #E2E8F0;
-				text-align: left;
+				padding: 12px 0;
+				font-family: 'Archivo', sans-serif;
+				font-size: 14px;
+				vertical-align: top;
 			}
-
-			.details-table tr:last-child td {
-				border-bottom: none;
-			}
-
-			.details-table tr:nth-child(even) {
-				background-color: #F8FAFC;
-			}
-
-			.details-label {
-				font-weight: 600;
-				color: #64748B;
+			.details-table td:first-child {
+				color: #888;
 				width: 40%;
 				font-size: 13px;
-				text-transform: uppercase;
-				letter-spacing: 0.5px;
 			}
-
-			.details-value {
-				font-weight: 600;
-				color: #0F172A;
-				font-size: 15px;
+			.details-table td:last-child {
+				color: #1A1A1A;
+				font-weight: 500;
+				text-align: right;
 			}
-
 			.details-highlight {
-				color: #0096C7;
-				font-weight: 800;
+				color: #0096C7 !important;
+				font-weight: 700 !important;
 			}
 
-			.admin-note {
-				background-color: #E5F4FA;
-				border-left: 4px solid #0096C7;
-				padding: 20px 24px;
-				margin: 32px 0;
-				border-radius: 0 8px 8px 0;
-			}
-
-			.admin-note p {
-				margin: 0;
-				color: #334155;
+			/* Admin Note / Payment Note */
+			.admin-note, .payment-note {
+				background: rgba(0,150,199,0.07);
+				border-left: 3px solid #0096C7;
+				padding: 14px 16px;
+				margin: 24px 0;
+				font-family: 'Archivo', sans-serif;
+				font-size: 13px;
+				color: #555;
 				line-height: 1.6;
 			}
+			.admin-note strong, .payment-note strong { color: #1A1A1A; }
 
-			.admin-note .note-title {
-				font-weight: 800;
-				color: #0F172A;
-				margin-bottom: 8px;
-				font-size: 13px;
+			/* Divider */
+			.divider {
+				margin: 28px 0;
+				border: none;
+				border-top: 1px solid rgba(0,0,0,0.08);
+			}
+
+			/* Footer */
+			.footer {
+				background: #1A1A1A;
+				padding: 28px 36px;
+			}
+			.footer-top {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				margin-bottom: 20px;
+			}
+			.footer-logo {
+				font-family: 'Sora', sans-serif;
+				font-size: 11px;
+				font-weight: 700;
+				letter-spacing: 0.2em;
+				color: #F5F1E8;
 				text-transform: uppercase;
-				letter-spacing: 0.5px;
+				border: 1.5px solid rgba(255,255,255,0.2);
+				padding: 4px 9px;
+				text-decoration: none;
+				display: inline-block;
 			}
-
-			.email-footer {
-				background-color: #F1F5F9;
-				padding: 32px 40px;
-				text-align: center;
-				font-size: 14px;
-				color: #64748B;
+			.footer-support {
+				font-family: 'Archivo', sans-serif;
+				font-size: 12px;
+				color: rgba(255,255,255,0.35);
+				text-align: right;
 			}
-
-			.email-footer p {
-				margin: 8px 0;
-			}
-
-			.email-footer a {
+			.footer-support a {
 				color: #0096C7;
 				text-decoration: none;
-				font-weight: 600;
 			}
+			.footer-divider {
+				border: none;
+				border-top: 1px solid rgba(255,255,255,0.07);
+				margin-bottom: 16px;
+			}
+			.footer-legal {
+				font-family: 'Archivo', sans-serif;
+				font-size: 11px;
+				color: rgba(255,255,255,0.2);
+				line-height: 1.7;
+			}
+			.footer-legal a { color: rgba(255,255,255,0.3); text-decoration: underline; }
 
-			.email-footer a:hover {
-				text-decoration: underline;
+			@media (max-width: 520px) {
+				.email-wrapper { margin: 0; width: 100%; }
+				.header, .confirm-banner, .email-body, .footer {
+					padding-left: 20px; padding-right: 20px;
+				}
+				.confirm-title { font-size: 20px; }
+				.footer-top { flex-direction: column; align-items: flex-start; gap: 16px; }
+				.footer-support { text-align: left; }
 			}
 		</style>
 	</head>
-
 	<body>
 		<div class="email-wrapper">
-			<div class="email-container">
-				<div class="email-header">
-					<h1>CWC WAKE PARK</h1>
+			<!-- Header -->
+			<div class="header">
+				<a href="<?php echo esc_url(home_url()); ?>" class="logo">CWC WAKE PARK</a>
+				<?php if ($ref_code): ?>
+					<div class="header-ref">Ref: <span>#<?php echo esc_html($ref_code); ?></span></div>
+				<?php endif; ?>
+			</div>
+
+			<!-- Confirmation Banner -->
+			<div class="confirm-banner">
+				<div class="confirm-icon">✓</div>
+				<div class="confirm-text">
+					<div class="confirm-label"><?php echo esc_html($title); ?></div>
+					<div class="confirm-title"><?php echo esc_html($banner_title); ?></div>
+					<div class="confirm-subtitle"><?php echo $banner_subtitle; ?></div>
 				</div>
-				<div class="email-body">
-					<h2 class="email-title"><?php echo esc_html($title); ?></h2>
-					<div class="email-content">
-						<?php echo $content; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+			</div>
+
+			<!-- Main Body -->
+			<div class="email-body">
+				<?php echo $content; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+			</div>
+
+			<!-- Footer -->
+			<div class="footer">
+				<div class="footer-top">
+					<a href="<?php echo esc_url(home_url()); ?>" class="footer-logo">CWC</a>
+					<div class="footer-support">
+						Need help?<br/>
+						<a href="mailto:info@cwcwake.com">info@cwcwake.com</a> · +63 2 8888 0000
 					</div>
 				</div>
-				<div class="email-footer">
-					<p>&copy; <?php echo date('Y'); ?> CWC Wake Park. All rights reserved.</p>
-					<p><a href="<?php echo esc_url(home_url()); ?>">Visit our website</a> &nbsp;&bull;&nbsp; <a
-							href="mailto:info@cwcwake.com">Contact Support</a></p>
+				<hr class="footer-divider" />
+				<div class="footer-legal">
+					&copy; <?php echo date('Y'); ?> CWC World Travel Co. · All rights reserved.<br/>
+					This is a transactional email regarding your inquiry or booking.<br/>
+					<a href="<?php echo esc_url(home_url('/privacy-policy')); ?>">Privacy Policy</a> · <a href="<?php echo esc_url(home_url('/terms-and-conditions')); ?>">Terms & Conditions</a>
 				</div>
 			</div>
 		</div>
 	</body>
-
 	</html>
 	<?php
 	return ob_get_clean();
 }
+
 
 /**
  * Handle booking submission via AJAX.
@@ -255,31 +385,17 @@ function cwc_submit_booking()
 	// Check room availability for the selected dates
 	if (function_exists('cwc_count_overlapping_bookings') && function_exists('cwc_get_room_inventory')) {
 		$room_clean = preg_replace('/\s+Room$/i', '', trim($room));
-		$room_posts = get_posts([
-			'post_type' => 'accommodation',
-			'post_status' => 'publish',
-			'posts_per_page' => -1,
-		]);
 		$room_post_id = 0;
-		foreach ($room_posts as $rp) {
-			$rp_title = strtolower(trim($rp->post_title));
-			$room_clean_lower = strtolower(trim($room_clean));
-			$room_full_lower = strtolower(trim($room));
-
-			if ($rp_title === $room_clean_lower || $rp_title === $room_full_lower || preg_replace('/\s+Room$/i', '', $rp_title) === $room_clean_lower) {
-				$room_post_id = $rp->ID;
-				break;
-			}
+		if (function_exists('cwc_find_accommodation_post_by_room_name')) {
+			$room_post = cwc_find_accommodation_post_by_room_name($room);
+			$room_post_id = $room_post instanceof WP_Post ? (int) $room_post->ID : 0;
 		}
 
 		if ($room_post_id) {
-			$total_units = cwc_get_room_inventory($room_post_id);
 			$overlapping = cwc_count_overlapping_bookings($room, $checkin_date, $checkout_date);
-			$available_units = max(0, $total_units - $overlapping);
-
-			if ($available_units <= 0) {
+			if ($overlapping > 0) {
 				wp_send_json_error([
-					'message' => 'Sorry, this room type is fully booked for your selected dates. Please choose different dates or another room.',
+					'message' => 'Sorry, this room is already reserved for your selected dates. Please choose different dates.',
 					'fully_booked' => true,
 				]);
 			}
@@ -308,6 +424,14 @@ function cwc_submit_booking()
 		update_post_meta($booking_id, '_cwc_bk_nights', $nights);
 		$price_num = (float) preg_replace('/[^0-9.]/', '', $price);
 		update_post_meta($booking_id, '_cwc_bk_price_num', $price_num);
+
+		if (!empty($room_post_id) && function_exists('cwc_sync_booking_room_link')) {
+			cwc_sync_booking_room_link($booking_id, $room_post_id);
+		}
+
+		if (!empty($room_post_id) && function_exists('cwc_assign_available_unit_to_booking')) {
+			cwc_assign_available_unit_to_booking($booking_id, $room_post_id, $checkin_date, $checkout_date);
+		}
 
 		/* ── PayMongo Integration ── */
 		$paymongo_methods = ['paymaya'];
@@ -361,22 +485,6 @@ function cwc_submit_booking()
 			error_log('PayMongo Error: ' . print_r($response, true));
 		}
 
-		// Automatically mark an available physical room as booked
-		if (isset($room_post_id) && $room_post_id && function_exists('cwc_get_physical_rooms')) {
-			$physical_rooms = cwc_get_physical_rooms($room_post_id);
-			$updated = false;
-			foreach ($physical_rooms as &$p_room) {
-				if (($p_room['status'] ?? 'available') === 'available') {
-					$p_room['status'] = 'booked';
-					$updated = true;
-					update_post_meta($booking_id, '_cwc_bk_assigned_room', $p_room['name'] ?? '');
-					break;
-				}
-			}
-			if ($updated) {
-				update_post_meta($room_post_id, '_cwc_physical_rooms', wp_json_encode($physical_rooms));
-			}
-		}
 	}
 
 	// Retrieve auto-generated reference from the insert hook
@@ -387,70 +495,99 @@ function cwc_submit_booking()
 	ob_start();
 	?>
 	<p>Hi <strong><?php echo esc_html($name); ?></strong>,</p>
-	<p>Thank you for choosing CWC Wake Park! We have received your booking request. Here are the details of your
-		reservation:</p>
+	<p>Thank you for choosing CWC Wake Park! Your booking has been confirmed and we've reserved your space. Please review your itinerary details below.</p>
 
+	<!-- Stay Summary Card -->
+	<div class="trip-card">
+		<div class="trip-card-header">
+			<span class="trip-card-header-label">Stay Summary</span>
+			<span class="trip-card-header-status">Confirmed</span>
+		</div>
+		<div style="padding: 24px 22px;">
+			<div style="display: flex; justify-content: space-between; align-items: flex-end;">
+				<div>
+					<div style="font-family: 'Sora', sans-serif; font-size: 24px; font-weight: 800; color: #1A1A1A; line-height: 1;"><?php echo esc_html($room); ?></div>
+					<div style="font-family: 'Archivo', sans-serif; font-size: 12px; color: #888; margin-top: 4px;">CWC Wake Park · Camarines Sur</div>
+				</div>
+				<?php if ($assigned_room): ?>
+				<div style="text-align: right;">
+					<div style="font-family: 'Archivo', sans-serif; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: #aaa; margin-bottom: 2px;">Assigned Unit</div>
+					<div style="font-family: 'Sora', sans-serif; font-size: 16px; font-weight: 700; color: #0096C7;"><?php echo esc_html($assigned_room); ?></div>
+				</div>
+				<?php endif; ?>
+			</div>
+
+			<hr style="margin: 20px 0; border: none; border-top: 1px solid rgba(0,0,0,0.07);" />
+
+			<div style="display: flex; gap: 20px;">
+				<div style="flex: 1;">
+					<div style="font-family: 'Archivo', sans-serif; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: #aaa; margin-bottom: 5px;">Check-in</div>
+					<div style="font-family: 'Sora', sans-serif; font-size: 14px; font-weight: 600; color: #1A1A1A;"><?php echo esc_html(date('M j, Y', strtotime($checkin))); ?></div>
+					<div style="font-family: 'Archivo', sans-serif; font-size: 12px; color: #888; margin-top: 2px;">from 14:00</div>
+				</div>
+				<div style="flex: 1;">
+					<div style="font-family: 'Archivo', sans-serif; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: #aaa; margin-bottom: 5px;">Check-out</div>
+					<div style="font-family: 'Sora', sans-serif; font-size: 14px; font-weight: 600; color: #1A1A1A;"><?php echo esc_html(date('M j, Y', strtotime($checkout))); ?></div>
+					<div style="font-family: 'Archivo', sans-serif; font-size: 12px; color: #888; margin-top: 2px;">by 12:00</div>
+				</div>
+				<div style="flex: 1;">
+					<div style="font-family: 'Archivo', sans-serif; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: #aaa; margin-bottom: 5px;">Duration</div>
+					<div style="font-family: 'Sora', sans-serif; font-size: 14px; font-weight: 600; color: #1A1A1A;"><?php echo esc_html($nights); ?> Night<?php echo $nights > 1 ? 's' : ''; ?></div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="details-title">Guest Details</div>
 	<table class="details-table">
-		<?php if ($ref): ?>
-			<tr>
-				<td class="details-label">Booking Reference</td>
-				<td class="details-value details-highlight"><?php echo esc_html($ref); ?></td>
-			</tr>
+		<tr>
+			<td>Primary Guest</td>
+			<td><?php echo esc_html($name); ?></td>
+		</tr>
+		<tr>
+			<td>Phone Number</td>
+			<td><?php echo esc_html($phone); ?></td>
+		</tr>
+		<tr>
+			<td>Email Address</td>
+			<td><?php echo esc_html($email); ?></td>
+		</tr>
+		<?php if (!empty($guests) && is_array($guests)): ?>
+			<?php foreach ($guests as $index => $guest): ?>
+				<tr>
+					<td>Additional Guest <?php echo $index + 1; ?></td>
+					<td><?php echo esc_html($guest['name']); ?> (<?php echo esc_html(ucfirst($guest['type'])); ?>)</td>
+				</tr>
+			<?php endforeach; ?>
 		<?php endif; ?>
+	</table>
+
+	<div class="details-title">Payment Summary</div>
+	<table class="details-table">
 		<tr>
-			<td class="details-label">Room Type</td>
-			<td class="details-value"><?php echo esc_html($room); ?></td>
-		</tr>
-		<?php if ($assigned_room): ?>
-			<tr>
-				<td class="details-label">Room Number</td>
-				<td class="details-value details-highlight"><?php echo esc_html($assigned_room); ?></td>
-			</tr>
-		<?php endif; ?>
-		<tr>
-			<td class="details-label">Check-in Date</td>
-			<td class="details-value"><?php echo esc_html($checkin); ?></td>
+			<td>Payment Method</td>
+			<td style="text-transform: uppercase;"><?php echo esc_html($payment_method); ?></td>
 		</tr>
 		<tr>
-			<td class="details-label">Check-out Date</td>
-			<td class="details-value"><?php echo esc_html($checkout); ?></td>
-		</tr>
-		<tr>
-			<td class="details-label">Duration</td>
-			<td class="details-value"><?php echo esc_html($nights); ?> night<?php echo $nights > 1 ? 's' : ''; ?></td>
-		</tr>
-		<tr>
-			<td class="details-label">Phone Number</td>
-			<td class="details-value"><?php echo esc_html($phone); ?></td>
-		</tr>
-		<tr>
-			<td class="details-label">Payment Method</td>
-			<td class="details-value" style="text-transform: uppercase;"><?php echo esc_html($payment_method); ?></td>
-		</tr>
-		<tr>
-			<td class="details-label">Total Price</td>
-			<td class="details-value details-highlight"><?php echo esc_html($price); ?></td>
+			<td>Total Charged</td>
+			<td class="details-highlight" style="font-size: 18px;"><?php echo esc_html($price); ?></td>
 		</tr>
 	</table>
 
-	<?php if (!empty($guests) && is_array($guests)): ?>
-		<h3 class="email-title" style="font-size: 18px; margin-top: 32px; margin-bottom: 16px;">Additional Guests</h3>
-		<ul style="padding-left: 20px; color: #475569; line-height: 1.6;">
-			<?php foreach ($guests as $guest): ?>
-				<li><strong><?php echo esc_html($guest['name']); ?></strong>
-					(<?php echo esc_html(ucfirst($guest['type'])); ?>)</li>
-			<?php endforeach; ?>
-		</ul>
-	<?php endif; ?>
+	<div class="payment-note">
+		<strong>Booking Status: Pending Confirmation</strong> — Our team will verify your payment and details. You will receive a final confirmation once processed. If you have any questions, please contact us at info@cwcwake.com.
+	</div>
 
-	<p style="margin-top: 32px;">If you have any questions or need to make changes to your reservation, please don't
-		hesitate to reply to this email.</p>
-	<p>We look forward to hosting you!</p>
-	<p>Best regards,<br><strong>The CWC Wake Park Team</strong></p>
+	<p style="margin-top: 32px;">We look forward to hosting you at CWC Wake Park!</p>
+	<p>Best regards,<br><strong>The CWC Team</strong></p>
 	<?php
 	$email_content = ob_get_clean();
 
-	$full_html = cwc_get_email_template('Your Booking Confirmation', $email_content);
+	$full_html = cwc_get_email_template('Booking Confirmation', $email_content, [
+		'ref' => $ref,
+		'banner_title' => "You're all set, " . explode(' ', $name)[0] . "!",
+		'banner_subtitle' => "Your reservation at CWC Wake Park is confirmed.<br/>A summary has been sent to " . esc_html($email)
+	]);
 
 	$headers = array('Content-Type: text/html; charset=UTF-8');
 
@@ -487,31 +624,35 @@ function cwc_submit_inquiry()
 	// Build the email content
 	ob_start();
 	?>
-	<p>You have received a new inquiry from the <strong>Rates & Park Hours</strong> page.</p>
+	<p>You have received a new inquiry from the <strong>Rates & Park Hours</strong> page. Please find the details below:</p>
 
+	<div class="details-title">Inquiry Details</div>
 	<table class="details-table">
 		<tr>
-			<td class="details-label" style="width: 30%;">From</td>
-			<td class="details-value"><?php echo esc_html($email); ?></td>
+			<td>From</td>
+			<td><?php echo esc_html($email); ?></td>
 		</tr>
 		<tr>
-			<td class="details-label" style="width: 30%;">Subject</td>
-			<td class="details-value"><?php echo esc_html($subject); ?></td>
-		</tr>
-		<tr>
-			<td class="details-label" style="width: 30%; vertical-align: top;">Message</td>
-			<td class="details-value" style="font-weight: 400; line-height: 1.6;">
-				<?php echo nl2br(esc_html($message)); ?></td>
+			<td>Subject</td>
+			<td><?php echo esc_html($subject); ?></td>
 		</tr>
 	</table>
 
-	<p style="font-size: 14px; color: #71717a; margin-top: 24px;">
-		<em>Note: You can reply directly to this email to contact the visitor.</em>
-	</p>
+	<div class="details-title">Message</div>
+	<div style="background: #fff; border: 1.5px solid rgba(0,0,0,0.07); padding: 20px; font-family: 'Archivo', sans-serif; font-size: 14px; line-height: 1.6; color: #1A1A1A;">
+		<?php echo nl2br(esc_html($message)); ?>
+	</div>
+
+	<div class="payment-note" style="margin-top: 32px;">
+		<strong>Note:</strong> You can reply directly to this email to contact the visitor. This inquiry was sent via the global contact system.
+	</div>
 	<?php
 	$email_content = ob_get_clean();
 
-	$full_html = cwc_get_email_template('New Inquiry: ' . $subject, $email_content);
+	$full_html = cwc_get_email_template('New Inquiry', $email_content, [
+		'banner_title' => $subject,
+		'banner_subtitle' => "A visitor has sent a message regarding: " . esc_html($subject)
+	]);
 
 	$headers = array(
 		'Content-Type: text/html; charset=UTF-8',

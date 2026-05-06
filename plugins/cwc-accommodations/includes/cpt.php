@@ -35,19 +35,53 @@ if ( ! defined( 'ABSPATH' ) ) {
  * CPT registration
  * --------------------------------------------------------- */
 
-function cwc_get_room_inventory( $post_id ) {
-	$physical_rooms = cwc_get_physical_rooms( $post_id );
-	if ( ! empty( $physical_rooms ) ) {
-		$count = 0;
-		foreach ( $physical_rooms as $room ) {
-			if ( 'available' === ( $room['status'] ?? 'available' ) ) {
-				$count++;
-			}
-		}
-		return $count;
+function cwc_normalize_room_title_key( $room_name ) {
+	$room_name = is_string( $room_name ) ? trim( $room_name ) : '';
+	$room_name = preg_replace( '/\s+Room$/i', '', $room_name );
+	return strtolower( $room_name );
+}
+
+function cwc_normalize_physical_room_rows( $rooms ) {
+	if ( ! is_array( $rooms ) ) {
+		return [];
 	}
-	$inventory = get_post_meta( $post_id, '_cwc_inventory', true );
-	return $inventory !== '' ? intval( $inventory ) : 1; // Default to 1 if not set
+
+	$normalized = [];
+	foreach ( $rooms as $room ) {
+		if ( ! is_array( $room ) ) {
+			continue;
+		}
+
+		$name = sanitize_text_field( $room['name'] ?? '' );
+		if ( '' === $name ) {
+			continue;
+		}
+
+		$id = isset( $room['id'] ) ? preg_replace( '/[^a-z0-9_-]/i', '', (string) $room['id'] ) : '';
+		if ( '' === $id ) {
+			$id = 'unit_' . wp_generate_password( 12, false, false );
+		}
+
+		$status = sanitize_key( $room['status'] ?? 'available' );
+		if ( ! in_array( $status, [ 'available', 'booked' ], true ) ) {
+			$status = 'available';
+		}
+
+		$normalized[] = [
+			'id'     => strtolower( $id ),
+			'name'   => $name,
+			'status' => $status,
+		];
+	}
+
+	return $normalized;
+}
+
+function cwc_update_physical_rooms( $post_id, array $rooms ) {
+	$rooms = cwc_normalize_physical_room_rows( $rooms );
+	update_post_meta( $post_id, '_cwc_physical_rooms', wp_json_encode( $rooms ) );
+	update_post_meta( $post_id, '_cwc_inventory', count( $rooms ) );
+	return $rooms;
 }
 
 function cwc_get_physical_rooms( $post_id ) {
@@ -55,7 +89,316 @@ function cwc_get_physical_rooms( $post_id ) {
 	if ( empty( $rooms_raw ) ) {
 		return [];
 	}
-	return json_decode( $rooms_raw, true ) ?: [];
+
+	$decoded = json_decode( $rooms_raw, true );
+	if ( ! is_array( $decoded ) ) {
+		return [];
+	}
+
+	$normalized = cwc_normalize_physical_room_rows( $decoded );
+	if ( wp_json_encode( $decoded ) !== wp_json_encode( $normalized ) ) {
+		cwc_update_physical_rooms( $post_id, $normalized );
+	}
+
+	return $normalized;
+}
+
+function cwc_get_room_inventory( $post_id ) {
+	$physical_rooms = cwc_get_physical_rooms( $post_id );
+	if ( ! empty( $physical_rooms ) ) {
+		return count( $physical_rooms );
+	}
+	$inventory = get_post_meta( $post_id, '_cwc_inventory', true );
+	return $inventory !== '' ? intval( $inventory ) : 1;
+}
+
+function cwc_get_room_blocked_unit_count( $post_id ) {
+	$count = 0;
+	foreach ( cwc_get_physical_rooms( $post_id ) as $room ) {
+		if ( 'booked' === ( $room['status'] ?? 'available' ) ) {
+			$count++;
+		}
+	}
+	return $count;
+}
+
+function cwc_find_accommodation_post_by_room_name( $room_name ) {
+	$room_key = cwc_normalize_room_title_key( $room_name );
+	if ( '' === $room_key ) {
+		return null;
+	}
+
+	$room_posts = get_posts( [
+		'post_type'      => 'accommodation',
+		'post_status'    => 'publish',
+		'posts_per_page' => -1,
+	] );
+
+	foreach ( $room_posts as $room_post ) {
+		if ( cwc_normalize_room_title_key( $room_post->post_title ) === $room_key ) {
+			return $room_post;
+		}
+	}
+
+	return null;
+}
+
+function cwc_booking_status_is_active( $status ) {
+	return in_array( $status, [ 'pending', 'confirmed', 'checked-in' ], true );
+}
+
+function cwc_get_booking_room_post_id( $booking_id ) {
+	$booking_id = (int) $booking_id;
+	if ( $booking_id <= 0 ) {
+		return 0;
+	}
+
+	$post_parent = (int) get_post_field( 'post_parent', $booking_id );
+	if ( $post_parent > 0 && 'accommodation' === get_post_type( $post_parent ) ) {
+		return $post_parent;
+	}
+
+	$room_post_id = (int) get_post_meta( $booking_id, '_cwc_bk_room_post_id', true );
+	if ( $room_post_id > 0 && 'accommodation' === get_post_type( $room_post_id ) ) {
+		return $room_post_id;
+	}
+
+	$room_name = (string) get_post_meta( $booking_id, '_cwc_bk_room', true );
+	$room_post = cwc_find_accommodation_post_by_room_name( $room_name );
+	if ( ! $room_post instanceof WP_Post ) {
+		return 0;
+	}
+
+	$room_post_id = (int) $room_post->ID;
+	update_post_meta( $booking_id, '_cwc_bk_room_post_id', $room_post_id );
+	wp_update_post( [
+		'ID'          => $booking_id,
+		'post_parent' => $room_post_id,
+	] );
+
+	return $room_post_id;
+}
+
+function cwc_get_booking_assigned_unit_id( $booking_id ) {
+	$booking_id = (int) $booking_id;
+	if ( $booking_id <= 0 ) {
+		return '';
+	}
+
+	$unit_id = (string) get_post_meta( $booking_id, '_cwc_bk_assigned_unit_id', true );
+	if ( '' !== $unit_id ) {
+		return $unit_id;
+	}
+
+	$assigned_room_name = (string) get_post_meta( $booking_id, '_cwc_bk_assigned_room', true );
+	$room_post_id       = cwc_get_booking_room_post_id( $booking_id );
+	if ( '' === $assigned_room_name || $room_post_id <= 0 ) {
+		return '';
+	}
+
+	foreach ( cwc_get_physical_rooms( $room_post_id ) as $room ) {
+		if ( $assigned_room_name === ( $room['name'] ?? '' ) && ! empty( $room['id'] ) ) {
+			update_post_meta( $booking_id, '_cwc_bk_assigned_unit_id', $room['id'] );
+			return $room['id'];
+		}
+	}
+
+	return '';
+}
+
+function cwc_find_physical_room_by_booking( $booking_id ) {
+	$room_post_id = cwc_get_booking_room_post_id( $booking_id );
+	if ( $room_post_id <= 0 ) {
+		return null;
+	}
+
+	$unit_id             = cwc_get_booking_assigned_unit_id( $booking_id );
+	$assigned_room_name  = (string) get_post_meta( $booking_id, '_cwc_bk_assigned_room', true );
+	$physical_rooms      = cwc_get_physical_rooms( $room_post_id );
+
+	foreach ( $physical_rooms as $index => $room ) {
+		$room_id   = (string) ( $room['id'] ?? '' );
+		$room_name = (string) ( $room['name'] ?? '' );
+		if ( ( '' !== $unit_id && $room_id === $unit_id ) || ( '' === $unit_id && '' !== $assigned_room_name && $room_name === $assigned_room_name ) ) {
+			return [
+				'post_id' => $room_post_id,
+				'index'   => $index,
+				'room'    => $room,
+			];
+		}
+	}
+
+	return null;
+}
+
+function cwc_booking_overlaps_range( $booking_id, $checkin_date, $checkout_date, $exclude_booking_id = 0 ) {
+	$booking_id = (int) $booking_id;
+	if ( $booking_id <= 0 || (int) $exclude_booking_id === $booking_id ) {
+		return false;
+	}
+
+	$status = (string) get_post_meta( $booking_id, '_cwc_bk_status', true );
+	if ( ! cwc_booking_status_is_active( $status ) ) {
+		return false;
+	}
+
+	$bk_checkin  = (string) get_post_meta( $booking_id, '_cwc_bk_checkin', true );
+	$bk_checkout = (string) get_post_meta( $booking_id, '_cwc_bk_checkout', true );
+	if ( '' === $bk_checkin || '' === $bk_checkout ) {
+		return false;
+	}
+
+	$bk_ci = date( 'Y-m-d', strtotime( $bk_checkin ) );
+	$bk_co = date( 'Y-m-d', strtotime( $bk_checkout ) );
+	return $bk_ci < $checkout_date && $bk_co > $checkin_date;
+}
+
+function cwc_get_overlapping_booking_ids_for_room_post( $room_post_id, $checkin_date, $checkout_date, $exclude_booking_id = 0 ) {
+	$room_post_id = (int) $room_post_id;
+	if ( $room_post_id <= 0 ) {
+		return [];
+	}
+
+	$booking_ids = get_posts( [
+		'post_type'      => 'cwc_booking',
+		'post_status'    => 'publish',
+		'posts_per_page' => -1,
+		'fields'         => 'ids',
+	] );
+
+	$matches = [];
+	foreach ( $booking_ids as $booking_id ) {
+		if ( cwc_get_booking_room_post_id( $booking_id ) !== $room_post_id ) {
+			continue;
+		}
+
+		if ( cwc_booking_overlaps_range( $booking_id, $checkin_date, $checkout_date, $exclude_booking_id ) ) {
+			$matches[] = (int) $booking_id;
+		}
+	}
+
+	return $matches;
+}
+
+function cwc_get_room_unit_allocation( $room_post_id, $checkin_date, $checkout_date, $exclude_booking_id = 0 ) {
+	$room_post_id = (int) $room_post_id;
+	$units        = cwc_get_physical_rooms( $room_post_id );
+	$booking_ids  = cwc_get_overlapping_booking_ids_for_room_post( $room_post_id, $checkin_date, $checkout_date, $exclude_booking_id );
+
+	usort(
+		$booking_ids,
+		static function ( $left, $right ) {
+			$left_date  = strtotime( (string) get_post_meta( $left, '_cwc_bk_checkin', true ) ) ?: 0;
+			$right_date = strtotime( (string) get_post_meta( $right, '_cwc_bk_checkin', true ) ) ?: 0;
+			if ( $left_date === $right_date ) {
+				return $left <=> $right;
+			}
+			return $left_date <=> $right_date;
+		}
+	);
+
+	if ( empty( $units ) ) {
+		$total_units = cwc_get_room_inventory( $room_post_id );
+		$occupied    = count( $booking_ids );
+		return [
+			'total_units'          => $total_units,
+			'booking_ids'          => $booking_ids,
+			'booking_to_unit'      => [],
+			'occupied_unit_ids'    => [],
+			'manual_blocked_ids'   => [],
+			'available_unit_ids'   => [],
+			'manual_blocked_count' => 0,
+			'occupied_count'       => $occupied,
+			'available_units'      => max( 0, $total_units - $occupied ),
+			'overflow_booking_ids' => [],
+		];
+	}
+
+	$unit_map           = [];
+	$manual_blocked_ids = [];
+	$available_pool     = [];
+
+	foreach ( $units as $unit ) {
+		$unit_id = (string) ( $unit['id'] ?? '' );
+		if ( '' === $unit_id ) {
+			continue;
+		}
+
+		$unit_map[ $unit_id ] = $unit;
+		if ( 'booked' === ( $unit['status'] ?? 'available' ) ) {
+			$manual_blocked_ids[ $unit_id ] = true;
+		} else {
+			$available_pool[ $unit_id ] = $unit;
+		}
+	}
+
+	$booking_to_unit = [];
+	$pending_ids     = [];
+	$used_unit_ids   = [];
+
+	foreach ( $booking_ids as $booking_id ) {
+		$unit_id = cwc_get_booking_assigned_unit_id( $booking_id );
+		if ( '' !== $unit_id && isset( $unit_map[ $unit_id ] ) && ! isset( $used_unit_ids[ $unit_id ] ) ) {
+			$booking_to_unit[ $booking_id ] = $unit_map[ $unit_id ];
+			$used_unit_ids[ $unit_id ] = true;
+			unset( $available_pool[ $unit_id ] );
+			continue;
+		}
+		$pending_ids[] = $booking_id;
+	}
+
+	foreach ( $pending_ids as $booking_id ) {
+		$next_unit_id = array_key_first( $available_pool );
+		if ( null === $next_unit_id ) {
+			break;
+		}
+
+		$booking_to_unit[ $booking_id ] = $available_pool[ $next_unit_id ];
+		$used_unit_ids[ $next_unit_id ] = true;
+		unset( $available_pool[ $next_unit_id ] );
+	}
+
+	$occupied_unit_ids = [];
+	foreach ( $booking_to_unit as $booking_id => $unit ) {
+		$unit_id = (string) ( $unit['id'] ?? '' );
+		if ( '' !== $unit_id ) {
+			$occupied_unit_ids[ $unit_id ] = true;
+		}
+	}
+
+	$effective_manual_blocks = array_diff_key( $manual_blocked_ids, $occupied_unit_ids );
+	$overflow_booking_ids    = array_values( array_diff( $booking_ids, array_keys( $booking_to_unit ) ) );
+
+	return [
+		'total_units'          => count( $unit_map ),
+		'booking_ids'          => $booking_ids,
+		'booking_to_unit'      => $booking_to_unit,
+		'occupied_unit_ids'    => array_keys( $occupied_unit_ids ),
+		'manual_blocked_ids'   => array_keys( $effective_manual_blocks ),
+		'available_unit_ids'   => array_keys( $available_pool ),
+		'manual_blocked_count' => count( $effective_manual_blocks ),
+		'occupied_count'       => count( $booking_to_unit ),
+		'available_units'      => count( $available_pool ),
+		'overflow_booking_ids' => $overflow_booking_ids,
+	];
+}
+
+function cwc_find_available_unit_for_booking( $room_post_id, $checkin_date, $checkout_date, $exclude_booking_id = 0 ) {
+	$allocation = cwc_get_room_unit_allocation( $room_post_id, $checkin_date, $checkout_date, $exclude_booking_id );
+	if ( empty( $allocation['available_unit_ids'] ) ) {
+		return null;
+	}
+
+	$available_ids = $allocation['available_unit_ids'];
+	$rooms         = cwc_get_physical_rooms( $room_post_id );
+	foreach ( $rooms as $room ) {
+		$room_id = (string) ( $room['id'] ?? '' );
+		if ( in_array( $room_id, $available_ids, true ) ) {
+			return $room;
+		}
+	}
+
+	return null;
 }
 
 /**
@@ -798,18 +1141,19 @@ function cwc_accommodation_availability( $post_id ) {
 	if ( empty( $rooms ) ) {
 		// Fallback to old meta if no physical rooms are defined
 		$old_value = (string) get_post_meta( $post_id, '_cwc_availability', true );
-		return in_array( $old_value, [ 'available', 'fully-booked' ], true ) ? $old_value : 'available';
+		return in_array( $old_value, [ 'available', 'fully-booked', 'maintenance' ], true ) ? $old_value : 'available';
 	}
 
-	$has_available = false;
-	foreach ( $rooms as $room ) {
-		if ( 'available' === ( $room['status'] ?? '' ) ) {
-			$has_available = true;
-			break;
-		}
+	$meta_availability = (string) get_post_meta( $post_id, '_cwc_availability', true );
+	if ( 'maintenance' === $meta_availability ) {
+		return 'maintenance';
 	}
 
-	return $has_available ? 'available' : 'fully-booked';
+	$today = current_time( 'Y-m-d' );
+	$allocation = cwc_get_room_unit_allocation( $post_id, $today, date( 'Y-m-d', strtotime( $today . ' +1 day' ) ) );
+	$available = (int) ( $allocation['available_units'] ?? 0 );
+
+	return $available > 0 ? 'available' : 'fully-booked';
 }
 
 /**

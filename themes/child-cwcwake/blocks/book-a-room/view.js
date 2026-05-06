@@ -5,6 +5,8 @@
 			return;
 		}
 
+			const isOverlayMode = () => window.matchMedia('(max-width: 1024px)').matches;
+
 		const modals = document.querySelectorAll('.cwc-booking-modal');
 
 		// Move backdrop to body
@@ -49,7 +51,7 @@
 			trigger.addEventListener('click', () => {
 				const targetModal = trigger.getAttribute('data-modal-target');
 
-				if (targetModal === 'guests') {
+				if (targetModal === 'guests' || targetModal === 'date') {
 					const roomVal = document.getElementById('cwc-val-room');
 					if (!roomVal || roomVal.textContent.trim() === 'Choose Room' || roomVal.textContent.trim() === '') {
 						if (window.cwcToast) {
@@ -65,17 +67,22 @@
 				const modal = document.getElementById(targetId);
 				if (modal) {
 					closeModal();
-					backdrop.classList.add('is-active');
+						modal.classList.add('is-active');
 
-					// Append modal to the clicked field so it stays perfectly attached
-					trigger.appendChild(modal);
-					modal.classList.add('is-active');
-
-					// Clear any inline styles from previous iterations
-					modal.style.position = '';
-					modal.style.top = '';
-					modal.style.left = '';
-					modal.style.transform = '';
+						if (isOverlayMode()) {
+							backdrop.classList.add('is-active');
+							backdrop.appendChild(modal);
+							modal.style.position = '';
+							modal.style.top = '';
+							modal.style.left = '';
+							modal.style.transform = '';
+						} else {
+							trigger.appendChild(modal);
+							modal.style.position = '';
+							modal.style.top = '';
+							modal.style.left = '';
+							modal.style.transform = '';
+						}
 				} else if (targetModal === 'date') {
 					// Date modal could be implemented with a library like flatpickr.
 					// For now we'll just simulate selecting a date.
@@ -374,13 +381,24 @@
 				const response = await fetch('/wp-admin/admin-ajax.php', { method: 'POST', body: formData });
 				const result = await response.json();
 
-				if (result.success && result.data.fully_booked) {
+				if (!result.success) {
 					proceedBtn.textContent = origText;
 					proceedBtn.disabled = false;
 					if (window.cwcToast) {
-						window.cwcToast.show('Sorry, this room is fully booked for your selected dates. Please choose different dates or another room.', 'error');
+						window.cwcToast.show(result.data.message || 'Validation failed. Please check your selection.', 'error');
 					} else {
-						alert('Sorry, this room is fully booked for your selected dates. Please choose different dates or another room.');
+						alert(result.data.message || 'Validation failed. Please check your selection.');
+					}
+					return;
+				}
+
+				if (result.data.fully_booked) {
+					proceedBtn.textContent = origText;
+					proceedBtn.disabled = false;
+					if (window.cwcToast) {
+						window.cwcToast.show('Sorry, this room is already reserved for your selected dates. Please choose different dates.', 'error');
+					} else {
+						alert('Sorry, this room is already reserved for your selected dates. Please choose different dates.');
 					}
 					return;
 				}

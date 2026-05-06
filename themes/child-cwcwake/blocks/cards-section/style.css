@@ -801,6 +801,17 @@
 	.cwc-cards-section--staggered .cwc-cards-section__item {
 		grid-column: span 6;
 	}
+
+	.cwc-cards-section--staggered .cwc-cards-section__card-body,
+	.cwc-cards-section--staggered .cwc-cards-section__card-content {
+		align-items: center !important;
+		text-align: center !important;
+	}
+
+	.cwc-cards-section--staggered .cwc-cards-section__card-title,
+	.cwc-cards-section--staggered .cwc-cards-section__card-subtitle {
+		text-align: center !important;
+	}
 }
 
 @media (max-width: 767px) {

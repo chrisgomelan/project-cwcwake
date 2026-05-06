@@ -419,6 +419,14 @@
 			.then( result => {
 				if ( result.success ) {
 					if ( result.data?.redirect_url ) {
+						/* Update session storage with current form values before redirecting to PayMongo */
+						const currentData = JSON.parse(sessionStorage.getItem('cwc_booking_data') || '{}');
+						currentData.name = fullNameInput?.value || '';
+						currentData.email = emailInput?.value || '';
+						currentData.phone = phoneInput?.value || '';
+						currentData.additionalGuests = additionalGuests;
+						sessionStorage.setItem('cwc_booking_data', JSON.stringify(currentData));
+
 						window.location.href = result.data.redirect_url;
 						return;
 					}
@@ -679,7 +687,7 @@
 				indicator.style.background = '#fef2f2';
 				indicator.style.color = '#dc2626';
 				indicator.style.border = '1px solid #fecaca';
-				indicator.innerHTML = 'This room type is fully booked for your selected dates.';
+				indicator.innerHTML = 'This room is already reserved for your selected dates.';
 				if (btnConfirmPay) {
 					btnConfirmPay.disabled = true;
 					btnConfirmPay.style.opacity = '0.5';
@@ -1057,6 +1065,16 @@
 
 		/* ─── Init ─── */
 		const syncInitialUI = () => {
+			/* Populate form fields from session if they exist (important for return from PayMongo) */
+			if (bookingData.name && fullNameInput) fullNameInput.value = bookingData.name;
+			if (bookingData.email && emailInput) emailInput.value = bookingData.email;
+			if (bookingData.phone && phoneInput) phoneInput.value = bookingData.phone;
+			if (bookingData.additionalGuests) {
+				additionalGuests = bookingData.additionalGuests;
+				renderGuestRows();
+				updateCapacityUI();
+			}
+
 			if (summaryRoomName) {
 				const roomName = bookingData.room.includes('Room') ? bookingData.room : `${bookingData.room} Room`;
 				summaryRoomName.textContent = roomName;
@@ -1120,12 +1138,17 @@
 		// Check for success redirect from PayMongo
 		const urlParams = new URLSearchParams( window.location.search );
 		if ( urlParams.get( 'booking_success' ) === '1' ) {
-			sessionStorage.removeItem( 'cwc_booking_data' );
 			if ( typeof openModal === 'function' ) {
 				openModal( 'success' );
 			}
 			// Clean up URL
 			window.history.replaceState( {}, document.title, window.location.pathname );
+
+			// Auto-redirect to homepage after 5 seconds
+			setTimeout( () => {
+				sessionStorage.removeItem( 'cwc_booking_data' );
+				window.location.href = '/';
+			}, 5000 );
 		}
 	} );
 } )();

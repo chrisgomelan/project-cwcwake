@@ -96,6 +96,26 @@ function cwc_register_accommodation_meta_boxes()
 }
 add_action('add_meta_boxes_accommodation', 'cwc_register_accommodation_meta_boxes');
 
+/**
+ * Register the Event Details meta box on the post editor screen.
+ *
+ * @since 1.0.0
+ *
+ * @return void
+ */
+function cwc_register_post_event_meta_box()
+{
+	add_meta_box(
+		'cwc_post_event_details',
+		__('Event Details', 'cwc-accommodations'),
+		'cwc_render_post_event_details_box',
+		'post',
+		'side',
+		'default'
+	);
+}
+add_action('add_meta_boxes_post', 'cwc_register_post_event_meta_box');
+
 /* ---------------------------------------------------------
  * Box renderers
  * --------------------------------------------------------- */
@@ -155,6 +175,19 @@ function cwc_render_accommodation_pricing_box($post)
 					<?php esc_html_e('Maximum number of persons allowed in this room type.', 'cwc-accommodations'); ?></p>
 			</td>
 		</tr>
+		<tr>
+			<th><label for="cwc_availability"><?php esc_html_e('Room Status', 'cwc-accommodations'); ?></label></th>
+			<td>
+				<select id="cwc_availability" name="cwc_availability" class="widefat">
+					<?php foreach ($availability_options as $value => $option): ?>
+						<option value="<?php echo esc_attr($value); ?>" <?php selected($availability, $value); ?>>
+							<?php echo esc_html($option['label']); ?>
+						</option>
+					<?php endforeach; ?>
+				</select>
+				<p class="description"><?php echo esc_html($availability_options[$availability]['help'] ?? ''); ?></p>
+			</td>
+		</tr>
 	</table>
 
 	<hr />
@@ -172,6 +205,8 @@ function cwc_render_accommodation_pricing_box($post)
 				?>
 				<li class="cwc-physical-room-row"
 					style="display: flex; gap: 10px; align-items: center; margin-bottom: 8px; background: #f9f9f9; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+					<input type="hidden" name="cwc_physical_rooms[<?php echo $idx; ?>][id]"
+						value="<?php echo esc_attr($room['id'] ?? ''); ?>" />
 					<input type="text" name="cwc_physical_rooms[<?php echo $idx; ?>][name]"
 						value="<?php echo esc_attr($room['name'] ?? ''); ?>" placeholder="Room Name (e.g. Villa 101)"
 						class="widefat" />
@@ -179,7 +214,7 @@ function cwc_render_accommodation_pricing_box($post)
 						<option value="available" <?php selected($room['status'] ?? 'available', 'available'); ?>>
 							<?php esc_html_e('Available', 'cwc-accommodations'); ?></option>
 						<option value="booked" <?php selected($room['status'] ?? '', 'booked'); ?>>
-							<?php esc_html_e('Booked', 'cwc-accommodations'); ?></option>
+							<?php esc_html_e('Booked / Blocked', 'cwc-accommodations'); ?></option>
 					</select>
 					<button type="button" class="button cwc-remove-physical-room" title="Remove Room">×</button>
 				</li>
@@ -199,10 +234,11 @@ function cwc_render_accommodation_pricing_box($post)
 					const idx = $list.find('li').length;
 					const html = `
 					<li class="cwc-physical-room-row" style="display: flex; gap: 10px; align-items: center; margin-bottom: 8px; background: #f9f9f9; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+						<input type="hidden" name="cwc_physical_rooms[${idx}][id]" value="" />
 						<input type="text" name="cwc_physical_rooms[${idx}][name]" value="" placeholder="Room Name" class="widefat" />
 						<select name="cwc_physical_rooms[${idx}][status]">
 							<option value="available">Available</option>
-							<option value="booked">Booked</option>
+							<option value="booked">Booked / Blocked</option>
 						</select>
 						<button type="button" class="button cwc-remove-physical-room">×</button>
 					</li>
@@ -511,6 +547,30 @@ function cwc_render_accommodation_inclusions_box($post)
 	<?php
 }
 
+/**
+ * Render the Event Details box for standard posts.
+ *
+ * @since 1.0.0
+ *
+ * @param WP_Post $post Current post being edited.
+ * @return void
+ */
+function cwc_render_post_event_details_box($post)
+{
+	wp_nonce_field('cwc_post_event_meta', 'cwc_post_event_meta_nonce');
+
+	$event_date = (string) get_post_meta($post->ID, '_cwc_event_date', true);
+	?>
+	<p>
+		<label for="cwc_event_date"><strong><?php esc_html_e('Event Date', 'cwc-accommodations'); ?></strong></label><br />
+		<input type="date" id="cwc_event_date" name="cwc_event_date" value="<?php echo esc_attr($event_date); ?>"
+			class="widefat" />
+		<span
+			class="description"><?php esc_html_e('Format: YYYY-MM-DD. Only used if the post is in the "Events" category.', 'cwc-accommodations'); ?></span>
+	</p>
+	<?php
+}
+
 /* ---------------------------------------------------------
  * Save handler
  * --------------------------------------------------------- */
@@ -559,10 +619,11 @@ function cwc_save_accommodation_meta($post_id)
 	$physical_rooms = [];
 	if (isset($_POST['cwc_physical_rooms']) && is_array($_POST['cwc_physical_rooms'])) {
 		foreach ($_POST['cwc_physical_rooms'] as $room) {
+			$id = isset($room['id']) ? preg_replace('/[^a-z0-9_-]/i', '', (string) $room['id']) : '';
 			$name = sanitize_text_field($room['name'] ?? '');
 			$status = sanitize_key($room['status'] ?? 'available');
 			if ($name) {
-				$physical_rooms[] = ['name' => $name, 'status' => $status];
+				$physical_rooms[] = ['id' => strtolower($id), 'name' => $name, 'status' => $status];
 			}
 		}
 	}
@@ -571,6 +632,7 @@ function cwc_save_accommodation_meta($post_id)
 		'_cwc_price' => $_POST['cwc_price'] ?? '',
 		'_cwc_price_sub' => $_POST['cwc_price_sub'] ?? '',
 		'_cwc_capacity' => $_POST['cwc_capacity'] ?? 0,
+		'_cwc_availability' => $_POST['cwc_availability'] ?? 'available',
 		'_cwc_inventory' => count($physical_rooms),
 		'_cwc_gallery_ids' => $_POST['cwc_gallery_ids'] ?? '',
 		'_cwc_physical_rooms' => wp_json_encode($physical_rooms),
@@ -625,3 +687,40 @@ function cwc_save_accommodation_meta($post_id)
 	}
 }
 add_action('save_post_accommodation', 'cwc_save_accommodation_meta');
+
+/**
+ * Save the Event Details for standard posts.
+ *
+ * @since 1.0.0
+ *
+ * @param int $post_id Post ID.
+ * @return void
+ */
+function cwc_save_post_event_meta($post_id)
+{
+	if (!isset($_POST['cwc_post_event_meta_nonce'])) {
+		return;
+	}
+
+	$nonce = sanitize_text_field(wp_unslash($_POST['cwc_post_event_meta_nonce']));
+	if (!wp_verify_nonce($nonce, 'cwc_post_event_meta')) {
+		return;
+	}
+
+	if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
+		return;
+	}
+
+	if (!current_user_can('edit_post', $post_id)) {
+		return;
+	}
+
+	if ('post' !== get_post_type($post_id)) {
+		return;
+	}
+
+	if (isset($_POST['cwc_event_date'])) {
+		update_post_meta($post_id, '_cwc_event_date', sanitize_text_field(wp_unslash($_POST['cwc_event_date'])));
+	}
+}
+add_action('save_post_post', 'cwc_save_post_event_meta');

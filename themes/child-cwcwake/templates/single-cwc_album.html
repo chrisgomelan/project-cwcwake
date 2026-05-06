@@ -88,26 +88,24 @@
 
 					const pagination = document.createElement("div");
 					pagination.className = "cwc-pagination";
-					// Add space around and on the sides
-					pagination.style.margin = "4rem auto";
-					pagination.style.padding = "0 clamp(1rem, 5vw, 4rem)";
+					pagination.style.marginBottom = "4rem";
 					gallery.after(pagination);
 
-					let itemsPerPage = 12;
+					let itemsPerPage = 8;
 					let currentPage = 1;
 
 					const updateConfig = () => {
 						const w = window.innerWidth;
-						if (w <= 600) itemsPerPage = 3;      // Mobile
-						else if (w <= 1024) itemsPerPage = 6; // Tablet
-						else itemsPerPage = 12;               // Desktop
+						if (w <= 600) itemsPerPage = 4;      // Mobile (2x2)
+						else if (w <= 1024) itemsPerPage = 6; // Tablet (3x2)
+						else itemsPerPage = 8;               // Desktop (4x2)
 					};
 
 					const goToPage = (page) => {
 						const totalPages = Math.ceil(items.length / itemsPerPage);
 						if (page > totalPages) page = totalPages || 1;
 						if (page < 1) page = 1;
-						
+
 						currentPage = page;
 						const start = (page - 1) * itemsPerPage;
 						const end = start + itemsPerPage;
@@ -138,15 +136,41 @@
 							const btn = document.createElement("button");
 							btn.className = `cwc-page ${isDisabled ? 'cwc-page--disabled' : ''} ${isCurrent ? 'cwc-page--current' : ''}`;
 							btn.innerHTML = html;
+							if (isDisabled) btn.setAttribute('aria-disabled', 'true');
+							if (isCurrent) btn.setAttribute('aria-current', 'page');
 							btn.onclick = () => { if (!isDisabled && !isCurrent) goToPage(target); };
 							pagination.appendChild(btn);
 						};
 
-						createBtn("&larr;", currentPage - 1, currentPage === 1, false);
-						for (let i = 1; i <= totalPages; i++) {
-							createBtn(i, i, false, i === currentPage);
+						const createEllipsis = () => {
+							const span = document.createElement("span");
+							span.className = "cwc-page cwc-page--ellipsis";
+							span.innerHTML = "…";
+							span.setAttribute('aria-hidden', 'true');
+							pagination.appendChild(span);
+						};
+
+						// Build page list with windowing
+						const windowSize = 1;
+						let pages = [1];
+						for (let i = Math.max(2, currentPage - windowSize); i <= Math.min(totalPages - 1, currentPage + windowSize); i++) {
+							pages.push(i);
 						}
-						createBtn("&rarr;", currentPage + 1, currentPage === totalPages, false);
+						if (totalPages > 1) pages.push(totalPages);
+						pages = [...new Set(pages)].sort((a, b) => a - b);
+
+						createBtn("‹", currentPage - 1, currentPage === 1, false);
+
+						let prevPage = 0;
+						pages.forEach(page => {
+							if (prevPage > 0 && (page - prevPage) > 1) {
+								createEllipsis();
+							}
+							createBtn(page, page, false, page === currentPage);
+							prevPage = page;
+						});
+
+						createBtn("›", currentPage + 1, currentPage === totalPages, false);
 					};
 
 					updateConfig();
@@ -167,7 +191,6 @@
 				}
 			});
 		</script>
-		<!-- /wp:html -->
 		<!-- /wp:html -->
 	</main>
 	<!-- /wp:group -->

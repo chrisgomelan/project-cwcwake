@@ -172,6 +172,108 @@ function cwc_log_email($booking_id, $type, $to, $sent, $admin_note = '')
 	update_post_meta($booking_id, '_cwc_bk_email_log', wp_json_encode($log));
 }
 
+function cwc_sync_booking_room_link($booking_id, $room_post_id = 0)
+{
+	$booking_id = (int) $booking_id;
+	$room_post_id = (int) $room_post_id;
+
+	if ($booking_id <= 0) {
+		return 0;
+	}
+
+	if ($room_post_id <= 0 && function_exists('cwc_get_booking_room_post_id')) {
+		$room_post_id = cwc_get_booking_room_post_id($booking_id);
+	}
+
+	if ($room_post_id <= 0 || 'accommodation' !== get_post_type($room_post_id)) {
+		return 0;
+	}
+
+	update_post_meta($booking_id, '_cwc_bk_room_post_id', $room_post_id);
+
+	if ((int) get_post_field('post_parent', $booking_id) !== $room_post_id) {
+		wp_update_post([
+			'ID' => $booking_id,
+			'post_parent' => $room_post_id,
+		]);
+	}
+
+	return $room_post_id;
+}
+
+function cwc_assign_available_unit_to_booking($booking_id, $room_post_id = 0, $checkin = '', $checkout = '')
+{
+	$booking_id = (int) $booking_id;
+	$room_post_id = cwc_sync_booking_room_link($booking_id, $room_post_id);
+
+	if ($room_post_id <= 0 || !function_exists('cwc_find_available_unit_for_booking')) {
+		return null;
+	}
+
+	$checkin = $checkin ?: (string) get_post_meta($booking_id, '_cwc_bk_checkin', true);
+	$checkout = $checkout ?: (string) get_post_meta($booking_id, '_cwc_bk_checkout', true);
+
+	if (!$checkin || !$checkout) {
+		return null;
+	}
+
+	$unit = cwc_find_available_unit_for_booking(
+		$room_post_id,
+		date('Y-m-d', strtotime($checkin)),
+		date('Y-m-d', strtotime($checkout)),
+		$booking_id
+	);
+
+	if (!$unit || empty($unit['id'])) {
+		return null;
+	}
+
+	update_post_meta($booking_id, '_cwc_bk_assigned_unit_id', $unit['id']);
+	update_post_meta($booking_id, '_cwc_bk_assigned_room', $unit['name'] ?? '');
+
+	return $unit;
+}
+
+function cwc_release_legacy_booked_unit_for_booking($booking_id)
+{
+	if (!function_exists('cwc_find_physical_room_by_booking')) {
+		return;
+	}
+
+	$match = cwc_find_physical_room_by_booking($booking_id);
+	if (!$match || !is_array($match)) {
+		return;
+	}
+
+	$room = $match['room'] ?? [];
+	if (($room['status'] ?? 'available') !== 'booked') {
+		return;
+	}
+
+	$room_post_id = (int) ($match['post_id'] ?? 0);
+	$checkin = (string) get_post_meta($booking_id, '_cwc_bk_checkin', true);
+	$checkout = (string) get_post_meta($booking_id, '_cwc_bk_checkout', true);
+	if ($room_post_id <= 0 || !$checkin || !$checkout) {
+		return;
+	}
+
+	$unit_id = (string) ($room['id'] ?? '');
+	foreach (cwc_get_overlapping_booking_ids_for_room_post($room_post_id, date('Y-m-d', strtotime($checkin)), date('Y-m-d', strtotime($checkout)), $booking_id) as $other_booking_id) {
+		if ($unit_id && $unit_id === cwc_get_booking_assigned_unit_id($other_booking_id)) {
+			return;
+		}
+	}
+
+	$physical_rooms = cwc_get_physical_rooms($room_post_id);
+	$index = (int) ($match['index'] ?? -1);
+	if ($index < 0 || !isset($physical_rooms[$index])) {
+		return;
+	}
+
+	$physical_rooms[$index]['status'] = 'available';
+	cwc_update_physical_rooms($room_post_id, $physical_rooms);
+}
+
 /* ────────────────────────────────────────────
    AJAX: Update Booking Status (with modal)
    ──────────────────────────────────────────── */
@@ -206,41 +308,9 @@ function cwc_update_booking_status()
 		'email_sent' => $send_email,
 	]);
 
-	// Auto-release physical room if cancelled or completed
+	// Auto-release legacy unit locks for older bookings that still marked the unit itself as booked.
 	if (in_array($new_status, ['completed', 'cancelled'], true) && !in_array($old_status, ['completed', 'cancelled'], true)) {
-		$assigned_room_name = get_post_meta($booking_id, '_cwc_bk_assigned_room', true);
-		$room_name = get_post_meta($booking_id, '_cwc_bk_room', true);
-
-		if ($assigned_room_name && $room_name && function_exists('cwc_get_physical_rooms')) {
-			$room_clean = preg_replace('/\s+Room$/i', '', trim($room_name));
-			$room_posts = get_posts([
-				'post_type' => 'accommodation',
-				'post_status' => 'publish',
-				'posts_per_page' => -1,
-			]);
-
-			foreach ($room_posts as $rp) {
-				$rp_title = strtolower(trim($rp->post_title));
-				$room_clean_lower = strtolower(trim($room_clean));
-				$room_full_lower = strtolower(trim($room_name));
-
-				if ($rp_title === $room_clean_lower || $rp_title === $room_full_lower || preg_replace('/\s+Room$/i', '', $rp_title) === $room_clean_lower) {
-					$physical_rooms = cwc_get_physical_rooms($rp->ID);
-					$updated = false;
-					foreach ($physical_rooms as &$p_room) {
-						if (($p_room['name'] ?? '') === $assigned_room_name && ($p_room['status'] ?? '') === 'booked') {
-							$p_room['status'] = 'available';
-							$updated = true;
-							break;
-						}
-					}
-					if ($updated) {
-						update_post_meta($rp->ID, '_cwc_physical_rooms', wp_json_encode($physical_rooms));
-					}
-					break;
-				}
-			}
-		}
+		cwc_release_legacy_booked_unit_for_booking($booking_id);
 	}
 
 	// Send email if requested
@@ -332,10 +402,11 @@ function cwc_toggle_physical_room_status()
 	}
 
 	$room_id = isset($_POST['room_id']) ? absint($_POST['room_id']) : 0;
+	$unit_id = isset($_POST['unit_id']) ? preg_replace('/[^a-z0-9_-]/i', '', (string) wp_unslash($_POST['unit_id'])) : '';
 	$unit_name = isset($_POST['unit_name']) ? sanitize_text_field(wp_unslash($_POST['unit_name'])) : '';
 	$new_status = isset($_POST['new_status']) ? sanitize_key($_POST['new_status']) : '';
 
-	if (!$room_id || !$unit_name || !in_array($new_status, ['available', 'booked'], true)) {
+	if (!$room_id || (!$unit_id && !$unit_name) || !in_array($new_status, ['available', 'booked'], true)) {
 		wp_send_json_error(['message' => 'Invalid data.']);
 	}
 
@@ -343,7 +414,9 @@ function cwc_toggle_physical_room_status()
 		$physical_rooms = cwc_get_physical_rooms($room_id);
 		$updated = false;
 		foreach ($physical_rooms as &$p_room) {
-			if (($p_room['name'] ?? '') === $unit_name) {
+			$matches_id = $unit_id && ($p_room['id'] ?? '') === strtolower($unit_id);
+			$matches_name = !$unit_id && ($p_room['name'] ?? '') === $unit_name;
+			if ($matches_id || $matches_name) {
 				$p_room['status'] = $new_status;
 				$updated = true;
 				break;
@@ -351,7 +424,7 @@ function cwc_toggle_physical_room_status()
 		}
 
 		if ($updated) {
-			update_post_meta($room_id, '_cwc_physical_rooms', wp_json_encode($physical_rooms));
+			cwc_update_physical_rooms($room_id, $physical_rooms);
 			wp_send_json_success(['message' => 'Unit status updated.']);
 		}
 	}
@@ -366,11 +439,11 @@ add_action('wp_ajax_cwc_toggle_physical_room_status', 'cwc_toggle_physical_room_
    ──────────────────────────────────────────── */
 
 /**
- * Check if a room type has availability for the given date range.
+ * Check if a room should be treated as available for the given date range.
  *
- * Returns the number of available units and whether the room is fully booked
- * for the requested period. Considers overlapping confirmed/pending bookings
- * against the physical room inventory.
+ * Current booking UX treats any existing reservation for the same room and
+ * date range as unavailable on the public booking calendars, even when the
+ * room type has multiple physical units configured in the dashboard.
  */
 function cwc_check_room_availability()
 {
@@ -378,8 +451,8 @@ function cwc_check_room_availability()
 	$checkin = isset($_POST['checkin']) ? sanitize_text_field(wp_unslash($_POST['checkin'])) : '';
 	$checkout = isset($_POST['checkout']) ? sanitize_text_field(wp_unslash($_POST['checkout'])) : '';
 
-	if (empty($room_name) || empty($checkin) || empty($checkout)) {
-		wp_send_json_error(['message' => 'Room, check-in, and check-out dates are required.']);
+	if (empty($room_name) || 'Choose Room' === $room_name || empty($checkin) || empty($checkout)) {
+		wp_send_json_error(['message' => 'Please select a room and specify check-in/check-out dates.']);
 	}
 
 	$checkin_date = date('Y-m-d', strtotime($checkin));
@@ -389,33 +462,22 @@ function cwc_check_room_availability()
 		wp_send_json_error(['message' => 'Invalid date range.']);
 	}
 
-	// Normalize room name: strip " Room" suffix for matching with post titles
-	$room_name_clean = preg_replace('/\s+Room$/i', '', trim($room_name));
+	$room_post = function_exists('cwc_find_accommodation_post_by_room_name')
+		? cwc_find_accommodation_post_by_room_name($room_name)
+		: null;
+	$room_post_id = $room_post instanceof WP_Post ? (int) $room_post->ID : 0;
+	$total_units = $room_post_id ? cwc_get_room_inventory($room_post_id) : 1;
+	$overlapping = cwc_count_overlapping_bookings($room_name, $checkin_date, $checkout_date);
+	$available_units = $overlapping > 0 ? 0 : $total_units;
 
-	// Find the room post to get inventory
-	$room_posts = get_posts([
-		'post_type' => 'accommodation',
-		'post_status' => 'publish',
-		'posts_per_page' => -1,
-	]);
-	$room_posts = array_filter($room_posts, function ($p) use ($room_name_clean, $room_name) {
-		$title_lower = strtolower(trim($p->post_title));
-		return $title_lower === strtolower($room_name_clean)
-			|| $title_lower === strtolower(trim($room_name));
-	});
-	$room_posts = array_values($room_posts);
-
-	$total_units = 1;
-	if (!empty($room_posts)) {
-		$room_post_id = $room_posts[0]->ID;
-		$total_units = cwc_get_room_inventory($room_post_id);
+	if ($room_post_id && function_exists('cwc_get_room_unit_allocation')) {
+		$allocation = cwc_get_room_unit_allocation($room_post_id, $checkin_date, $checkout_date);
+		$total_units = (int) ($allocation['total_units'] ?? $total_units);
+		$overlapping = (int) ($allocation['occupied_count'] ?? 0) + count($allocation['overflow_booking_ids'] ?? []);
+		$available_units = $overlapping > 0 ? 0 : $total_units;
 	}
 
-	// Count overlapping active bookings for this room
-	$overlapping = cwc_count_overlapping_bookings($room_name, $checkin_date, $checkout_date);
-
-	$available_units = max(0, $total_units - $overlapping);
-	$is_fully_booked = ($available_units <= 0);
+	$is_fully_booked = ($overlapping > 0);
 
 	wp_send_json_success([
 		'room' => $room_name,
@@ -448,7 +510,10 @@ function cwc_count_overlapping_bookings($room_name, $checkin_date, $checkout_dat
 		'fields' => 'ids',
 	]);
 
-	// Normalize: strip " Room" suffix for comparison
+	$room_post = function_exists('cwc_find_accommodation_post_by_room_name')
+		? cwc_find_accommodation_post_by_room_name($room_name)
+		: null;
+	$room_post_id = $room_post instanceof WP_Post ? (int) $room_post->ID : 0;
 	$room_name_clean = strtolower(preg_replace('/\s+Room$/i', '', trim($room_name)));
 
 	$count = 0;
@@ -458,14 +523,20 @@ function cwc_count_overlapping_bookings($room_name, $checkin_date, $checkout_dat
 		}
 
 		$bk_status = get_post_meta($booking_id, '_cwc_bk_status', true);
-		if (in_array($bk_status, ['cancelled', 'completed'], true)) {
+		if (!cwc_booking_status_is_active($bk_status)) {
 			continue;
 		}
 
-		$bk_room = get_post_meta($booking_id, '_cwc_bk_room', true);
-		$bk_room_clean = strtolower(preg_replace('/\s+Room$/i', '', trim($bk_room)));
-		if ($bk_room_clean !== $room_name_clean) {
-			continue;
+		if ($room_post_id > 0 && function_exists('cwc_get_booking_room_post_id')) {
+			if (cwc_get_booking_room_post_id($booking_id) !== $room_post_id) {
+				continue;
+			}
+		} else {
+			$bk_room = get_post_meta($booking_id, '_cwc_bk_room', true);
+			$bk_room_clean = strtolower(preg_replace('/\s+Room$/i', '', trim($bk_room)));
+			if ($bk_room_clean !== $room_name_clean) {
+				continue;
+			}
 		}
 
 		$bk_checkin = get_post_meta($booking_id, '_cwc_bk_checkin', true);
@@ -489,85 +560,35 @@ function cwc_count_overlapping_bookings($room_name, $checkin_date, $checkout_dat
 }
 
 /**
- * AJAX: Get all fully booked dates for a specific room.
+ * AJAX: Get all unavailable dates for a specific room.
  *
- * Returns an array of Y-m-d strings where the room has 0 available units.
+ * Returns an array of Y-m-d strings where the room already has an existing
+ * reservation and should be disabled in the public booking calendars.
  */
 function cwc_get_booked_dates()
 {
 	$room_name = isset($_POST['room']) ? sanitize_text_field(wp_unslash($_POST['room'])) : '';
-	if (empty($room_name)) {
-		wp_send_json_success([]);
+	if (empty($room_name) || 'Choose Room' === $room_name) {
+		wp_send_json_error(['message' => 'Please select a room first.']);
 	}
 
-	$room_name_clean = preg_replace('/\s+Room$/i', '', trim($room_name));
-	$room_posts = get_posts([
-		'post_type' => 'accommodation',
-		'post_status' => 'publish',
-		'posts_per_page' => -1,
-	]);
-
-	$room_post_id = 0;
-	foreach ($room_posts as $p) {
-		$title_lower = strtolower(trim($p->post_title));
-		if ($title_lower === strtolower($room_name_clean) || $title_lower === strtolower(trim($room_name))) {
-			$room_post_id = $p->ID;
-			break;
-		}
-	}
+	$room_post = function_exists('cwc_find_accommodation_post_by_room_name')
+		? cwc_find_accommodation_post_by_room_name($room_name)
+		: null;
+	$room_post_id = $room_post instanceof WP_Post ? (int) $room_post->ID : 0;
 
 	if (!$room_post_id) {
 		wp_send_json_success([]);
 	}
 
-	$total_units = cwc_get_room_inventory($room_post_id);
-
-	$bookings = get_posts([
-		'post_type' => 'cwc_booking',
-		'post_status' => 'publish',
-		'posts_per_page' => -1,
-		'fields' => 'ids',
-	]);
-
-	$room_name_clean_lower = strtolower($room_name_clean);
-	$date_counts = [];
-
-	foreach ($bookings as $booking_id) {
-		$bk_status = get_post_meta($booking_id, '_cwc_bk_status', true);
-		if (in_array($bk_status, ['cancelled', 'completed'], true)) {
-			continue;
-		}
-
-		$bk_room = get_post_meta($booking_id, '_cwc_bk_room', true);
-		$bk_room_clean = strtolower(preg_replace('/\s+Room$/i', '', trim($bk_room)));
-		if ($bk_room_clean !== $room_name_clean_lower) {
-			continue;
-		}
-
-		$bk_checkin = get_post_meta($booking_id, '_cwc_bk_checkin', true);
-		$bk_checkout = get_post_meta($booking_id, '_cwc_bk_checkout', true);
-
-		if (empty($bk_checkin) || empty($bk_checkout)) {
-			continue;
-		}
-
-		$start = new DateTime($bk_checkin);
-		$end = new DateTime($bk_checkout);
-
-		// Increment overlap count for each night of the booking
-		$period = new DatePeriod($start, new DateInterval('P1D'), $end);
-		foreach ($period as $date) {
-			$date_str = $date->format('Y-m-d');
-			if (!isset($date_counts[$date_str])) {
-				$date_counts[$date_str] = 0;
-			}
-			$date_counts[$date_str]++;
-		}
-	}
-
 	$fully_booked_dates = [];
-	foreach ($date_counts as $date_str => $count) {
-		if ($count >= $total_units) {
+	$today = new DateTimeImmutable(current_time('Y-m-d'));
+	for ($offset = 0; $offset < 365; $offset++) {
+		$date = $today->modify('+' . $offset . ' days');
+		$next_date = $date->modify('+1 day');
+		$overlapping = cwc_count_overlapping_bookings($room_name, $date->format('Y-m-d'), $next_date->format('Y-m-d'));
+		if ($overlapping > 0) {
+			$date_str = $date->format('Y-m-d');
 			$fully_booked_dates[] = $date_str;
 		}
 	}
@@ -779,38 +800,6 @@ function cwc_process_past_checkouts()
 			'email_sent' => false,
 		]);
 
-		$assigned_room_name = get_post_meta($booking_id, '_cwc_bk_assigned_room', true);
-		$room_name = get_post_meta($booking_id, '_cwc_bk_room', true);
-
-		if ($assigned_room_name && $room_name && function_exists('cwc_get_physical_rooms')) {
-			$room_clean = preg_replace('/\s+Room$/i', '', trim($room_name));
-			$room_posts = get_posts([
-				'post_type' => 'accommodation',
-				'post_status' => 'publish',
-				'posts_per_page' => -1,
-			]);
-
-			foreach ($room_posts as $rp) {
-				$rp_title = strtolower(trim($rp->post_title));
-				$room_clean_lower = strtolower(trim($room_clean));
-				$room_full_lower = strtolower(trim($room_name));
-
-				if ($rp_title === $room_clean_lower || $rp_title === $room_full_lower || preg_replace('/\s+Room$/i', '', $rp_title) === $room_clean_lower) {
-					$physical_rooms = cwc_get_physical_rooms($rp->ID);
-					$updated = false;
-					foreach ($physical_rooms as &$p_room) {
-						if (($p_room['name'] ?? '') === $assigned_room_name && ($p_room['status'] ?? '') === 'booked') {
-							$p_room['status'] = 'available';
-							$updated = true;
-							break;
-						}
-					}
-					if ($updated) {
-						update_post_meta($rp->ID, '_cwc_physical_rooms', wp_json_encode($physical_rooms));
-					}
-					break;
-				}
-			}
-		}
+		cwc_release_legacy_booked_unit_for_booking($booking_id);
 	}
 }

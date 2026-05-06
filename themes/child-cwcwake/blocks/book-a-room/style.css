@@ -126,6 +126,12 @@
 		height: 54px;
 		width: 140px;
 	}
+
+	.cwc-booking-bar__field--checkout .cwc-booking-modal,
+	.cwc-booking-bar__field--guests .cwc-booking-modal {
+		left: auto;
+		right: 0;
+	}
 }
 
 .cwc-booking-bar__field {
@@ -317,7 +323,7 @@
 	inset: 0;
 	background: transparent;
 	display: none;
-	z-index: 10000;
+	z-index: 10050;
 }
 
 .cwc-modal-backdrop.is-active {
@@ -325,15 +331,20 @@
 }
 
 .cwc-booking-modal {
-	position: absolute;
-	top: 100%;
-	left: 0;
-	z-index: 10002;
+	z-index: 10060;
 	display: none;
 	width: max-content;
 	min-width: 100%;
 	max-width: 420px;
 	cursor: default;
+}
+
+@media (min-width: 1025px) {
+	.cwc-booking-modal {
+		position: absolute;
+		top: 100%;
+		left: 0;
+	}
 }
 
 .cwc-booking-modal.is-active {
@@ -388,6 +399,7 @@
 	display: flex;
 	align-items: center;
 	transition: opacity 0.2s;
+	outline: none;
 }
 
 .cwc-calendar__prev:hover,
@@ -506,6 +518,7 @@
 	accent-color: #0096C7;
 	width: 20px;
 	height: 20px;
+	outline: none;
 }
 
 .cwc-booking-modal__confirm {
@@ -613,7 +626,7 @@
 	}
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
 	.cwc-book-hero__image-tile {
 		width: 100%;
 		max-width: none;
@@ -660,15 +673,15 @@
 	}
 
 	.cwc-booking-modal {
-		position: fixed;
-		top: 50%;
-		left: 50%;
-		transform: translate(-50%, -50%);
-		width: 90vw;
+		position: relative;
+		width: min(420px, calc(100vw - 40px));
+		min-width: 280px;
 		max-width: 420px;
-		max-height: 80vh;
+		max-height: calc(100vh - 40px);
 		overflow-y: auto;
-		z-index: 10002;
+		top: auto;
+		left: auto;
+		right: auto;
 	}
 
 	.cwc-booking-modal__content {
@@ -676,6 +689,14 @@
 	}
 
 	.cwc-modal-backdrop {
+		display: none;
+	}
+
+	.cwc-modal-backdrop.is-active {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		padding: 20px;
 		background: rgba(0, 0, 0, 0.5);
 		backdrop-filter: blur(2px);
 	}

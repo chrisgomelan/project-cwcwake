@@ -87,15 +87,13 @@
 		document.body.classList.remove(OPEN_BODY_CLASS);
 		setBackdropVisible(false);
 
-		// Collapse any open accordion sub-menus natively.
+		// Collapse any open sub-menus directly.
 		drawer.querySelectorAll('.wp-block-navigation-item.is-submenu-open')
 			.forEach((item) => {
-				const ic = item.querySelector(':scope > .wp-block-navigation__submenu-icon');
-				if (ic) {
-					ic.click();
-				} else {
-					// Fallback if there is no chevron icon
-					item.classList.remove('is-submenu-open');
+				item.classList.remove('is-submenu-open');
+				const toggle = item.querySelector('.wp-block-navigation-submenu__toggle, .wp-block-navigation__submenu-icon');
+				if (toggle && toggle.tagName === 'BUTTON') {
+					toggle.setAttribute('aria-expanded', 'false');
 				}
 			});
 	};
@@ -142,65 +140,68 @@
 	 *     destination) → close the drawer and let the navigation
 	 *     happen naturally.
 	 */
+
+	const closeOtherSubmenus = (currentParent) => {
+		drawer.querySelectorAll('.wp-block-navigation-item.is-submenu-open').forEach((openItem) => {
+			if (openItem !== currentParent && !openItem.contains(currentParent)) {
+				openItem.classList.remove('is-submenu-open');
+				// Also update the toggle button's aria-expanded if it exists
+				const toggle = openItem.querySelector('.wp-block-navigation-submenu__toggle, .wp-block-navigation__submenu-icon');
+				if (toggle && toggle.tagName === 'BUTTON') {
+					toggle.setAttribute('aria-expanded', 'false');
+				}
+			}
+		});
+	};
+
 	drawer.addEventListener('click', (event) => {
-		const chevron = event.target.closest('.wp-block-navigation__submenu-icon');
-		if (chevron) {
+		const target = event.target;
+		const toggle = target.closest('.wp-block-navigation-submenu__toggle, .wp-block-navigation__submenu-icon');
+		const link = target.closest('a');
+
+		// Case 1: Clicked a toggle button/icon
+		if (toggle) {
 			event.preventDefault();
 			event.stopPropagation();
 
-			const parent = chevron.closest('.wp-block-navigation-item.has-child');
-			if (parent) {
-				const isOpening = !parent.classList.contains('is-submenu-open');
+			const item = toggle.closest('.wp-block-navigation-item.has-child');
+			if (item) {
+				const isOpening = !item.classList.contains('is-submenu-open');
+				if (isOpening) closeOtherSubmenus(item);
+				item.classList.toggle('is-submenu-open');
 
-				// Close all other open submenus first (Accordion style)
-				drawer.querySelectorAll('.wp-block-navigation-item.is-submenu-open').forEach((openItem) => {
-					if (openItem !== parent && !openItem.contains(parent)) {
-						openItem.classList.remove('is-submenu-open');
-					}
-				});
-
-				// Toggle this one
-				if (isOpening) {
-					parent.classList.add('is-submenu-open');
-				} else {
-					parent.classList.remove('is-submenu-open');
+				const btn = item.querySelector('.wp-block-navigation-submenu__toggle');
+				if (btn && btn.tagName === 'BUTTON') {
+					btn.setAttribute('aria-expanded', isOpening);
 				}
 			}
 			return;
 		}
 
-		const link = event.target.closest('a');
-		if (!link) return;
+		// Case 2: Clicked a link
+		if (link) {
+			const item = link.closest('.wp-block-navigation-item.has-child');
+			const href = link.getAttribute('href');
+			const isPlaceholder = !href || href === '#' || href === '';
 
-		const item = link.closest('.wp-block-navigation-item');
-		const isPlaceholder = !link.getAttribute('href') ||
-			link.getAttribute('href') === '#' ||
-			link.getAttribute('href') === '';
+			if (item && isPlaceholder) {
+				event.preventDefault();
+				event.stopPropagation();
 
-		// Parent placeholder link click
-		if (item && item.classList.contains('has-child') && isPlaceholder) {
-			event.preventDefault();
-			event.stopPropagation();
+				const isOpening = !item.classList.contains('is-submenu-open');
+				if (isOpening) closeOtherSubmenus(item);
+				item.classList.toggle('is-submenu-open');
 
-			const isOpening = !item.classList.contains('is-submenu-open');
-
-			// Close others
-			drawer.querySelectorAll('.wp-block-navigation-item.is-submenu-open').forEach((openItem) => {
-				if (openItem !== item && !openItem.contains(item)) {
-					openItem.classList.remove('is-submenu-open');
+				const btn = item.querySelector('.wp-block-navigation-submenu__toggle');
+				if (btn && btn.tagName === 'BUTTON') {
+					btn.setAttribute('aria-expanded', isOpening);
 				}
-			});
-
-			if (isOpening) {
-				item.classList.add('is-submenu-open');
-			} else {
-				item.classList.remove('is-submenu-open');
+				return;
 			}
-			return;
-		}
 
-		// Real navigation → close the drawer.
-		closeDrawer();
+			// Real navigation → close the drawer.
+			closeDrawer();
+		}
 	});
 
 	/*

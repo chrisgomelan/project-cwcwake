@@ -316,6 +316,7 @@
 			btn.addEventListener('click', async (e) => {
 				e.preventDefault();
 				const roomId = btn.dataset.roomId;
+				const unitId = btn.dataset.unitId || '';
 				const unitName = btn.dataset.unitName;
 				const currentStatus = btn.dataset.currentStatus;
 				const newStatus = currentStatus === 'booked' ? 'available' : 'booked';
@@ -334,6 +335,9 @@
 					const formData = new URLSearchParams();
 					formData.append('action', 'cwc_toggle_physical_room_status');
 					formData.append('room_id', roomId);
+					if (unitId) {
+						formData.append('unit_id', unitId);
+					}
 					formData.append('unit_name', unitName);
 					formData.append('new_status', newStatus);
 
@@ -383,5 +387,4 @@
 		});
 	});
 })();
-
 

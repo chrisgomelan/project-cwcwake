@@ -376,6 +376,10 @@
 		margin-bottom: var(--wp--preset--spacing--40);
 	}
 
+	.cwc-reviews__quote-mark {
+		width: 48px;
+	}
+
 	.cwc-reviews__slide {
 		grid-template-columns: 1fr;
 		gap: var(--wp--preset--spacing--40);

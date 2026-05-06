@@ -265,37 +265,7 @@ $icon = static function ( $slug ) {
 						</div>
 					<?php endif; ?>
 
-					<?php if ( ! empty( $amenities ) ) : ?>
-						<div class="cwc-room-info__section">
-							<?php if ( '' !== $amenities_label ) : ?>
-								<h3 class="cwc-room-info__label"><?php echo esc_html( $amenities_label ); ?></h3>
-							<?php endif; ?>
-							<ul class="cwc-room-info__amenities">
-								<?php
-								foreach ( $amenities as $amenity ) {
-									if ( ! is_array( $amenity ) ) {
-										$amenity = array( 'label' => (string) $amenity );
-									}
-									$label    = isset( $amenity['label'] ) ? (string) $amenity['label'] : '';
-									$icon_key = isset( $amenity['icon'] ) ? (string) $amenity['icon'] : '';
-									if ( '' === $label ) {
-										continue;
-									}
-									?>
-									<li class="cwc-room-info__chip">
-										<?php
-										if ( '' !== $icon_key ) {
-											echo $icon( $icon_key ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-										}
-										?>
-										<span><?php echo esc_html( $label ); ?></span>
-									</li>
-									<?php
-								}
-								?>
-							</ul>
-						</div>
-					<?php endif; ?>
+					
 
 					<?php if ( ! empty( $inclusions ) ) : ?>
 						<div class="cwc-room-info__section">
@@ -362,7 +332,37 @@ $icon = static function ( $slug ) {
 					</aside>
 				<?php endif; ?>
 			</div>
-
+				<?php if ( ! empty( $amenities ) ) : ?>
+						<div class="cwc-room-info__section">
+							<?php if ( '' !== $amenities_label ) : ?>
+								<h3 class="cwc-room-info__label"><?php echo esc_html( $amenities_label ); ?></h3>
+							<?php endif; ?>
+							<ul class="cwc-room-info__amenities">
+								<?php
+								foreach ( $amenities as $amenity ) {
+									if ( ! is_array( $amenity ) ) {
+										$amenity = array( 'label' => (string) $amenity );
+									}
+									$label    = isset( $amenity['label'] ) ? (string) $amenity['label'] : '';
+									$icon_key = isset( $amenity['icon'] ) ? (string) $amenity['icon'] : '';
+									if ( '' === $label ) {
+										continue;
+									}
+									?>
+									<li class="cwc-room-info__chip">
+										<?php
+										if ( '' !== $icon_key ) {
+											echo $icon( $icon_key ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+										}
+										?>
+										<span><?php echo esc_html( $label ); ?></span>
+									</li>
+									<?php
+								}
+								?>
+							</ul>
+						</div>
+					<?php endif; ?>
 			<?php if ( ! empty( $policies ) ) : ?>
 				<div class="cwc-room-info__section cwc-room-info__section--policies">
 					<?php if ( '' !== $policies_label ) : ?>

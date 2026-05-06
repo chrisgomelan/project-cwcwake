@@ -17,7 +17,6 @@
 
 .cwc-room-info__panel {
 	position: relative;
-	overflow: hidden;
 	background: #f8f9fa;
 	border: 1px solid rgba(0, 0, 0, 0.5);
 	border-radius: 15px;
@@ -64,6 +63,8 @@
 
 .cwc-room-info__section {
 	margin: 0;
+	padding-top: clamp(0.5rem, 1vw, 0.75rem);
+	padding-bottom: clamp(0.5rem, 1vw, 0.75rem);
 }
 
 .cwc-room-info__section--policies {
@@ -237,6 +238,7 @@
 	border: 1px solid rgba(0, 0, 0, 0.4);
 	border-radius: 6px;
 	background: #F7F9FBff;
+	position: relative;
 }
 
 .cwc-room-info__pricing-field--guests {
@@ -270,7 +272,7 @@
 .cwc-room-info__pricing-label {
 	font-family: var(--wp--preset--font-family--heading);
 	font-weight: 600;
-	font-size: 1.1rem;
+	font-size: clamp(0.9rem, 1.1vw, 1.1rem);
 	line-height: 1.2;
 	color: #1a1a1a;
 	margin-bottom: 0.2rem;
@@ -279,7 +281,7 @@
 .cwc-room-info__pricing-val {
 	font-family: var(--wp--preset--font-family--body);
 	font-weight: 400;
-	font-size: 0.95rem;
+	font-size: clamp(0.85rem, 0.95vw, 0.95rem);
 	line-height: 1.2;
 	color: #1a1a1a;
 }
@@ -396,15 +398,28 @@
 		grid-template-columns: minmax(0, 1fr);
 	}
 
+	.cwc-room-info__main {
+		display: contents;
+	}
+
+	.cwc-room-info__section:first-of-type {
+		order: 1;
+	}
+
+	.cwc-room-info__pricing {
+		order: 2;
+		max-width: 430px;
+		justify-self: center;
+	}
+
+	.cwc-room-info__section:not(:first-of-type) {
+		order: 3;
+	}
+
 	.cwc-room-info__title,
 	.cwc-room-info__label,
 	.cwc-room-info__description {
 		text-align: center;
-	}
-
-	.cwc-room-info__pricing {
-		max-width: 430px;
-		justify-self: center;
 	}
 
 	.cwc-room-info__policies {

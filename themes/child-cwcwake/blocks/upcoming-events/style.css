@@ -58,8 +58,9 @@
 
 .cwc-upcoming-events__layout {
 	display: grid;
-	grid-template-columns: 200px 1fr;
-	gap: 2rem;
+	/* Increased min-width from 160px to 220px to prevent month name wrapping */
+	grid-template-columns: clamp(220px, 18vw, 280px) 1fr;
+	gap: clamp(1.5rem, 3vw, 3rem);
 	align-items: stretch;
 }
 
@@ -85,8 +86,9 @@
 	position: absolute;
 	top: 1.5rem;
 	bottom: 1.5rem;
-	left: calc(100% - 55px);
-	width: 6.23px;
+	/* Centered on the circles: 100% - (half of the circle column width) */
+	left: calc(100% - (clamp(88px, 10vw, 110px) / 2));
+	width: 6px;
 	background-color: #1A1A1A;
 	transform: translateX(-50%);
 	opacity: 1;
@@ -95,7 +97,7 @@
 
 .cwc-upcoming-events__rail-item {
 	display: grid;
-	grid-template-columns: 1fr 110px;
+	grid-template-columns: 1fr clamp(88px, 10vw, 110px);
 	align-items: center;
 	gap: 1rem;
 	position: relative;
@@ -105,13 +107,16 @@
 .cwc-upcoming-events__month {
 	font-family: var(--wp--preset--font-family--heading);
 	font-weight: 600;
-	font-size: 1.25rem;
+	font-size: clamp(0.9rem, 1.2vw, 1.25rem);
 	color: rgba(0, 0, 0, 0.7);
 	text-align: right;
+	white-space: nowrap; /* Ensure month names never wrap */
 }
 
 .cwc-upcoming-events__rail-item--active .cwc-upcoming-events__month {
 	color: #000000;
+	font-weight: 700;
+	font-size: clamp(1rem, 1.5vw, 1.5rem);
 }
 
 .cwc-upcoming-events__day {
@@ -119,14 +124,14 @@
 	align-items: center;
 	justify-content: center;
 	justify-self: center;
-	width: 73px;
-	height: 73px;
+	width: clamp(60px, 7vw, 73px);
+	height: clamp(60px, 7vw, 73px);
 	border-radius: 50%;
 	background-color: #1a1a1a;
 	color: #f8f9fa;
 	font-family: var(--wp--preset--font-family--heading);
 	font-weight: 700;
-	font-size: 1.5rem;
+	font-size: clamp(1rem, 1.4vw, 1.5rem);
 	text-decoration: none;
 	transition: transform 150ms ease, background-color 150ms ease;
 	cursor: pointer;
@@ -141,10 +146,10 @@
 }
 
 .cwc-upcoming-events__day--active {
-	width: 110px;
-	height: 110px;
+	width: clamp(88px, 10vw, 110px);
+	height: clamp(88px, 10vw, 110px);
 	background-color: var(--wp--preset--color--primary);
-	font-size: 2.25rem;
+	font-size: clamp(1.5rem, 2vw, 2.25rem);
 }
 
 /* ---------------------------------------------------------
@@ -269,30 +274,10 @@
  * --------------------------------------------------------- */
 
 @media (max-width: 1024px) {
-	.cwc-upcoming-events__layout {
-		grid-template-columns: 160px 1fr;
-		gap: 1.5rem;
-	}
-
-	.cwc-upcoming-events__rail-item {
-		grid-template-columns: 1fr 88px;
-	}
-
-	.cwc-upcoming-events__timeline::before {
-		left: calc(100% - 44px);
-	}
-
-	.cwc-upcoming-events__day--active {
-		width: 88px;
-		height: 88px;
-		font-size: 1.75rem;
-	}
-
-	.cwc-upcoming-events__day {
-		width: 60px;
-		height: 60px;
-		font-size: 1.25rem;
-	}
+	/* 
+	 * Removed fixed overrides here because clamp() handles 
+	 * the smooth transition between desktop and mobile sizes.
+	 */
 }
 
 /* ---------------------------------------------------------
