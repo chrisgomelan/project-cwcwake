@@ -578,7 +578,8 @@ function cwc_render_booking_dashboard()
 				'payments' => 'Payments',
 				'room-tracking' => 'Room Units Tracking',
 				'availability' => 'Availability',
-				'analytics' => 'Analytics',
+				'rates'        => 'Rates Management',
+				'analytics'    => 'Analytics',
 			];
 			$base_url = admin_url('edit.php?post_type=accommodation&page=cwc-booking-dashboard');
 			foreach ($tabs as $slug => $label):
@@ -626,6 +627,9 @@ function cwc_render_booking_dashboard()
 					break;
 				case 'availability':
 					cwc_render_dash_availability_sync($bookings);
+					break;
+				case 'rates':
+					cwc_render_dash_rates();
 					break;
 				case 'analytics':
 					cwc_render_dash_analytics($bookings, $room_counts, $room_revenue, $total_revenue);
@@ -1556,3 +1560,187 @@ function cwc_render_dash_analytics($bookings, $room_counts, $room_revenue, $tota
 	</div>
 	<?php
 }
+
+/* ─── TAB: Rates Management ─── */
+function cwc_render_dash_rates()
+{
+	$categories = cwc_get_global_rates();
+	?>
+	<div class="cwc-dash__card">
+		<div class="cwc-dash__card-header cwc-dash__card-header--with-actions">
+			<div class="cwc-dash__header-title">
+				<h2>Global Rates Management</h2>
+				<span class="cwc-dash__badge"><?php echo count($categories); ?> categories</span>
+			</div>
+			<div class="cwc-dash__actions">
+				<button type="button" class="button button-primary" id="cwc-rates-save-btn">Save All Rates</button>
+			</div>
+		</div>
+
+		<form id="cwc-rates-manager-form" method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
+			<input type="hidden" name="action" value="cwc_save_global_rates">
+			<?php wp_nonce_field('cwc_save_rates_nonce', 'cwc_rates_nonce'); ?>
+
+			<div id="cwc-rates-categories" class="cwc-rates-list">
+				<?php foreach ($categories as $c_idx => $cat): ?>
+					<div class="cwc-rates-category-item" data-index="<?php echo $c_idx; ?>">
+						<div class="cwc-rates-category-header">
+							<div class="cwc-rates-category-drag dashicons dashicons-menu"></div>
+							<div class="cwc-rates-category-info">
+								<input type="text" name="rates[<?php echo $c_idx; ?>][title]" 
+									value="<?php echo esc_attr($cat['title']); ?>" 
+									placeholder="Category Title (e.g. Wakeboarding)" class="cwc-rates-input-title">
+								<input type="hidden" name="rates[<?php echo $c_idx; ?>][id]" 
+									value="<?php echo esc_attr($cat['id']); ?>">
+								<textarea name="rates[<?php echo $c_idx; ?>][description]" 
+									placeholder="Description..." rows="2"><?php echo esc_textarea($cat['description']); ?></textarea>
+							</div>
+							<button type="button" class="cwc-rates-remove-category">&times;</button>
+						</div>
+
+						<div class="cwc-rates-table-editor">
+							<table class="cwc-rates-editor-table">
+								<tbody>
+									<!-- Column Controls -->
+									<tr class="cwc-rates-controls-row">
+										<?php 
+										$first_row = $cat['table'][0] ?? [''];
+										foreach ($first_row as $col_idx => $cell): ?>
+											<td>
+												<button type="button" class="cwc-rates-remove-col" data-col="<?php echo $col_idx; ?>" title="Remove Column">&times;</button>
+											</td>
+										<?php endforeach; ?>
+										<td class="cwc-rates-add-col-cell">
+											<button type="button" class="cwc-rates-add-col" title="Add Column">+</button>
+										</td>
+									</tr>
+
+									<?php foreach ($cat['table'] as $r_idx => $row): ?>
+										<tr>
+											<?php foreach ($row as $col_idx => $cell): ?>
+												<td>
+													<input type="text" name="rates[<?php echo $c_idx; ?>][table][<?php echo $r_idx; ?>][<?php echo $col_idx; ?>]" 
+														value="<?php echo esc_attr($cell); ?>">
+												</td>
+											<?php endforeach; ?>
+											<td><button type="button" class="cwc-rates-remove-row-btn">&times;</button></td>
+										</tr>
+									<?php endforeach; ?>
+								</tbody>
+							</table>
+							<div class="cwc-rates-table-actions">
+								<button type="button" class="button cwc-rates-add-row-btn">+ Add Row</button>
+							</div>
+						</div>
+					</div>
+				<?php endforeach; ?>
+			</div>
+
+			<div class="cwc-rates-footer-actions">
+				<button type="button" class="button" id="cwc-rates-add-category-btn">+ Add New Category</button>
+			</div>
+		</form>
+	</div>
+
+	<!-- Template for New Category -->
+	<template id="cwc-rates-category-template">
+		<div class="cwc-rates-category-item" data-index="__CAT_IDX__">
+			<div class="cwc-rates-category-header">
+				<div class="cwc-rates-category-drag dashicons dashicons-menu"></div>
+				<div class="cwc-rates-category-info">
+					<input type="text" name="rates[__CAT_IDX__][title]" value="" placeholder="New Category Title" class="cwc-rates-input-title">
+					<input type="hidden" name="rates[__CAT_IDX__][id]" value="">
+					<textarea name="rates[__CAT_IDX__][description]" placeholder="Description..." rows="2"></textarea>
+				</div>
+				<button type="button" class="cwc-rates-remove-category">&times;</button>
+			</div>
+			<div class="cwc-rates-table-editor">
+				<table class="cwc-rates-editor-table">
+					<tbody>
+						<tr class="cwc-rates-controls-row">
+							<td>
+								<button type="button" class="cwc-rates-remove-col" data-col="0">&times;</button>
+							</td>
+							<td class="cwc-rates-add-col-cell">
+								<button type="button" class="cwc-rates-add-col" title="Add Column">+</button>
+							</td>
+						</tr>
+						<tr>
+							<td><input type="text" name="rates[__CAT_IDX__][table][0][0]" value=""></td>
+							<td><button type="button" class="cwc-rates-remove-row-btn">&times;</button></td>
+						</tr>
+					</tbody>
+				</table>
+				<div class="cwc-rates-table-actions">
+					<button type="button" class="button cwc-rates-add-row-btn">+ Add Row</button>
+				</div>
+			</div>
+		</div>
+	</template>
+	<?php
+}
+
+/**
+ * Handle saving of global rates.
+ */
+function cwc_handle_global_rates_save()
+{
+	if (!current_user_can('manage_options')) {
+		wp_die(__('Unauthorized.', 'cwc-accommodations'));
+	}
+
+	check_admin_referer('cwc_save_rates_nonce', 'cwc_rates_nonce');
+
+	$rates_raw = isset($_POST['rates']) ? $_POST['rates'] : [];
+	$sanitized_rates = [];
+
+	foreach ($rates_raw as $cat) {
+		$title = sanitize_text_field($cat['title'] ?? '');
+		if (!$title) continue;
+
+		$id = sanitize_key($cat['id'] ?? '');
+		if (!$id) {
+			$id = sanitize_title($title);
+		}
+
+		$description = wp_kses_post($cat['description'] ?? '');
+		$table_raw = isset($cat['table']) ? $cat['table'] : [];
+		$table = [];
+
+		// Rebuild table to ensure sequential indices and clean data
+		$row_indices = array_keys($table_raw);
+		sort($row_indices);
+
+		foreach ($row_indices as $r_idx) {
+			$row_data = $table_raw[$r_idx];
+			$col_indices = array_keys($row_data);
+			sort($col_indices);
+			
+			$clean_row = [];
+			foreach ($col_indices as $c_idx) {
+				$clean_row[] = sanitize_text_field($row_data[$c_idx]);
+			}
+			if (!empty(array_filter($clean_row))) {
+				$table[] = $clean_row;
+			}
+		}
+
+		$sanitized_rates[] = [
+			'id'          => $id,
+			'title'       => $title,
+			'description' => $description,
+			'table'       => $table,
+		];
+	}
+
+	update_option('cwc_global_rates', $sanitized_rates);
+
+	wp_safe_redirect(add_query_arg([
+		'post_type' => 'accommodation',
+		'page'      => 'cwc-booking-dashboard',
+		'tab'       => 'rates',
+		'updated'   => '1'
+	], admin_url('edit.php')));
+	exit;
+}
+add_action('admin_post_cwc_save_global_rates', 'cwc_handle_global_rates_save');

@@ -100,7 +100,8 @@
 				type: 'GET',
 				data: {
 					action: 'cwc_global_search',
-					q: query
+					q: query,
+					nonce: window.cwcVars?.nonce
 				},
 				success: ( response ) => {
 					if ( response.success ) {
@@ -129,7 +130,8 @@
 				url: ajaxUrl,
 				type: 'GET',
 				data: {
-					action: 'cwc_search_recommendations'
+					action: 'cwc_search_recommendations',
+					nonce: window.cwcVars?.nonce
 				},
 				success: ( response ) => {
 					if ( response.success ) {

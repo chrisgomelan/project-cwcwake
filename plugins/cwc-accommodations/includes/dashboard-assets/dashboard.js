@@ -385,6 +385,126 @@
 				}
 			});
 		});
+
+		/* ─── Rates Management Tab Logic ─── */
+		const ratesList = document.getElementById('cwc-rates-categories');
+		const addCategoryBtn = document.getElementById('cwc-rates-add-category-btn');
+		const categoryTemplate = document.getElementById('cwc-rates-category-template');
+		const saveRatesBtn = document.getElementById('cwc-rates-save-btn');
+		const ratesForm = document.getElementById('cwc-rates-manager-form');
+
+		if (ratesList && addCategoryBtn && categoryTemplate) {
+			
+			// Add Category
+			addCategoryBtn.addEventListener('click', () => {
+				const index = ratesList.querySelectorAll('.cwc-rates-category-item').length;
+				let html = categoryTemplate.innerHTML.replace(/__CAT_IDX__/g, index);
+				
+				const div = document.createElement('div');
+				div.innerHTML = html.trim();
+				const newItem = div.firstChild;
+				
+				ratesList.appendChild(newItem);
+				newItem.scrollIntoView({ behavior: 'smooth', block: 'center' });
+			});
+
+			// Save Button Trigger
+			if (saveRatesBtn && ratesForm) {
+				saveRatesBtn.addEventListener('click', () => {
+					ratesForm.submit();
+				});
+			}
+
+			// Delegate Events (Remove, Add Row, Add Col)
+			ratesList.addEventListener('click', (e) => {
+				const target = e.target;
+
+				// Remove Category
+				if (target.classList.contains('cwc-rates-remove-category')) {
+					if (confirm('Are you sure you want to remove this entire rate category?')) {
+						target.closest('.cwc-rates-category-item').remove();
+					}
+				}
+
+				// Add Row
+				if (target.classList.contains('cwc-rates-add-row-btn')) {
+					const categoryItem = target.closest('.cwc-rates-category-item');
+					const catIdx = categoryItem.dataset.index;
+					const tableBody = categoryItem.querySelector('.cwc-rates-editor-table tbody');
+					const controlRow = tableBody.querySelector('.cwc-rates-controls-row');
+					const colCount = controlRow.querySelectorAll('td').length - 1;
+					const rowIdx = tableBody.querySelectorAll('tr:not(.cwc-rates-controls-row)').length;
+
+					const tr = document.createElement('tr');
+					let cellsHtml = '';
+					for (let i = 0; i < colCount; i++) {
+						cellsHtml += `<td><input type="text" name="rates[${catIdx}][table][${rowIdx}][${i}]" value=""></td>`;
+					}
+					cellsHtml += `<td><button type="button" class="cwc-rates-remove-row-btn">&times;</button></td>`;
+					
+					tr.innerHTML = cellsHtml;
+					tableBody.appendChild(tr);
+				}
+
+				// Remove Row
+				if (target.classList.contains('cwc-rates-remove-row-btn')) {
+					if (confirm('Delete this row?')) {
+						target.closest('tr').remove();
+					}
+				}
+
+				// Add Column
+				if (target.classList.contains('cwc-rates-add-col')) {
+					const categoryItem = target.closest('.cwc-rates-category-item');
+					const catIdx = categoryItem.dataset.index;
+					const table = categoryItem.querySelector('.cwc-rates-editor-table');
+					const tableBody = table.querySelector('tbody');
+					const controlRow = tableBody.querySelector('.cwc-rates-controls-row');
+					const dataRows = tableBody.querySelectorAll('tr:not(.cwc-rates-controls-row)');
+					const colIdx = controlRow.querySelectorAll('td').length - 1;
+
+					// Add Control Cell
+					const tdControl = document.createElement('td');
+					tdControl.innerHTML = `<button type="button" class="cwc-rates-remove-col" data-col="${colIdx}" title="Remove Column">&times;</button>`;
+					controlRow.insertBefore(tdControl, target.parentElement);
+
+					// Add Body Cells
+					dataRows.forEach((row, rIdx) => {
+						const td = document.createElement('td');
+						td.innerHTML = `<input type="text" name="rates[${catIdx}][table][${rIdx}][${colIdx}]" value="">`;
+						row.insertBefore(td, row.lastElementChild);
+					});
+				}
+
+				// Remove Column
+				if (target.classList.contains('cwc-rates-remove-col')) {
+					const table = target.closest('table');
+					const controlRow = table.querySelector('.cwc-rates-controls-row');
+					const totalCols = controlRow.querySelectorAll('td').length - 1; // Exclude add-col cell
+
+					if (totalCols <= 1) {
+						alert('You must have at least one column.');
+						return;
+					}
+
+					if (confirm('Are you sure you want to remove this column? This will delete all data in this column for this category.')) {
+						const colIdx = Array.from(target.parentElement.parentElement.children).indexOf(target.parentElement);
+						
+						// Remove from every row
+						table.querySelectorAll('tr').forEach(row => {
+							if (row.cells[colIdx]) {
+								row.cells[colIdx].remove();
+							}
+						});
+
+						// Re-index remaining column buttons
+						table.querySelectorAll('.cwc-rates-remove-col').forEach((btn, idx) => {
+							btn.dataset.col = idx;
+						});
+					}
+				}
+			});
+		}
 	});
 })();
 

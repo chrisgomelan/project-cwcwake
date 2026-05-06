@@ -457,3 +457,71 @@
  }
  
  .cwc-dash__hidden-page { display: none !important; }
+
+ /* ── Rates Management ── */
+.cwc-rates-list { padding: 24px; display: flex; flex-direction: column; gap: 20px; }
+.cwc-rates-category-item {
+	background: #fff; border: 1px solid #e2e8f0; border-radius: 12px;
+	box-shadow: 0 1px 3px rgba(0,0,0,0.02); overflow: hidden;
+}
+.cwc-rates-category-header {
+	display: flex; align-items: flex-start; gap: 16px; padding: 20px;
+	background: #fafbfc; border-bottom: 1px solid #f1f5f9;
+}
+.cwc-rates-category-drag {
+	cursor: move; color: #cbd5e1; margin-top: 10px;
+}
+.cwc-rates-category-info { flex: 1; display: flex; flex-direction: column; gap: 10px; }
+.cwc-rates-input-title {
+	font-size: 18px !important; font-weight: 700 !important; color: #1e293b !important;
+	border: none !important; background: transparent !important; padding: 0 !important;
+	box-shadow: none !important; width: 100%;
+}
+.cwc-rates-input-title:focus { background: #fff !important; padding: 4px 8px !important; border: 1px solid #3b82f6 !important; border-radius: 4px !important; }
+.cwc-rates-category-info textarea {
+	font-size: 13px; color: #64748b; line-height: 1.5; border: 1px solid transparent;
+	background: transparent; resize: vertical; padding: 4px 0; outline: none;
+}
+.cwc-rates-category-info textarea:focus { border-color: #e2e8f0; background: #fff; padding: 8px; border-radius: 6px; }
+
+.cwc-rates-remove-category {
+	background: none; border: none; color: #94a3b8; font-size: 24px; cursor: pointer;
+	padding: 4px; transition: color 0.2s;
+}
+.cwc-rates-remove-category:hover { color: #ef4444; }
+
+.cwc-rates-table-editor { padding: 20px; }
+.cwc-rates-editor-table { width: 100%; border-collapse: collapse; margin-bottom: 16px; }
+.cwc-rates-editor-table th, .cwc-rates-editor-table td {
+	border: 1px solid #e2e8f0; padding: 8px; position: relative;
+}
+.cwc-rates-editor-table th { background: #f8fafc; }
+.cwc-rates-col-header { display: flex; align-items: center; gap: 6px; }
+.cwc-rates-col-header input {
+	flex: 1; font-size: 12px; font-weight: 700; text-transform: uppercase;
+	border: none; background: transparent; padding: 4px; outline: none; text-align: center;
+}
+.cwc-rates-remove-col, .cwc-rates-remove-row-btn {
+	background: #fee2e2; color: #ef4444; border: none; width: 22px; height: 22px;
+	border-radius: 50%; font-size: 14px; cursor: pointer; display: flex;
+	align-items: center; justify-content: center; line-height: 1; opacity: 0; transition: all 0.2s;
+}
+.cwc-rates-controls-row td:hover .cwc-rates-remove-col,
+.cwc-rates-editor-table tr:hover .cwc-rates-remove-row-btn { opacity: 1; }
+
+.cwc-rates-remove-col:hover, .cwc-rates-remove-row-btn:hover { background: #ef4444; color: #fff; }
+
+.cwc-rates-controls-row td { text-align: center; background: #f8fafc; padding: 4px !important; }
+
+.cwc-rates-editor-table td input {
+	width: 100%; border: none; background: transparent; font-size: 13px; padding: 6px; outline: none;
+}
+.cwc-rates-add-col-cell { background: #f1f5f9 !important; width: 40px; text-align: center; border: none !important; }
+.cwc-rates-add-col {
+	background: #3b82f6; color: #fff; border: none; width: 24px; height: 24px;
+	border-radius: 50%; font-size: 18px; cursor: pointer;
+}
+.cwc-rates-table-actions { display: flex; justify-content: center; }
+.cwc-rates-footer-actions { padding: 0 24px 24px; }
+.cwc-rates-add-row-btn { background: #f8fafc !important; border: 1px dashed #cbd5e1 !important; width: 100%; color: #64748b !important; }
+.cwc-rates-add-row-btn:hover { background: #f1f5f9 !important; border-color: #94a3b8 !important; color: #1e293b !important; }

@@ -45,7 +45,7 @@
 	margin: 0;
 	padding: 0;
 	list-style: none;
-	font-family: 'Inter', system-ui, sans-serif;
+	font-family: 'Inter', sans-serif;
 	font-weight: 600;
 	font-size: clamp(16px, 1.5vw, 20px);
 	line-height: 1;
@@ -99,7 +99,7 @@
    ---------------------------------------- */
 
 .cwc-breadcrumbs__current {
-	font-family: 'Sora', system-ui, sans-serif;
+	font-family: 'Sora', sans-serif;
 	font-weight: 600;
 	color: #0096C7;
 }

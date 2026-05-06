@@ -993,13 +993,14 @@ input.bf-field__input.bf-guest-name {
 
 .bf-modal {
 	position: fixed;
-	top: 50%;
+	top: 55%;
 	left: 50%;
 	transform: translate(-50%, -50%);
 	z-index: 1000;
 	display: none;
 	width: 90%;
 	max-width: 560px;
+	max-height: 90vh;
 }
 
 .bf-modal.is-active {
@@ -1011,6 +1012,9 @@ input.bf-field__input.bf-guest-name {
 	border-radius: 12px;
 	padding: 40px;
 	box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+	max-height: 90vh;
+	display: flex;
+	flex-direction: column;
 }
 
 .bf-modal__inner--trip {
@@ -1045,9 +1049,13 @@ input.bf-field__input.bf-guest-name {
 
 .bf-modal__body {
 	display: flex;
-	gap: 25px;
-	justify-content: center;
+	justify-content: flex-start;
 	flex-direction: column;
+	margin-bottom: 15px;
+	overflow-y: auto;
+	flex: 1;
+	padding-right: 5px;
+	/* space for scrollbar */
 }
 
 .bf-modal__save {
@@ -1152,6 +1160,10 @@ input.bf-field__input.bf-guest-name {
 
 .bf-calendar.is-open {
 	display: block;
+}
+
+.bf-modal__body:has(.bf-calendar.is-open) .bf-modal__date-selection-wrapper {
+	display: none;
 }
 
 .bf-calendar__header {
@@ -1292,6 +1304,7 @@ input.bf-field__input.bf-guest-name {
 	accent-color: #0096C7;
 	width: 24px;
 	height: 24px;
+	outline: none;
 }
 
 /* Modal: additional guest row */
@@ -1474,21 +1487,61 @@ input.bf-field__input.bf-guest-name {
 	}
 
 	.bf-modal__inner {
-		padding: 24px;
+		padding: 20px;
 	}
 
 	.bf-modal__title {
-		font-size: 28px;
+		font-size: 24px;
 	}
 
-	.bf-modal__date-cards {
+	.bf-modal__room-option-name {
+		font-size: 18px;
+	}
+
+	.bf-modal__room-option-cap {
+		font-size: 14px;
+	}
+
+	.bf-modal__room-option {
+		padding: 12px 0;
+	}
+
+	/* Trip Summary Modal Responsiveness */
+	.bf-modal__inner--trip {
+		padding: 20px;
+	}
+
+	.bf-modal__date-selection-wrapper {
 		flex-direction: column;
+		gap: 12px;
+		margin-bottom: 0;
 	}
 
-	.bf-modal__date-divider {
-		width: 60px;
-		height: 1px;
-		margin: 4px 0;
+	.bf-modal__date-selection-grid {
+		padding: 16px;
+		gap: 12px;
+	}
+
+	.bf-modal__vertical-divider {
+		display: none;
+	}
+
+	.bf-modal__date-label {
+		font-size: 18px;
+		line-height: 1.2;
+	}
+
+	.bf-modal__date-val {
+		font-size: 16px;
+	}
+
+	.bf-calendar__month-year {
+		font-size: 18px;
+	}
+
+	.bf-modal__save {
+		height: 50px;
+		font-size: 14px;
 	}
 
 	.bf-guest-row__field-group {

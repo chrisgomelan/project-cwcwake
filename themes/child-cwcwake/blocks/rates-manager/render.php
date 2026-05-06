@@ -11,7 +11,12 @@ if (!defined('ABSPATH')) {
 	exit;
 }
 
-$categories = $attributes['categories'] ?? array();
+if ( function_exists( 'cwc_get_global_rates' ) ) {
+	$categories = cwc_get_global_rates();
+} else {
+	$categories = $attributes['categories'] ?? array();
+}
+
 if (empty($categories)) {
 	return;
 }
@@ -90,9 +95,9 @@ $wrapper_attributes = get_block_wrapper_attributes(
 										<?php foreach ($rate_cat['table'] as $r_idx => $row): ?>
 											<tr>
 												<?php foreach ($row as $cell): ?>
-													<<?php echo 0 === $r_idx ? 'th' : 'td'; ?> class="cwc-rates-manager__cell">
+													<td class="cwc-rates-manager__cell">
 														<?php echo esc_html($cell); ?>
-													</<?php echo 0 === $r_idx ? 'th' : 'td'; ?>>
+													</td>
 												<?php endforeach; ?>
 											</tr>
 										<?php endforeach; ?>

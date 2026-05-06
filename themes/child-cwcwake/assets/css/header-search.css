@@ -127,6 +127,7 @@
     text-decoration: none;
     color: #1e293b;
     transition: background 0.2s ease;
+    font-weight: 400;
 }
 
 .cwc-header__search-item:hover {
@@ -219,6 +220,7 @@
     border-radius: 20px;
     transition: all 0.2s ease;
     width: fit-content;
+    font-weight: 400;
 }
 
 .cwc-header__search-rec-item:hover {
