@@ -87,6 +87,7 @@
 	color: #F5F1EB;
 	text-decoration: none;
 	transition: transform 0.2s ease, box-shadow 0.2s ease;
+	outline: none;
 }
 
 .cwc-cta-footer__btn:hover {

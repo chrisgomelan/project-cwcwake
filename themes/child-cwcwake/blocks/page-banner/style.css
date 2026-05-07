@@ -50,6 +50,50 @@
 }
 
 /* ----------------------------------------
+   Vertical decorative lines (3 dividers)
+   Only shown when has-vertical-lines class is present
+   ---------------------------------------- */
+
+.cwc-page-banner::before {
+	display: none;
+}
+
+.cwc-page-banner.has-vertical-lines::before {
+	display: block;
+	content: "";
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background:
+		linear-gradient(to right, transparent 24%, #FFFFFFB2 24%, #FFFFFFB2 24.15%, transparent 24.15%),
+		linear-gradient(to right, transparent 50%, #FFFFFFB2 50%, #FFFFFFB2 50.15%, transparent 50.15%),
+		linear-gradient(to right, transparent 74%, #FFFFFFB2 74%, #FFFFFFB2 74.15%, transparent 74.15%);
+	background-size: 100% 100%;
+	pointer-events: none;
+	z-index: 0;
+}
+
+.cwc-page-banner__overlay {
+	z-index: 1;
+}
+
+.cwc-page-banner__content {
+	z-index: 2;
+}
+
+.cwc-page-banner__corner {
+	z-index: 3;
+}
+
+@media (max-width: 900px) {
+	.cwc-page-banner::before {
+		display: none;
+	}
+}
+
+/* ----------------------------------------
    Decorative corner brackets
    ---------------------------------------- */
 

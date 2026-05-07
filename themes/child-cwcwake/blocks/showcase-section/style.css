@@ -225,11 +225,75 @@
 .cwc-showcase__play {
 	position: relative;
 	z-index: 1;
-	transition: transform 0.2s ease;
+	transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 .cwc-showcase__poster:hover .cwc-showcase__play {
 	transform: scale(1.1);
+}
+
+/* ----------------------------------------
+   Lite Embeds (Performance Optimization)
+   ---------------------------------------- */
+
+.cwc-showcase__lite-embed {
+	position: relative;
+	width: 100%;
+	aspect-ratio: 16 / 9;
+	background: #000;
+	cursor: pointer;
+	overflow: hidden;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.cwc-showcase__poster-img {
+	position: absolute;
+	inset: 0;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	transition: transform 0.6s ease, filter 0.4s ease;
+}
+
+.cwc-showcase__poster-img--empty {
+	background: var(--wp--preset--color--text-muted);
+}
+
+.cwc-showcase__play-overlay {
+	position: absolute;
+	inset: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: rgba(0, 0, 0, 0);
+	transition: background 0.4s ease;
+	z-index: 2;
+}
+
+.cwc-showcase__lite-embed:hover .cwc-showcase__poster-img {
+	transform: scale(1.05);
+	filter: brightness(0.8);
+}
+
+.cwc-showcase__lite-embed:hover .cwc-showcase__play-overlay {
+	background: rgba(0, 0, 0, 0.15);
+}
+
+.cwc-showcase__lite-embed:hover .cwc-showcase__play {
+	transform: scale(1.15);
+}
+
+.cwc-showcase__lite-embed.is-loaded {
+	cursor: default;
+}
+
+.cwc-showcase__video--iframe {
+	border: 0;
+	width: 100%;
+	height: 100%;
+	aspect-ratio: 16 / 9;
 }
 
 /* ----------------------------------------

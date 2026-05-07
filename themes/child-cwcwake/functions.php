@@ -169,7 +169,7 @@ function cwc_preload_lcp_resources() {
 	$preload_image = '';
 
 	if ( is_front_page() ) {
-		$preload_image = '/wp-content/uploads/2026/04/hero-home.jpg';
+		$preload_image = '/wp-content/uploads/2026/05/hero-home.webp';
 	} elseif ( is_page( 'water-sports' ) ) {
 		$preload_image = '/wp-content/uploads/2026/04/watersports-page-bg-banner-e1776914994956.webp';
 	} elseif ( is_page( 'accommodations' ) ) {
@@ -1298,7 +1298,8 @@ add_filter( 'posts_where', 'cwc_exclude_hub_pages_where', 10, 2 );
  * @param array|string $mimes    Array of mime types or string of mime types.
  * @return array Modified file data.
  */
-function cwc_fix_svg_filetype( $data, $file, $filename, $mimes ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed -- Signature required by wp_check_filetype_and_ext filter.
+function cwc_fix_svg_filetype( $data, $file, $filename, $mimes ) {
+ // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed -- Signature required by wp_check_filetype_and_ext filter.
 	$ext = pathinfo( $filename, PATHINFO_EXTENSION );
 	if ( 'svg' === strtolower( $ext ) ) {
 		$data['type'] = 'image/svg+xml';
@@ -1508,104 +1509,104 @@ function cwc_get_intent_map() {
 	$home = home_url( '/' );
 	return array(
 		// Water / swimming intent.
-		'swim'        => array(
+		'swim'       => array(
 			'keywords' => array( 'pool', 'water', 'wakeboard', 'lake', 'aqua' ),
 			'pages'    => array(
 				'Water Sports'     => $home . 'water-sports/',
 				'Elite Facilities' => $home . 'elite-facilities/',
 			),
 		),
-		'pool'        => array(
+		'pool'       => array(
 			'keywords' => array( 'swim', 'water', 'aqua', 'lake' ),
 			'pages'    => array(
 				'Water Sports'     => $home . 'water-sports/',
 				'Elite Facilities' => $home . 'elite-facilities/',
 			),
 		),
-		'wakeboard'   => array(
+		'wakeboard'  => array(
 			'keywords' => array( 'water', 'cable', 'ride', 'board', 'beginner' ),
 			'pages'    => array(
 				'Water Sports' => $home . 'water-sports/',
 				'Rates'        => $home . 'rates/',
 			),
 		),
-		'surf'        => array(
+		'surf'       => array(
 			'keywords' => array( 'wakeboard', 'water', 'board', 'wave' ),
 			'pages'    => array( 'Water Sports' => $home . 'water-sports/' ),
 		),
 		// Accommodation intent.
-		'sleep'       => array(
+		'sleep'      => array(
 			'keywords' => array( 'room', 'accommodation', 'villa', 'cabin', 'cabana', 'stay', 'dwell' ),
 			'pages'    => array( 'Accommodations' => $home . 'accommodations/' ),
 		),
-		'stay'        => array(
+		'stay'       => array(
 			'keywords' => array( 'room', 'accommodation', 'villa', 'cabin', 'cabana', 'book', 'dwell' ),
 			'pages'    => array( 'Accommodations' => $home . 'accommodations/' ),
 		),
-		'room'        => array(
+		'room'       => array(
 			'keywords' => array( 'accommodation', 'villa', 'cabin', 'cabana', 'stay', 'dwell' ),
 			'pages'    => array( 'Accommodations' => $home . 'accommodations/' ),
 		),
-		'hotel'       => array(
+		'hotel'      => array(
 			'keywords' => array( 'accommodation', 'villa', 'room', 'cabin', 'stay' ),
 			'pages'    => array( 'Accommodations' => $home . 'accommodations/' ),
 		),
 		// Food / dining intent.
-		'eat'         => array(
+		'eat'        => array(
 			'keywords' => array( 'food', 'restaurant', 'dining', 'bar', 'meal' ),
 			'pages'    => array( 'FAQs' => $home . 'faqs/' ),
 		),
-		'food'        => array(
+		'food'       => array(
 			'keywords' => array( 'restaurant', 'dining', 'eat', 'bar', 'meal' ),
 			'pages'    => array( 'FAQs' => $home . 'faqs/' ),
 		),
-		'restaurant'  => array(
+		'restaurant' => array(
 			'keywords' => array( 'food', 'dining', 'eat', 'bar' ),
 			'pages'    => array( 'FAQs' => $home . 'faqs/' ),
 		),
 		// Pricing intent.
-		'price'       => array(
+		'price'      => array(
 			'keywords' => array( 'rate', 'cost', 'fee', 'budget', 'promo', 'discount' ),
 			'pages'    => array( 'Rates' => $home . 'rates/' ),
 		),
-		'cost'        => array(
+		'cost'       => array(
 			'keywords' => array( 'rate', 'price', 'fee', 'budget' ),
 			'pages'    => array( 'Rates' => $home . 'rates/' ),
 		),
-		'cheap'       => array(
+		'cheap'      => array(
 			'keywords' => array( 'budget', 'affordable', 'cabin', 'rate', 'promo' ),
 			'pages'    => array(
 				'Rates'          => $home . 'rates/',
 				'Accommodations' => $home . 'accommodations/',
 			),
 		),
-		'budget'      => array(
+		'budget'     => array(
 			'keywords' => array( 'cheap', 'affordable', 'cabin', 'rate', 'promo' ),
 			'pages'    => array( 'Rates' => $home . 'rates/' ),
 		),
 		// Booking intent.
-		'book'        => array(
+		'book'       => array(
 			'keywords' => array( 'reservation', 'reserve', 'booking', 'schedule' ),
 			'pages'    => array( 'Book Now' => $home . 'book-now/' ),
 		),
-		'reserve'     => array(
+		'reserve'    => array(
 			'keywords' => array( 'book', 'reservation', 'booking' ),
 			'pages'    => array( 'Book Now' => $home . 'book-now/' ),
 		),
 		// Travel / location intent.
-		'directions'  => array(
+		'directions' => array(
 			'keywords' => array( 'location', 'map', 'travel', 'address', 'get' ),
 			'pages'    => array(
 				'FAQs'       => $home . 'faqs/',
 				'Contact Us' => $home . 'contact-us/',
 			),
 		),
-		'location'    => array(
+		'location'   => array(
 			'keywords' => array( 'directions', 'map', 'address', 'where' ),
 			'pages'    => array( 'Contact Us' => $home . 'contact-us/' ),
 		),
 		// Activity intent.
-		'activity'    => array(
+		'activity'   => array(
 			'keywords' => array( 'sport', 'adventure', 'fun', 'ride', 'game' ),
 			'pages'    => array(
 				'Water Sports'     => $home . 'water-sports/',
@@ -1613,7 +1614,7 @@ function cwc_get_intent_map() {
 				'Elite Facilities' => $home . 'elite-facilities/',
 			),
 		),
-		'fun'         => array(
+		'fun'        => array(
 			'keywords' => array( 'activity', 'adventure', 'sport', 'game', 'play' ),
 			'pages'    => array(
 				'Water Sports'    => $home . 'water-sports/',
@@ -1621,7 +1622,7 @@ function cwc_get_intent_map() {
 			),
 		),
 		// Family intent.
-		'kid'         => array(
+		'kid'        => array(
 			'keywords' => array( 'child', 'family', 'children', 'kids' ),
 			'pages'    => array(
 				'Land Activities'  => $home . 'land-activities/',
@@ -1629,7 +1630,7 @@ function cwc_get_intent_map() {
 				'FAQs'             => $home . 'faqs/',
 			),
 		),
-		'family'      => array(
+		'family'     => array(
 			'keywords' => array( 'kid', 'child', 'group', 'children' ),
 			'pages'    => array(
 				'Accommodations' => $home . 'accommodations/',
@@ -1637,11 +1638,11 @@ function cwc_get_intent_map() {
 			),
 		),
 		// Photo / gallery intent.
-		'photo'       => array(
+		'photo'      => array(
 			'keywords' => array( 'gallery', 'picture', 'image', 'album' ),
 			'pages'    => array( 'Gallery' => $home . 'gallery/' ),
 		),
-		'picture'     => array(
+		'picture'    => array(
 			'keywords' => array( 'gallery', 'photo', 'image', 'album' ),
 			'pages'    => array( 'Gallery' => $home . 'gallery/' ),
 		),
@@ -1748,7 +1749,7 @@ function cwc_global_search_handler() {
 	$total = count( $results['faqs'] ) + count( $results['accommodations'] ) + count( $results['posts'] );
 
 	if ( $total === 0 ) {
-		$intent        = cwc_resolve_intent( $q_words, $clean_q );
+		$intent         = cwc_resolve_intent( $q_words, $clean_q );
 		$expanded_words = $intent['keywords'];
 
 		if ( ! empty( $expanded_words ) ) {
@@ -1879,8 +1880,8 @@ function cwc_resolve_intent( $q_words, $clean_q ) {
 		foreach ( $intent_map as $intent_key => $intent_data ) {
 			// Match if the word starts with the intent key or vice-versa (stem matching).
 			if ( strpos( $word, $intent_key ) === 0 || strpos( $intent_key, $word ) === 0 ) {
-				$keywords = array_merge( $keywords, $intent_data['keywords'] );
-				$pages    = array_merge( $pages, $intent_data['pages'] );
+				$keywords  = array_merge( $keywords, $intent_data['keywords'] );
+				$pages     = array_merge( $pages, $intent_data['pages'] );
 				$matched[] = $intent_key;
 			}
 		}

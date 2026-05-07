@@ -54,13 +54,22 @@ $wrapper_attrs = get_block_wrapper_attributes(
 
 			<div class="cwc-intro__video-wrap">
 				<?php if ( $is_vimeo ) : ?>
-					<iframe
-						class="cwc-intro__video"
-						src="https://player.vimeo.com/video/<?php echo esc_attr( $vimeo_id ); ?>?byline=0&portrait=0&title=0"
-						frameborder="0"
-						allow="autoplay; fullscreen; picture-in-picture"
-						allowfullscreen
-					></iframe>
+					<div class="cwc-intro__lite-embed" data-embed-url="https://player.vimeo.com/video/<?php echo esc_attr( $vimeo_id ); ?>?byline=0&portrait=0&title=0&autoplay=1">
+						<?php if ( ! empty( $video_poster ) ) : ?>
+							<img src="<?php echo esc_url( $video_poster ); ?>" alt="" class="cwc-intro__poster-img" loading="lazy">
+						<?php else : ?>
+							<div class="cwc-intro__poster-img cwc-intro__poster-img--empty"></div>
+						<?php endif; ?>
+						
+						<div class="cwc-intro__play-overlay">
+							<span class="cwc-intro__play-icon" aria-hidden="true">
+								<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="currentColor">
+									<circle cx="12" cy="12" r="11" fill="rgba(0,0,0,0.6)" stroke="white" stroke-width="1.5"/>
+									<polygon points="9.5,7 17,12 9.5,17" fill="white"/>
+								</svg>
+							</span>
+						</div>
+					</div>
 				<?php elseif ( ! empty( $video_url ) ) : ?>
 					<video
 						class="cwc-intro__video"

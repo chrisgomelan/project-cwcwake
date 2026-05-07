@@ -18,7 +18,7 @@ if (!defined('ABSPATH')) {
  */
 function cwc_get_email_template($title, $content, $args = [])
 {
-	$logo_url = home_url('/wp-content/themes/child-cwcwake/assets/images/logo.png'); // Assuming a logo exists, or fallback to text
+	$logo_url = home_url('/wp-content/uploads/2026/04/cwc-instagram-logo-1.webp');
 	$ref_code = $args['ref'] ?? '';
 	$banner_title = $args['banner_title'] ?? "You're all set!";
 	$banner_subtitle = $args['banner_subtitle'] ?? "Your booking has been received and is being processed.";
@@ -75,6 +75,7 @@ function cwc_get_email_template($title, $content, $args = [])
 				text-transform: uppercase;
 				text-decoration: none;
 				display: inline-block;
+				width: 100%;
 			}
 
 			.header-ref {
@@ -274,14 +275,21 @@ function cwc_get_email_template($title, $content, $args = [])
 
 			.footer-logo {
 				font-family: 'Sora', sans-serif;
-				font-size: 50px;
+				font-size: 20px;
 				font-weight: 700;
 				letter-spacing: 0.05em;
 				color: #FFFFFF;
 				text-transform: uppercase;
 				text-decoration: none;
-				display: block;
+				display: inline-block;
 				margin-bottom: 16px;
+				padding: 8px 0;
+			}
+
+			.footer-logo img {
+				display: block;
+				max-width: 100%;
+				height: auto;
 			}
 
 			.footer-support {
@@ -353,10 +361,12 @@ function cwc_get_email_template($title, $content, $args = [])
 			<div class="header">
 				<table width="100%" border="0" cellspacing="0" cellpadding="0">
 					<tr>
-						<td align="left" valign="middle" class="mobile-stack">
+						<td class="mobile-stack" align="center" valign="middle">
 							<a href="<?php echo esc_url(home_url()); ?>" class="logo"
-								style="color: #FFFFFF; text-decoration: none; text-transform: uppercase; font-size: 14px;">CamSur
-								Watersports Complex</a>
+								style="color: #FFFFFF; text-decoration: none; text-transform: uppercase; font-size: 14px;">
+							<img src="<?php echo esc_url($logo_url); ?>" alt="CWC Wake Park - Watersports Resort" width="133"
+									height="28" style="display: block; border: 0;" />
+							</a>
 						</td>
 						<?php if ($ref_code): ?>
 							<td align="right" valign="middle" class="mobile-stack">
@@ -397,9 +407,12 @@ function cwc_get_email_template($title, $content, $args = [])
 			<div class="footer">
 				<table width="100%" border="0" cellspacing="0" cellpadding="0">
 					<tr>
-						<td align="center" valign="top" style="padding-bottom: 16px;">
+						<td align="center" valign="top" style="padding-bottom: 24px;">
 							<a href="<?php echo esc_url(home_url()); ?>" class="footer-logo"
-								style="color: #FFFFFF; text-decoration: none;">CWC</a>
+								style="color: #FFFFFF; text-decoration: none; display: inline-block; padding: 8px 0;">
+								<img src="<?php echo esc_url($logo_url); ?>" alt="CWC Wake Park - Watersports Resort" width="200" height="42"
+									style="display: block; border: 0; margin: 0 auto; max-width: 100%;" />
+							</a>
 						</td>
 					</tr>
 					<tr>

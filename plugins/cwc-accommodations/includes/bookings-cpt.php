@@ -280,6 +280,11 @@ function cwc_release_legacy_booked_unit_for_booking($booking_id)
 
 function cwc_update_booking_status()
 {
+	// Verify nonce
+	if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'cwc_dash_nonce')) {
+		wp_send_json_error(['message' => 'Nonce verification failed. Please refresh and try again.']);
+	}
+
 	if (!current_user_can('manage_options')) {
 		wp_send_json_error(['message' => 'Unauthorized']);
 	}
@@ -333,6 +338,11 @@ add_action('wp_ajax_cwc_update_booking_status', 'cwc_update_booking_status');
 
 function cwc_update_payment_status()
 {
+	// Verify nonce
+	if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'cwc_dash_nonce')) {
+		wp_send_json_error(['message' => 'Nonce verification failed. Please refresh and try again.']);
+	}
+
 	if (!current_user_can('manage_options')) {
 		wp_send_json_error(['message' => 'Unauthorized']);
 	}
@@ -367,6 +377,11 @@ add_action('wp_ajax_cwc_update_payment_status', 'cwc_update_payment_status');
 
 function cwc_resend_booking_email()
 {
+	// Verify nonce
+	if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'cwc_dash_nonce')) {
+		wp_send_json_error(['message' => 'Nonce verification failed. Please refresh and try again.']);
+	}
+
 	if (!current_user_can('manage_options')) {
 		wp_send_json_error(['message' => 'Unauthorized']);
 	}

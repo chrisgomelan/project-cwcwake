@@ -920,3 +920,9 @@ body:not(.cwc-home) .cwc-header__burger-bar {
 		color: var(--wp--preset--color--text);
 	}
 }
+
+/* Prevent chevron from rotating/flipping on hover on mobile */
+.cwc-header__nav-center .wp-block-navigation-item.has-child.open-on-hover-click:hover svg,
+.cwc-header__nav-center .wp-block-navigation-item.has-child.open-on-hover-click:hover .wp-block-navigation__submenu-icon svg {
+	transform: none !important;
+}

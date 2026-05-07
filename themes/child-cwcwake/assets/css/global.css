@@ -381,6 +381,42 @@ img {
 		the header geometry exactly. */
 	padding-left: 0 !important;
 	padding-right: 0 !important;
+	position: relative;
+}
+
+/* ----------------------------------------
+   Vertical decorative lines (3 dividers) for tropical section
+   Conditional: shown only when "has-vertical-lines" class is present
+   ---------------------------------------- */
+
+/* Base: hide lines on all sections */
+.cwc-tropical-section::before {
+	display: none !important;
+}
+
+/* Show lines only when has-vertical-lines class is added to tropical section */
+.cwc-tropical-section.has-vertical-lines::before {
+	display: block !important;
+	content: "";
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background:
+		linear-gradient(to right, transparent 24%, #1E1E1E 24%, #1E1E1E 24.15%, transparent 24.15%),
+		linear-gradient(to right, transparent 50%, #1E1E1E 50%, #1E1E1E 50.15%, transparent 50.15%),
+		linear-gradient(to right, transparent 74%, #1E1E1E 74%, #1E1E1E 74.15%, transparent 74.15%);
+	background-size: 100% 100%;
+	pointer-events: none;
+	z-index: 0;
+	opacity: 0.3;
+}
+
+@media (max-width: 900px) {
+	.cwc-tropical-section.has-vertical-lines::before {
+		display: none !important;
+	}
 }
 
 .cwc-tropical-section>.cwc-breadcrumbs__wrap,
@@ -405,6 +441,8 @@ img {
 	margin-inline: auto;
 	padding-left: clamp(1rem, 4vw, 4rem);
 	padding-right: clamp(1rem, 4vw, 4rem);
+	position: relative;
+	z-index: 1;
 }
 
 /* ----------------------------------------
@@ -481,6 +519,7 @@ img {
 	box-shadow: -2px 4px 12px rgba(24, 24, 24, 0.06);
 	cursor: pointer;
 	border: none;
+	outline: none;
 }
 
 .cwc-page:hover,
@@ -1158,4 +1197,12 @@ input[type="date"]::after {
 	.cwc-inquiry-form {
 		gap: 16px;
 	}
+}
+
+/* ----------------------------------------
+	Contact Page Overrides
+	---------------------------------------- */
+
+.u-padding-0 {
+	padding: 0 !important;
 }
