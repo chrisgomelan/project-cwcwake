@@ -381,6 +381,42 @@ img {
 		the header geometry exactly. */
 	padding-left: 0 !important;
 	padding-right: 0 !important;
+	position: relative;
+}
+
+/* ----------------------------------------
+   Vertical decorative lines (3 dividers) for tropical section
+   Conditional: shown only when "has-vertical-lines" class is present
+   ---------------------------------------- */
+
+/* Base: hide lines on all sections */
+.cwc-tropical-section::before {
+	display: none !important;
+}
+
+/* Show lines only when has-vertical-lines class is added to tropical section */
+.cwc-tropical-section.has-vertical-lines::before {
+	display: block !important;
+	content: "";
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background:
+		linear-gradient(to right, transparent 24%, #1E1E1E 24%, #1E1E1E 24.15%, transparent 24.15%),
+		linear-gradient(to right, transparent 50%, #1E1E1E 50%, #1E1E1E 50.15%, transparent 50.15%),
+		linear-gradient(to right, transparent 74%, #1E1E1E 74%, #1E1E1E 74.15%, transparent 74.15%);
+	background-size: 100% 100%;
+	pointer-events: none;
+	z-index: 0;
+	opacity: 0.3;
+}
+
+@media (max-width: 900px) {
+	.cwc-tropical-section.has-vertical-lines::before {
+		display: none !important;
+	}
 }
 
 .cwc-tropical-section>.cwc-breadcrumbs__wrap,
@@ -405,6 +441,8 @@ img {
 	margin-inline: auto;
 	padding-left: clamp(1rem, 4vw, 4rem);
 	padding-right: clamp(1rem, 4vw, 4rem);
+	position: relative;
+	z-index: 1;
 }
 
 /* ----------------------------------------
@@ -481,6 +519,7 @@ img {
 	box-shadow: -2px 4px 12px rgba(24, 24, 24, 0.06);
 	cursor: pointer;
 	border: none;
+	outline: none;
 }
 
 .cwc-page:hover,
@@ -670,8 +709,8 @@ img {
 .cwc-404__title {
 	font-family: var(--wp--preset--font-family--heading);
 	font-weight: 700;
-	font-size: clamp(32px, 4vw, 56px);
-	line-height: 1.1;
+	font-size: clamp(28px, 4vw, 48px);
+	line-height: 1.15;
 	color: var(--wp--preset--color--secondary);
 	margin: 0;
 	margin-top: -3rem;
@@ -680,30 +719,121 @@ img {
 .cwc-404__message {
 	font-family: var(--wp--preset--font-family--body);
 	font-weight: 500;
-	font-size: clamp(16px, 1.2vw, 20px);
+	font-size: clamp(15px, 1.2vw, 19px);
 	line-height: 1.6;
-	color: rgba(0, 0, 0, 0.6);
+	color: rgba(0, 0, 0, 0.55);
 	margin: 0;
+	max-width: 480px;
 }
+
+/* ── 404 Search Bar ─────────────────────────── */
+
+.cwc-404__search {
+	width: 100%;
+	max-width: 480px;
+	margin-top: 0.5rem;
+}
+
+.cwc-404__search-wrap {
+	position: relative;
+	display: flex;
+	align-items: center;
+}
+
+.cwc-404__search-icon {
+	position: absolute;
+	left: 18px;
+	color: #94a3b8;
+	pointer-events: none;
+	flex-shrink: 0;
+}
+
+.cwc-404__search-input {
+	width: 100%;
+	padding: 14px 52px 14px 48px;
+	border: 2px solid #e2e8f0;
+	border-radius: 999px;
+	font-family: var(--wp--preset--font-family--body);
+	font-size: clamp(14px, 1vw, 16px);
+	font-weight: 400;
+	color: #1e293b;
+	background: #ffffff;
+	outline: none;
+	transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.cwc-404__search-input::placeholder {
+	color: #94a3b8;
+}
+
+.cwc-404__search-input:focus {
+	border-color: var(--wp--preset--color--primary);
+	box-shadow: 0 0 0 4px rgba(0, 150, 199, 0.1);
+}
+
+.cwc-404__search-clear {
+	position: absolute;
+	right: 14px;
+	background: none;
+	border: none;
+	color: #94a3b8;
+	cursor: pointer;
+	padding: 4px;
+	display: none;
+	transition: color 0.2s ease;
+}
+
+.cwc-404__search-clear.is-visible {
+	display: flex;
+}
+
+.cwc-404__search-clear:hover {
+	color: #64748b;
+}
+
+/* ── 404 Inline Results ─────────────────────── */
+
+.cwc-404__search-results {
+	width: 100%;
+	max-height: 380px;
+	overflow-y: auto;
+	margin-top: 12px;
+	background: #ffffff;
+	border-radius: 12px;
+	box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+	text-align: left;
+}
+
+.cwc-404__search-results:empty {
+	display: none;
+}
+
+.cwc-404__search-results:not(:empty) {
+	padding: 12px 16px 16px;
+}
+
+/* ── 404 Home Button ────────────────────────── */
 
 .cwc-404__btn {
 	display: inline-flex;
 	align-items: center;
 	gap: 0.5em;
-	padding: 0.85em 2.5em;
-	background: var(--wp--preset--color--primary);
-	color: #ffffff;
+	padding: 0.75em 2em;
 	font-family: var(--wp--preset--font-family--heading);
 	font-weight: 600;
-	font-size: clamp(15px, 1vw, 18px);
+	font-size: clamp(14px, 1vw, 16px);
 	text-decoration: none;
 	border-radius: 999px;
-	box-shadow: 0 4px 16px rgba(0, 150, 199, 0.3);
 	transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
-	margin-top: 0.5rem;
 }
 
-.cwc-404__btn:hover {
+.cwc-404__btn--home {
+	background: var(--wp--preset--color--primary);
+	color: #ffffff;
+	box-shadow: 0 4px 16px rgba(0, 150, 199, 0.3);
+}
+
+.cwc-404__btn--home:hover {
 	background: var(--wp--preset--color--primary-dark);
 	transform: translateY(-2px);
 	box-shadow: 0 8px 24px rgba(0, 150, 199, 0.4);
@@ -1067,4 +1197,12 @@ input[type="date"]::after {
 	.cwc-inquiry-form {
 		gap: 16px;
 	}
+}
+
+/* ----------------------------------------
+	Contact Page Overrides
+	---------------------------------------- */
+
+.u-padding-0 {
+	padding: 0 !important;
 }

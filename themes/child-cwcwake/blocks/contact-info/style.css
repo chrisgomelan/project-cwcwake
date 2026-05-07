@@ -8,6 +8,8 @@
 .cwc-contact-info {
 	margin-block-start: var(--wp--preset--spacing--50, 2.5rem) !important;
 	margin-block-end: var(--wp--preset--spacing--50, 2.5rem);
+	padding: 0;
+
 }
 
 .cwc-contact-info__panel {
@@ -27,6 +29,8 @@
 	flex-direction: column;
 	gap: clamp(1rem, 2vw, 1.5rem);
 	padding: clamp(1.5rem, 3vw, 3rem);
+	min-width: 0;
+	overflow: hidden;
 }
 
 .cwc-contact-info__header {
@@ -73,6 +77,9 @@
 	font-size: clamp(1rem, 1.2vw, 1.25rem);
 	line-height: 1.5;
 	color: #000000;
+	overflow-wrap: break-word;
+	word-break: break-word;
+	min-width: 0;
 }
 
 /* ---------- Email/phone list ---------- */
@@ -81,6 +88,7 @@
 	list-style: none;
 	margin: 0;
 	padding: 0;
+	min-width: 0;
 	display: flex;
 	flex-direction: column;
 	gap: clamp(0.75rem, 1.5vw, 1.25rem);
@@ -89,6 +97,8 @@
 .cwc-contact-info__list-item {
 	display: flex;
 	align-items: flex-start;
+	min-width: 0;
+	overflow: hidden;
 	gap: 0.85rem;
 }
 
@@ -149,6 +159,9 @@
 	font-family: var(--wp--preset--font-family--body, 'Archivo', sans-serif);
 	font-weight: 500;
 	font-size: clamp(1rem, 1.2vw, 1.25rem);
+	overflow-wrap: break-word;
+	word-break: break-word;
+	min-width: 0;
 	line-height: 1.5;
 	color: #000000;
 }
@@ -204,6 +217,7 @@
 	.cwc-contact-info__image img {
 		min-height: 260px;
 		max-height: 380px;
+		display: none;
 	}
 }
 
@@ -216,5 +230,31 @@
 	.cwc-contact-info__icon {
 		width: 26px;
 		height: 26px;
+	}
+
+	.cwc-contact-info__content {
+		padding: clamp(1.25rem, 5vw, 2rem);
+	}
+
+	.cwc-contact-info__map {
+		aspect-ratio: 4 / 3;
+		min-height: 200px;
+	}
+
+	.cwc-contact-info__title {
+		font-size: clamp(1.5rem, 5vw, 2.5rem);
+	}
+
+	.cwc-contact-info__description,
+	.cwc-contact-info__address {
+		font-size: clamp(0.95rem, 2.5vw, 1rem);
+	}
+
+	.cwc-contact-info__list-label {
+		font-size: clamp(0.9rem, 2vw, 1rem);
+	}
+
+	.cwc-contact-info__list-value {
+		font-size: clamp(0.9rem, 2vw, 1rem);
 	}
 }

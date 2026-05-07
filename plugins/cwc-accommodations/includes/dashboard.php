@@ -46,15 +46,15 @@ function cwc_dash_selected_date_range()
 {
 	$start_raw = isset($_GET['tracking_start_date']) ? sanitize_text_field(wp_unslash($_GET['tracking_start_date'])) : '';
 	$end_raw = isset($_GET['tracking_end_date']) ? sanitize_text_field(wp_unslash($_GET['tracking_end_date'])) : '';
-	
+
 	$start_date = $start_raw && preg_match('/^\d{4}-\d{2}-\d{2}$/', $start_raw) && strtotime($start_raw) ? $start_raw : current_time('Y-m-d');
 	$end_date = $end_raw && preg_match('/^\d{4}-\d{2}-\d{2}$/', $end_raw) && strtotime($end_raw) ? $end_raw : date('Y-m-d', strtotime($start_date . ' +7 days'));
-	
+
 	// Ensure end date is not before start date
 	if (strtotime($end_date) < strtotime($start_date)) {
 		$end_date = $start_date;
 	}
-	
+
 	return [
 		'start' => $start_date,
 		'end' => $end_date,
@@ -121,7 +121,8 @@ function cwc_render_dash_room_tracking_sync($bookings)
 	?>
 	<div class="cwc-dash__card">
 		<div class="cwc-dash__card-header">
-			<div class="cwc-dash__card-header cwc-dash__card-header--with-actions" style="padding:0;border:0;box-shadow:none;background:none;">
+			<div class="cwc-dash__card-header cwc-dash__card-header--with-actions"
+				style="padding:0;border:0;box-shadow:none;background:none;">
 				<div class="cwc-dash__header-title">
 					<h2>Room Units Tracking</h2>
 					<span class="cwc-dash__badge"><?php echo count($rooms); ?> room types</span>
@@ -283,7 +284,8 @@ function cwc_render_dash_room_tracking_sync($bookings)
 
 				<?php if (!empty($active_bookings_for_room)): ?>
 					<div style="margin-top: 16px;">
-						<h4 style="font-size: 14px; font-weight: 600; margin: 0 0 8px; color: #475569;">Active Bookings for <?php echo esc_html($selected_date_label); ?>
+						<h4 style="font-size: 14px; font-weight: 600; margin: 0 0 8px; color: #475569;">Active Bookings for
+							<?php echo esc_html($selected_date_label); ?>
 						</h4>
 						<div class="cwc-dash__schedule-list">
 							<?php foreach ($active_bookings_for_room as $active_booking):
@@ -292,10 +294,12 @@ function cwc_render_dash_room_tracking_sync($bookings)
 								<div class="cwc-dash__schedule-item" style="padding: 8px 12px;">
 									<div class="cwc-dash__schedule-info" style="flex: 1;">
 										<strong><?php echo esc_html($active_booking['name']); ?></strong>
-										<small><?php echo esc_html($active_booking['ref']); ?> · <?php echo esc_html($active_booking['checkin']); ?> →
-											<?php echo esc_html($active_booking['checkout']); ?><?php echo $unit_name ? ' · ' . esc_html($unit_name) : ''; ?></small>
+										<small><?php echo esc_html($active_booking['ref']); ?> ·
+											<?php echo esc_html($active_booking['checkin']); ?> →
+											<?php echo esc_html($active_booking['checkout']); ?>				<?php echo $unit_name ? ' · ' . esc_html($unit_name) : ''; ?></small>
 									</div>
-									<span class="cwc-dash__status-dot cwc-dash__status-dot--<?php echo esc_attr($active_booking['status']); ?>">
+									<span
+										class="cwc-dash__status-dot cwc-dash__status-dot--<?php echo esc_attr($active_booking['status']); ?>">
 										<?php echo esc_html(ucwords(str_replace('-', ' ', $active_booking['status']))); ?>
 									</span>
 								</div>
@@ -341,7 +345,8 @@ function cwc_render_dash_availability_sync($bookings)
 	<div class="cwc-dash__grid-2">
 		<div class="cwc-dash__card">
 			<div class="cwc-dash__card-header">
-				<div class="cwc-dash__card-header cwc-dash__card-header--with-actions" style="padding:0;border:0;box-shadow:none;background:none;">
+				<div class="cwc-dash__card-header cwc-dash__card-header--with-actions"
+					style="padding:0;border:0;box-shadow:none;background:none;">
 					<div class="cwc-dash__header-title">
 						<h2>Room Units Status Overview</h2>
 						<span class="cwc-dash__badge"><?php echo esc_html($selected_date_label); ?></span>
@@ -363,7 +368,9 @@ function cwc_render_dash_availability_sync($bookings)
 					<div class="cwc-dash__room-card">
 						<div class="cwc-dash__room-card-header">
 							<h3><?php echo esc_html($room_post->post_title); ?></h3>
-							<span class="cwc-dash__room-cap">Max <?php echo esc_html((int) get_post_meta($room_post->ID, '_cwc_capacity', true)); ?> guests</span>
+							<span class="cwc-dash__room-cap">Max
+								<?php echo esc_html((int) get_post_meta($room_post->ID, '_cwc_capacity', true)); ?>
+								guests</span>
 						</div>
 						<div class="cwc-dash__room-bar-wrap">
 							<div class="cwc-dash__room-bar cwc-dash__room-bar--<?php echo esc_attr($bar_cls); ?>"
@@ -402,10 +409,12 @@ function cwc_render_dash_availability_sync($bookings)
 							</div>
 							<div class="cwc-dash__schedule-info">
 								<strong><?php echo esc_html($upcoming_booking['name']); ?></strong>
-								<small><?php echo esc_html($upcoming_booking['room']); ?> · <?php echo esc_html($upcoming_booking['checkin']); ?> →
+								<small><?php echo esc_html($upcoming_booking['room']); ?> ·
+									<?php echo esc_html($upcoming_booking['checkin']); ?> →
 									<?php echo esc_html($upcoming_booking['checkout']); ?></small>
 							</div>
-							<span class="cwc-dash__status-dot cwc-dash__status-dot--<?php echo esc_attr($upcoming_booking['status']); ?>">
+							<span
+								class="cwc-dash__status-dot cwc-dash__status-dot--<?php echo esc_attr($upcoming_booking['status']); ?>">
 								<?php echo esc_html(ucwords(str_replace('-', ' ', $upcoming_booking['status']))); ?>
 							</span>
 						</div>
@@ -578,8 +587,8 @@ function cwc_render_booking_dashboard()
 				'payments' => 'Payments',
 				'room-tracking' => 'Room Units Tracking',
 				'availability' => 'Availability',
-				'rates'        => 'Rates Management',
-				'analytics'    => 'Analytics',
+				'rates' => 'Rates Management',
+				'analytics' => 'Analytics',
 			];
 			$base_url = admin_url('edit.php?post_type=accommodation&page=cwc-booking-dashboard');
 			foreach ($tabs as $slug => $label):
@@ -1587,13 +1596,13 @@ function cwc_render_dash_rates()
 						<div class="cwc-rates-category-header">
 							<div class="cwc-rates-category-drag dashicons dashicons-menu"></div>
 							<div class="cwc-rates-category-info">
-								<input type="text" name="rates[<?php echo $c_idx; ?>][title]" 
-									value="<?php echo esc_attr($cat['title']); ?>" 
+								<input type="text" name="rates[<?php echo $c_idx; ?>][title]"
+									value="<?php echo esc_attr($cat['title']); ?>"
 									placeholder="Category Title (e.g. Wakeboarding)" class="cwc-rates-input-title">
-								<input type="hidden" name="rates[<?php echo $c_idx; ?>][id]" 
+								<input type="hidden" name="rates[<?php echo $c_idx; ?>][id]"
 									value="<?php echo esc_attr($cat['id']); ?>">
-								<textarea name="rates[<?php echo $c_idx; ?>][description]" 
-									placeholder="Description..." rows="2"><?php echo esc_textarea($cat['description']); ?></textarea>
+								<textarea name="rates[<?php echo $c_idx; ?>][description]" placeholder="Description..."
+									rows="2"><?php echo esc_textarea($cat['description']); ?></textarea>
 							</div>
 							<button type="button" class="cwc-rates-remove-category">&times;</button>
 						</div>
@@ -1603,11 +1612,12 @@ function cwc_render_dash_rates()
 								<tbody>
 									<!-- Column Controls -->
 									<tr class="cwc-rates-controls-row">
-										<?php 
+										<?php
 										$first_row = $cat['table'][0] ?? [''];
 										foreach ($first_row as $col_idx => $cell): ?>
 											<td>
-												<button type="button" class="cwc-rates-remove-col" data-col="<?php echo $col_idx; ?>" title="Remove Column">&times;</button>
+												<button type="button" class="cwc-rates-remove-col"
+													data-col="<?php echo $col_idx; ?>" title="Remove Column">&times;</button>
 											</td>
 										<?php endforeach; ?>
 										<td class="cwc-rates-add-col-cell">
@@ -1619,7 +1629,8 @@ function cwc_render_dash_rates()
 										<tr>
 											<?php foreach ($row as $col_idx => $cell): ?>
 												<td>
-													<input type="text" name="rates[<?php echo $c_idx; ?>][table][<?php echo $r_idx; ?>][<?php echo $col_idx; ?>]" 
+													<input type="text"
+														name="rates[<?php echo $c_idx; ?>][table][<?php echo $r_idx; ?>][<?php echo $col_idx; ?>]"
 														value="<?php echo esc_attr($cell); ?>">
 												</td>
 											<?php endforeach; ?>
@@ -1648,7 +1659,8 @@ function cwc_render_dash_rates()
 			<div class="cwc-rates-category-header">
 				<div class="cwc-rates-category-drag dashicons dashicons-menu"></div>
 				<div class="cwc-rates-category-info">
-					<input type="text" name="rates[__CAT_IDX__][title]" value="" placeholder="New Category Title" class="cwc-rates-input-title">
+					<input type="text" name="rates[__CAT_IDX__][title]" value="" placeholder="New Category Title"
+						class="cwc-rates-input-title">
 					<input type="hidden" name="rates[__CAT_IDX__][id]" value="">
 					<textarea name="rates[__CAT_IDX__][description]" placeholder="Description..." rows="2"></textarea>
 				</div>
@@ -1696,7 +1708,8 @@ function cwc_handle_global_rates_save()
 
 	foreach ($rates_raw as $cat) {
 		$title = sanitize_text_field($cat['title'] ?? '');
-		if (!$title) continue;
+		if (!$title)
+			continue;
 
 		$id = sanitize_key($cat['id'] ?? '');
 		if (!$id) {
@@ -1715,7 +1728,7 @@ function cwc_handle_global_rates_save()
 			$row_data = $table_raw[$r_idx];
 			$col_indices = array_keys($row_data);
 			sort($col_indices);
-			
+
 			$clean_row = [];
 			foreach ($col_indices as $c_idx) {
 				$clean_row[] = sanitize_text_field($row_data[$c_idx]);
@@ -1726,10 +1739,10 @@ function cwc_handle_global_rates_save()
 		}
 
 		$sanitized_rates[] = [
-			'id'          => $id,
-			'title'       => $title,
+			'id' => $id,
+			'title' => $title,
 			'description' => $description,
-			'table'       => $table,
+			'table' => $table,
 		];
 	}
 
@@ -1737,9 +1750,9 @@ function cwc_handle_global_rates_save()
 
 	wp_safe_redirect(add_query_arg([
 		'post_type' => 'accommodation',
-		'page'      => 'cwc-booking-dashboard',
-		'tab'       => 'rates',
-		'updated'   => '1'
+		'page' => 'cwc-booking-dashboard',
+		'tab' => 'rates',
+		'updated' => '1'
 	], admin_url('edit.php')));
 	exit;
 }

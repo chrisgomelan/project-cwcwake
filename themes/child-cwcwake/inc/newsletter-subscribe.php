@@ -61,17 +61,32 @@ function cwc_handle_newsletter_subscribe() {
 	/* translators: %s: Subscriber email address. */
 	$subject = sprintf( __( 'New newsletter subscription: %s', 'child-cwcwake' ), $email );
 
-	/* translators: 1: Subscriber email. 2: Total subscriber count. */
-	$body = sprintf(
-		__(
-			"A visitor just subscribed to the CWC Wake newsletter:\n\nEmail: %1\$s\nTotal subscribers: %2\$d\n",
-			'child-cwcwake'
-		),
-		$email,
-		count( $subscribers )
-	);
+	ob_start();
+	?>
+	<p>You have a new subscriber to the CWC Wake newsletter. Here are the details:</p>
 
-	wp_mail( $recipient, $subject, $body );
+	<div class="details-title">Subscriber Details</div>
+	<table class="details-table">
+		<tr>
+			<td>Email</td>
+			<td><?php echo esc_html( $email ); ?></td>
+		</tr>
+		<tr>
+			<td>Total Subscribers</td>
+			<td><?php echo esc_html( count( $subscribers ) ); ?></td>
+		</tr>
+	</table>
+	<?php
+	$email_content = ob_get_clean();
+
+	$body = cwc_get_email_template( 'New Newsletter Subscriber', $email_content, [
+		'banner_title'    => 'New Subscriber',
+		'banner_subtitle' => esc_html( $email ) . ' has subscribed.'
+	] );
+
+	$headers = array( 'Content-Type: text/html; charset=UTF-8' );
+
+	wp_mail( $recipient, $subject, $body, $headers );
 
 	wp_send_json_success( [ 'message' => "Thanks for subscribing! We'll keep you in the loop.", 'status' => 'success' ] );
 }
@@ -131,7 +146,7 @@ function cwc_newsletter_inject_into_footer( $html ) {
 
 			const formData = new FormData(form);
 
-			fetch(form.action, {
+			fetch(form.getAttribute('action'), {
 				method: 'POST',
 				body: formData
 			})

@@ -56,4 +56,26 @@
 			dot.addEventListener( 'click', () => goToPage( i ) );
 		} );
 	} );
+	// Lite Embed Handler
+	document.querySelectorAll( '.cwc-showcase__lite-embed' ).forEach( ( embed ) => {
+		embed.addEventListener( 'click', () => {
+			const url = embed.dataset.embedUrl;
+			if ( ! url ) return;
+
+			// Add autoplay to the URL if not present
+			const finalUrl = url.includes( '?' ) ? `${ url }&autoplay=1` : `${ url }?autoplay=1`;
+
+			const iframe = document.createElement( 'iframe' );
+			iframe.className = 'cwc-showcase__video cwc-showcase__video--iframe';
+			iframe.src = finalUrl;
+			iframe.frameBorder = '0';
+			iframe.allow = 'autoplay; fullscreen; picture-in-picture';
+			iframe.allowFullscreen = true;
+
+			// Clear the poster and play button, then append iframe
+			embed.innerHTML = '';
+			embed.appendChild( iframe );
+			embed.classList.add( 'is-loaded' );
+		} );
+	} );
 } )();

@@ -70,6 +70,7 @@
 	color: #1A1A1A;
 	text-decoration: none;
 	transition: var(--wp--custom--transition--default);
+	outline: none;
 }
 
 .cwc-breadcrumbs__link:hover {

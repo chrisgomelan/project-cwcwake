@@ -165,13 +165,22 @@ $wrapper_attrs = get_block_wrapper_attributes(
 					?>
 					<div class="cwc-showcase__card cwc-showcase__card--video">
 						<?php if ( ! empty( $embed_url ) ) : ?>
-							<iframe
-								class="cwc-showcase__video cwc-showcase__video--iframe"
-								src="<?php echo esc_url( $embed_url ); ?>"
-								frameborder="0"
-								allow="autoplay; fullscreen; picture-in-picture"
-								allowfullscreen
-							></iframe>
+							<div class="cwc-showcase__lite-embed" data-embed-url="<?php echo esc_url( $embed_url ); ?>">
+								<?php if ( ! empty( $vid_poster ) ) : ?>
+									<img src="<?php echo esc_url( $vid_poster ); ?>" alt="" class="cwc-showcase__poster-img" loading="lazy">
+								<?php else : ?>
+									<div class="cwc-showcase__poster-img cwc-showcase__poster-img--empty"></div>
+								<?php endif; ?>
+								
+								<div class="cwc-showcase__play-overlay">
+									<span class="cwc-showcase__play" aria-hidden="true">
+										<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 48 48">
+											<circle cx="24" cy="24" r="23" fill="rgba(0,0,0,0.6)" stroke="white" stroke-width="2"/>
+											<polygon points="19,14 35,24 19,34" fill="white"/>
+										</svg>
+									</span>
+								</div>
+							</div>
 						<?php elseif ( ! empty( $vid_url ) ) : ?>
 							<video
 								class="cwc-showcase__video"

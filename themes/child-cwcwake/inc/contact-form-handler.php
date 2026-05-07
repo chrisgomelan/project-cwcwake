@@ -166,16 +166,37 @@ function cwc_handle_contact_submit() {
 	/* translators: %s: Visitor name. */
 	$subject = sprintf( __( 'New contact message from %s', 'child-cwcwake' ), $name );
 
-	/* translators: 1: Visitor name. 2: Visitor email. 3: Message body. */
-	$body = sprintf(
-		__(
-			"You have a new message from the CWC Wake website contact form:\n\nName: %1\$s\nEmail: %2\$s\n\nMessage:\n%3\$s\n",
-			'child-cwcwake'
-		),
-		$name,
-		$email,
-		$message
-	);
+	ob_start();
+	?>
+	<p>You have received a new contact message from the CWC Wake website. Please find the details below:</p>
+
+	<div class="details-title">Contact Details</div>
+	<table class="details-table">
+		<tr>
+			<td>Name</td>
+			<td><?php echo esc_html( $name ); ?></td>
+		</tr>
+		<tr>
+			<td>Email</td>
+			<td><?php echo esc_html( $email ); ?></td>
+		</tr>
+	</table>
+
+	<div class="details-title">Message</div>
+	<div style="background: #fff; border: 1px solid #E8E8E8; padding: 24px; border-radius: 6px; font-family: 'Archivo', sans-serif; font-size: 15px; line-height: 1.6; color: #444444;">
+		<?php echo nl2br( esc_html( $message ) ); ?>
+	</div>
+
+	<div class="payment-note" style="margin-top: 32px;">
+		<strong>Note:</strong> You can reply directly to this email to respond to the visitor.
+	</div>
+	<?php
+	$email_content = ob_get_clean();
+
+	$body = cwc_get_email_template( 'Contact Message', $email_content, [
+		'banner_title'    => 'New Contact Message',
+		'banner_subtitle' => 'Message from ' . esc_html( $name )
+	] );
 
 	/*
 	 * Setting Reply-To to the visitor's email lets the admin hit
@@ -183,7 +204,10 @@ function cwc_handle_contact_submit() {
 	 * the site default so the message passes SPF/DKIM checks
 	 * configured in WP Mail SMTP.
 	 */
-	$headers = array( 'Reply-To: ' . $name . ' <' . $email . '>' );
+	$headers = array( 
+		'Content-Type: text/html; charset=UTF-8',
+		'Reply-To: ' . $name . ' <' . $email . '>' 
+	);
 
 	$sent = wp_mail( $recipient, $subject, $body, $headers );
 

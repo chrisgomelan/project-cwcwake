@@ -27,20 +27,15 @@ themes/twentytwentythree/
 themes/twentytwentyfour/
 themes/twentytwentyfive/
 
-# --- Third-party plugins (installed via WP admin / composer) ---
-# Ignore everything in plugins/ by default …
-plugins/*
-# … but keep the directory itself and any custom plugins we build.
-# Note: gitignore re-includes need both the folder AND its contents,
-# otherwise files inside an excluded directory stay excluded even
-# when listed individually. Add a matching pair per custom plugin.
-!plugins/.gitkeep
-!plugins/cwc-accommodations/
-!plugins/cwc-accommodations/**
-!plugins/wordpress-importer/
-!plugins/wordpress-importer/**
-!plugins/wp-mail-smtp/
-!plugins/wp-mail-smtp/**
+# --- Plugins ---
+# We are tracking all plugins so collaborators get exactly what you have installed,
+# including SEO plugins and custom plugins.
+# If you later decide to ignore third-party plugins, uncomment `plugins/*`.
+# plugins/*
+
+# --- Database Syncing ---
+# Allow the database dump file to be tracked so posts, pages, and meta descriptions sync.
+!db-sync.sql
 
 # --- Dependency & build artifacts ---
 node_modules/

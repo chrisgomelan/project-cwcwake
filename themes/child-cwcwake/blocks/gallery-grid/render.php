@@ -60,14 +60,15 @@ $wrapper_attrs = get_block_wrapper_attributes(
 	<ul class="cwc-gallery-grid__list">
 		<?php
 		foreach ( $items as $item ) :
-			$item_title  = $item['title'] ?? '';
-			$image       = $item['image'] ?? '';
-			$album_count = $item['albumCount'] ?? '';
-			$album_slug  = $item['albumSlug'] ?? '';
-			$album_id    = isset( $item['albumId'] ) ? (int) $item['albumId'] : 0;
-			$url         = $item['url'] ?? '';
-			$width       = ( ( $item['width'] ?? 'half' ) === 'full' ) ? 'full' : 'half';
-			$item_class  = 'cwc-gallery-grid__item cwc-gallery-grid__item--' . $width;
+			$item_title     = $item['title'] ?? '';
+			$image          = $item['image'] ?? '';
+			$album_count    = $item['albumCount'] ?? '';
+			$album_slug     = $item['albumSlug'] ?? '';
+			$album_id       = isset( $item['albumId'] ) ? (int) $item['albumId'] : 0;
+			$url            = $item['url'] ?? '';
+			$width          = ( ( $item['width'] ?? 'half' ) === 'full' ) ? 'full' : 'half';
+			$object_position = $item['objectPosition'] ?? '';
+			$item_class     = 'cwc-gallery-grid__item cwc-gallery-grid__item--' . $width;
 
 			/*
 			 * Resolve the published cwc_album behind this card once,
@@ -147,6 +148,9 @@ $wrapper_attrs = get_block_wrapper_attributes(
 								src="<?php echo esc_url( $image ); ?>"
 								alt="<?php echo esc_attr( $item_title ); ?>"
 								loading="lazy"
+								<?php if ( ! empty( $object_position ) ) : ?>
+									style="object-position: <?php echo esc_attr( $object_position ); ?>;"
+								<?php endif; ?>
 							/>
 						<?php endif; ?>
 

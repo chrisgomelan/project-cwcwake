@@ -13,7 +13,7 @@
 	margin: 0 auto !important;
 	min-height: clamp(300px, 28vw, 476px);
 	border-radius: 30px;
-	background-position: center;
+	background-position: bottom center;
 	background-size: cover;
 	background-repeat: no-repeat;
 	display: flex;

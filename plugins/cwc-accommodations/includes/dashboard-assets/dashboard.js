@@ -206,13 +206,14 @@
 						formData.append('new_status', newStatus);
 						formData.append('send_email', sendEmail);
 						formData.append('admin_note', adminNote);
+					formData.append('nonce', cwcDash.nonce);
 
-						const response = await fetch(cwcDash.ajaxUrl, { method: 'POST', body: formData });
-						const result = await response.json();
+					const response = await fetch(cwcDash.ajaxUrl, { method: 'POST', body: formData });
+					const result = await response.json();
 
-						if (result.success) {
-							location.reload(); // Reload to show new statuses and badges
-						} else {
+					if (result.success) {
+						location.reload();
+					} else {
 							alert('Error: ' + result.data.message);
 							submitStatusBtn.textContent = btnOriginalText;
 							submitStatusBtn.disabled = false;
@@ -240,6 +241,7 @@
 					formData.append('action', 'cwc_update_payment_status');
 					formData.append('booking_id', bookingId);
 					formData.append('payment_status', paymentStatus);
+					formData.append('nonce', cwcDash.nonce);
 
 					const response = await fetch(cwcDash.ajaxUrl, { method: 'POST', body: formData });
 					const result = await response.json();
@@ -269,6 +271,7 @@
 					const formData = new URLSearchParams();
 					formData.append('action', 'cwc_resend_booking_email');
 					formData.append('booking_id', bookingId);
+					formData.append('nonce', cwcDash.nonce);
 
 					const response = await fetch(cwcDash.ajaxUrl, { method: 'POST', body: formData });
 					const result = await response.json();

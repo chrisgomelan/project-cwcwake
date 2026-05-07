@@ -187,6 +187,10 @@
 	transition: transform 0.3s ease;
 }
 
+.cwc-site-footer__socials a {
+	outline: none;
+}
+
 .cwc-site-footer__socials a:hover img {
 	transform: translateY(-3px);
 }
@@ -252,6 +256,7 @@
 	color: #1A1A1A;
 	text-decoration: none;
 	transition: color 0.2s ease;
+	outline: none;
 }
 
 .cwc-site-footer__links-col a:hover {

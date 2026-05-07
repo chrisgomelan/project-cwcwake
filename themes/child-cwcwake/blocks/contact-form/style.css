@@ -9,6 +9,7 @@
 .cwc-contact-form {
 	margin-block-start: var(--wp--preset--spacing--50, 2.5rem) !important;
 	margin-block-end: var(--wp--preset--spacing--60, 4rem);
+	padding: 0;
 }
 
 .cwc-contact-form__panel {
@@ -227,6 +228,7 @@
 		width: 52px;
 		height: 52px;
 	}
+
 	.cwc-contact-form__icon {
 		width: 26px;
 		height: 26px;
