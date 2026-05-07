@@ -27,16 +27,24 @@ function cwc_get_email_template($title, $content, $args = [])
 	?>
 	<!DOCTYPE html>
 	<html lang="en">
+
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<title><?php echo esc_html($title); ?></title>
-		<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Archivo:wght@400;500;600&display=swap" rel="stylesheet" />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Archivo:wght@400;500;600&display=swap"
+			rel="stylesheet" />
 		<style>
-			* { margin: 0; padding: 0; box-sizing: border-box; }
+			* {
+				margin: 0;
+				padding: 0;
+				box-sizing: border-box;
+			}
+
 			body {
-				background-color: #EBEBE6;
-				font-family: 'Archivo', sans-serif;
+				background-color: #F4F4F4;
+				font-family: 'Archivo', Arial, sans-serif;
 				color: #1A1A1A;
 				-webkit-font-smoothing: antialiased;
 				margin: 0;
@@ -46,37 +54,36 @@ function cwc_get_email_template($title, $content, $args = [])
 			.email-wrapper {
 				max-width: 600px;
 				margin: 40px auto;
-				background: #F5F1E8;
-				box-shadow: 0 20px 50px rgba(0,0,0,0.05);
+				background: #FFFFFF;
+				box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+				border-radius: 8px;
+				overflow: hidden;
 			}
 
 			/* Header */
 			.header {
 				background: #1A1A1A;
-				padding: 24px 36px;
-				display: flex;
-				align-items: center;
-				justify-content: space-between;
+				padding: 24px 40px;
 			}
+
 			.logo {
 				font-family: 'Sora', sans-serif;
-				font-size: 14px;
+				font-size: 16px;
 				font-weight: 700;
-				letter-spacing: 0.2em;
-				color: #F5F1E8;
+				letter-spacing: 0.1em;
+				color: #FFFFFF;
 				text-transform: uppercase;
-				border: 1.5px solid rgba(255,255,255,0.3);
-				padding: 5px 10px;
 				text-decoration: none;
 				display: inline-block;
 			}
+
 			.header-ref {
 				font-family: 'Archivo', sans-serif;
-				font-size: 11px;
-				letter-spacing: 0.1em;
-				color: rgba(255,255,255,0.35);
-				text-transform: uppercase;
+				font-size: 12px;
+				letter-spacing: 0.05em;
+				color: rgba(255, 255, 255, 0.6);
 			}
+
 			.header-ref span {
 				color: #0096C7;
 				font-weight: 600;
@@ -85,231 +92,300 @@ function cwc_get_email_template($title, $content, $args = [])
 			/* Confirmation Banner */
 			.confirm-banner {
 				background: #0096C7;
-				padding: 36px 36px 32px;
-				display: flex;
-				align-items: flex-start;
-				gap: 20px;
+				padding: 40px;
 			}
+
 			.confirm-icon {
-				width: 48px;
-				height: 48px;
-				background: rgba(255,255,255,0.15);
+				width: 50px;
+				height: 50px;
+				background: rgba(255, 255, 255, 0.2);
 				border-radius: 50%;
-				display: flex;
-				align-items: center;
-				justify-content: center;
-				flex-shrink: 0;
+				text-align: center;
+				line-height: 50px;
 				font-size: 22px;
 				color: #fff;
+				margin: 0;
 			}
+
 			.confirm-text {}
+
 			.confirm-label {
 				font-family: 'Archivo', sans-serif;
-				font-size: 11px;
-				letter-spacing: 0.18em;
+				font-size: 12px;
+				letter-spacing: 0.1em;
 				text-transform: uppercase;
-				color: rgba(255,255,255,0.7);
-				margin-bottom: 6px;
+				color: rgba(255, 255, 255, 0.8);
+				margin-bottom: 4px;
+				font-weight: 600;
 			}
+
 			.confirm-title {
 				font-family: 'Sora', sans-serif;
 				font-size: 24px;
 				font-weight: 700;
 				color: #FFFFFF;
-				line-height: 1.2;
+				line-height: 1.3;
 			}
+
 			.confirm-subtitle {
 				font-family: 'Archivo', sans-serif;
-				font-size: 14px;
-				color: rgba(255,255,255,0.75);
+				font-size: 15px;
+				color: rgba(255, 255, 255, 0.9);
 				margin-top: 6px;
 				line-height: 1.5;
 			}
 
 			/* Content Body */
 			.email-body {
-				padding: 36px;
+				padding: 40px;
 			}
+
 			.email-body p {
 				font-family: 'Archivo', sans-serif;
 				font-size: 15px;
-				line-height: 1.7;
-				color: #444;
-				margin-bottom: 20px;
+				line-height: 1.6;
+				color: #444444;
+				margin-bottom: 24px;
 			}
+
 			.email-body p strong {
 				color: #1A1A1A;
 				font-weight: 600;
 			}
 
-			/* Trip Summary Card (Used in content) */
+			/* Trip Summary Card */
 			.trip-card {
-				margin: 20px 0;
-				border: 1.5px solid rgba(0,0,0,0.1);
-				background: #fff;
+				margin: 32px 0;
+				border: 1px solid #E8E8E8;
+				border-radius: 8px;
+				background: #FFFFFF;
+				overflow: hidden;
 			}
+
 			.trip-card-header {
-				background: #1A1A1A;
-				padding: 14px 22px;
+				background: #F9F9F9;
+				border-bottom: 1px solid #E8E8E8;
+				padding: 16px 24px;
 				display: flex;
 				align-items: center;
 				justify-content: space-between;
 			}
-			.trip-card-header-label {
-				font-family: 'Sora', sans-serif;
-				font-size: 12px;
-				font-weight: 600;
-				letter-spacing: 0.12em;
-				text-transform: uppercase;
-				color: rgba(255,255,255,0.6);
-			}
-			.trip-card-header-status {
-				font-family: 'Archivo', sans-serif;
-				font-size: 11px;
-				font-weight: 600;
-				letter-spacing: 0.1em;
-				text-transform: uppercase;
-				background: #0096C7;
-				color: #fff;
-				padding: 3px 10px;
-			}
 
-			/* Details Tables */
-			.details-title {
+			.trip-card-header-label {
 				font-family: 'Sora', sans-serif;
 				font-size: 13px;
 				font-weight: 700;
 				letter-spacing: 0.1em;
 				text-transform: uppercase;
 				color: #1A1A1A;
-				margin-top: 32px;
-				margin-bottom: 12px;
 			}
+
+			.trip-card-header-status {
+				font-family: 'Archivo', sans-serif;
+				font-size: 11px;
+				font-weight: 700;
+				letter-spacing: 0.05em;
+				text-transform: uppercase;
+				background: #E3F2FD;
+				color: #0277BD;
+				padding: 4px 10px;
+				border-radius: 4px;
+			}
+
+			/* Details Tables */
+			.details-title {
+				font-family: 'Sora', sans-serif;
+				font-size: 14px;
+				font-weight: 700;
+				letter-spacing: 0.05em;
+				text-transform: uppercase;
+				color: #1A1A1A;
+				margin-top: 36px;
+				margin-bottom: 16px;
+				padding-bottom: 8px;
+				border-bottom: 2px solid #F0F0F0;
+			}
+
 			.details-table {
 				width: 100%;
 				border-collapse: collapse;
-				margin-bottom: 24px;
+				margin-bottom: 28px;
 			}
+
 			.details-table tr {
-				border-bottom: 1px solid rgba(0,0,0,0.06);
+				border-bottom: 1px solid #F0F0F0;
 			}
-			.details-table tr:last-child { border-bottom: none; }
+
+			.details-table tr:last-child {
+				border-bottom: none;
+			}
+
 			.details-table td {
-				padding: 12px 0;
+				padding: 14px 0;
 				font-family: 'Archivo', sans-serif;
-				font-size: 14px;
+				font-size: 15px;
 				vertical-align: top;
 			}
+
 			.details-table td:first-child {
-				color: #888;
-				width: 40%;
-				font-size: 13px;
+				color: #666666;
+				width: 45%;
 			}
+
 			.details-table td:last-child {
 				color: #1A1A1A;
 				font-weight: 500;
 				text-align: right;
 			}
+
 			.details-highlight {
 				color: #0096C7 !important;
 				font-weight: 700 !important;
 			}
 
 			/* Admin Note / Payment Note */
-			.admin-note, .payment-note {
-				background: rgba(0,150,199,0.07);
-				border-left: 3px solid #0096C7;
-				padding: 14px 16px;
-				margin: 24px 0;
+			.payment-note {
+				background: #F5FAFC;
+				border-left: 4px solid #0096C7;
+				padding: 16px 20px;
+				margin: 32px 0;
 				font-family: 'Archivo', sans-serif;
-				font-size: 13px;
-				color: #555;
+				font-size: 14px;
+				color: #444444;
 				line-height: 1.6;
+				border-radius: 0 4px 4px 0;
 			}
-			.admin-note strong, .payment-note strong { color: #1A1A1A; }
 
-			/* Divider */
-			.divider {
-				margin: 28px 0;
-				border: none;
-				border-top: 1px solid rgba(0,0,0,0.08);
+			.payment-note strong {
+				color: #1A1A1A;
 			}
 
 			/* Footer */
 			.footer {
 				background: #1A1A1A;
-				padding: 28px 36px;
+				padding: 32px 40px;
 			}
+
 			.footer-top {
-				display: flex;
-				justify-content: space-between;
-				align-items: center;
-				margin-bottom: 20px;
+				margin-bottom: 24px;
+				width: 100%;
+				text-align: center;
 			}
+
 			.footer-logo {
 				font-family: 'Sora', sans-serif;
-				font-size: 11px;
+				font-size: 50px;
 				font-weight: 700;
-				letter-spacing: 0.2em;
-				color: #F5F1E8;
+				letter-spacing: 0.05em;
+				color: #FFFFFF;
 				text-transform: uppercase;
-				border: 1.5px solid rgba(255,255,255,0.2);
-				padding: 4px 9px;
 				text-decoration: none;
-				display: inline-block;
+				display: block;
+				margin-bottom: 16px;
 			}
+
 			.footer-support {
 				font-family: 'Archivo', sans-serif;
-				font-size: 12px;
-				color: rgba(255,255,255,0.35);
-				text-align: right;
+				font-size: 13px;
+				color: rgba(255, 255, 255, 0.6);
+				text-align: center;
+				line-height: 1.5;
 			}
+
 			.footer-support a {
 				color: #0096C7;
 				text-decoration: none;
+				font-weight: 500;
 			}
+
 			.footer-divider {
 				border: none;
-				border-top: 1px solid rgba(255,255,255,0.07);
-				margin-bottom: 16px;
+				border-top: 1px solid rgba(255, 255, 255, 0.1);
+				margin-bottom: 24px;
 			}
+
 			.footer-legal {
 				font-family: 'Archivo', sans-serif;
-				font-size: 11px;
-				color: rgba(255,255,255,0.2);
-				line-height: 1.7;
+				font-size: 12px;
+				color: rgba(255, 255, 255, 0.4);
+				line-height: 1.8;
+				text-align: center;
+				width: 100%;
 			}
-			.footer-legal a { color: rgba(255,255,255,0.3); text-decoration: underline; }
+
+			.footer-legal a {
+				color: rgba(255, 255, 255, 0.6);
+				text-decoration: underline;
+			}
 
 			@media (max-width: 520px) {
-				.email-wrapper { margin: 0; width: 100%; }
-				.header, .confirm-banner, .email-body, .footer {
-					padding-left: 20px; padding-right: 20px;
+				.email-wrapper {
+					margin: 0;
+					width: 100%;
+					border-radius: 0;
 				}
-				.confirm-title { font-size: 20px; }
-				.footer-top { flex-direction: column; align-items: flex-start; gap: 16px; }
-				.footer-support { text-align: left; }
+
+				.header,
+				.confirm-banner,
+				.email-body,
+				.footer {
+					padding-left: 24px;
+					padding-right: 24px;
+				}
+
+				.confirm-title {
+					font-size: 22px;
+				}
+
+				.mobile-stack {
+					display: block;
+					width: 100%;
+					text-align: left !important;
+					margin-bottom: 12px;
+				}
 			}
 		</style>
 	</head>
+
 	<body>
 		<div class="email-wrapper">
 			<!-- Header -->
 			<div class="header">
-				<a href="<?php echo esc_url(home_url()); ?>" class="logo">CWC WAKE PARK</a>
-				<?php if ($ref_code): ?>
-					<div class="header-ref">Ref: <span>#<?php echo esc_html($ref_code); ?></span></div>
-				<?php endif; ?>
+				<table width="100%" border="0" cellspacing="0" cellpadding="0">
+					<tr>
+						<td align="left" valign="middle" class="mobile-stack">
+							<a href="<?php echo esc_url(home_url()); ?>" class="logo"
+								style="color: #FFFFFF; text-decoration: none; text-transform: uppercase; font-size: 14px;">CamSur
+								Watersports Complex</a>
+						</td>
+						<?php if ($ref_code): ?>
+							<td align="right" valign="middle" class="mobile-stack">
+								<div class="header-ref">Ref: <span
+										style="color: #0096C7; font-weight: 600;">#<?php echo esc_html($ref_code); ?></span>
+								</div>
+							</td>
+						<?php endif; ?>
+					</tr>
+				</table>
 			</div>
 
 			<!-- Confirmation Banner -->
 			<div class="confirm-banner">
-				<div class="confirm-icon">✓</div>
-				<div class="confirm-text">
-					<div class="confirm-label"><?php echo esc_html($title); ?></div>
-					<div class="confirm-title"><?php echo esc_html($banner_title); ?></div>
-					<div class="confirm-subtitle"><?php echo $banner_subtitle; ?></div>
-				</div>
+				<table width="100%" border="0" cellspacing="0" cellpadding="0">
+					<tr>
+						<td width="50" valign="top">
+							<div class="confirm-icon" style="text-align: center; line-height: 50px;">✓</div>
+						</td>
+						<td width="20"></td>
+						<td valign="top">
+							<div class="confirm-text">
+								<div class="confirm-label"><?php echo esc_html($title); ?></div>
+								<div class="confirm-title"><?php echo esc_html($banner_title); ?></div>
+								<div class="confirm-subtitle"><?php echo $banner_subtitle; ?></div>
+							</div>
+						</td>
+					</tr>
+				</table>
 			</div>
 
 			<!-- Main Body -->
@@ -319,22 +395,41 @@ function cwc_get_email_template($title, $content, $args = [])
 
 			<!-- Footer -->
 			<div class="footer">
-				<div class="footer-top">
-					<a href="<?php echo esc_url(home_url()); ?>" class="footer-logo">CWC</a>
-					<div class="footer-support">
-						Need help?<br/>
-						<a href="mailto:info@cwcwake.com">info@cwcwake.com</a> · +63 2 8888 0000
-					</div>
-				</div>
+				<table width="100%" border="0" cellspacing="0" cellpadding="0">
+					<tr>
+						<td align="center" valign="top" style="padding-bottom: 16px;">
+							<a href="<?php echo esc_url(home_url()); ?>" class="footer-logo"
+								style="color: #FFFFFF; text-decoration: none;">CWC</a>
+						</td>
+					</tr>
+					<tr>
+						<td align="center" valign="top" class="footer-support" style="padding-bottom: 24px;">
+							Need help?<br />
+							<a href="mailto:info@cwcwake.com"
+								style="color: #0096C7; text-decoration: none;">info@cwcwake.com</a> · <span
+								style="color: rgba(255,255,255,0.6);">+63 2 8888 0000</span>
+						</td>
+					</tr>
+				</table>
 				<hr class="footer-divider" />
 				<div class="footer-legal">
-					&copy; <?php echo date('Y'); ?> CWC World Travel Co. · All rights reserved.<br/>
-					This is a transactional email regarding your inquiry or booking.<br/>
-					<a href="<?php echo esc_url(home_url('/privacy-policy')); ?>">Privacy Policy</a> · <a href="<?php echo esc_url(home_url('/terms-and-conditions')); ?>">Terms & Conditions</a>
+					<div style="margin-bottom: 8px;">
+						&copy; <?php echo date('Y'); ?> CWC World Travel Co. · All rights reserved.
+					</div>
+					<div style="margin-bottom: 8px;">
+						This is a transactional email regarding your inquiry or booking.
+					</div>
+					<div>
+						<a href="<?php echo esc_url(home_url('/privacy-policy')); ?>"
+							style="color: rgba(255,255,255,0.6); text-decoration: underline;">Privacy Policy</a> · <a
+							href="<?php echo esc_url(home_url('/terms-and-conditions')); ?>"
+							style="color: rgba(255,255,255,0.6); text-decoration: underline;">Terms & Conditions</a>
+					</div>
 				</div>
 			</div>
 		</div>
 	</body>
+
 	</html>
 	<?php
 	return ob_get_clean();
@@ -446,17 +541,17 @@ function cwc_submit_booking()
 					'attributes' => [
 						'line_items' => [
 							[
-								'amount'      => $amount,
-								'currency'    => 'PHP',
+								'amount' => $amount,
+								'currency' => 'PHP',
 								'description' => 'Booking for ' . $room . ' (' . $nights . ' nights)',
-								'name'        => $room,
-								'quantity'    => 1,
+								'name' => $room,
+								'quantity' => 1,
 							]
 						],
 						'payment_method_types' => ['card', 'gcash', 'paymaya', 'grab_pay'],
-						'success_url'          => $success_url,
-						'cancel_url'           => $current_url,
-						'description'          => 'CWC Wake Park Booking - ' . $ref,
+						'success_url' => $success_url,
+						'cancel_url' => $current_url,
+						'description' => 'CWC Wake Park Booking - ' . $ref,
 					]
 				]
 			];
@@ -464,7 +559,7 @@ function cwc_submit_booking()
 			$response = wp_remote_post('https://api.paymongo.com/v1/checkout_sessions', [
 				'headers' => [
 					'Authorization' => 'Basic ' . base64_encode(PAYMONGO_SECRET_KEY . ':'),
-					'Content-Type'  => 'application/json',
+					'Content-Type' => 'application/json',
 				],
 				'body' => wp_json_encode($payload),
 			]);
@@ -477,7 +572,7 @@ function cwc_submit_booking()
 						update_post_meta($booking_id, '_cwc_paymongo_session_id', $body['data']['id']);
 					}
 					wp_send_json_success([
-						'message'      => 'Redirecting to payment gateway...',
+						'message' => 'Redirecting to payment gateway...',
 						'redirect_url' => $checkout_url
 					]);
 				}
@@ -494,8 +589,9 @@ function cwc_submit_booking()
 	// Build the email content
 	ob_start();
 	?>
-	<p>Hi <strong><?php echo esc_html($name); ?></strong>,</p>
-	<p>Thank you for choosing CWC Wake Park! Your booking has been confirmed and we've reserved your space. Please review your itinerary details below.</p>
+	<p style="margin-bottom: 24px;">Hi <strong><?php echo esc_html($name); ?></strong>,</p>
+	<p style="margin-bottom: 24px;">Thank you for choosing CWC Wake Park! Your booking has been confirmed and we've reserved
+		your space. Please review your itinerary details below.</p>
 
 	<!-- Stay Summary Card -->
 	<div class="trip-card">
@@ -503,36 +599,62 @@ function cwc_submit_booking()
 			<span class="trip-card-header-label">Stay Summary</span>
 			<span class="trip-card-header-status">Confirmed</span>
 		</div>
-		<div style="padding: 24px 22px;">
-			<div style="display: flex; justify-content: space-between; align-items: flex-end;">
+		<div style="padding: 24px;">
+			<div style="display: flex; justify-content: space-between; align-items: flex-start;">
 				<div>
-					<div style="font-family: 'Sora', sans-serif; font-size: 24px; font-weight: 800; color: #1A1A1A; line-height: 1;"><?php echo esc_html($room); ?></div>
-					<div style="font-family: 'Archivo', sans-serif; font-size: 12px; color: #888; margin-top: 4px;">CWC Wake Park · Camarines Sur</div>
+					<div
+						style="font-family: 'Sora', sans-serif; font-size: 22px; font-weight: 800; color: #1A1A1A; line-height: 1.2;">
+						<?php echo esc_html($room); ?>
+					</div>
+					<div style="font-family: 'Archivo', sans-serif; font-size: 13px; color: #666; margin-top: 6px;">CWC Wake
+						Park · Camarines Sur</div>
 				</div>
 				<?php if ($assigned_room): ?>
-				<div style="text-align: right;">
-					<div style="font-family: 'Archivo', sans-serif; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: #aaa; margin-bottom: 2px;">Assigned Unit</div>
-					<div style="font-family: 'Sora', sans-serif; font-size: 16px; font-weight: 700; color: #0096C7;"><?php echo esc_html($assigned_room); ?></div>
-				</div>
+					<div
+						style="text-align: right; background: #F5FAFC; padding: 10px 14px; border-radius: 6px; border: 1px solid #E1F2F9;">
+						<div
+							style="font-family: 'Archivo', sans-serif; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: #0096C7; margin-bottom: 4px; font-weight: 600;">
+							Assigned Unit</div>
+						<div style="font-family: 'Sora', sans-serif; font-size: 16px; font-weight: 700; color: #1A1A1A;">
+							<?php echo esc_html($assigned_room); ?>
+						</div>
+					</div>
 				<?php endif; ?>
 			</div>
 
-			<hr style="margin: 20px 0; border: none; border-top: 1px solid rgba(0,0,0,0.07);" />
-
-			<div style="display: flex; gap: 20px;">
-				<div style="flex: 1;">
-					<div style="font-family: 'Archivo', sans-serif; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: #aaa; margin-bottom: 5px;">Check-in</div>
-					<div style="font-family: 'Sora', sans-serif; font-size: 14px; font-weight: 600; color: #1A1A1A;"><?php echo esc_html(date('M j, Y', strtotime($checkin))); ?></div>
-					<div style="font-family: 'Archivo', sans-serif; font-size: 12px; color: #888; margin-top: 2px;">from 14:00</div>
-				</div>
-				<div style="flex: 1;">
-					<div style="font-family: 'Archivo', sans-serif; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: #aaa; margin-bottom: 5px;">Check-out</div>
-					<div style="font-family: 'Sora', sans-serif; font-size: 14px; font-weight: 600; color: #1A1A1A;"><?php echo esc_html(date('M j, Y', strtotime($checkout))); ?></div>
-					<div style="font-family: 'Archivo', sans-serif; font-size: 12px; color: #888; margin-top: 2px;">by 12:00</div>
-				</div>
-				<div style="flex: 1;">
-					<div style="font-family: 'Archivo', sans-serif; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: #aaa; margin-bottom: 5px;">Duration</div>
-					<div style="font-family: 'Sora', sans-serif; font-size: 14px; font-weight: 600; color: #1A1A1A;"><?php echo esc_html($nights); ?> Night<?php echo $nights > 1 ? 's' : ''; ?></div>
+			<div
+				style="background: #F9F9F9; border-radius: 6px; padding: 20px; margin-top: 24px; border: 1px solid #EEEEEE;">
+				<div style="display: flex; gap: 24px;">
+					<div style="flex: 1;">
+						<div
+							style="font-family: 'Archivo', sans-serif; font-size: 11px; letter-spacing: 0.05em; text-transform: uppercase; color: #888; margin-bottom: 6px; font-weight: 600;">
+							Check-in</div>
+						<div style="font-family: 'Sora', sans-serif; font-size: 15px; font-weight: 700; color: #1A1A1A;">
+							<?php echo esc_html(date('M j, Y', strtotime($checkin))); ?>
+						</div>
+						<div style="font-family: 'Archivo', sans-serif; font-size: 13px; color: #666; margin-top: 4px;">from
+							14:00</div>
+					</div>
+					<div style="width: 1px; background: #E0E0E0;"></div>
+					<div style="flex: 1;">
+						<div
+							style="font-family: 'Archivo', sans-serif; font-size: 11px; letter-spacing: 0.05em; text-transform: uppercase; color: #888; margin-bottom: 6px; font-weight: 600;">
+							Check-out</div>
+						<div style="font-family: 'Sora', sans-serif; font-size: 15px; font-weight: 700; color: #1A1A1A;">
+							<?php echo esc_html(date('M j, Y', strtotime($checkout))); ?>
+						</div>
+						<div style="font-family: 'Archivo', sans-serif; font-size: 13px; color: #666; margin-top: 4px;">by
+							12:00</div>
+					</div>
+					<div style="width: 1px; background: #E0E0E0;"></div>
+					<div style="flex: 1;">
+						<div
+							style="font-family: 'Archivo', sans-serif; font-size: 11px; letter-spacing: 0.05em; text-transform: uppercase; color: #888; margin-bottom: 6px; font-weight: 600;">
+							Duration</div>
+						<div style="font-family: 'Sora', sans-serif; font-size: 15px; font-weight: 700; color: #1A1A1A;">
+							<?php echo esc_html($nights); ?> Night<?php echo $nights > 1 ? 's' : ''; ?>
+						</div>
+					</div>
 				</div>
 			</div>
 		</div>
@@ -575,11 +697,12 @@ function cwc_submit_booking()
 	</table>
 
 	<div class="payment-note">
-		<strong>Booking Status: Pending Confirmation</strong> — Our team will verify your payment and details. You will receive a final confirmation once processed. If you have any questions, please contact us at info@cwcwake.com.
+		<strong>Booking Status: Pending Confirmation</strong> — Our team will verify your payment and details. You will
+		receive a final confirmation once processed. If you have any questions, please contact us at info@cwcwake.com.
 	</div>
 
-	<p style="margin-top: 32px;">We look forward to hosting you at CWC Wake Park!</p>
-	<p>Best regards,<br><strong>The CWC Team</strong></p>
+	<p style="margin-top: 32px; margin-bottom: 8px;">We look forward to hosting you at CWC Wake Park!</p>
+	<p style="margin-bottom: 0;">Best regards,<br><strong style="color: #1A1A1A;">The CWC Team</strong></p>
 	<?php
 	$email_content = ob_get_clean();
 
@@ -639,12 +762,14 @@ function cwc_submit_inquiry()
 	</table>
 
 	<div class="details-title">Message</div>
-	<div style="background: #fff; border: 1.5px solid rgba(0,0,0,0.07); padding: 20px; font-family: 'Archivo', sans-serif; font-size: 14px; line-height: 1.6; color: #1A1A1A;">
+	<div
+		style="background: #fff; border: 1px solid #E8E8E8; padding: 24px; border-radius: 6px; font-family: 'Archivo', sans-serif; font-size: 15px; line-height: 1.6; color: #444444;">
 		<?php echo nl2br(esc_html($message)); ?>
 	</div>
 
 	<div class="payment-note" style="margin-top: 32px;">
-		<strong>Note:</strong> You can reply directly to this email to contact the visitor. This inquiry was sent via the global contact system.
+		<strong>Note:</strong> You can reply directly to this email to contact the visitor. This inquiry was sent via the
+		global contact system.
 	</div>
 	<?php
 	$email_content = ob_get_clean();

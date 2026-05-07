@@ -1,7 +1,8 @@
 /*
  * CWC Wake — Header Search
- * 
- * Styles for the global live search in the header.
+ *
+ * Styles for the global live search in the header,
+ * including intent-hint banners and suggestion cards.
  */
 
 .cwc-header__search-container {
@@ -201,6 +202,85 @@
     to {
         transform: rotate(360deg);
     }
+}
+
+/* ── Intent Hint Banner ──────────────────────────────────────── */
+
+.cwc-header__search-intent-hint {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 12px 14px;
+    margin: 8px 0 4px;
+    background: linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 100%);
+    border-radius: 10px;
+    border-left: 3px solid var(--wp--preset--color--primary, #0096C7);
+    font-size: 13px;
+    line-height: 1.5;
+    color: #1e4e6e;
+    animation: cwc-hint-in 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.cwc-header__search-intent-hint svg {
+    flex-shrink: 0;
+    margin-top: 2px;
+    color: var(--wp--preset--color--primary, #0096C7);
+}
+
+@keyframes cwc-hint-in {
+    from {
+        opacity: 0;
+        transform: translateY(-6px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ── Suggestion Cards (fallback / intent pages) ──────────────── */
+
+.cwc-header__search-section--suggestions {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid #e2e8f0;
+}
+
+.cwc-header__search-suggestions-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.cwc-header__search-suggestion-card {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    text-decoration: none;
+    color: #1e293b;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    background: transparent;
+}
+
+.cwc-header__search-suggestion-card:hover {
+    background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+    color: var(--wp--preset--color--primary, #0096C7);
+    padding-left: 16px;
+}
+
+.cwc-header__search-suggestion-card svg {
+    flex-shrink: 0;
+    color: var(--wp--preset--color--primary, #0096C7);
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.cwc-header__search-suggestion-card:hover svg {
+    opacity: 1;
 }
 
 /* ── Recommendations (Empty state) ───────────────────────────── */

@@ -1495,10 +1495,166 @@ add_action( 'wp_ajax_cwc_global_search', 'cwc_global_search_handler' );
 add_action( 'wp_ajax_nopriv_cwc_global_search', 'cwc_global_search_handler' );
 
 /**
+ * Intent-to-keyword mapping for natural language search.
+ *
+ * Maps conversational concepts (e.g. "swim", "eat", "sleep") to
+ * site-relevant search terms so queries like "I want to swim, is
+ * there a pool?" surface Water Sports, accommodation, and FAQ results
+ * instead of an empty state.
+ *
+ * @return array<string, array{keywords: string[], pages: array<string, string>}>
+ */
+function cwc_get_intent_map() {
+	$home = home_url( '/' );
+	return array(
+		// Water / swimming intent.
+		'swim'        => array(
+			'keywords' => array( 'pool', 'water', 'wakeboard', 'lake', 'aqua' ),
+			'pages'    => array(
+				'Water Sports'     => $home . 'water-sports/',
+				'Elite Facilities' => $home . 'elite-facilities/',
+			),
+		),
+		'pool'        => array(
+			'keywords' => array( 'swim', 'water', 'aqua', 'lake' ),
+			'pages'    => array(
+				'Water Sports'     => $home . 'water-sports/',
+				'Elite Facilities' => $home . 'elite-facilities/',
+			),
+		),
+		'wakeboard'   => array(
+			'keywords' => array( 'water', 'cable', 'ride', 'board', 'beginner' ),
+			'pages'    => array(
+				'Water Sports' => $home . 'water-sports/',
+				'Rates'        => $home . 'rates/',
+			),
+		),
+		'surf'        => array(
+			'keywords' => array( 'wakeboard', 'water', 'board', 'wave' ),
+			'pages'    => array( 'Water Sports' => $home . 'water-sports/' ),
+		),
+		// Accommodation intent.
+		'sleep'       => array(
+			'keywords' => array( 'room', 'accommodation', 'villa', 'cabin', 'cabana', 'stay', 'dwell' ),
+			'pages'    => array( 'Accommodations' => $home . 'accommodations/' ),
+		),
+		'stay'        => array(
+			'keywords' => array( 'room', 'accommodation', 'villa', 'cabin', 'cabana', 'book', 'dwell' ),
+			'pages'    => array( 'Accommodations' => $home . 'accommodations/' ),
+		),
+		'room'        => array(
+			'keywords' => array( 'accommodation', 'villa', 'cabin', 'cabana', 'stay', 'dwell' ),
+			'pages'    => array( 'Accommodations' => $home . 'accommodations/' ),
+		),
+		'hotel'       => array(
+			'keywords' => array( 'accommodation', 'villa', 'room', 'cabin', 'stay' ),
+			'pages'    => array( 'Accommodations' => $home . 'accommodations/' ),
+		),
+		// Food / dining intent.
+		'eat'         => array(
+			'keywords' => array( 'food', 'restaurant', 'dining', 'bar', 'meal' ),
+			'pages'    => array( 'FAQs' => $home . 'faqs/' ),
+		),
+		'food'        => array(
+			'keywords' => array( 'restaurant', 'dining', 'eat', 'bar', 'meal' ),
+			'pages'    => array( 'FAQs' => $home . 'faqs/' ),
+		),
+		'restaurant'  => array(
+			'keywords' => array( 'food', 'dining', 'eat', 'bar' ),
+			'pages'    => array( 'FAQs' => $home . 'faqs/' ),
+		),
+		// Pricing intent.
+		'price'       => array(
+			'keywords' => array( 'rate', 'cost', 'fee', 'budget', 'promo', 'discount' ),
+			'pages'    => array( 'Rates' => $home . 'rates/' ),
+		),
+		'cost'        => array(
+			'keywords' => array( 'rate', 'price', 'fee', 'budget' ),
+			'pages'    => array( 'Rates' => $home . 'rates/' ),
+		),
+		'cheap'       => array(
+			'keywords' => array( 'budget', 'affordable', 'cabin', 'rate', 'promo' ),
+			'pages'    => array(
+				'Rates'          => $home . 'rates/',
+				'Accommodations' => $home . 'accommodations/',
+			),
+		),
+		'budget'      => array(
+			'keywords' => array( 'cheap', 'affordable', 'cabin', 'rate', 'promo' ),
+			'pages'    => array( 'Rates' => $home . 'rates/' ),
+		),
+		// Booking intent.
+		'book'        => array(
+			'keywords' => array( 'reservation', 'reserve', 'booking', 'schedule' ),
+			'pages'    => array( 'Book Now' => $home . 'book-now/' ),
+		),
+		'reserve'     => array(
+			'keywords' => array( 'book', 'reservation', 'booking' ),
+			'pages'    => array( 'Book Now' => $home . 'book-now/' ),
+		),
+		// Travel / location intent.
+		'directions'  => array(
+			'keywords' => array( 'location', 'map', 'travel', 'address', 'get' ),
+			'pages'    => array(
+				'FAQs'       => $home . 'faqs/',
+				'Contact Us' => $home . 'contact-us/',
+			),
+		),
+		'location'    => array(
+			'keywords' => array( 'directions', 'map', 'address', 'where' ),
+			'pages'    => array( 'Contact Us' => $home . 'contact-us/' ),
+		),
+		// Activity intent.
+		'activity'    => array(
+			'keywords' => array( 'sport', 'adventure', 'fun', 'ride', 'game' ),
+			'pages'    => array(
+				'Water Sports'     => $home . 'water-sports/',
+				'Land Activities'  => $home . 'land-activities/',
+				'Elite Facilities' => $home . 'elite-facilities/',
+			),
+		),
+		'fun'         => array(
+			'keywords' => array( 'activity', 'adventure', 'sport', 'game', 'play' ),
+			'pages'    => array(
+				'Water Sports'    => $home . 'water-sports/',
+				'Land Activities' => $home . 'land-activities/',
+			),
+		),
+		// Family intent.
+		'kid'         => array(
+			'keywords' => array( 'child', 'family', 'children', 'kids' ),
+			'pages'    => array(
+				'Land Activities'  => $home . 'land-activities/',
+				'Elite Facilities' => $home . 'elite-facilities/',
+				'FAQs'             => $home . 'faqs/',
+			),
+		),
+		'family'      => array(
+			'keywords' => array( 'kid', 'child', 'group', 'children' ),
+			'pages'    => array(
+				'Accommodations' => $home . 'accommodations/',
+				'Rates'          => $home . 'rates/',
+			),
+		),
+		// Photo / gallery intent.
+		'photo'       => array(
+			'keywords' => array( 'gallery', 'picture', 'image', 'album' ),
+			'pages'    => array( 'Gallery' => $home . 'gallery/' ),
+		),
+		'picture'     => array(
+			'keywords' => array( 'gallery', 'photo', 'image', 'album' ),
+			'pages'    => array( 'Gallery' => $home . 'gallery/' ),
+		),
+	);
+}
+
+/**
  * Handle the cwc_global_search AJAX action.
  *
  * Searches across FAQs, accommodations, and posts/pages using a
  * phrase-aware, word-based matching algorithm with stop-word filtering.
+ * When no results are found, performs intent-based keyword expansion
+ * and always provides smart fallback suggestions.
  *
  * @return void Sends JSON response and exits.
  */
@@ -1512,6 +1668,8 @@ function cwc_global_search_handler() {
 				'faqs'           => array(),
 				'accommodations' => array(),
 				'posts'          => array(),
+				'suggestions'    => array(),
+				'intent_hint'    => '',
 			)
 		);
 	}
@@ -1520,13 +1678,13 @@ function cwc_global_search_handler() {
 		'faqs'           => array(),
 		'accommodations' => array(),
 		'posts'          => array(),
+		'suggestions'    => array(),
+		'intent_hint'    => '',
 	);
 
-	// 1. Search FAQs
-	$faq_data   = cwc_get_faq_data();
-	$faq_url    = home_url( '/faqs/' );
+	// ── Shared text-processing helpers ──────────────────────────
 	$clean_q    = strtolower( preg_replace( '/[^\w\s]/', '', $q ) );
-	$stop_words = array( 'i', 'want', 'the', 'a', 'an', 'and', 'for', 'to', 'how', 'do', 'can', 'is', 'are', 'what', 'where', 'there' );
+	$stop_words = array( 'i', 'want', 'the', 'a', 'an', 'and', 'for', 'to', 'how', 'do', 'can', 'is', 'are', 'what', 'where', 'there', 'any', 'have', 'has', 'does', 'it', 'my', 'me', 'we', 'you', 'your', 'this', 'that' );
 	$q_words    = array_filter(
 		explode( ' ', $clean_q ),
 		function ( $w ) use ( $stop_words ) {
@@ -1544,43 +1702,13 @@ function cwc_global_search_handler() {
 		);
 	}
 
-	foreach ( $faq_data as $cat ) {
-		foreach ( $cat['items'] as $item ) {
-			$clean_item_q = strtolower( preg_replace( '/[^\w\s]/', '', $item['q'] ) );
-			$clean_item_a = strtolower( preg_replace( '/[^\w\s]/', '', $item['a'] ) );
+	// ── 1. Search FAQs ─────────────────────────────────────────
+	$faq_data = cwc_get_faq_data();
+	$faq_url  = home_url( '/faqs/' );
 
-			$is_match = false;
+	$results['faqs'] = cwc_search_faqs( $faq_data, $faq_url, $clean_q, $q_words );
 
-			// Priority 1: Phrase match (ignoring punctuation).
-			if ( stripos( $clean_item_q, $clean_q ) !== false || stripos( $clean_item_a, $clean_q ) !== false ) {
-				$is_match = true;
-			} elseif ( ! empty( $q_words ) ) {
-				// Priority 2: Word-based match (fallback for natural language).
-				$match_count = 0;
-				foreach ( $q_words as $word ) {
-					if ( stripos( $clean_item_q, $word ) !== false || stripos( $clean_item_a, $word ) !== false ) {
-						++$match_count;
-					}
-				}
-				// If at least one significant word matches (for short queries) or 50% for longer ones.
-				$threshold = count( $q_words ) === 1 ? 1 : ceil( count( $q_words ) * 0.5 );
-				if ( $match_count >= $threshold ) {
-					$is_match = true;
-				}
-			}
-
-			if ( $is_match ) {
-				$results['faqs'][] = array(
-					'title'   => $item['q'],
-					'excerpt' => wp_trim_words( $item['a'], 15 ),
-					'url'     => $faq_url,
-				);
-			}
-		}
-	}
-	$results['faqs'] = array_slice( $results['faqs'], 0, 5 );
-
-	// 2. Search Accommodations
+	// ── 2. Search Accommodations ────────────────────────────────
 	$acc_query = new WP_Query(
 		array(
 			'post_type'      => 'accommodation',
@@ -1598,7 +1726,7 @@ function cwc_global_search_handler() {
 		);
 	}
 
-	// 3. Search Posts/Pages
+	// ── 3. Search Posts/Pages ───────────────────────────────────
 	$post_query = new WP_Query(
 		array(
 			'post_type'      => array( 'post', 'page' ),
@@ -1616,7 +1744,211 @@ function cwc_global_search_handler() {
 		);
 	}
 
+	// ── 4. Intent-based fallback when results are empty ─────────
+	$total = count( $results['faqs'] ) + count( $results['accommodations'] ) + count( $results['posts'] );
+
+	if ( $total === 0 ) {
+		$intent        = cwc_resolve_intent( $q_words, $clean_q );
+		$expanded_words = $intent['keywords'];
+
+		if ( ! empty( $expanded_words ) ) {
+			$results['intent_hint'] = $intent['hint'];
+
+			// Re-search FAQs with expanded keywords.
+			$results['faqs'] = cwc_search_faqs( $faq_data, $faq_url, '', $expanded_words );
+
+			// Re-search posts/pages with each expanded keyword.
+			$seen_ids = array();
+			foreach ( $expanded_words as $kw ) {
+				$kw_query = new WP_Query(
+					array(
+						'post_type'      => array( 'post', 'page', 'accommodation' ),
+						'post_status'    => 'publish',
+						's'              => $kw,
+						'posts_per_page' => 3,
+					)
+				);
+				foreach ( $kw_query->posts as $post ) {
+					if ( isset( $seen_ids[ $post->ID ] ) ) {
+						continue;
+					}
+					$seen_ids[ $post->ID ] = true;
+					$bucket                = 'accommodation' === $post->post_type ? 'accommodations' : 'posts';
+					$results[ $bucket ][]  = array(
+						'title' => get_the_title( $post->ID ),
+						'url'   => get_permalink( $post->ID ),
+						'type'  => $post->post_type,
+					);
+				}
+			}
+
+			$results['accommodations'] = array_slice( $results['accommodations'], 0, 5 );
+			$results['posts']          = array_slice( $results['posts'], 0, 5 );
+
+			// Add curated page suggestions from intent map.
+			foreach ( $intent['pages'] as $label => $url ) {
+				$results['suggestions'][] = array(
+					'title' => $label,
+					'url'   => $url,
+					'type'  => 'suggestion',
+				);
+			}
+		}
+	}
+
+	// ── 5. Always-on fallback suggestions ───────────────────────
+	$total_after = count( $results['faqs'] ) + count( $results['accommodations'] ) + count( $results['posts'] );
+
+	if ( $total_after === 0 ) {
+		$results['suggestions'] = cwc_get_fallback_suggestions( $q );
+		if ( empty( $results['intent_hint'] ) ) {
+			$results['intent_hint'] = 'We couldn\'t find an exact match, but here are some pages you might find helpful:';
+		}
+	}
+
 	wp_send_json_success( $results );
+}
+
+/**
+ * Search FAQs using phrase and word-based matching.
+ *
+ * @param array    $faq_data  Structured FAQ categories from cwc_get_faq_data().
+ * @param string   $faq_url   URL to link FAQ results to.
+ * @param string   $phrase    Cleaned query phrase for exact matching (may be empty).
+ * @param string[] $words     Array of significant query words.
+ * @return array Matched FAQ items (max 5).
+ */
+function cwc_search_faqs( $faq_data, $faq_url, $phrase, $words ) {
+	$matches = array();
+
+	foreach ( $faq_data as $cat ) {
+		foreach ( $cat['items'] as $item ) {
+			$clean_item_q = strtolower( preg_replace( '/[^\w\s]/', '', $item['q'] ) );
+			$clean_item_a = strtolower( preg_replace( '/[^\w\s]/', '', $item['a'] ) );
+
+			$is_match = false;
+
+			// Priority 1: Phrase match.
+			if ( ! empty( $phrase ) && ( stripos( $clean_item_q, $phrase ) !== false || stripos( $clean_item_a, $phrase ) !== false ) ) {
+				$is_match = true;
+			} elseif ( ! empty( $words ) ) {
+				// Priority 2: Word-based match.
+				$match_count = 0;
+				foreach ( $words as $word ) {
+					if ( stripos( $clean_item_q, $word ) !== false || stripos( $clean_item_a, $word ) !== false ) {
+						++$match_count;
+					}
+				}
+				$threshold = count( $words ) === 1 ? 1 : max( 1, (int) ceil( count( $words ) * 0.4 ) );
+				if ( $match_count >= $threshold ) {
+					$is_match = true;
+				}
+			}
+
+			if ( $is_match ) {
+				$matches[] = array(
+					'title'   => $item['q'],
+					'excerpt' => wp_trim_words( $item['a'], 15 ),
+					'url'     => $faq_url,
+				);
+			}
+		}
+	}
+
+	return array_slice( $matches, 0, 5 );
+}
+
+/**
+ * Resolve user intent from query words using the intent map.
+ *
+ * Scans the user's significant words against the intent map keys
+ * (including partial / stem matching) and returns expanded keywords,
+ * curated page links, and a human-readable hint.
+ *
+ * @param string[] $q_words  Significant words from the user query.
+ * @param string   $clean_q  Full cleaned query string.
+ * @return array{keywords: string[], pages: array<string, string>, hint: string}
+ */
+function cwc_resolve_intent( $q_words, $clean_q ) {
+	$intent_map = cwc_get_intent_map();
+	$keywords   = array();
+	$pages      = array();
+	$matched    = array();
+
+	foreach ( $q_words as $word ) {
+		foreach ( $intent_map as $intent_key => $intent_data ) {
+			// Match if the word starts with the intent key or vice-versa (stem matching).
+			if ( strpos( $word, $intent_key ) === 0 || strpos( $intent_key, $word ) === 0 ) {
+				$keywords = array_merge( $keywords, $intent_data['keywords'] );
+				$pages    = array_merge( $pages, $intent_data['pages'] );
+				$matched[] = $intent_key;
+			}
+		}
+	}
+
+	// Also check if the full query contains any intent key.
+	if ( empty( $matched ) ) {
+		foreach ( $intent_map as $intent_key => $intent_data ) {
+			if ( strpos( $clean_q, $intent_key ) !== false ) {
+				$keywords  = array_merge( $keywords, $intent_data['keywords'] );
+				$pages     = array_merge( $pages, $intent_data['pages'] );
+				$matched[] = $intent_key;
+			}
+		}
+	}
+
+	$keywords = array_unique( $keywords );
+	$hint     = '';
+
+	if ( ! empty( $matched ) ) {
+		$hint = 'Based on your question, here\'s what we found related to ' . implode( ', ', array_unique( $matched ) ) . ':';
+	}
+
+	return array(
+		'keywords' => array_values( $keywords ),
+		'pages'    => $pages,
+		'hint'     => $hint,
+	);
+}
+
+/**
+ * Build always-on fallback suggestions for truly unmatched queries.
+ *
+ * Returns a curated set of the site's most popular pages so users
+ * always have somewhere to go.
+ *
+ * @param string $q Original query string (unused for now, available for future ranking).
+ * @return array Array of suggestion items.
+ */
+function cwc_get_fallback_suggestions( $q ) {
+	$home = home_url( '/' );
+	return array(
+		array(
+			'title' => 'Water Sports & Wakeboarding',
+			'url'   => $home . 'water-sports/',
+			'type'  => 'suggestion',
+		),
+		array(
+			'title' => 'Accommodations & Rooms',
+			'url'   => $home . 'accommodations/',
+			'type'  => 'suggestion',
+		),
+		array(
+			'title' => 'Rates & Pricing',
+			'url'   => $home . 'rates/',
+			'type'  => 'suggestion',
+		),
+		array(
+			'title' => 'Frequently Asked Questions',
+			'url'   => $home . 'faqs/',
+			'type'  => 'suggestion',
+		),
+		array(
+			'title' => 'Contact Us',
+			'url'   => $home . 'contact-us/',
+			'type'  => 'suggestion',
+		),
+	);
 }
 
 /**
