@@ -63,6 +63,8 @@ require_once CWC_ACC_PATH . 'includes/migrate.php';
 require_once CWC_ACC_PATH . 'includes/bookings-cpt.php';
 require_once CWC_ACC_PATH . 'includes/subscribers.php';
 require_once CWC_ACC_PATH . 'includes/dashboard.php';
+require_once CWC_ACC_PATH . 'includes/coupons.php';
+require_once CWC_ACC_PATH . 'includes/mailer.php';
 
 /* ---------------------------------------------------------
  * Activation / deactivation

@@ -946,6 +946,95 @@ input.bf-field__input.bf-guest-name {
 	color: #DDDFE3;
 }
 
+/* ─── Promo Code ─── */
+.bf-summary__promo {
+	margin-bottom: 24px;
+}
+
+.bf-summary__promo-row {
+	display: flex;
+	gap: 8px;
+	margin-top: 8px;
+}
+
+.bf-summary__promo-input {
+	flex: 1;
+	height: 48px;
+	border: 1px solid rgba(26, 26, 26, 0.4);
+	border-radius: 8px;
+	background: #fff;
+	padding: 0 12px;
+	font-size: 16px;
+	font-family: inherit;
+}
+
+.bf-summary__promo-btn {
+	height: 48px;
+	padding: 0 20px;
+	background: #0096C7;
+	color: #fff;
+	border: none;
+	border-radius: 8px;
+	font-weight: 600;
+	cursor: pointer;
+	transition: background 0.3s;
+}
+
+.bf-summary__promo-btn:hover {
+	background: #007BA3;
+}
+
+.bf-summary__promo-msg {
+	font-size: 14px;
+	margin-top: 8px;
+}
+
+.bf-summary__promo-msg.success {
+	color: #059669;
+}
+
+.bf-summary__promo-msg.error {
+	color: #dc2626;
+}
+
+.bf-summary__promo-applied {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-top: 12px;
+	padding: 8px 12px;
+	background: #f1f5f9;
+	border-radius: 8px;
+}
+
+.bf-summary__promo-tag {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	background: #0096C7;
+	color: #fff;
+	padding: 4px 8px;
+	border-radius: 4px;
+	font-size: 12px;
+	font-weight: 700;
+	text-transform: uppercase;
+}
+
+.bf-summary__promo-remove {
+	background: none;
+	border: none;
+	color: #fff;
+	font-size: 16px;
+	cursor: pointer;
+	line-height: 1;
+	padding: 0;
+}
+
+.bf-summary__promo-discount {
+	font-weight: 700;
+	color: #CA0003;
+}
+
 .bf-summary__total {
 	display: flex;
 	justify-content: space-between;
@@ -1615,4 +1704,98 @@ input.bf-field__input.bf-guest-name {
 	color: #E24F26;
 	text-decoration: underline;
 	font-weight: 600;
+}
+
+/* --- Legal Modal Styles --- */
+.js-open-legal {
+	color: #0096C7;
+	text-decoration: none;
+	font-weight: 600;
+	transition: color 0.2s ease;
+}
+
+.js-open-legal:hover {
+	color: #007BA3;
+	text-decoration: underline;
+}
+
+#bf-legal-modal {
+	z-index: 10000;
+}
+
+#bf-legal-modal.is-visible {
+	display: block !important;
+}
+
+#bf-legal-modal .bf-modal__overlay {
+	position: fixed;
+	inset: 0;
+	background: rgba(0, 0, 0, 0.6);
+	backdrop-filter: blur(4px);
+	cursor: pointer;
+}
+
+#bf-legal-modal .bf-modal__container {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	background: #fff;
+	width: 90%;
+	max-width: 700px;
+	max-height: 80vh;
+	border-radius: 16px;
+	display: flex;
+	flex-direction: column;
+	overflow: hidden;
+	box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+}
+
+#bf-legal-modal .bf-modal__header {
+	padding: 24px 32px;
+	border-bottom: 1px solid #eee;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 0;
+}
+
+#bf-legal-modal .bf-modal__title {
+	margin: 0;
+	font-size: 24px;
+	color: #0096C7;
+	font-family: var(--wp--preset--font-family--heading, 'Sora', sans-serif);
+}
+
+#bf-legal-modal .bf-modal__close {
+	background: none;
+	border: none;
+	font-size: 30px;
+	cursor: pointer;
+	color: #999;
+	line-height: 1;
+	padding: 0;
+}
+
+#bf-legal-modal .bf-modal__body {
+	padding: 32px;
+	overflow-y: auto;
+	font-family: var(--wp--preset--font-family--body, 'Archivo', sans-serif);
+	line-height: 1.6;
+	color: #333;
+	flex: 1;
+}
+
+#bf-legal-modal .bf-modal__body h1,
+#bf-legal-modal .bf-modal__body h2,
+#bf-legal-modal .bf-modal__body h3 {
+	color: #1A1A1A;
+	margin-top: 1.5em;
+	font-family: var(--wp--preset--font-family--heading, 'Sora', sans-serif);
+}
+
+#bf-legal-modal .bf-modal__footer {
+	padding: 24px 32px;
+	border-top: 1px solid #eee;
+	background: #f9f9f9;
 }

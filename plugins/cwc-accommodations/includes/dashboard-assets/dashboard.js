@@ -175,6 +175,16 @@
 					document.getElementById('modal-new-status').value = btn.dataset.status;
 					document.getElementById('modal-admin-note').value = '';
 
+					const requests = btn.dataset.requests || '';
+					const reqWrap = document.getElementById('modal-requests-wrap');
+					const reqText = document.getElementById('modal-special-requests');
+					if (requests) {
+						reqText.textContent = requests;
+						reqWrap.style.display = 'block';
+					} else {
+						reqWrap.style.display = 'none';
+					}
+
 					modal.style.display = 'flex';
 					document.querySelectorAll('.cwc-dash__actions-dropdown.is-open').forEach(el => el.classList.remove('is-open'));
 				});

@@ -296,7 +296,8 @@ function cwc_render_dash_room_tracking_sync($bookings)
 										<strong><?php echo esc_html($active_booking['name']); ?></strong>
 										<small><?php echo esc_html($active_booking['ref']); ?> ·
 											<?php echo esc_html($active_booking['checkin']); ?> →
-											<?php echo esc_html($active_booking['checkout']); ?>				<?php echo $unit_name ? ' · ' . esc_html($unit_name) : ''; ?></small>
+											<?php echo esc_html($active_booking['checkout']); ?>
+											<?php echo $unit_name ? ' · ' . esc_html($unit_name) : ''; ?></small>
 									</div>
 									<span
 										class="cwc-dash__status-dot cwc-dash__status-dot--<?php echo esc_attr($active_booking['status']); ?>">
@@ -535,6 +536,7 @@ function cwc_get_all_bookings($args = [])
 			'guests' => json_decode(get_post_meta($post->ID, '_cwc_bk_guests', true) ?: '[]', true),
 			'audit_log' => json_decode(get_post_meta($post->ID, '_cwc_bk_audit_log', true) ?: '[]', true),
 			'email_log' => json_decode(get_post_meta($post->ID, '_cwc_bk_email_log', true) ?: '[]', true),
+			'requests' => get_post_meta($post->ID, '_cwc_bk_requests', true),
 		];
 	}
 	return $bookings;
@@ -663,6 +665,11 @@ function cwc_render_booking_dashboard()
 						<p><strong>Booking:</strong> <span id="modal-booking-ref"></span></p>
 						<p><strong>Guest:</strong> <span id="modal-guest-name"></span> (<span
 								id="modal-guest-email"></span>)</p>
+						<p id="modal-requests-wrap"
+							style="display:none; margin-top: 10px; padding-top: 10px; border-top: 1px solid #e2e8f0;">
+							<strong>Special Request:</strong><br>
+							<span id="modal-special-requests" style="font-style: italic; color: #b45309;"></span>
+						</p>
 					</div>
 					<div class="cwc-dash__modal-field">
 						<label for="modal-new-status">New Status</label>
@@ -767,36 +774,37 @@ function cwc_render_dash_bookings($bookings)
 				<p>No bookings yet. Bookings will appear here once guests start reserving rooms.</p>
 			</div>
 		<?php else: ?>
-		<!-- Bulk Actions Bar -->
-		<div id="cwc-bulk-actions-bar" class="cwc-dash__bulk-bar" style="display: none;">
-			<div class="cwc-dash__bulk-info">
-				<span id="cwc-bulk-count">0</span> items selected
+			<!-- Bulk Actions Bar -->
+			<div id="cwc-bulk-actions-bar" class="cwc-dash__bulk-bar" style="display: none;">
+				<div class="cwc-dash__bulk-info">
+					<span id="cwc-bulk-count">0</span> items selected
+				</div>
+				<div class="cwc-dash__bulk-controls">
+					<select id="cwc-bulk-status" class="cwc-dash__filter-select">
+						<option value="">Change Booking Status...</option>
+						<option value="pending">Mark as Pending</option>
+						<option value="confirmed">Mark as Confirmed</option>
+						<option value="cancelled">Mark as Cancelled</option>
+						<option value="completed">Mark as Completed</option>
+					</select>
+					<select id="cwc-bulk-payment" class="cwc-dash__filter-select">
+						<option value="">Change Payment Status...</option>
+						<option value="unpaid">Mark as Unpaid</option>
+						<option value="paid">Mark as Paid</option>
+						<option value="failed">Mark as Failed</option>
+						<option value="refunded">Mark as Refunded</option>
+					</select>
+					<label class="cwc-dash__bulk-checkbox-label"
+						style="display: flex; align-items: center; gap: 6px; font-size: 12px; cursor: pointer; margin-right: 8px;">
+						<input type="checkbox" id="cwc-bulk-send-email" checked style="margin: 0; width: 14px; height: 14px;">
+						Send Emails
+					</label>
+					<button id="cwc-bulk-apply" class="button button-primary">Apply Bulk Action</button>
+					<button id="cwc-bulk-cancel" class="button">Cancel</button>
+				</div>
 			</div>
-			<div class="cwc-dash__bulk-controls">
-				<select id="cwc-bulk-status" class="cwc-dash__filter-select">
-					<option value="">Change Booking Status...</option>
-					<option value="pending">Mark as Pending</option>
-					<option value="confirmed">Mark as Confirmed</option>
-					<option value="cancelled">Mark as Cancelled</option>
-					<option value="completed">Mark as Completed</option>
-				</select>
-				<select id="cwc-bulk-payment" class="cwc-dash__filter-select">
-					<option value="">Change Payment Status...</option>
-					<option value="unpaid">Mark as Unpaid</option>
-					<option value="paid">Mark as Paid</option>
-					<option value="failed">Mark as Failed</option>
-					<option value="refunded">Mark as Refunded</option>
-				</select>
-				<label class="cwc-dash__bulk-checkbox-label" style="display: flex; align-items: center; gap: 6px; font-size: 12px; cursor: pointer; margin-right: 8px;">
-					<input type="checkbox" id="cwc-bulk-send-email" checked style="margin: 0; width: 14px; height: 14px;">
-					Send Emails
-				</label>
-				<button id="cwc-bulk-apply" class="button button-primary">Apply Bulk Action</button>
-				<button id="cwc-bulk-cancel" class="button">Cancel</button>
-			</div>
-		</div>
 
-		<div class="cwc-dash__table-wrap">
+			<div class="cwc-dash__table-wrap">
 				<table class="cwc-dash__table" id="cwc-bookings-table">
 					<thead>
 						<tr>
@@ -804,6 +812,7 @@ function cwc_render_dash_bookings($bookings)
 							<th>Ref ID</th>
 							<th>Guest</th>
 							<th>Room</th>
+							<th>Special Request</th>
 							<th>Unit</th>
 							<th>Check-in / Check-out</th>
 							<th>Nights</th>
@@ -821,8 +830,9 @@ function cwc_render_dash_bookings($bookings)
 								data-email="<?php echo esc_attr(strtolower($b['email'])); ?>"
 								data-phone="<?php echo esc_attr(strtolower($b['phone'])); ?>"
 								data-status="<?php echo esc_attr($b['status']); ?>"
-								data-payment-status="<?php echo esc_attr($b['payment_status']); ?>">
-								
+								data-payment-status="<?php echo esc_attr($b['payment_status']); ?>"
+								data-requests="<?php echo esc_attr($b['requests']); ?>">
+
 								<td><input type="checkbox" class="cwc-row-checkbox" value="<?php echo esc_attr($b['id']); ?>"></td>
 
 								<td class="cwc-dash__td-ref"><strong><?php echo esc_html($b['ref']); ?></strong></td>
@@ -833,6 +843,16 @@ function cwc_render_dash_bookings($bookings)
 									</div>
 								</td>
 								<td><span class="cwc-dash__room-pill"><?php echo esc_html($b['room']); ?></span></td>
+								<td>
+									<?php if (!empty($b['requests'])): ?>
+										<div class="cwc-dash__requests-note" title="<?php echo esc_attr($b['requests']); ?>">
+											<span class="dashicons dashicons-warning"></span>
+											<?php echo esc_html($b['requests']); ?>
+										</div>
+									<?php else: ?>
+										<span style="color:#cbd5e1;">None</span>
+									<?php endif; ?>
+								</td>
 								<td>
 									<?php if (!empty($b['assigned_room'])): ?>
 										<span class="cwc-dash__unit-pill"><?php echo esc_html($b['assigned_room']); ?></span>
@@ -937,6 +957,7 @@ function cwc_render_dash_guests($bookings)
 							<th>Email</th>
 							<th>Phone</th>
 							<th>Room</th>
+							<th>Promo Code</th>
 							<th>Booking Status</th>
 						</tr>
 					</thead>
@@ -977,6 +998,16 @@ function cwc_render_dash_guests($bookings)
 								<td><?php echo esc_html($b['email']); ?></td>
 								<td><?php echo esc_html($b['phone']); ?></td>
 								<td><span class="cwc-dash__room-pill"><?php echo esc_html($b['room']); ?></span></td>
+								<td>
+									<?php
+									$coupon = get_post_meta($b['id'], '_cwc_bk_coupon_code', true);
+									if ($coupon) {
+										echo '<span class="cwc-dash__badge" style="background:#ecfdf5;color:#059669;border:1px solid #10b981;">' . esc_html($coupon) . '</span>';
+									} else {
+										echo '<span style="color:#94a3b8;">—</span>';
+									}
+									?>
+								</td>
 								<td>
 									<span class="cwc-dash__status-dot cwc-dash__status-dot--<?php echo esc_attr($b['status']); ?>">
 										<?php echo esc_html(ucwords(str_replace('-', ' ', $b['status']))); ?>

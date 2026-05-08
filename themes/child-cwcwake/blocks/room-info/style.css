@@ -300,7 +300,7 @@
 	min-height: 56px;
 	padding: 0.5rem 1.25rem;
 	border-radius: 8px;
-	background: #0096C7;
+	background: #0096C7 !important;
 	color: #ffffff;
 	font-family: var(--wp--preset--font-family--heading);
 	font-weight: 600;

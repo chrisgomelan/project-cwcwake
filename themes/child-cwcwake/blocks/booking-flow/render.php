@@ -216,8 +216,8 @@ $first_room_price = $first_room['price'];
 						<label class="bf-checkbox">
 							<input type="checkbox" class="bf-checkbox__input" id="bf-agree-updates">
 							<span class="bf-checkbox__box"></span>
-							<span class="bf-checkbox__label">I agree to receive status updates via Email &amp;
-								SMS</span>
+							<span class="bf-checkbox__label">By booking, you agree to receive essential transaction
+								updates via the email and phone number provided.</span>
 						</label>
 
 						<button class="bf-btn-primary" id="bf-to-payment" type="button">Proceed to Payment</button>
@@ -256,9 +256,11 @@ $first_room_price = $first_room['price'];
 						</div>
 
 						<!-- PayMaya Info (visible for paymaya) -->
-						<div class="bf-paymaya-info" id="bf-paymaya-info" style="display: none; margin-bottom: 32px; gap: 15px; flex-direction: column;">
+						<div class="bf-paymaya-info" id="bf-paymaya-info"
+							style="display: none; margin-bottom: 32px; gap: 15px; flex-direction: column;">
 							<h3 class="bf-panel__sub-label">PayMaya</h3>
-							<p class="bf-panel__desc">You will be redirected to PayMongo's secure payment page to complete your transaction via PayMaya.</p>
+							<p class="bf-panel__desc">You will be redirected to PayMongo's secure payment page to
+								complete your transaction via PayMaya.</p>
 						</div>
 
 						<!-- Card form (visible for visa/mastercard) -->
@@ -481,7 +483,8 @@ $first_room_price = $first_room['price'];
 						<div class="bf-summary__price-breakdown" style="font-size: 14px; color: #475569;">
 							<div style="display:flex;justify-content:space-between;">
 								<span>Rate per night</span>
-								<span>₱ <?php echo esc_html(number_format($nightly_rate, 2)); ?></span>
+								<span id="bf-summary-rate-label">₱
+									<?php echo esc_html(number_format($nightly_rate, 2)); ?></span>
 							</div>
 							<?php if ($nights_count > 0): ?>
 								<div id="bf-summary-nights" class="bf-summary__nights-row"
@@ -492,6 +495,29 @@ $first_room_price = $first_room['price'];
 								</div>
 							<?php endif; ?>
 						</div>
+
+						<!-- Promo Code -->
+						<div class="bf-summary__promo">
+							<div class="bf-summary__section-header">
+								<h3 class="bf-summary__sub-label">Promo Code</h3>
+							</div>
+							<div class="bf-summary__promo-row">
+								<input type="text" id="bf-promo-code" class="bf-summary__promo-input"
+									placeholder="Enter code">
+								<button type="button" id="bf-apply-promo" class="bf-summary__promo-btn">Apply</button>
+							</div>
+							<div id="bf-promo-msg" class="bf-summary__promo-msg"></div>
+							<div id="bf-promo-applied" class="bf-summary__promo-applied" style="display: none;">
+								<span class="bf-summary__promo-tag">
+									<span id="bf-promo-tag-text">CODE</span>
+									<button type="button" id="bf-remove-promo"
+										class="bf-summary__promo-remove">&times;</button>
+								</span>
+								<span class="bf-summary__promo-discount" id="bf-promo-discount">-₱ 0.00</span>
+							</div>
+						</div>
+
+						<div class="bf-summary__divider"></div>
 
 						<!-- Total Price -->
 						<div class="bf-summary__total">
@@ -584,16 +610,15 @@ $first_room_price = $first_room['price'];
 						$is_room_booked = ($room['availability'] === 'fully-booked');
 						?>
 						<label
-							class="bf-modal__room-option<?php echo $is_room_booked ? ' bf-modal__room-option--booked' : ''; ?>"
-							style="<?php echo $is_room_booked ? 'opacity: 0.6; position: relative; cursor: not-allowed; pointer-events: none; filter: grayscale(100%);' : ''; ?>">
+							class="bf-modal__room-option<?php echo $is_room_booked ? ' bf-modal__room-option--booked' : ''; ?>">
 							<div class="bf-modal__room-option-text">
 								<span class="bf-modal__room-option-name"><?php echo esc_html($room['title']); ?></span>
 								<span class="bf-modal__room-option-cap">Max <?php echo esc_html($room['capacity']); ?>
 									persons</span>
 								<?php if ($is_room_booked): ?>
 									<span
-										style="display:inline-block;margin-top:4px;padding:2px 8px;border-radius:4px;background:#fef2f2;color:#dc2626;font-size:11px;font-weight:600;">Fully
-										Booked</span>
+										style="display:inline-block;margin-top:4px;padding:2px 8px;border-radius:4px;background:#fef2f2;color:#dc2626;font-size:11px;font-weight:600;">Check
+										Availability</span>
 								<?php endif; ?>
 							</div>
 							<input type="radio" name="bf_modal_room" class="bf-modal__radio"
@@ -603,7 +628,7 @@ $first_room_price = $first_room['price'];
 								data-excerpt="<?php echo esc_attr($room['excerpt']); ?>"
 								data-beds="<?php echo esc_attr(wp_json_encode($room['beds'])); ?>"
 								data-image="<?php echo esc_url($room['image']); ?>"
-								data-availability="<?php echo esc_attr($room['availability']); ?>" <?php echo $is_room_booked ? ' disabled' : ''; ?> 	<?php echo 0 === $index && !$is_room_booked ? ' checked' : ''; ?>>
+								data-availability="<?php echo esc_attr($room['availability']); ?>" <?php echo 0 === $index ? ' checked' : ''; ?>>
 						</label>
 					<?php endforeach; ?>
 				</div>
@@ -691,3 +716,45 @@ $first_room_price = $first_room['price'];
 	</div>
 
 </div>
+<div class="bf-modal" id="bf-legal-modal" style="display: none;">
+	<div class="bf-modal__overlay js-close-legal"></div>
+	<div class="bf-modal__container">
+		<div class="bf-modal__header">
+			<h2 class="bf-modal__title" id="bf-legal-title">Terms of Use</h2>
+			<button class="bf-modal__close js-close-legal">&times;</button>
+		</div>
+		<div class="bf-modal__body" id="bf-legal-content">
+			<!-- Dynamic Content -->
+		</div>
+		<div class="bf-modal__footer">
+			<button class="bf-btn-primary js-close-legal" style="width: 100%;">I Understand</button>
+		</div>
+	</div>
+</div>
+
+</div><!-- .wp-block-cwc-booking-flow -->
+
+<?php
+// Pre-fetch content for the modal to avoid extra AJAX
+$legal_data = [];
+$policy_pages = ['privacy-policy', 'terms-and-conditions'];
+
+foreach ($policy_pages as $slug) {
+	$page = get_page_by_path($slug);
+	if ($page) {
+		$content = apply_filters('the_content', $page->post_content);
+		$legal_data[$slug === 'privacy-policy' ? 'privacy' : 'terms'] = [
+			'title' => get_the_title($page),
+			'content' => $content
+		];
+	} else {
+		$legal_data[$slug === 'privacy-policy' ? 'privacy' : 'terms'] = [
+			'title' => $slug === 'privacy-policy' ? 'Privacy Policy' : 'Terms of Use',
+			'content' => '<p>Information for this page is currently being updated. Please contact support for details.</p>'
+		];
+	}
+}
+?>
+<script>
+	window.cwcLegalData = <?php echo wp_json_encode($legal_data); ?>;
+</script>

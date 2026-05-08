@@ -30,6 +30,10 @@
 			"type": "string",
 			"default": "BEST WAKEPARK"
 		},
+		"headingAfterEmphasis": {
+			"type": "string",
+			"default": ""
+		},
 		"headingLine2": {
 			"type": "string",
 			"default": "IN THE PHILIPPINES"

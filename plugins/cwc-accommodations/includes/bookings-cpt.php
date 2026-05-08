@@ -483,16 +483,16 @@ function cwc_check_room_availability()
 	$room_post_id = $room_post instanceof WP_Post ? (int) $room_post->ID : 0;
 	$total_units = $room_post_id ? cwc_get_room_inventory($room_post_id) : 1;
 	$overlapping = cwc_count_overlapping_bookings($room_name, $checkin_date, $checkout_date);
-	$available_units = $overlapping > 0 ? 0 : $total_units;
+	$available_units = max(0, $total_units - $overlapping);
 
 	if ($room_post_id && function_exists('cwc_get_room_unit_allocation')) {
 		$allocation = cwc_get_room_unit_allocation($room_post_id, $checkin_date, $checkout_date);
 		$total_units = (int) ($allocation['total_units'] ?? $total_units);
 		$overlapping = (int) ($allocation['occupied_count'] ?? 0) + count($allocation['overflow_booking_ids'] ?? []);
-		$available_units = $overlapping > 0 ? 0 : $total_units;
+		$available_units = max(0, $total_units - $overlapping);
 	}
 
-	$is_fully_booked = ($overlapping > 0);
+	$is_fully_booked = ($available_units <= 0);
 
 	wp_send_json_success([
 		'room' => $room_name,
@@ -602,7 +602,8 @@ function cwc_get_booked_dates()
 		$date = $today->modify('+' . $offset . ' days');
 		$next_date = $date->modify('+1 day');
 		$overlapping = cwc_count_overlapping_bookings($room_name, $date->format('Y-m-d'), $next_date->format('Y-m-d'));
-		if ($overlapping > 0) {
+		$total_units = cwc_get_room_inventory($room_post_id);
+		if ($overlapping >= $total_units) {
 			$date_str = $date->format('Y-m-d');
 			$fully_booked_dates[] = $date_str;
 		}
@@ -692,89 +693,128 @@ function cwc_send_booking_status_email($booking_id, $status, $admin_note = '')
 	// Build the email body
 	ob_start();
 	?>
-	<p>Hi <strong><?php echo esc_html($name); ?></strong>,</p>
-	<p><?php echo esc_html($tpl['message']); ?></p>
+		<p>Hi <strong>
+		<?php echo esc_html($name); ?>
+	</strong>,</p>
+	<p>
+		<?php echo esc_html($tpl['message']); ?></p>
 
-	<table class="details-table">
-		<?php if ($ref): ?>
-			<tr>
-				<td class="details-label">Booking Reference</td>
-				<td class="details-value details-highlight"><?php echo esc_html($ref); ?></td>
+		<table class="details-table">
+			<?php if ($ref): ?>
+				<tr>
+			<td class="details-label">Booking Reference</td>
+			<td class="details-value details-highlight">
+				<?php echo esc_html($ref); ?>
+			</td>
 			</tr>
 		<?php endif; ?>
+
 		<?php if ($status !== 'completed'): ?>
-			<tr>
-				<td class="details-label">Room</td>
-				<td class="details-value"><?php echo esc_html($room); ?></td>
+				<tr>
+			<td class="details-label">Room</td>
+			<td class="details-value">
+				<?php echo esc_html($room); ?>
+			</td>
 			</tr>
 			<?php if ($assigned_room): ?>
-				<tr>
-					<td class="details-label">Room Number</td>
-					<td class="details-value details-highlight"><?php echo esc_html($assigned_room); ?></td>
+					<tr>
+				<td class="details-label">Room Number</td>
+				<td class="details-value details-highlight">
+					<?php echo esc_html($assigned_room); ?>
+				</td>
 				</tr>
 			<?php endif; ?>
 		<?php endif; ?>
-		<tr>
-			<td class="details-label">Check-in</td>
-			<td class="details-value"><?php echo esc_html($checkin); ?></td>
-		</tr>
-		<tr>
-			<td class="details-label">Check-out</td>
-			<td class="details-value"><?php echo esc_html($checkout); ?></td>
-		</tr>
-		<?php if ($nights > 0 && $status !== 'completed'): ?>
+
 			<tr>
-				<td class="details-label">Duration</td>
-				<td class="details-value"><?php echo esc_html($nights); ?> night<?php echo $nights > 1 ? 's' : ''; ?></td>
+				<td class="details-label">Check-in</td>
+				<td class="details-value">
+					<?php echo esc_html($checkin); ?>
+				</td>
 			</tr>
-		<?php endif; ?>
-		<tr>
-			<td class="details-label">Amount</td>
-			<td class="details-value details-highlight"><?php echo esc_html($price); ?></td>
-		</tr>
-		<tr>
-			<td class="details-label">Payment</td>
-			<td class="details-value" style="text-transform: capitalize;"><?php echo esc_html($pay_status); ?>
-				(<?php echo esc_html(strtoupper($pay_method)); ?>)</td>
-		</tr>
-		<tr>
-			<td class="details-label">Booking Status</td>
-			<td class="details-value details-highlight" style="text-transform: capitalize;">
-				<?php echo esc_html($status); ?>
-			</td>
-		</tr>
-	</table>
+			<tr>
+				<td class="details-label">Check-out</td>
+				<td class="details-value">
+					<?php echo esc_html($checkout); ?>
+				</td>
+			</tr>
 
-	<?php if (!empty($admin_note)): ?>
-		<div class="admin-note">
-			<p class="note-title">Note from CWC Team:</p>
-			<p><?php echo nl2br(esc_html($admin_note)); ?></p>
-		</div>
-	<?php endif; ?>
+			<?php if ($status !== 'completed' && $nights > 0): ?>
+					<tr>
+				<td class="details-label">Duration</td>
+				<td class="details-value">
+					<?php echo esc_html($nights); ?> night
+					<?php echo $nights > 1 ? 's' : ''; ?>
+				</td>
+				</tr>
+			<?php endif; ?>
 
-	<p style="margin-top: 24px; color: #64748b; font-size: 14px;">If you have any questions, feel free to reply to this
-		email or contact us at <a href="mailto:info@cwcwake.com" style="color: #0096C7;">info@cwcwake.com</a>.</p>
-	<?php
-	$body = ob_get_clean();
+			<tr>
+				<td class="details-label">Amount</td>
+				<td class="details-value details-highlight">
+					<?php echo esc_html($price); ?>
+				</td>
+			</tr>
 
-	// Wrap in premium template
-	if (function_exists('cwc_get_email_template')) {
-		$full_html = cwc_get_email_template($tpl['heading'], $body, [
-			'ref' => $ref,
-			'banner_title' => $tpl['banner_title'] ?? "You're all set!",
-			'banner_subtitle' => $tpl['banner_subtitle'] ?? "Your booking has been received and is being processed."
-		]);
-	} else {
-		$full_html = $body;
-	}
+			<?php
+			$coupon_code = get_post_meta($booking_id, '_cwc_bk_coupon_code', true);
+			$discount = get_post_meta($booking_id, '_cwc_bk_discount', true);
+			if ($coupon_code):
+				?>
+					<tr>
+						<td class="details-label">Promo Code</td>
+						<td class="details-value" style="color: #059669;">-₱ <?php echo number_format((float) $discount, 2); ?> (
+				<?php echo esc_html($coupon_code); ?>)</td>
+				</tr>
+			<?php endif; ?>
 
-	$headers = ['Content-Type: text/html; charset=UTF-8'];
-	$sent = wp_mail($email, $tpl['subject'], $full_html, $headers);
+			<tr>
+				<td class="details-label">Payment</td>
+				<td class="details-value" style="text-transform: capitalize;">
+					<?php echo esc_html($pay_status); ?>
+					(
+					<?php echo esc_html(strtoupper($pay_method)); ?>)
+				</td>
+				</tr> <tr>
+				<td class="details-label">Booking Status</td>
+				<td class="details-value details-highlight" style="text-transform: capitalize;">
+					<?php echo esc_html($status); ?>
+					</td> </tr>
+						</table>
 
-	// Log the email
-	cwc_log_email($booking_id, 'status_' . $status, $email, $sent, $admin_note);
+						<?php if (!empty($admin_note)): ?>
+								<div class="admin-note">
+							<p class="note-title">Note from CWC Team:</p>
+							<p>
+								<?php echo nl2br(esc_html($admin_note)); ?>
+							</p>
+							</div> <?php endif; ?>
 
-	return $sent;
+						<p style="margin-top: 24px; color: #64748b; font-size: 14px;">If you have any questions, feel free
+							to reply to this
+							email or contact us at <a href="mailto:info@cwcwake.com"
+								style="color: #0096C7;">info@cwcwake.com</a>.</p>
+						<?php
+						$body = ob_get_clean();
+
+						// Wrap in premium template
+						if (function_exists('cwc_get_email_template')) {
+							$full_html = cwc_get_email_template($tpl['heading'], $body, [
+								'ref' => $ref,
+								'banner_title' => $tpl['banner_title'] ?? "You're all set!",
+								'banner_subtitle' => $tpl['banner_subtitle'] ?? "Your booking has been received and is being processed."
+							]);
+						} else {
+							$full_html = $body;
+						}
+
+						$headers = ['Content-Type: text/html; charset=UTF-8'];
+						$sent = wp_mail($email, $tpl['subject'], $full_html, $headers);
+
+						// Log the email
+						cwc_log_email($booking_id, 'status_' . $status, $email, $sent, $admin_note);
+
+						return $sent;
 }
 
 /* ────────────────────────────────────────────
@@ -862,7 +902,8 @@ function cwc_bulk_update_bookings()
 
 	foreach ($ids as $booking_id) {
 		$booking_id = absint($booking_id);
-		if (!$booking_id) continue;
+		if (!$booking_id)
+			continue;
 
 		$was_modified = false;
 
@@ -876,7 +917,7 @@ function cwc_bulk_update_bookings()
 					'to' => $status,
 					'email_sent' => $send_email
 				]);
-				
+
 				// Release unit locks if needed
 				if (in_array($status, ['completed', 'cancelled'], true) && !in_array($old_status, ['completed', 'cancelled'], true)) {
 					if (function_exists('cwc_release_legacy_booked_unit_for_booking')) {
@@ -905,7 +946,7 @@ function cwc_bulk_update_bookings()
 				$was_modified = true;
 			}
 		}
-		
+
 		if ($was_modified) {
 			$updated_count++;
 		} else {
