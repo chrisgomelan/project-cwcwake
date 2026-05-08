@@ -138,6 +138,167 @@
 			filterTable(null, table);
 		});
 
+		const queryParams = new URLSearchParams(window.location.search);
+		const highlightBookingId = queryParams.get('booking_id');
+		const bookingDetailsModal = document.getElementById('cwc-booking-details-modal');
+		const bookingDetailsContent = document.getElementById('booking-details-content');
+		const bookingDetailsCloseBtns = document.querySelectorAll('.js-close-booking-details-modal');
+
+		const escapeHtml = (value) => String(value ?? '').replace(/[&<>"]+/g, (char) => ({
+			'&': '&amp;',
+			'<': '&lt;',
+			'>': '&gt;',
+			'"': '&quot;'
+		}[char] || char));
+
+		const openBookingDetailsModal = () => {
+			if (bookingDetailsModal) bookingDetailsModal.style.display = 'flex';
+		};
+
+		const closeBookingDetailsModal = () => {
+			if (bookingDetailsModal) bookingDetailsModal.style.display = 'none';
+		};
+
+		bookingDetailsCloseBtns.forEach((btn) => btn.addEventListener('click', closeBookingDetailsModal));
+
+		/* ─── Bookings Calendar (FullCalendar) ─── */
+		const calendarEl = document.getElementById('cwc-bookings-calendar');
+
+		const loadScript = (src) => new Promise((resolve, reject) => {
+			const s = document.createElement('script');
+			s.src = src;
+			s.onload = resolve;
+			s.onerror = reject;
+			document.head.appendChild(s);
+		});
+
+		const loadCss = (href) => new Promise((resolve) => {
+			if (document.querySelector(`link[href="${href}"]`)) return resolve();
+			const l = document.createElement('link');
+			l.rel = 'stylesheet';
+			l.href = href;
+			document.head.appendChild(l);
+			// No reliable onload across browsers for link; resolve after short delay
+			setTimeout(resolve, 250);
+		});
+
+		if (calendarEl) {
+			const ensureFCAndInit = async () => {
+				if (typeof FullCalendar === 'undefined') {
+					try {
+						await loadCss('https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css');
+						await loadScript('https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js');
+					} catch (err) {
+						console.error('Failed to load FullCalendar:', err);
+						return;
+					}
+				}
+
+				const fetchEvents = async (info, successCallback, failureCallback) => {
+				try {
+					const formData = new URLSearchParams();
+					formData.append('action', 'cwc_get_bookings_events');
+					formData.append('nonce', cwcDash.nonce);
+					const resp = await fetch(cwcDash.ajaxUrl, { method: 'POST', body: formData });
+					const data = await resp.json();
+					if (data.success) return successCallback(data.data);
+					return failureCallback(data.data?.message || 'Failed to load events');
+				} catch (err) {
+					return failureCallback(err);
+				}
+			};
+
+				const calendar = new FullCalendar.Calendar(calendarEl, {
+				initialView: 'dayGridMonth',
+				headerToolbar: { left: 'prev,next today', center: 'title', right: 'dayGridMonth,dayGridWeek' },
+				height: 600,
+				events: fetchEvents,
+					eventClick: async function(info) {
+						info.jsEvent.preventDefault();
+						const id = info.event.id;
+						if (!id || !bookingDetailsContent) return;
+
+						bookingDetailsContent.innerHTML = '<p>Loading booking details...</p>';
+						openBookingDetailsModal();
+
+						try {
+							const formData = new URLSearchParams();
+							formData.append('action', 'cwc_get_booking_details');
+							formData.append('booking_id', id);
+							formData.append('nonce', cwcDash.nonce);
+
+							const response = await fetch(cwcDash.ajaxUrl, { method: 'POST', body: formData });
+							const result = await response.json();
+
+							if (!result.success) {
+								bookingDetailsContent.innerHTML = '<p>Unable to load booking details.</p>';
+								return;
+							}
+
+							const b = result.data;
+							const additionalGuests = Array.isArray(b.guests) ? b.guests : [];
+							const totalGuests = 1 + additionalGuests.length;
+							const promo = b.coupon_code ? `<div><strong>Promo Code:</strong> <span style="color:#059669;">${escapeHtml(b.coupon_code)}</span></div>` : '';
+							const discount = b.discount_num ? `<div><strong>Discount:</strong> <span style="color:#dc2626;">-₱${Number(b.discount_num).toFixed(2)}</span></div>` : '';
+							const guests = additionalGuests.length
+								? `<ul style="margin:8px 0 0 18px;">${additionalGuests.map(g => `<li>${escapeHtml(g.name || '')} <span style="color:#64748b;">(${escapeHtml(g.type || 'adult')})</span></li>`).join('')}</ul>`
+								: '<span>None</span>';
+
+							bookingDetailsContent.innerHTML = `
+								<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+									<div><strong>Total Guests:</strong> ${totalGuests}</div>
+									<div><strong>Additional Guests:</strong> ${additionalGuests.length}</div>
+									<div><strong>Ref:</strong> ${escapeHtml(b.ref)}</div>
+									<div><strong>Transaction ID:</strong> ${escapeHtml(b.transaction_id || '—')}</div>
+									<div><strong>Guest:</strong> ${escapeHtml(b.name)}</div>
+									<div><strong>Email:</strong> ${escapeHtml(b.email)}</div>
+									<div><strong>Phone:</strong> ${escapeHtml(b.phone)}</div>
+									<div><strong>Room:</strong> ${escapeHtml(b.room)}</div>
+									<div><strong>Unit:</strong> ${escapeHtml(b.assigned_room || '—')}</div>
+									<div><strong>Status:</strong> ${escapeHtml(b.status)}</div>
+									<div><strong>Payment:</strong> ${escapeHtml(b.payment_status)}</div>
+									<div><strong>Check-in:</strong> ${escapeHtml(b.checkin)}</div>
+									<div><strong>Check-out:</strong> ${escapeHtml(b.checkout)}</div>
+									<div><strong>Amount:</strong> <span style="color:${b.discount_num ? '#059669' : '#111827'};font-weight:700;">${escapeHtml('₱' + Number(b.discounted_total || 0).toFixed(2))}</span></div>
+									${promo}
+									${discount}
+									<div style="grid-column:1 / -1;"><strong>Special Requests:</strong> ${escapeHtml(b.requests || 'None')}</div>
+									<div style="grid-column:1 / -1;"><strong>Additional Guests:</strong> ${guests}</div>
+								</div>
+							`;
+						} catch (err) {
+							console.error(err);
+							bookingDetailsContent.innerHTML = '<p>Unexpected error loading booking details.</p>';
+						}
+					},
+				eventDidMount: function(info) {
+					if (info.event.extendedProps) {
+						const name = info.event.extendedProps.name || '';
+						const unit = info.event.extendedProps.unit || '';
+						const status = info.event.extendedProps.status || '';
+						let title = name;
+						if (unit) title += ' • ' + unit;
+						if (status) title += ' (' + status + ')';
+						info.el.setAttribute('title', title);
+					}
+				}
+					});
+
+					calendar.render();
+				};
+
+				ensureFCAndInit();
+		}
+
+			if (highlightBookingId) {
+				const selectedRow = document.querySelector(`.cwc-dash__row-item[data-id="${highlightBookingId}"]`);
+				if (selectedRow) {
+					selectedRow.style.outline = '2px solid #2563eb';
+					selectedRow.style.background = '#eff6ff';
+					selectedRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
+				}
+			}
+
 		/* ─── Actions Dropdown ─── */
 		document.addEventListener('click', (e) => {
 			// Close all dropdowns if clicking outside

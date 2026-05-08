@@ -419,6 +419,7 @@
 			formData.append('room', summaryRoomName?.textContent || '');
 			formData.append('price', summaryPrice?.textContent || '');
 			formData.append('nights', String(calculateNights()));
+			formData.append('guests', JSON.stringify(additionalGuests || []));
 			formData.append('requests', block.querySelector('#bf-requests')?.value || '');
 
 			if (appliedCoupon) {
