@@ -400,7 +400,8 @@
 			formData.append('action', 'cwc_submit_booking');
 			formData.append('name', fullNameInput?.value || '');
 			formData.append('email', emailInput?.value || '');
-			formData.append('phone', phoneInput?.value || '');
+			const dialCode = selectedCode ? selectedCode.textContent.trim() : '';
+			formData.append('phone', (dialCode ? dialCode + ' ' : '') + (phoneInput?.value || ''));
 			formData.append('checkin', summaryCheckin?.textContent || '');
 			formData.append('checkout', summaryCheckout?.textContent || '');
 			formData.append('room', summaryRoomName?.textContent || '');
@@ -423,7 +424,7 @@
 						const currentData = JSON.parse(sessionStorage.getItem('cwc_booking_data') || '{}');
 						currentData.name = fullNameInput?.value || '';
 						currentData.email = emailInput?.value || '';
-						currentData.phone = phoneInput?.value || '';
+						currentData.phone = (dialCode ? dialCode + ' ' : '') + (phoneInput?.value || '');
 						currentData.additionalGuests = additionalGuests;
 						sessionStorage.setItem('cwc_booking_data', JSON.stringify(currentData));
 

@@ -244,6 +244,7 @@
 	color: var(--wp--preset--color--text);
 	text-decoration: none;
 	transition: background-color 0.3s ease, color 0.3s ease;
+	outline: none;
 }
 
 .cwc-accommodations__card-btn:hover {

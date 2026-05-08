@@ -767,10 +767,40 @@ function cwc_render_dash_bookings($bookings)
 				<p>No bookings yet. Bookings will appear here once guests start reserving rooms.</p>
 			</div>
 		<?php else: ?>
-			<div class="cwc-dash__table-wrap">
+		<!-- Bulk Actions Bar -->
+		<div id="cwc-bulk-actions-bar" class="cwc-dash__bulk-bar" style="display: none;">
+			<div class="cwc-dash__bulk-info">
+				<span id="cwc-bulk-count">0</span> items selected
+			</div>
+			<div class="cwc-dash__bulk-controls">
+				<select id="cwc-bulk-status" class="cwc-dash__filter-select">
+					<option value="">Change Booking Status...</option>
+					<option value="pending">Mark as Pending</option>
+					<option value="confirmed">Mark as Confirmed</option>
+					<option value="cancelled">Mark as Cancelled</option>
+					<option value="completed">Mark as Completed</option>
+				</select>
+				<select id="cwc-bulk-payment" class="cwc-dash__filter-select">
+					<option value="">Change Payment Status...</option>
+					<option value="unpaid">Mark as Unpaid</option>
+					<option value="paid">Mark as Paid</option>
+					<option value="failed">Mark as Failed</option>
+					<option value="refunded">Mark as Refunded</option>
+				</select>
+				<label class="cwc-dash__bulk-checkbox-label" style="display: flex; align-items: center; gap: 6px; font-size: 12px; cursor: pointer; margin-right: 8px;">
+					<input type="checkbox" id="cwc-bulk-send-email" checked style="margin: 0; width: 14px; height: 14px;">
+					Send Emails
+				</label>
+				<button id="cwc-bulk-apply" class="button button-primary">Apply Bulk Action</button>
+				<button id="cwc-bulk-cancel" class="button">Cancel</button>
+			</div>
+		</div>
+
+		<div class="cwc-dash__table-wrap">
 				<table class="cwc-dash__table" id="cwc-bookings-table">
 					<thead>
 						<tr>
+							<th style="width: 30px;"><input type="checkbox" id="cwc-bulk-select-all"></th>
 							<th>Ref ID</th>
 							<th>Guest</th>
 							<th>Room</th>
@@ -792,6 +822,8 @@ function cwc_render_dash_bookings($bookings)
 								data-phone="<?php echo esc_attr(strtolower($b['phone'])); ?>"
 								data-status="<?php echo esc_attr($b['status']); ?>"
 								data-payment-status="<?php echo esc_attr($b['payment_status']); ?>">
+								
+								<td><input type="checkbox" class="cwc-row-checkbox" value="<?php echo esc_attr($b['id']); ?>"></td>
 
 								<td class="cwc-dash__td-ref"><strong><?php echo esc_html($b['ref']); ?></strong></td>
 								<td>

@@ -583,6 +583,40 @@ img {
 }
 
 /* ----------------------------------------
+	Album Empty State
+	---------------------------------------- */
+
+.cwc-album-empty-state {
+	transition: opacity 0.4s ease;
+}
+
+/* Optional: Logic to hide empty state if the preceding grid has content.
+   The block uses the wrapper class .cwc-albums. */
+.cwc-albums + .cwc-album-empty-state,
+.cwc-albums ~ .cwc-album-empty-state {
+	display: none !important;
+}
+
+.cwc-album-empty-state__icon-wrap {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: fit-content;
+	margin-inline: auto;
+}
+
+.cwc-album-empty-state h3 {
+	margin-bottom: 0.5rem !important;
+	color: #0096C7 !important;
+}
+
+.cwc-album-empty-state p {
+	max-width: 400px;
+	margin-inline: auto;
+	line-height: 1.5;
+}
+
+/* ----------------------------------------
 	Responsive adjustments
 	---------------------------------------- */
 

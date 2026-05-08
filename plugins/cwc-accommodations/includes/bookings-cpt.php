@@ -656,22 +656,30 @@ function cwc_send_booking_status_email($booking_id, $status, $admin_note = '')
 		'pending' => [
 			'subject' => 'Booking Received — CWC Wake Park',
 			'heading' => 'Booking Received',
-			'message' => 'Thank you for your reservation! Your booking is currently being reviewed by our team. We will notify you once it has been confirmed.',
+			'banner_title' => "You're all set!",
+			'banner_subtitle' => "Your booking has been received and is being processed.",
+			'message' => 'Thank you for your reservation! Our team is currently reviewing your details and we will notify you once confirmed.',
 		],
 		'confirmed' => [
 			'subject' => 'Booking Confirmed! — CWC Wake Park',
 			'heading' => 'Your Booking is Confirmed!',
+			'banner_title' => "It's Official!",
+			'banner_subtitle' => "Your reservation at CWC Wake Park is confirmed.",
 			'message' => 'Great news! Your booking has been confirmed. We look forward to welcoming you at CWC Wake Park!',
 		],
 		'cancelled' => [
 			'subject' => 'Booking Cancelled — CWC Wake Park',
-			'heading' => 'Booking Cancellation Notice',
-			'message' => 'We regret to inform you that your booking has been cancelled. If you have any questions or believe this is an error, please don\'t hesitate to contact us.',
+			'heading' => 'Booking Cancellation',
+			'banner_title' => "Booking Cancelled",
+			'banner_subtitle' => "We have processed your booking cancellation.",
+			'message' => 'We regret to inform you that your booking has been cancelled. If you have any questions or believe this is an error, please contact us.',
 		],
 		'completed' => [
 			'subject' => 'Thank You for Staying! — CWC Wake Park',
 			'heading' => 'Thank You for Your Visit!',
-			'message' => 'We hope you had an amazing time at CWC Wake Park! We would love to see you again soon.',
+			'banner_title' => "Thank you for visiting!",
+			'banner_subtitle' => "We hope you had a wonderful stay at CWC Wake Park.",
+			'message' => 'We loved having you stay with us! Below is a summary of your visit for your records.',
 		],
 	];
 
@@ -694,15 +702,17 @@ function cwc_send_booking_status_email($booking_id, $status, $admin_note = '')
 				<td class="details-value details-highlight"><?php echo esc_html($ref); ?></td>
 			</tr>
 		<?php endif; ?>
-		<tr>
-			<td class="details-label">Room</td>
-			<td class="details-value"><?php echo esc_html($room); ?></td>
-		</tr>
-		<?php if ($assigned_room): ?>
+		<?php if ($status !== 'completed'): ?>
 			<tr>
-				<td class="details-label">Room Number</td>
-				<td class="details-value details-highlight"><?php echo esc_html($assigned_room); ?></td>
+				<td class="details-label">Room</td>
+				<td class="details-value"><?php echo esc_html($room); ?></td>
 			</tr>
+			<?php if ($assigned_room): ?>
+				<tr>
+					<td class="details-label">Room Number</td>
+					<td class="details-value details-highlight"><?php echo esc_html($assigned_room); ?></td>
+				</tr>
+			<?php endif; ?>
 		<?php endif; ?>
 		<tr>
 			<td class="details-label">Check-in</td>
@@ -712,7 +722,7 @@ function cwc_send_booking_status_email($booking_id, $status, $admin_note = '')
 			<td class="details-label">Check-out</td>
 			<td class="details-value"><?php echo esc_html($checkout); ?></td>
 		</tr>
-		<?php if ($nights > 0): ?>
+		<?php if ($nights > 0 && $status !== 'completed'): ?>
 			<tr>
 				<td class="details-label">Duration</td>
 				<td class="details-value"><?php echo esc_html($nights); ?> night<?php echo $nights > 1 ? 's' : ''; ?></td>
@@ -749,7 +759,11 @@ function cwc_send_booking_status_email($booking_id, $status, $admin_note = '')
 
 	// Wrap in premium template
 	if (function_exists('cwc_get_email_template')) {
-		$full_html = cwc_get_email_template($tpl['heading'], $body);
+		$full_html = cwc_get_email_template($tpl['heading'], $body, [
+			'ref' => $ref,
+			'banner_title' => $tpl['banner_title'] ?? "You're all set!",
+			'banner_subtitle' => $tpl['banner_subtitle'] ?? "Your booking has been received and is being processed."
+		]);
 	} else {
 		$full_html = $body;
 	}
@@ -818,3 +832,96 @@ function cwc_process_past_checkouts()
 		cwc_release_legacy_booked_unit_for_booking($booking_id);
 	}
 }
+
+/* ────────────────────────────────────────────
+   AJAX: Bulk Update Bookings
+   ──────────────────────────────────────────── */
+
+function cwc_bulk_update_bookings()
+{
+	// Verify nonce
+	if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'cwc_dash_nonce')) {
+		wp_send_json_error(['message' => 'Nonce verification failed. Please refresh and try again.']);
+	}
+
+	if (!current_user_can('manage_options')) {
+		wp_send_json_error(['message' => 'Unauthorized']);
+	}
+
+	$ids = isset($_POST['ids']) ? json_decode(wp_unslash($_POST['ids']), true) : [];
+	$status = isset($_POST['status']) ? sanitize_key($_POST['status']) : '';
+	$payment_status = isset($_POST['payment_status']) ? sanitize_key($_POST['payment_status']) : '';
+	$send_email = isset($_POST['send_email']) && $_POST['send_email'] === '1';
+
+	if (empty($ids)) {
+		wp_send_json_error(['message' => 'No bookings selected.']);
+	}
+
+	$updated_count = 0;
+	$skipped_count = 0;
+
+	foreach ($ids as $booking_id) {
+		$booking_id = absint($booking_id);
+		if (!$booking_id) continue;
+
+		$was_modified = false;
+
+		// 1. Update Booking Status
+		if ($status) {
+			$old_status = get_post_meta($booking_id, '_cwc_bk_status', true);
+			if ($old_status !== $status) {
+				update_post_meta($booking_id, '_cwc_bk_status', $status);
+				cwc_add_audit_log($booking_id, 'bulk_status_changed', [
+					'from' => $old_status,
+					'to' => $status,
+					'email_sent' => $send_email
+				]);
+				
+				// Release unit locks if needed
+				if (in_array($status, ['completed', 'cancelled'], true) && !in_array($old_status, ['completed', 'cancelled'], true)) {
+					if (function_exists('cwc_release_legacy_booked_unit_for_booking')) {
+						cwc_release_legacy_booked_unit_for_booking($booking_id);
+					}
+				}
+
+				// Send email if requested
+				if ($send_email && function_exists('cwc_send_booking_status_email')) {
+					cwc_send_booking_status_email($booking_id, $status, 'Bulk status update');
+				}
+
+				$was_modified = true;
+			}
+		}
+
+		// 2. Update Payment Status
+		if ($payment_status) {
+			$old_p_status = get_post_meta($booking_id, '_cwc_bk_payment_status', true);
+			if ($old_p_status !== $payment_status) {
+				update_post_meta($booking_id, '_cwc_bk_payment_status', $payment_status);
+				cwc_add_audit_log($booking_id, 'bulk_payment_status_changed', [
+					'from' => $old_p_status,
+					'to' => $payment_status
+				]);
+				$was_modified = true;
+			}
+		}
+		
+		if ($was_modified) {
+			$updated_count++;
+		} else {
+			$skipped_count++;
+		}
+	}
+
+	$message = "Successfully updated {$updated_count} bookings.";
+	if ($skipped_count > 0) {
+		$message .= " ({$skipped_count} skipped as they already had that status).";
+	}
+
+	wp_send_json_success([
+		'message' => $message,
+		'updated' => $updated_count,
+		'skipped' => $skipped_count
+	]);
+}
+add_action('wp_ajax_cwc_bulk_update_bookings', 'cwc_bulk_update_bookings');

@@ -438,6 +438,7 @@
 	white-space: nowrap;
 	flex-shrink: 0;
 	transition: var(--wp--custom--transition--default);
+	outline: none;
 }
 
 .cwc-showcase__social-btn:hover {
@@ -452,6 +453,7 @@
 	background: var(--wp--preset--color--text-muted);
 	position: relative;
 	display: block;
+	outline: none;
 }
 
 .cwc-showcase__card--social img {

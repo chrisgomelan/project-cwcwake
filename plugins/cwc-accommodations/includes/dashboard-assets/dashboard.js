@@ -508,6 +508,117 @@
 				}
 			});
 		}
+
+		/* ─── Bulk Actions Logic ─── */
+		const bulkBar = document.getElementById('cwc-bulk-actions-bar');
+		const bulkCount = document.getElementById('cwc-bulk-count');
+		const bulkSelectAll = document.getElementById('cwc-bulk-select-all');
+		const bulkStatus = document.getElementById('cwc-bulk-status');
+		const bulkPayment = document.getElementById('cwc-bulk-payment');
+		const bulkApplyBtn = document.getElementById('cwc-bulk-apply');
+		const bulkCancelBtn = document.getElementById('cwc-bulk-cancel');
+		const rowCheckboxes = () => document.querySelectorAll('.cwc-row-checkbox');
+
+		const updateBulkUI = () => {
+			const selected = Array.from(rowCheckboxes()).filter(cb => cb.checked);
+			const count = selected.length;
+			
+			if (count > 0) {
+				if (bulkBar) bulkBar.style.display = 'flex';
+				if (bulkCount) bulkCount.textContent = count;
+			} else {
+				if (bulkBar) bulkBar.style.display = 'none';
+				if (bulkSelectAll) bulkSelectAll.checked = false;
+			}
+
+			// Highlight selected rows
+			rowCheckboxes().forEach(cb => {
+				const row = cb.closest('tr');
+				if (cb.checked) {
+					row.classList.add('is-selected');
+				} else {
+					row.classList.remove('is-selected');
+				}
+			});
+		};
+
+		if (bulkSelectAll) {
+			bulkSelectAll.addEventListener('change', () => {
+				// Only select visible rows (not hidden by filter/pagination)
+				const visibleCheckboxes = Array.from(rowCheckboxes()).filter(cb => {
+					const row = cb.closest('tr');
+					return !row.classList.contains('cwc-dash__hidden') && !row.classList.contains('cwc-dash__hidden-page');
+				});
+				
+				visibleCheckboxes.forEach(cb => cb.checked = bulkSelectAll.checked);
+				updateBulkUI();
+			});
+		}
+
+		document.addEventListener('change', (e) => {
+			if (e.target.classList.contains('cwc-row-checkbox')) {
+				updateBulkUI();
+			}
+		});
+
+		if (bulkCancelBtn) {
+			bulkCancelBtn.addEventListener('click', () => {
+				rowCheckboxes().forEach(cb => cb.checked = false);
+				if (bulkSelectAll) bulkSelectAll.checked = false;
+				updateBulkUI();
+			});
+		}
+
+		if (bulkApplyBtn) {
+			bulkApplyBtn.addEventListener('click', async () => {
+				const selectedIds = Array.from(rowCheckboxes())
+					.filter(cb => cb.checked)
+					.map(cb => cb.value);
+				
+				const status = bulkStatus ? bulkStatus.value : '';
+				const payment = bulkPayment ? bulkPayment.value : '';
+				const sendEmail = document.getElementById('cwc-bulk-send-email')?.checked;
+
+				if (!status && !payment) {
+					alert('Please select an action to apply.');
+					return;
+				}
+
+				if (!confirm(`Apply changes to ${selectedIds.length} selected bookings?`)) return;
+
+				const originalText = bulkApplyBtn.textContent;
+				bulkApplyBtn.textContent = 'Applying...';
+				bulkApplyBtn.disabled = true;
+
+				try {
+					const formData = new URLSearchParams();
+					formData.append('action', 'cwc_bulk_update_bookings');
+					formData.append('ids', JSON.stringify(selectedIds));
+					if (status) formData.append('status', status);
+					if (payment) formData.append('payment_status', payment);
+					formData.append('send_email', sendEmail ? '1' : '0');
+					formData.append('nonce', cwcDash.nonce);
+
+					const response = await fetch(cwcDash.ajaxUrl, { method: 'POST', body: formData });
+					const result = await response.json();
+
+					if (result.success) {
+						alert(result.data.message);
+						location.reload();
+					} else {
+						alert('Error: ' + result.data.message);
+						bulkApplyBtn.textContent = originalText;
+						bulkApplyBtn.disabled = false;
+					}
+				} catch (err) {
+					console.error(err);
+					alert('A server error occurred.');
+					bulkApplyBtn.textContent = originalText;
+					bulkApplyBtn.disabled = false;
+				}
+			});
+		}
 	});
+
 })();
 
