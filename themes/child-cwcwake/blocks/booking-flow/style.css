@@ -959,6 +959,8 @@ input.bf-field__input.bf-guest-name {
 
 .bf-summary__promo-input {
 	flex: 1;
+	min-width: 0;
+	box-sizing: border-box;
 	height: 48px;
 	border: 1px solid rgba(26, 26, 26, 0.4);
 	border-radius: 8px;
@@ -969,6 +971,7 @@ input.bf-field__input.bf-guest-name {
 }
 
 .bf-summary__promo-btn {
+	flex-shrink: 0;
 	height: 48px;
 	padding: 0 20px;
 	background: #0096C7;
@@ -1107,8 +1110,7 @@ input.bf-field__input.bf-guest-name {
 }
 
 .bf-modal__inner--trip {
-	max-width: 520px;
-	padding: 30px;
+	padding: 40px;
 }
 
 .bf-modal__header {
@@ -1144,6 +1146,7 @@ input.bf-field__input.bf-guest-name {
 	overflow-y: auto;
 	flex: 1;
 	padding-right: 5px;
+	gap: 20px;
 	/* space for scrollbar */
 }
 
@@ -1181,13 +1184,15 @@ input.bf-field__input.bf-guest-name {
 }
 
 .bf-modal__date-selection-grid {
+	flex: 1;
 	display: flex;
 	align-items: center;
-	gap: 20px;
-	padding: 24px;
+	gap: 16px;
+	padding: 20px 24px;
 	background: #F7F9FB;
 	border-radius: 12px;
 	border: 1px solid #DDDFE3;
+	min-width: 0;
 }
 
 .bf-modal__vertical-divider {
@@ -1198,9 +1203,12 @@ input.bf-field__input.bf-guest-name {
 }
 
 .bf-modal__date-icon-col {
-	padding-top: 4px;
-	height: 21px;
-	width: 21px;
+	flex-shrink: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	height: 24px;
+	width: 24px;
 }
 
 .bf-modal__date-icon-col img {
@@ -1219,18 +1227,20 @@ input.bf-field__input.bf-guest-name {
 	font-family: 'Poppins', sans-serif;
 	font-weight: 600;
 	font-size: 24px;
-	line-height: 28px;
+	line-height: 1.2;
 	color: #0096C7;
 	margin: 0;
+	white-space: nowrap;
 }
 
 .bf-modal__date-val {
 	font-family: var(--wp--preset--font-family--ui, 'Inter', sans-serif);
 	font-weight: 400;
 	font-size: 18px;
-	line-height: 14px;
+	line-height: 1.4;
 	color: #1A1A1A;
 	transition: color 0.2s;
+	white-space: nowrap;
 }
 
 .bf-modal__date-info-col:hover .bf-modal__date-val {
@@ -1609,6 +1619,11 @@ input.bf-field__input.bf-guest-name {
 	.bf-modal__date-selection-grid {
 		padding: 16px;
 		gap: 12px;
+		justify-content: center;
+	}
+
+	.bf-modal__date-info-col {
+		flex: initial;
 	}
 
 	.bf-modal__vertical-divider {
@@ -1751,6 +1766,22 @@ input.bf-field__input.bf-guest-name {
 	box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
 }
 
+#bf-legal-modal .bf-modal__container {
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	background: #fff;
+	width: 90%;
+	max-width: 800px;
+	max-height: 85vh;
+	border-radius: 20px;
+	z-index: 1001;
+	display: flex;
+	flex-direction: column;
+	box-shadow: 0 15px 50px rgba(0, 0, 0, 0.3);
+}
+
 #bf-legal-modal .bf-modal__header {
 	padding: 24px 32px;
 	border-bottom: 1px solid #eee;
@@ -1799,3 +1830,65 @@ input.bf-field__input.bf-guest-name {
 	border-top: 1px solid #eee;
 	background: #f9f9f9;
 }
+
+/* ─── Editor Placeholder ─── */
+.bf-editor-placeholder {
+	padding: 40px;
+	background: #f0f0f0;
+	border: 2px dashed #ccc;
+	border-radius: 8px;
+	text-align: center;
+	color: #666;
+}
+.bf-editor-info h3 {
+	margin: 0 0 10px 0;
+	color: #0096C7;
+}
+.bf-editor-info p {
+	margin: 5px 0;
+}
+
+/* ─── Legal Content (Inside Modal) ─── */
+.bf-modal__body .cwc-policy {
+	margin: 0;
+}
+.bf-modal__body .cwc-policy__intro {
+	padding: 0 0 24px 0;
+}
+.bf-modal__body .cwc-policy__intro p,
+.bf-modal__body .cwc-policy__body {
+	font-family: 'Archivo', system-ui, sans-serif;
+	font-weight: 500;
+	font-size: 16px;
+	line-height: 1.6;
+	color: #1a1a1a;
+	margin-bottom: 1em;
+}
+.bf-modal__body .cwc-policy__panel {
+	background: #f8f9fa;
+	border: 1px solid rgba(0, 0, 0, 0.1);
+	border-radius: 16px;
+	padding: 24px;
+	display: flex;
+	flex-direction: column;
+	gap: 32px;
+}
+.bf-modal__body .cwc-policy__section {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+}
+.bf-modal__body .cwc-policy__label {
+	margin: 0;
+	font-family: 'Sora', system-ui, sans-serif;
+	font-weight: 700;
+	font-size: 24px;
+	line-height: 1.2;
+	color: #0096c7;
+}
+.bf-modal__body .cwc-policy__body-wrap {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+

@@ -275,18 +275,18 @@ $first_room_price = $first_room['price'];
 							</div>
 							<div class="bf-field">
 								<label class="bf-field__label">Card Number <span class="bf-field__req">*</span></label>
-								<input type="text" class="bf-field__input" id="bf-card-number"
-									placeholder="Enter Card Number" maxlength="19">
+								<input type="text" inputmode="numeric" pattern="[0-9]*" class="bf-field__input" id="bf-card-number"
+									placeholder="0000 0000 0000 0000" maxlength="19">
 							</div>
 							<div class="bf-field-row">
 								<div class="bf-field bf-field--half">
 									<label class="bf-field__label">Expiry <span class="bf-field__req">*</span></label>
-									<input type="text" class="bf-field__input" id="bf-card-expiry" placeholder="MM/YY"
+									<input type="text" inputmode="numeric" pattern="[0-9]*" class="bf-field__input" id="bf-card-expiry" placeholder="MM/YY"
 										maxlength="5">
 								</div>
 								<div class="bf-field bf-field--half">
 									<label class="bf-field__label">CVC <span class="bf-field__req">*</span></label>
-									<input type="text" class="bf-field__input" id="bf-card-cvc" placeholder="CVC"
+									<input type="text" inputmode="numeric" pattern="[0-9]*" class="bf-field__input" id="bf-card-cvc" placeholder="123"
 										maxlength="4">
 								</div>
 							</div>
@@ -309,10 +309,24 @@ $first_room_price = $first_room['price'];
 						<label class="bf-checkbox">
 							<input type="checkbox" class="bf-checkbox__input" id="bf-agree-terms">
 							<span class="bf-checkbox__box"></span>
-							<span class="bf-checkbox__label">I accept the Terms of Use and Privacy Policy</span>
+							<span class="bf-checkbox__label">I accept the <a href="#" class="js-open-legal" data-type="terms">Terms of Use</a> and <a href="#" class="js-open-legal" data-type="privacy">Privacy Policy</a></span>
 						</label>
 
 						<button class="bf-btn-primary" id="bf-confirm-pay" type="button">Confirm and Pay</button>
+
+						<style>
+							.js-open-legal {
+								color: #0096C7;
+								text-decoration: underline;
+								cursor: pointer;
+								font-weight: 500;
+							}
+							.js-open-legal:hover {
+								color: #0077A3;
+								text-decoration: none;
+							}
+						</style>
+
 
 						<p class="bf-disclaimer">Deposits are non-refundable; no-shows will be charged the full booking
 							amount, and the remaining balance must be paid at the hotel upon arrival.</p>
@@ -737,23 +751,116 @@ $first_room_price = $first_room['price'];
 <?php
 // Pre-fetch content for the modal to avoid extra AJAX
 $legal_data = [];
-$policy_pages = ['privacy-policy', 'terms-and-conditions'];
 
-foreach ($policy_pages as $slug) {
-	$page = get_page_by_path($slug);
-	if ($page) {
-		$content = apply_filters('the_content', $page->post_content);
-		$legal_data[$slug === 'privacy-policy' ? 'privacy' : 'terms'] = [
-			'title' => get_the_title($page),
-			'content' => $content
-		];
-	} else {
-		$legal_data[$slug === 'privacy-policy' ? 'privacy' : 'terms'] = [
-			'title' => $slug === 'privacy-policy' ? 'Privacy Policy' : 'Terms of Use',
-			'content' => '<p>Information for this page is currently being updated. Please contact support for details.</p>'
-		];
+if ( ! function_exists( 'cwc_format_legal_content' ) ) {
+	function cwc_format_legal_content( $intro, $sections ) {
+		if ( empty( $intro ) && empty( $sections ) ) {
+			return '';
+		}
+		
+		$out = '<div class="cwc-policy">';
+		
+		if ( ! empty( $intro ) ) {
+			$paragraphs = preg_split( "/\r?\n\r?\n/", trim( $intro ) );
+			$out .= '<div class="cwc-policy__intro">';
+			foreach ( $paragraphs as $p ) {
+				$out .= '<p class="cwc-policy__body">' . nl2br( esc_html( $p ) ) . '</p>';
+			}
+			$out .= '</div>';
+		}
+		
+		if ( ! empty( $sections ) && is_array( $sections ) ) {
+			$out .= '<div class="cwc-policy__panel">';
+			foreach ( $sections as $section ) {
+				$label = $section['label'] ?? '';
+				$body  = $section['body'] ?? '';
+				$out .= '<article class="cwc-policy__section">';
+				if ( ! empty( $label ) ) {
+					$out .= '<h2 class="cwc-policy__label" style="font-size: clamp(24px, 3vw, 32px);">' . esc_html( $label ) . '</h2>';
+				}
+				if ( ! empty( $body ) ) {
+					$out .= '<div class="cwc-policy__body-wrap">';
+					$paragraphs = preg_split( "/\r?\n\r?\n/", trim( $body ) );
+					foreach ( $paragraphs as $p ) {
+						$out .= '<p class="cwc-policy__body">' . nl2br( esc_html( $p ) ) . '</p>';
+					}
+					$out .= '</div>';
+				}
+				$out .= '</article>';
+			}
+			$out .= '</div>';
+		}
+		
+		$out .= '</div>';
+		return $out;
 	}
 }
+
+if ( ! function_exists( 'cwc_find_policy_block' ) ) {
+	function cwc_find_policy_block( $blocks ) {
+		foreach ( $blocks as $block ) {
+			if ( $block['blockName'] === 'cwc/policy-content' ) {
+				return $block['attrs'];
+			}
+			if ( ! empty( $block['innerBlocks'] ) ) {
+				$found = cwc_find_policy_block( $block['innerBlocks'] );
+				if ( $found ) return $found;
+			}
+		}
+		return null;
+	}
+}
+
+// 1. Terms of Use
+$terms_title   = ! empty( $attributes['termsTitle'] ) ? $attributes['termsTitle'] : 'Terms of Use';
+$terms_content = ! empty( $attributes['termsContent'] ) ? $attributes['termsContent'] : '';
+
+if ( empty( $terms_content ) ) {
+	$terms_template_path = get_theme_file_path( 'templates/page-terms-and-conditions.html' );
+	if ( file_exists( $terms_template_path ) ) {
+		$blocks = parse_blocks( file_get_contents( $terms_template_path ) );
+		$policy_attrs = cwc_find_policy_block( $blocks );
+		if ( $policy_attrs ) {
+			$terms_content = cwc_format_legal_content( $policy_attrs['intro'] ?? '', $policy_attrs['sections'] ?? [] );
+		}
+	}
+	if ( empty( $terms_content ) ) {
+		$terms_content = '<div class="cwc-policy"><div class="cwc-policy__body"><p>Information for this page is currently being updated. Please contact support for details.</p></div></div>';
+	}
+} else {
+	// If it's a string from attributes, wrap it nicely
+	$terms_content = '<div class="cwc-policy"><div class="cwc-policy__body">' . nl2br( $terms_content ) . '</div></div>';
+}
+
+$legal_data['terms'] = [
+	'title'   => $terms_title,
+	'content' => $terms_content,
+];
+
+// 2. Privacy Policy
+$privacy_title   = ! empty( $attributes['privacyTitle'] ) ? $attributes['privacyTitle'] : 'Privacy Policy';
+$privacy_content = ! empty( $attributes['privacyContent'] ) ? $attributes['privacyContent'] : '';
+
+if ( empty( $privacy_content ) ) {
+	$privacy_template_path = get_theme_file_path( 'templates/page-privacy-policy.html' );
+	if ( file_exists( $privacy_template_path ) ) {
+		$blocks = parse_blocks( file_get_contents( $privacy_template_path ) );
+		$policy_attrs = cwc_find_policy_block( $blocks );
+		if ( $policy_attrs ) {
+			$privacy_content = cwc_format_legal_content( $policy_attrs['intro'] ?? '', $policy_attrs['sections'] ?? [] );
+		}
+	}
+	if ( empty( $privacy_content ) ) {
+		$privacy_content = '<div class="cwc-policy"><div class="cwc-policy__body"><p>Information for this page is currently being updated. Please contact support for details.</p></div></div>';
+	}
+} else {
+	$privacy_content = '<div class="cwc-policy"><div class="cwc-policy__body">' . nl2br( $privacy_content ) . '</div></div>';
+}
+
+$legal_data['privacy'] = [
+	'title'   => $privacy_title,
+	'content' => $privacy_content,
+];
 ?>
 <script>
 	window.cwcLegalData = <?php echo wp_json_encode($legal_data); ?>;

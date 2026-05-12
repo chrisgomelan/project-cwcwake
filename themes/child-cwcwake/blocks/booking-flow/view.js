@@ -168,6 +168,31 @@
 
 			e.target.value = val;
 		});
+		/* ─── Credit Card Input Restriction ─── */
+		const cardNumberInput = block.querySelector('#bf-card-number');
+		const cardExpiryInput = block.querySelector('#bf-card-expiry');
+		const cardCvcInput = block.querySelector('#bf-card-cvc');
+
+		cardNumberInput?.addEventListener('input', (e) => {
+			let val = e.target.value.replace(/\D/g, '');
+			val = val.substring(0, 16);
+			e.target.value = val.replace(/(\d{4})(?=\d)/g, '$1 ');
+		});
+
+		cardExpiryInput?.addEventListener('input', (e) => {
+			let val = e.target.value.replace(/\D/g, '');
+			val = val.substring(0, 4);
+			if (val.length >= 3) {
+				e.target.value = val.substring(0, 2) + '/' + val.substring(2);
+			} else {
+				e.target.value = val;
+			}
+		});
+
+		cardCvcInput?.addEventListener('input', (e) => {
+			let val = e.target.value.replace(/\D/g, '');
+			e.target.value = val.substring(0, 4);
+		});
 
 		function showError(el, message) {
 			const field = el.closest('.bf-field, .bf-guest-row__inner');
@@ -394,6 +419,60 @@
 		});
 
 		btnConfirmPay?.addEventListener('click', () => {
+			clearErrors();
+			let hasError = false;
+
+			const paymentMethod = block.querySelector('input[name="bf_payment_method"]:checked')?.value || '';
+
+			if (paymentMethod === 'visa' || paymentMethod === 'mastercard') {
+				const cardNameInput = block.querySelector('#bf-card-name');
+				const cardNumberInput = block.querySelector('#bf-card-number');
+				const cardExpiryInput = block.querySelector('#bf-card-expiry');
+				const cardCvcInput = block.querySelector('#bf-card-cvc');
+
+				if (!cardNameInput?.value.trim()) {
+					showError(cardNameInput, 'Card holder name is required.');
+					hasError = true;
+				}
+
+				const cardNum = cardNumberInput?.value.replace(/\D/g, '') || '';
+				if (cardNum.length < 13) {
+					showError(cardNumberInput, 'Please enter a valid card number.');
+					hasError = true;
+				}
+
+				const expiry = cardExpiryInput?.value || '';
+				const [monthStr, yearStr] = expiry.split('/');
+				
+				if (!monthStr || !yearStr || monthStr.length !== 2 || yearStr.length !== 2) {
+					showError(cardExpiryInput, 'Please enter a valid expiry date (MM/YY).');
+					hasError = true;
+				} else {
+					const month = parseInt(monthStr, 10);
+					const year = parseInt(yearStr, 10);
+					const now = new Date();
+					const currentMonth = now.getMonth() + 1;
+					const currentYear = now.getFullYear() % 100;
+
+					if (month < 1 || month > 12) {
+						showError(cardExpiryInput, 'Invalid month.');
+						hasError = true;
+					} else if (year < currentYear || (year === currentYear && month < currentMonth)) {
+						showError(cardExpiryInput, 'Card has expired.');
+						hasError = true;
+					}
+				}
+
+				const cvc = cardCvcInput?.value.replace(/\D/g, '') || '';
+				if (cvc.length < 3) {
+					showError(cardCvcInput, 'Invalid CVC.');
+					hasError = true;
+				}
+			}
+
+			if (hasError) {
+				return;
+			}
 			const agree = block.querySelector('#bf-agree-terms');
 			if (agree && !agree.checked) {
 				if (window.cwcToast) {
@@ -427,7 +506,6 @@
 				formData.append('discount_amount', appliedCoupon.discount_amount || 0);
 			}
 
-			const paymentMethod = block.querySelector('input[name="bf_payment_method"]:checked')?.value || '';
 			formData.append('payment_method', paymentMethod);
 			formData.append('marketing_consent', block.querySelector('#bf-agree-updates')?.checked ? '1' : '0');
 			formData.append('current_url', window.location.href);
@@ -1008,6 +1086,42 @@
 			btn.addEventListener('click', closeAllModals);
 		});
 
+		/* ─── Legal Modal Logic ─── */
+		const legalModal = document.querySelector('#bf-legal-modal');
+		const legalTitle = document.querySelector('#bf-legal-title');
+		const legalContent = document.querySelector('#bf-legal-content');
+
+		block.querySelectorAll('.js-open-legal').forEach((link) => {
+			link.addEventListener('click', (e) => {
+				e.preventDefault();
+				const type = link.dataset.type; // 'terms' or 'privacy'
+				if (window.cwcLegalData && window.cwcLegalData[type]) {
+					if (legalTitle) legalTitle.textContent = window.cwcLegalData[type].title;
+					if (legalContent) legalContent.innerHTML = window.cwcLegalData[type].content;
+
+					backdrop?.classList.add('is-active');
+					if (legalModal) {
+						legalModal.classList.add('is-active');
+						legalModal.style.display = 'block';
+					}
+				}
+			});
+		});
+
+		document.querySelectorAll('.js-close-legal').forEach((btn) => {
+			btn.addEventListener('click', () => {
+				if (legalModal) {
+					legalModal.classList.remove('is-active');
+					legalModal.style.display = 'none';
+				}
+				// Only remove backdrop if no other modal is active
+				if (!block.querySelector('.bf-modal.is-active')) {
+					backdrop?.classList.remove('is-active');
+				}
+			});
+		});
+
+
 		/* Edit links in summary → open modals */
 		block.querySelectorAll('.bf-summary__edit-link[data-modal]').forEach((btn) => {
 			btn.addEventListener('click', () => {
@@ -1026,7 +1140,7 @@
 					const list = block.querySelector('#bf-modal-guests-list');
 					if (list) {
 						list.innerHTML = '';
-						additionalGuests.forEach((name, idx) => {
+						additionalGuests.forEach((guest, idx) => {
 							const row = document.createElement('div');
 							row.className = 'bf-modal__guest-row';
 							row.innerHTML = `
@@ -1038,7 +1152,7 @@
 											Edit
 										</button>
 									</div>
-									<input type="text" class="bf-field__input bf-modal-guest-name" data-idx="${idx}" value="${name || `Additional Guest ${idx + 1}`}">
+									<input type="text" class="bf-field__input bf-modal-guest-name" data-idx="${idx}" value="${guest.name || ''}" placeholder="Additional Guest ${idx + 1}">
 								</div>
 							`;
 							list.appendChild(row);
