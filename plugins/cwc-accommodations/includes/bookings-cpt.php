@@ -749,38 +749,52 @@ function cwc_send_booking_status_email($booking_id, $status, $admin_note = '')
 				</tr>
 			<?php endif; ?>
 
-			<tr>
-				<td class="details-label">Amount</td>
-				<td class="details-value details-highlight">
-					<?php echo esc_html($price); ?>
-				</td>
-			</tr>
-
-			<?php
-			$coupon_code = get_post_meta($booking_id, '_cwc_bk_coupon_code', true);
-			$discount = get_post_meta($booking_id, '_cwc_bk_discount', true);
-			if ($coupon_code):
-				?>
-					<tr>
-						<td class="details-label">Promo Code</td>
-						<td class="details-value" style="color: #059669;">-₱ <?php echo number_format((float) $discount, 2); ?> (
-				<?php echo esc_html($coupon_code); ?>)</td>
+		<?php
+		$coupon_code = get_post_meta($booking_id, '_cwc_bk_coupon_code', true);
+		$discount = get_post_meta($booking_id, '_cwc_bk_discount', true);
+		$original_price = get_post_meta($booking_id, '_cwc_bk_original_price', true);
+		
+		// Show original price if there's a discount
+		if ($discount && $original_price):
+			?>
+				<tr>
+					<td class="details-label">Original Amount</td>
+					<td class="details-value" style="text-decoration: line-through; color: #94a3b8;">
+						₱ <?php echo number_format((float) $original_price, 2); ?>
+					</td>
 				</tr>
-			<?php endif; ?>
+				<tr>
+					<td class="details-label">Discount <?php if ($coupon_code): ?>(<?php echo esc_html($coupon_code); ?>)<?php endif; ?></td>
+					<td class="details-value" style="color: #059669; font-weight: 600;">
+						-₱ <?php echo number_format((float) $discount, 2); ?>
+					</td>
+				</tr>
+			<?php
+		?>
+		<?php endif; ?>
 
-			<tr>
-				<td class="details-label">Payment</td>
-				<td class="details-value" style="text-transform: capitalize;">
-					<?php echo esc_html($pay_status); ?>
-					(
-					<?php echo esc_html(strtoupper($pay_method)); ?>)
-				</td>
-				</tr> <tr>
-				<td class="details-label">Booking Status</td>
-				<td class="details-value details-highlight" style="text-transform: capitalize;">
-					<?php echo esc_html($status); ?>
-					</td> </tr>
-						</table>
+		<tr>
+			<td class="details-label" style="<?php echo $discount ? 'font-weight: 600;' : ''; ?>">Final Amount</td>
+			<td class="details-value details-highlight" style="<?php echo $discount ? 'font-weight: 600; font-size: 16px;' : ''; ?>">
+				<?php echo esc_html($price); ?>
+			</td>
+		</tr>
+
+		<tr>
+			<td class="details-label">Payment</td>
+			<td class="details-value" style="text-transform: capitalize;">
+				<?php echo esc_html($pay_status); ?>
+				(<?php echo esc_html(strtoupper($pay_method)); ?>)
+			</td>
+		</tr>
+
+		<tr>
+			<td class="details-label">Booking Status</td>
+			<td class="details-value details-highlight" style="text-transform: capitalize;">
+				<?php echo esc_html($status); ?>
+			</td>
+		</tr>
+	</table>
 
 						<?php if (!empty($admin_note)): ?>
 								<div class="admin-note">

@@ -592,6 +592,7 @@ function cwc_submit_booking()
 		if ($coupon_code) {
 			update_post_meta($booking_id, '_cwc_bk_coupon_code', $coupon_code);
 			update_post_meta($booking_id, '_cwc_bk_discount', $discount_amount);
+			update_post_meta($booking_id, '_cwc_bk_original_price', $calculated_subtotal);
 
 			// Increment coupon usage count
 			$coupons = get_posts([
