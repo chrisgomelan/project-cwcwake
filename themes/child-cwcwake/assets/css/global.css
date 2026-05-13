@@ -658,6 +658,19 @@ img {
 	overflow: hidden;
 }
 
+/* Above chat launcher when widget is present (matches chat-assistant.css stack). */
+body:has(#cwc-chat-root) .cwc-scroll-top {
+	bottom: calc(40px + 3.5rem + 14px);
+}
+
+/* Chat panel sits tight above the message button; hide scroll FAB while panel is open. */
+body:has(.cwc-chat__panel.is-open) .cwc-scroll-top,
+body:has(.cwc-chat__panel.is-open) .cwc-scroll-top.is-visible {
+	opacity: 0 !important;
+	visibility: hidden !important;
+	pointer-events: none !important;
+}
+
 .cwc-scroll-top.is-visible {
 	opacity: 1;
 	visibility: visible;
@@ -706,6 +719,10 @@ img {
 		right: 20px;
 		width: 48px;
 		height: 48px;
+	}
+
+	body:has(#cwc-chat-root) .cwc-scroll-top {
+		bottom: calc(20px + 3.5rem + 14px);
 	}
 }
 

@@ -7,8 +7,8 @@
 }
 
 /**
- * Stack offsets mirror `.cwc-scroll-top` in global.css (bottom/right + size)
- * so the chat launcher sits above the scroll FAB and the panel clears both.
+ * Stack: chat launcher at the corner; scroll-to-top above it (global.css).
+ * Panel sits just above the launcher. While open, scroll FAB is hidden so it does not add vertical gap.
  * z-index on fixed children — parent was static so z-index on .cwc-chat was ignored.
  */
 .cwc-chat {
@@ -22,7 +22,7 @@
 	--cwc-chat-scrollbar-thumb-hover: rgba(56, 189, 248, 0.5);
 	--cwc-chat-msg-avatar-size: 2rem;
 	--cwc-chat-turn-gap: 0.45rem;
-	/* Match .cwc-scroll-top defaults */
+	/* Match .cwc-scroll-top in global.css (bottom/right + size) */
 	--cwc-scroll-fab-bottom: 40px;
 	--cwc-scroll-fab-size: 54px;
 	--cwc-scroll-fab-right: 40px;
@@ -39,7 +39,7 @@
 	position: fixed;
 	z-index: var(--cwc-chat-z);
 	right: var(--cwc-scroll-fab-right);
-	bottom: calc(var(--cwc-scroll-fab-bottom) + var(--cwc-scroll-fab-size) + var(--cwc-chat-fab-gap));
+	bottom: var(--cwc-scroll-fab-bottom);
 	width: var(--cwc-chat-launcher-size);
 	height: var(--cwc-chat-launcher-size);
 	border-radius: 999px;
@@ -73,16 +73,12 @@
 	position: fixed;
 	z-index: var(--cwc-chat-z);
 	right: var(--cwc-scroll-fab-right);
-	bottom: calc(
-		var(--cwc-scroll-fab-bottom) + var(--cwc-scroll-fab-size) + var(--cwc-chat-fab-gap) +
-			var(--cwc-chat-launcher-size) + var(--cwc-chat-fab-gap)
-	);
+	bottom: calc(var(--cwc-scroll-fab-bottom) + var(--cwc-chat-launcher-size) + var(--cwc-chat-fab-gap));
 	width: min(28rem, calc(100vw - 2.5rem));
 	max-height: min(
 		52rem,
 		calc(
-			100vh - var(--cwc-scroll-fab-bottom) - var(--cwc-scroll-fab-size) - var(--cwc-chat-fab-gap) -
-				var(--cwc-chat-launcher-size) - var(--cwc-chat-fab-gap) - 2rem
+			100vh - var(--cwc-scroll-fab-bottom) - var(--cwc-chat-launcher-size) - var(--cwc-chat-fab-gap) - 2rem
 		)
 	);
 	display: flex;
