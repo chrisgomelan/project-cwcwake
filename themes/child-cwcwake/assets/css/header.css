@@ -184,7 +184,7 @@ body.admin-bar {
 	Desktop Hover & Active States
 	---------------------------------------- */
 @media (min-width: 1200px) {
-	.cwc-header .wp-block-navigation .wp-block-navigation__container>.wp-block-navigation-item:hover {
+	.cwc-header .wp-block-navigation .wp-block-navigation__container>.wp-block-navigation-item:not(.open-on-hover-click):hover {
 		background-color: var(--wp--preset--color--accent);
 	}
 
@@ -194,9 +194,9 @@ body.admin-bar {
 	}
 
 	/* Ensure hover/active colors are consistent across all page states for navigation items */
-	.cwc-header .wp-block-navigation .wp-block-navigation__container>.wp-block-navigation-item:hover>.wp-block-navigation-item__content,
-	.cwc-header .wp-block-navigation .wp-block-navigation__container>.wp-block-navigation-item:hover>.wp-block-navigation-item__content .wp-block-navigation__submenu-icon svg,
-	.cwc-header .wp-block-navigation .wp-block-navigation__container>.wp-block-navigation-item:hover>.wp-block-navigation__submenu-icon svg,
+	.cwc-header .wp-block-navigation .wp-block-navigation__container>.wp-block-navigation-item:not(.open-on-hover-click):hover>.wp-block-navigation-item__content,
+	.cwc-header .wp-block-navigation .wp-block-navigation__container>.wp-block-navigation-item:not(.open-on-hover-click):hover>.wp-block-navigation-item__content .wp-block-navigation__submenu-icon svg,
+	.cwc-header .wp-block-navigation .wp-block-navigation__container>.wp-block-navigation-item:not(.open-on-hover-click):hover>.wp-block-navigation__submenu-icon svg,
 	.cwc-header .wp-block-navigation .wp-block-navigation__container>.wp-block-navigation-item.current-menu-item>.wp-block-navigation-item__content,
 	.cwc-header .wp-block-navigation .wp-block-navigation__container>.wp-block-navigation-item.current-menu-ancestor>.wp-block-navigation-item__content,
 	.cwc-header .wp-block-navigation .wp-block-navigation__container>.wp-block-navigation-item.current-menu-item>.wp-block-navigation__submenu-icon svg,
@@ -235,7 +235,16 @@ body.admin-bar {
 	width: clamp(14px, 0.8vw + 8px, 20px);
 	height: clamp(14px, 0.8vw + 8px, 20px);
 	margin-left: 5px;
-	transition: color 0.3s ease;
+	transition: color 0.3s ease, transform 0.3s ease;
+	transform: rotate(0deg) translateY(0);
+}
+
+@media (min-width: 1200px) {
+
+	.cwc-header .wp-block-navigation-item:hover .wp-block-navigation__submenu-icon svg,
+	.cwc-header .wp-block-navigation-item.is-submenu-open .wp-block-navigation__submenu-icon svg {
+		transform: rotate(180deg) translateY(2px) !important;
+	}
 }
 
 .cwc-header--scrolled .wp-block-navigation__submenu-icon svg {
@@ -298,6 +307,7 @@ body.admin-bar {
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
+	justify-self: center;
 	width: var(--cwc-book-w);
 	height: var(--cwc-book-h);
 	padding: 0 clamp(14px, 1.2vw + 8px, 20px);
@@ -390,6 +400,15 @@ body.admin-bar {
 	line-height: 1;
 	color: var(--wp--preset--color--text);
 	margin-left: 1rem;
+}
+
+/* Desktop Nested Submenus (Fly-out) */
+@media (min-width: 1200px) {
+	.cwc-header .wp-block-navigation__submenu-container .wp-block-navigation__submenu-container {
+		top: -6px !important;
+		left: 100% !important;
+		border-top: 6px solid var(--wp--preset--color--primary) !important;
+	}
 }
 
 /* ----------------------------------------
@@ -581,7 +600,7 @@ body.admin-bar {
 	/* Show logo inside drawer */
 	.cwc-header__nav-logo {
 		display: block;
-		margin-bottom: 40px;
+		margin-bottom: 10px !important;
 		padding-left: 8px;
 		/* Align slightly with links */
 	}
@@ -688,6 +707,12 @@ body.admin-bar {
 		height: 14px !important;
 		margin: 0 !important;
 		color: inherit;
+		transition: transform 0.3s ease;
+		transform: rotate(0deg) translateY(0);
+	}
+
+	.cwc-header__nav-center .wp-block-navigation-item.is-submenu-open .wp-block-navigation__submenu-icon svg {
+		transform: rotate(180deg) translateY(2px) !important;
 	}
 
 
@@ -711,9 +736,9 @@ body.admin-bar {
 		flex: none !important;
 		order: 99;
 		position: relative !important;
-		opacity: 1 !important;
-		visibility: visible !important;
-		pointer-events: auto !important;
+		opacity: 0 !important;
+		visibility: hidden !important;
+		pointer-events: none !important;
 		min-width: 0 !important;
 		width: 100% !important;
 		margin: 0 16px 0 24px !important;
@@ -728,7 +753,7 @@ body.admin-bar {
 		list-style: none !important;
 		max-height: 0;
 		overflow: hidden;
-		transition: max-height 0.4s ease, padding 0.4s ease, margin 0.4s ease;
+		transition: max-height 0.4s ease, padding 0.4s ease, margin 0.4s ease, opacity 0.4s ease, visibility 0.4s ease;
 	}
 
 	/* The vertical line for the tree */
@@ -749,6 +774,7 @@ body.admin-bar {
 		margin-bottom: 8px !important;
 		visibility: visible !important;
 		opacity: 1 !important;
+		pointer-events: auto !important;
 	}
 
 	.cwc-header__nav-center .wp-block-navigation__submenu-container .wp-block-navigation-item {
@@ -921,8 +947,22 @@ body:not(.cwc-home) .cwc-header__burger-bar {
 	}
 }
 
-/* Prevent chevron from rotating/flipping on hover on mobile */
-.cwc-header__nav-center .wp-block-navigation-item.has-child.open-on-hover-click:hover svg,
-.cwc-header__nav-center .wp-block-navigation-item.has-child.open-on-hover-click:hover .wp-block-navigation__submenu-icon svg {
-	transform: none !important;
+
+
+/* 
+ * Specific overrides for .open-on-hover-click items.
+ * These items keep the standard hover/interaction behavior but have
+ * specific visual overrides (like preventing the orange background).
+ */
+@media (min-width: 1200px) {
+
+	/* Ensure submenus still display on hover/focus-within (standard behavior) */
+	.cwc-header .wp-block-navigation-item.has-child:hover>.wp-block-navigation__submenu-container,
+	.cwc-header .wp-block-navigation-item.has-child:focus-within>.wp-block-navigation__submenu-container {
+		visibility: visible !important;
+		opacity: 1 !important;
+		display: block !important;
+	}
+
+
 }

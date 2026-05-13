@@ -216,8 +216,8 @@ $first_room_price = $first_room['price'];
 						<label class="bf-checkbox">
 							<input type="checkbox" class="bf-checkbox__input" id="bf-agree-updates">
 							<span class="bf-checkbox__box"></span>
-							<span class="bf-checkbox__label">I agree to receive status updates via Email &amp;
-								SMS</span>
+							<span class="bf-checkbox__label">By booking, you agree to receive essential transaction
+								updates via the email and phone number provided.</span>
 						</label>
 
 						<button class="bf-btn-primary" id="bf-to-payment" type="button">Proceed to Payment</button>
@@ -256,9 +256,11 @@ $first_room_price = $first_room['price'];
 						</div>
 
 						<!-- PayMaya Info (visible for paymaya) -->
-						<div class="bf-paymaya-info" id="bf-paymaya-info" style="display: none; margin-bottom: 32px; gap: 15px; flex-direction: column;">
+						<div class="bf-paymaya-info" id="bf-paymaya-info"
+							style="display: none; margin-bottom: 32px; gap: 15px; flex-direction: column;">
 							<h3 class="bf-panel__sub-label">PayMaya</h3>
-							<p class="bf-panel__desc">You will be redirected to PayMongo's secure payment page to complete your transaction via PayMaya.</p>
+							<p class="bf-panel__desc">You will be redirected to PayMongo's secure payment page to
+								complete your transaction via PayMaya.</p>
 						</div>
 
 						<!-- Card form (visible for visa/mastercard) -->
@@ -273,18 +275,18 @@ $first_room_price = $first_room['price'];
 							</div>
 							<div class="bf-field">
 								<label class="bf-field__label">Card Number <span class="bf-field__req">*</span></label>
-								<input type="text" class="bf-field__input" id="bf-card-number"
-									placeholder="Enter Card Number" maxlength="19">
+								<input type="text" inputmode="numeric" pattern="[0-9]*" class="bf-field__input" id="bf-card-number"
+									placeholder="0000 0000 0000 0000" maxlength="19">
 							</div>
 							<div class="bf-field-row">
 								<div class="bf-field bf-field--half">
 									<label class="bf-field__label">Expiry <span class="bf-field__req">*</span></label>
-									<input type="text" class="bf-field__input" id="bf-card-expiry" placeholder="MM/YY"
+									<input type="text" inputmode="numeric" pattern="[0-9]*" class="bf-field__input" id="bf-card-expiry" placeholder="MM/YY"
 										maxlength="5">
 								</div>
 								<div class="bf-field bf-field--half">
 									<label class="bf-field__label">CVC <span class="bf-field__req">*</span></label>
-									<input type="text" class="bf-field__input" id="bf-card-cvc" placeholder="CVC"
+									<input type="text" inputmode="numeric" pattern="[0-9]*" class="bf-field__input" id="bf-card-cvc" placeholder="123"
 										maxlength="4">
 								</div>
 							</div>
@@ -307,10 +309,24 @@ $first_room_price = $first_room['price'];
 						<label class="bf-checkbox">
 							<input type="checkbox" class="bf-checkbox__input" id="bf-agree-terms">
 							<span class="bf-checkbox__box"></span>
-							<span class="bf-checkbox__label">I accept the Terms of Use and Privacy Policy</span>
+							<span class="bf-checkbox__label">I accept the <a href="#" class="js-open-legal" data-type="terms">Terms of Use</a> and <a href="#" class="js-open-legal" data-type="privacy">Privacy Policy</a></span>
 						</label>
 
 						<button class="bf-btn-primary" id="bf-confirm-pay" type="button">Confirm and Pay</button>
+
+						<style>
+							.js-open-legal {
+								color: #0096C7;
+								text-decoration: underline;
+								cursor: pointer;
+								font-weight: 500;
+							}
+							.js-open-legal:hover {
+								color: #0077A3;
+								text-decoration: none;
+							}
+						</style>
+
 
 						<p class="bf-disclaimer">Deposits are non-refundable; no-shows will be charged the full booking
 							amount, and the remaining balance must be paid at the hotel upon arrival.</p>
@@ -481,7 +497,8 @@ $first_room_price = $first_room['price'];
 						<div class="bf-summary__price-breakdown" style="font-size: 14px; color: #475569;">
 							<div style="display:flex;justify-content:space-between;">
 								<span>Rate per night</span>
-								<span>₱ <?php echo esc_html(number_format($nightly_rate, 2)); ?></span>
+								<span id="bf-summary-rate-label">₱
+									<?php echo esc_html(number_format($nightly_rate, 2)); ?></span>
 							</div>
 							<?php if ($nights_count > 0): ?>
 								<div id="bf-summary-nights" class="bf-summary__nights-row"
@@ -492,6 +509,29 @@ $first_room_price = $first_room['price'];
 								</div>
 							<?php endif; ?>
 						</div>
+
+						<!-- Promo Code -->
+						<div class="bf-summary__promo">
+							<div class="bf-summary__section-header">
+								<h3 class="bf-summary__sub-label">Promo Code</h3>
+							</div>
+							<div class="bf-summary__promo-row">
+								<input type="text" id="bf-promo-code" class="bf-summary__promo-input"
+									placeholder="Enter code">
+								<button type="button" id="bf-apply-promo" class="bf-summary__promo-btn">Apply</button>
+							</div>
+							<div id="bf-promo-msg" class="bf-summary__promo-msg"></div>
+							<div id="bf-promo-applied" class="bf-summary__promo-applied" style="display: none;">
+								<span class="bf-summary__promo-tag">
+									<span id="bf-promo-tag-text">CODE</span>
+									<button type="button" id="bf-remove-promo"
+										class="bf-summary__promo-remove">&times;</button>
+								</span>
+								<span class="bf-summary__promo-discount" id="bf-promo-discount">-₱ 0.00</span>
+							</div>
+						</div>
+
+						<div class="bf-summary__divider"></div>
 
 						<!-- Total Price -->
 						<div class="bf-summary__total">
@@ -584,16 +624,15 @@ $first_room_price = $first_room['price'];
 						$is_room_booked = ($room['availability'] === 'fully-booked');
 						?>
 						<label
-							class="bf-modal__room-option<?php echo $is_room_booked ? ' bf-modal__room-option--booked' : ''; ?>"
-							style="<?php echo $is_room_booked ? 'opacity: 0.6; position: relative; cursor: not-allowed; pointer-events: none; filter: grayscale(100%);' : ''; ?>">
+							class="bf-modal__room-option<?php echo $is_room_booked ? ' bf-modal__room-option--booked' : ''; ?>">
 							<div class="bf-modal__room-option-text">
 								<span class="bf-modal__room-option-name"><?php echo esc_html($room['title']); ?></span>
 								<span class="bf-modal__room-option-cap">Max <?php echo esc_html($room['capacity']); ?>
 									persons</span>
 								<?php if ($is_room_booked): ?>
 									<span
-										style="display:inline-block;margin-top:4px;padding:2px 8px;border-radius:4px;background:#fef2f2;color:#dc2626;font-size:11px;font-weight:600;">Fully
-										Booked</span>
+										style="display:inline-block;margin-top:4px;padding:2px 8px;border-radius:4px;background:#fef2f2;color:#dc2626;font-size:11px;font-weight:600;">Check
+										Availability</span>
 								<?php endif; ?>
 							</div>
 							<input type="radio" name="bf_modal_room" class="bf-modal__radio"
@@ -603,7 +642,7 @@ $first_room_price = $first_room['price'];
 								data-excerpt="<?php echo esc_attr($room['excerpt']); ?>"
 								data-beds="<?php echo esc_attr(wp_json_encode($room['beds'])); ?>"
 								data-image="<?php echo esc_url($room['image']); ?>"
-								data-availability="<?php echo esc_attr($room['availability']); ?>" <?php echo $is_room_booked ? ' disabled' : ''; ?> 	<?php echo 0 === $index && !$is_room_booked ? ' checked' : ''; ?>>
+								data-availability="<?php echo esc_attr($room['availability']); ?>" <?php echo 0 === $index ? ' checked' : ''; ?>>
 						</label>
 					<?php endforeach; ?>
 				</div>
@@ -691,3 +730,138 @@ $first_room_price = $first_room['price'];
 	</div>
 
 </div>
+<div class="bf-modal" id="bf-legal-modal" style="display: none;">
+	<div class="bf-modal__overlay js-close-legal"></div>
+	<div class="bf-modal__container">
+		<div class="bf-modal__header">
+			<h2 class="bf-modal__title" id="bf-legal-title">Terms of Use</h2>
+			<button class="bf-modal__close js-close-legal">&times;</button>
+		</div>
+		<div class="bf-modal__body" id="bf-legal-content">
+			<!-- Dynamic Content -->
+		</div>
+		<div class="bf-modal__footer">
+			<button class="bf-btn-primary js-close-legal" style="width: 100%;">I Understand</button>
+		</div>
+	</div>
+</div>
+
+</div><!-- .wp-block-cwc-booking-flow -->
+
+<?php
+// Pre-fetch content for the modal to avoid extra AJAX
+$legal_data = [];
+
+if ( ! function_exists( 'cwc_format_legal_content' ) ) {
+	function cwc_format_legal_content( $intro, $sections ) {
+		if ( empty( $intro ) && empty( $sections ) ) {
+			return '';
+		}
+		
+		$out = '<div class="cwc-policy">';
+		
+		if ( ! empty( $intro ) ) {
+			$paragraphs = preg_split( "/\r?\n\r?\n/", trim( $intro ) );
+			$out .= '<div class="cwc-policy__intro">';
+			foreach ( $paragraphs as $p ) {
+				$out .= '<p class="cwc-policy__body">' . nl2br( esc_html( $p ) ) . '</p>';
+			}
+			$out .= '</div>';
+		}
+		
+		if ( ! empty( $sections ) && is_array( $sections ) ) {
+			$out .= '<div class="cwc-policy__panel">';
+			foreach ( $sections as $section ) {
+				$label = $section['label'] ?? '';
+				$body  = $section['body'] ?? '';
+				$out .= '<article class="cwc-policy__section">';
+				if ( ! empty( $label ) ) {
+					$out .= '<h2 class="cwc-policy__label" style="font-size: clamp(24px, 3vw, 32px);">' . esc_html( $label ) . '</h2>';
+				}
+				if ( ! empty( $body ) ) {
+					$out .= '<div class="cwc-policy__body-wrap">';
+					$paragraphs = preg_split( "/\r?\n\r?\n/", trim( $body ) );
+					foreach ( $paragraphs as $p ) {
+						$out .= '<p class="cwc-policy__body">' . nl2br( esc_html( $p ) ) . '</p>';
+					}
+					$out .= '</div>';
+				}
+				$out .= '</article>';
+			}
+			$out .= '</div>';
+		}
+		
+		$out .= '</div>';
+		return $out;
+	}
+}
+
+if ( ! function_exists( 'cwc_find_policy_block' ) ) {
+	function cwc_find_policy_block( $blocks ) {
+		foreach ( $blocks as $block ) {
+			if ( $block['blockName'] === 'cwc/policy-content' ) {
+				return $block['attrs'];
+			}
+			if ( ! empty( $block['innerBlocks'] ) ) {
+				$found = cwc_find_policy_block( $block['innerBlocks'] );
+				if ( $found ) return $found;
+			}
+		}
+		return null;
+	}
+}
+
+// 1. Terms of Use
+$terms_title   = ! empty( $attributes['termsTitle'] ) ? $attributes['termsTitle'] : 'Terms of Use';
+$terms_content = ! empty( $attributes['termsContent'] ) ? $attributes['termsContent'] : '';
+
+if ( empty( $terms_content ) ) {
+	$terms_template_path = get_theme_file_path( 'templates/page-terms-and-conditions.html' );
+	if ( file_exists( $terms_template_path ) ) {
+		$blocks = parse_blocks( file_get_contents( $terms_template_path ) );
+		$policy_attrs = cwc_find_policy_block( $blocks );
+		if ( $policy_attrs ) {
+			$terms_content = cwc_format_legal_content( $policy_attrs['intro'] ?? '', $policy_attrs['sections'] ?? [] );
+		}
+	}
+	if ( empty( $terms_content ) ) {
+		$terms_content = '<div class="cwc-policy"><div class="cwc-policy__body"><p>Information for this page is currently being updated. Please contact support for details.</p></div></div>';
+	}
+} else {
+	// If it's a string from attributes, wrap it nicely
+	$terms_content = '<div class="cwc-policy"><div class="cwc-policy__body">' . nl2br( $terms_content ) . '</div></div>';
+}
+
+$legal_data['terms'] = [
+	'title'   => $terms_title,
+	'content' => $terms_content,
+];
+
+// 2. Privacy Policy
+$privacy_title   = ! empty( $attributes['privacyTitle'] ) ? $attributes['privacyTitle'] : 'Privacy Policy';
+$privacy_content = ! empty( $attributes['privacyContent'] ) ? $attributes['privacyContent'] : '';
+
+if ( empty( $privacy_content ) ) {
+	$privacy_template_path = get_theme_file_path( 'templates/page-privacy-policy.html' );
+	if ( file_exists( $privacy_template_path ) ) {
+		$blocks = parse_blocks( file_get_contents( $privacy_template_path ) );
+		$policy_attrs = cwc_find_policy_block( $blocks );
+		if ( $policy_attrs ) {
+			$privacy_content = cwc_format_legal_content( $policy_attrs['intro'] ?? '', $policy_attrs['sections'] ?? [] );
+		}
+	}
+	if ( empty( $privacy_content ) ) {
+		$privacy_content = '<div class="cwc-policy"><div class="cwc-policy__body"><p>Information for this page is currently being updated. Please contact support for details.</p></div></div>';
+	}
+} else {
+	$privacy_content = '<div class="cwc-policy"><div class="cwc-policy__body">' . nl2br( $privacy_content ) . '</div></div>';
+}
+
+$legal_data['privacy'] = [
+	'title'   => $privacy_title,
+	'content' => $privacy_content,
+];
+?>
+<script>
+	window.cwcLegalData = <?php echo wp_json_encode($legal_data); ?>;
+</script>

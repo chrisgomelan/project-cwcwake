@@ -22,10 +22,25 @@ $theme_uri = get_stylesheet_directory_uri();
 $plus_svg  = $theme_uri . '/assets/images/plus-icon.svg';
 $minus_svg = $theme_uri . '/assets/images/minus.svg';
 
-$categories = cwc_get_faq_data();
+$categories_raw = $attributes['categories'] ?? [];
+$categories     = [];
+
+if ( ! empty( $categories_raw ) ) {
+	// If categories are passed via attributes, they might be an array of objects.
+	// We convert them to the expected associative array structure if needed.
+	foreach ( $categories_raw as $cat ) {
+		$slug = $cat['slug'] ?? sanitize_title( $cat['label'] ?? 'faq' );
+		$categories[ $slug ] = [
+			'label' => $cat['label'] ?? '',
+			'items' => $cat['items'] ?? [],
+		];
+	}
+} else {
+	$categories = cwc_get_faq_data();
+}
 
 $cat_keys  = array_keys( $categories );
-$first_key = $cat_keys[0];
+$first_key = $cat_keys[0] ?? '';
 ?>
 
 <section class="cwc-faq" data-cwc-faq>

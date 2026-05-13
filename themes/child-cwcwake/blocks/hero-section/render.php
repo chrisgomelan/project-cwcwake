@@ -11,9 +11,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 $bg_image         = $attributes['backgroundImage'] ?? '';
 $overlay_opacity  = $attributes['overlayOpacity'] ?? 50;
-$heading_line1    = $attributes['headingLine1'] ?? 'RIDE THE';
-$heading_emphasis = $attributes['headingEmphasis'] ?? 'BEST WAKEPARK';
-$heading_line2    = $attributes['headingLine2'] ?? 'IN THE PHILIPPINES';
+$heading_line1           = $attributes['headingLine1'] ?? 'RIDE THE';
+$heading_emphasis        = $attributes['headingEmphasis'] ?? 'BEST WAKEPARK';
+$heading_after_emphasis  = $attributes['headingAfterEmphasis'] ?? '';
+$heading_line2           = $attributes['headingLine2'] ?? 'IN THE PHILIPPINES';
 $subtitle         = $attributes['subtitle'] ?? 'Adventure, Relaxation, and Unforgettable moments - all in one place';
 $primary_label    = $attributes['primaryBtnLabel'] ?? 'Book A Ride';
 $primary_url      = $attributes['primaryBtnUrl'] ?? '#book';
@@ -51,8 +52,10 @@ $wrapper_attrs = get_block_wrapper_attributes(
 	<div class="cwc-hero__content">
 		<h1 class="cwc-hero__heading">
 			<?php echo esc_html( $heading_line1 ); ?>
-			<em><?php echo esc_html( $heading_emphasis ); ?></em><br>
-			<?php echo esc_html( $heading_line2 ); ?>
+			<em><?php echo esc_html( $heading_emphasis ); ?></em><?php echo esc_html( $heading_after_emphasis ); ?>
+			<?php if ( ! empty( $heading_line2 ) ) : ?>
+				<br><?php echo esc_html( $heading_line2 ); ?>
+			<?php endif; ?>
 		</h1>
 
 		<p class="cwc-hero__subtitle">

@@ -43,7 +43,19 @@
 		const summaryAmenities = block.querySelector('#bf-summary-amenities');
 		const summaryCapacity = block.querySelector('#bf-summary-capacity');
 		const summaryPrice = block.querySelector('#bf-summary-price');
+		const summaryRateLabel = block.querySelector('#bf-summary-rate-label');
 		const summaryRoomImg = block.querySelector('.bf-summary__room-img');
+
+		/* Promo Code refs */
+		const promoInput = block.querySelector('#bf-promo-code');
+		const btnApplyPromo = block.querySelector('#bf-apply-promo');
+		const promoMsg = block.querySelector('#bf-promo-msg');
+		const promoAppliedRow = block.querySelector('#bf-promo-applied');
+		const promoTagText = block.querySelector('#bf-promo-tag-text');
+		const btnRemovePromo = block.querySelector('#bf-remove-promo');
+		const promoDiscountLabel = block.querySelector('#bf-promo-discount');
+
+		let appliedCoupon = null; // { code, type, amount }
 
 		const summaryMobileRoom = block.querySelector('#bf-summary-mobile-room');
 		const summaryMobileCheckin = block.querySelector('#bf-summary-mobile-checkin');
@@ -156,6 +168,31 @@
 
 			e.target.value = val;
 		});
+		/* ─── Credit Card Input Restriction ─── */
+		const cardNumberInput = block.querySelector('#bf-card-number');
+		const cardExpiryInput = block.querySelector('#bf-card-expiry');
+		const cardCvcInput = block.querySelector('#bf-card-cvc');
+
+		cardNumberInput?.addEventListener('input', (e) => {
+			let val = e.target.value.replace(/\D/g, '');
+			val = val.substring(0, 16);
+			e.target.value = val.replace(/(\d{4})(?=\d)/g, '$1 ');
+		});
+
+		cardExpiryInput?.addEventListener('input', (e) => {
+			let val = e.target.value.replace(/\D/g, '');
+			val = val.substring(0, 4);
+			if (val.length >= 3) {
+				e.target.value = val.substring(0, 2) + '/' + val.substring(2);
+			} else {
+				e.target.value = val;
+			}
+		});
+
+		cardCvcInput?.addEventListener('input', (e) => {
+			let val = e.target.value.replace(/\D/g, '');
+			e.target.value = val.substring(0, 4);
+		});
 
 		function showError(el, message) {
 			const field = el.closest('.bf-field, .bf-guest-row__inner');
@@ -264,10 +301,10 @@
 		const backdrop = block.querySelector('#bf-modal-backdrop');
 
 		/* Payment method toggle */
-		const cardForm  = block.querySelector( '#bf-card-form' );
-		const gcashQr   = block.querySelector( '#bf-gcash-qr' );
-		const paymayaInfo = block.querySelector( '#bf-paymaya-info' );
-		const paymentRadios = block.querySelectorAll( 'input[name="bf_payment_method"]' );
+		const cardForm = block.querySelector('#bf-card-form');
+		const gcashQr = block.querySelector('#bf-gcash-qr');
+		const paymayaInfo = block.querySelector('#bf-paymaya-info');
+		const paymentRadios = block.querySelectorAll('input[name="bf_payment_method"]');
 
 		/* ═══════════════════════════════════════
 		   Step Navigation
@@ -382,6 +419,60 @@
 		});
 
 		btnConfirmPay?.addEventListener('click', () => {
+			clearErrors();
+			let hasError = false;
+
+			const paymentMethod = block.querySelector('input[name="bf_payment_method"]:checked')?.value || '';
+
+			if (paymentMethod === 'visa' || paymentMethod === 'mastercard') {
+				const cardNameInput = block.querySelector('#bf-card-name');
+				const cardNumberInput = block.querySelector('#bf-card-number');
+				const cardExpiryInput = block.querySelector('#bf-card-expiry');
+				const cardCvcInput = block.querySelector('#bf-card-cvc');
+
+				if (!cardNameInput?.value.trim()) {
+					showError(cardNameInput, 'Card holder name is required.');
+					hasError = true;
+				}
+
+				const cardNum = cardNumberInput?.value.replace(/\D/g, '') || '';
+				if (cardNum.length < 13) {
+					showError(cardNumberInput, 'Please enter a valid card number.');
+					hasError = true;
+				}
+
+				const expiry = cardExpiryInput?.value || '';
+				const [monthStr, yearStr] = expiry.split('/');
+				
+				if (!monthStr || !yearStr || monthStr.length !== 2 || yearStr.length !== 2) {
+					showError(cardExpiryInput, 'Please enter a valid expiry date (MM/YY).');
+					hasError = true;
+				} else {
+					const month = parseInt(monthStr, 10);
+					const year = parseInt(yearStr, 10);
+					const now = new Date();
+					const currentMonth = now.getMonth() + 1;
+					const currentYear = now.getFullYear() % 100;
+
+					if (month < 1 || month > 12) {
+						showError(cardExpiryInput, 'Invalid month.');
+						hasError = true;
+					} else if (year < currentYear || (year === currentYear && month < currentMonth)) {
+						showError(cardExpiryInput, 'Card has expired.');
+						hasError = true;
+					}
+				}
+
+				const cvc = cardCvcInput?.value.replace(/\D/g, '') || '';
+				if (cvc.length < 3) {
+					showError(cardCvcInput, 'Invalid CVC.');
+					hasError = true;
+				}
+			}
+
+			if (hasError) {
+				return;
+			}
 			const agree = block.querySelector('#bf-agree-terms');
 			if (agree && !agree.checked) {
 				if (window.cwcToast) {
@@ -400,42 +491,50 @@
 			formData.append('action', 'cwc_submit_booking');
 			formData.append('name', fullNameInput?.value || '');
 			formData.append('email', emailInput?.value || '');
-			formData.append('phone', phoneInput?.value || '');
+			const dialCode = selectedCode ? selectedCode.textContent.trim() : '';
+			formData.append('phone', (dialCode ? dialCode + ' ' : '') + (phoneInput?.value || ''));
 			formData.append('checkin', summaryCheckin?.textContent || '');
 			formData.append('checkout', summaryCheckout?.textContent || '');
 			formData.append('room', summaryRoomName?.textContent || '');
 			formData.append('price', summaryPrice?.textContent || '');
 			formData.append('nights', String(calculateNights()));
+			formData.append('guests', JSON.stringify(additionalGuests || []));
+			formData.append('requests', block.querySelector('#bf-requests')?.value || '');
 
-			const paymentMethod = block.querySelector('input[name="bf_payment_method"]:checked')?.value || '';
+			if (appliedCoupon) {
+				formData.append('coupon_code', appliedCoupon.code);
+				formData.append('discount_amount', appliedCoupon.discount_amount || 0);
+			}
+
 			formData.append('payment_method', paymentMethod);
-			formData.append( 'current_url', window.location.href );
+			formData.append('marketing_consent', block.querySelector('#bf-agree-updates')?.checked ? '1' : '0');
+			formData.append('current_url', window.location.href);
 
-			fetch( '/wp-admin/admin-ajax.php', {
+			fetch('/wp-admin/admin-ajax.php', {
 				method: 'POST',
 				body: formData
-			} )
-			.then( response => response.json() )
-			.then( result => {
-				if ( result.success ) {
-					if ( result.data?.redirect_url ) {
-						/* Update session storage with current form values before redirecting to PayMongo */
-						const currentData = JSON.parse(sessionStorage.getItem('cwc_booking_data') || '{}');
-						currentData.name = fullNameInput?.value || '';
-						currentData.email = emailInput?.value || '';
-						currentData.phone = phoneInput?.value || '';
-						currentData.additionalGuests = additionalGuests;
-						sessionStorage.setItem('cwc_booking_data', JSON.stringify(currentData));
+			})
+				.then(response => response.json())
+				.then(result => {
+					if (result.success) {
+						if (result.data?.redirect_url) {
+							/* Update session storage with current form values before redirecting to PayMongo */
+							const currentData = JSON.parse(sessionStorage.getItem('cwc_booking_data') || '{}');
+							currentData.name = fullNameInput?.value || '';
+							currentData.email = emailInput?.value || '';
+							currentData.phone = (dialCode ? dialCode + ' ' : '') + (phoneInput?.value || '');
+							currentData.additionalGuests = additionalGuests;
+							sessionStorage.setItem('cwc_booking_data', JSON.stringify(currentData));
 
-						window.location.href = result.data.redirect_url;
-						return;
-					}
-					sessionStorage.removeItem( 'cwc_booking_data' );
-					openModal( 'success' );
-					setTimeout( () => {
-						window.location.href = '/';
-					}, 5000 );
-				} else {
+							window.location.href = result.data.redirect_url;
+							return;
+						}
+						sessionStorage.removeItem('cwc_booking_data');
+						openModal('success');
+						setTimeout(() => {
+							window.location.href = '/';
+						}, 5000);
+					} else {
 						btnConfirmPay.disabled = false;
 						btnConfirmPay.textContent = 'Confirm and Pay';
 						const msg = result.data?.message || 'There was an issue processing your booking. Please try again.';
@@ -581,8 +680,8 @@
 			if (gcashQr) {
 				gcashQr.classList.toggle('is-visible', selected === 'gcash');
 			}
-			if ( paymayaInfo ) {
-				paymayaInfo.style.display = ( selected === 'paymaya' ) ? 'flex' : 'none';
+			if (paymayaInfo) {
+				paymayaInfo.style.display = (selected === 'paymaya') ? 'flex' : 'none';
 			}
 		};
 
@@ -591,12 +690,70 @@
 		});
 		togglePaymentUI();
 
+		/* ─── Promo Code Logic ─── */
+		btnApplyPromo?.addEventListener('click', () => {
+			const code = promoInput.value.trim();
+			if (!code) return;
+
+			btnApplyPromo.disabled = true;
+			const originalText = btnApplyPromo.textContent;
+			btnApplyPromo.textContent = '...';
+			promoMsg.textContent = '';
+			promoMsg.className = 'bf-summary__promo-msg';
+
+			const formData = new URLSearchParams();
+			formData.append('action', 'cwc_validate_coupon');
+			formData.append('code', code);
+
+			fetch('/wp-admin/admin-ajax.php', {
+				method: 'POST',
+				body: formData
+			})
+				.then(r => r.json())
+				.then(res => {
+					btnApplyPromo.disabled = false;
+					btnApplyPromo.textContent = originalText;
+
+					if (res.success) {
+						appliedCoupon = res.data;
+						promoMsg.textContent = res.data.message;
+						promoMsg.className = 'bf-summary__promo-msg success';
+						promoInput.value = '';
+
+						// Show applied UI
+						if (promoTagText) promoTagText.textContent = res.data.code;
+						if (promoAppliedRow) promoAppliedRow.style.display = 'flex';
+
+						updateNightsAndPrice();
+					} else {
+						promoMsg.textContent = res.data.message;
+						promoMsg.className = 'bf-summary__promo-msg error';
+					}
+				})
+				.catch(err => {
+					btnApplyPromo.disabled = false;
+					btnApplyPromo.textContent = originalText;
+					console.error('Promo error', err);
+				});
+		});
+
+		btnRemovePromo?.addEventListener('click', () => {
+			appliedCoupon = null;
+			if (promoAppliedRow) promoAppliedRow.style.display = 'none';
+			if (promoMsg) promoMsg.textContent = '';
+			updateNightsAndPrice();
+		});
+
 		/* ─── Nights Calculation & Price ─── */
 		let nightlyRate = 0;
-		const priceText = summaryPrice?.textContent || '';
-		const priceMatch = priceText.replace(/,/g, '').match(/[\d.]+/);
-		if (priceMatch) {
-			nightlyRate = parseFloat(priceMatch[0]);
+		if (summaryRateLabel && summaryRateLabel.dataset.rate) {
+			nightlyRate = parseFloat(summaryRateLabel.dataset.rate) || 0;
+		} else {
+			const priceText = summaryPrice?.textContent || '';
+			const priceMatch = priceText.replace(/,/g, '').match(/[\d.]+/);
+			if (priceMatch) {
+				nightlyRate = parseFloat(priceMatch[0]);
+			}
 		}
 
 		let nightsDisplay = block.querySelector('#bf-summary-nights');
@@ -620,16 +777,44 @@
 
 		const updateNightsAndPrice = () => {
 			const nights = calculateNights();
+
+			// Update the "Rate per night" label in the summary
+			if (summaryRateLabel) {
+				summaryRateLabel.textContent = `₱ ${nightlyRate.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+			}
+
 			if (nightsDisplay) {
 				nightsDisplay.innerHTML = nights > 0
 					? `<span>Duration</span><strong>${nights} night${nights !== 1 ? 's' : ''}</strong>`
 					: '';
 			}
-			if (nights > 0 && nightlyRate > 0 && summaryPrice) {
-				const total = nightlyRate * nights;
-				const formatted = `₱ ${total.toLocaleString('en-PH', { minimumFractionDigits: 2 })}`;
+
+			const baseTotal = nightlyRate * nights;
+			let discount = 0;
+
+			if (appliedCoupon) {
+				if (appliedCoupon.type === 'percent') {
+					discount = baseTotal * (appliedCoupon.amount / 100);
+				} else {
+					discount = appliedCoupon.amount;
+				}
+				// Save actual calculated discount for submission
+				appliedCoupon.discount_amount = discount;
+
+				if (promoDiscountLabel) {
+					promoDiscountLabel.textContent = `-₱ ${discount.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+					promoDiscountLabel.style.color = '#CA0003'; // Change to red
+				}
+			}
+
+			const finalTotal = Math.max(0, baseTotal - discount);
+			const formatted = `₱ ${finalTotal.toLocaleString('en-PH', { minimumFractionDigits: 2 })}`;
+
+			if (summaryPrice) {
 				summaryPrice.textContent = formatted;
-				if (summaryMobilePrice) summaryMobilePrice.textContent = formatted;
+			}
+			if (summaryMobilePrice) {
+				summaryMobilePrice.textContent = formatted;
 			}
 		};
 
@@ -901,6 +1086,42 @@
 			btn.addEventListener('click', closeAllModals);
 		});
 
+		/* ─── Legal Modal Logic ─── */
+		const legalModal = document.querySelector('#bf-legal-modal');
+		const legalTitle = document.querySelector('#bf-legal-title');
+		const legalContent = document.querySelector('#bf-legal-content');
+
+		block.querySelectorAll('.js-open-legal').forEach((link) => {
+			link.addEventListener('click', (e) => {
+				e.preventDefault();
+				const type = link.dataset.type; // 'terms' or 'privacy'
+				if (window.cwcLegalData && window.cwcLegalData[type]) {
+					if (legalTitle) legalTitle.textContent = window.cwcLegalData[type].title;
+					if (legalContent) legalContent.innerHTML = window.cwcLegalData[type].content;
+
+					backdrop?.classList.add('is-active');
+					if (legalModal) {
+						legalModal.classList.add('is-active');
+						legalModal.style.display = 'block';
+					}
+				}
+			});
+		});
+
+		document.querySelectorAll('.js-close-legal').forEach((btn) => {
+			btn.addEventListener('click', () => {
+				if (legalModal) {
+					legalModal.classList.remove('is-active');
+					legalModal.style.display = 'none';
+				}
+				// Only remove backdrop if no other modal is active
+				if (!block.querySelector('.bf-modal.is-active')) {
+					backdrop?.classList.remove('is-active');
+				}
+			});
+		});
+
+
 		/* Edit links in summary → open modals */
 		block.querySelectorAll('.bf-summary__edit-link[data-modal]').forEach((btn) => {
 			btn.addEventListener('click', () => {
@@ -919,7 +1140,7 @@
 					const list = block.querySelector('#bf-modal-guests-list');
 					if (list) {
 						list.innerHTML = '';
-						additionalGuests.forEach((name, idx) => {
+						additionalGuests.forEach((guest, idx) => {
 							const row = document.createElement('div');
 							row.className = 'bf-modal__guest-row';
 							row.innerHTML = `
@@ -931,7 +1152,7 @@
 											Edit
 										</button>
 									</div>
-									<input type="text" class="bf-field__input bf-modal-guest-name" data-idx="${idx}" value="${name || `Additional Guest ${idx + 1}`}">
+									<input type="text" class="bf-field__input bf-modal-guest-name" data-idx="${idx}" value="${guest.name || ''}" placeholder="Additional Guest ${idx + 1}">
 								</div>
 							`;
 							list.appendChild(row);
@@ -1133,22 +1354,22 @@
 		syncInitialUI();
 		updateCapacityUI();
 		renderGuestRows();
-		showStep( 2 );
+		showStep(2);
 
 		// Check for success redirect from PayMongo
-		const urlParams = new URLSearchParams( window.location.search );
-		if ( urlParams.get( 'booking_success' ) === '1' ) {
-			if ( typeof openModal === 'function' ) {
-				openModal( 'success' );
+		const urlParams = new URLSearchParams(window.location.search);
+		if (urlParams.get('booking_success') === '1') {
+			if (typeof openModal === 'function') {
+				openModal('success');
 			}
 			// Clean up URL
-			window.history.replaceState( {}, document.title, window.location.pathname );
+			window.history.replaceState({}, document.title, window.location.pathname);
 
 			// Auto-redirect to homepage after 5 seconds
-			setTimeout( () => {
-				sessionStorage.removeItem( 'cwc_booking_data' );
+			setTimeout(() => {
+				sessionStorage.removeItem('cwc_booking_data');
 				window.location.href = '/';
-			}, 5000 );
+			}, 5000);
 		}
-	} );
-} )();
+	});
+})();

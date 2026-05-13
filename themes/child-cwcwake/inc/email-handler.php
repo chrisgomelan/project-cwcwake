@@ -167,9 +167,6 @@ function cwc_get_email_template($title, $content, $args = [])
 				background: #F9F9F9;
 				border-bottom: 1px solid #E8E8E8;
 				padding: 16px 24px;
-				display: flex;
-				align-items: center;
-				justify-content: space-between;
 			}
 
 			.trip-card-header-label {
@@ -364,8 +361,8 @@ function cwc_get_email_template($title, $content, $args = [])
 						<td class="mobile-stack" align="center" valign="middle">
 							<a href="<?php echo esc_url(home_url()); ?>" class="logo"
 								style="color: #FFFFFF; text-decoration: none; text-transform: uppercase; font-size: 14px;">
-							<img src="<?php echo esc_url($logo_url); ?>" alt="CWC Wake Park - Watersports Resort" width="133"
-									height="28" style="display: block; border: 0;" />
+								<img src="<?php echo esc_url($logo_url); ?>" alt="CWC Wake Park - Watersports Resort"
+									width="133" height="28" style="display: block; border: 0;" />
 							</a>
 						</td>
 						<?php if ($ref_code): ?>
@@ -410,7 +407,8 @@ function cwc_get_email_template($title, $content, $args = [])
 						<td align="center" valign="top" style="padding-bottom: 24px;">
 							<a href="<?php echo esc_url(home_url()); ?>" class="footer-logo"
 								style="color: #FFFFFF; text-decoration: none; display: inline-block; padding: 8px 0;">
-								<img src="<?php echo esc_url($logo_url); ?>" alt="CWC Wake Park - Watersports Resort" width="200" height="42"
+								<img src="<?php echo esc_url($logo_url); ?>" alt="CWC Wake Park - Watersports Resort"
+									width="200" height="42"
 									style="display: block; border: 0; margin: 0 auto; max-width: 100%;" />
 							</a>
 						</td>
@@ -464,6 +462,10 @@ function cwc_submit_booking()
 	$payment_method = isset($_POST['payment_method']) ? sanitize_text_field(wp_unslash($_POST['payment_method'])) : '';
 	$guests = isset($_POST['guests']) ? json_decode(wp_unslash($_POST['guests']), true) : [];
 	$nights = isset($_POST['nights']) ? absint($_POST['nights']) : 0;
+	$coupon_code = isset($_POST['coupon_code']) ? strtoupper(sanitize_text_field(wp_unslash($_POST['coupon_code']))) : '';
+	$discount_amount = isset($_POST['discount_amount']) ? floatval($_POST['discount_amount']) : 0;
+	$requests = isset($_POST['requests']) ? sanitize_textarea_field(wp_unslash($_POST['requests'])) : '';
+	$marketing_consent = isset($_POST['marketing_consent']) ? sanitize_text_field(wp_unslash($_POST['marketing_consent'])) : '0';
 
 	if (empty($name) || empty($email)) {
 		wp_send_json_error(['message' => 'Name and email are required.']);
@@ -501,14 +503,70 @@ function cwc_submit_booking()
 
 		if ($room_post_id) {
 			$overlapping = cwc_count_overlapping_bookings($room, $checkin_date, $checkout_date);
-			if ($overlapping > 0) {
+			$inventory = cwc_get_room_inventory($room_post_id);
+			if ($overlapping >= $inventory) {
 				wp_send_json_error([
-					'message' => 'Sorry, this room is already reserved for your selected dates. Please choose different dates.',
+					'message' => 'Sorry, this room is already fully booked for your selected dates. Please choose different dates.',
 					'fully_booked' => true,
 				]);
 			}
 		}
 	}
+
+	/* ── Recalculate Price on Server (Security fix) ── */
+	$calculated_subtotal = 0;
+	$room_post = cwc_find_accommodation_post_by_room_name($room);
+	if (!$room_post) {
+		wp_send_json_error(['message' => 'Invalid room selection.']);
+	}
+
+	$room_post_id = (int) $room_post->ID;
+	$base_price_raw = get_post_meta($room_post_id, '_cwc_price', true);
+	$base_price = (float) preg_replace('/[^0-9.]/', '', $base_price_raw);
+	$calculated_subtotal = $base_price * $nights;
+
+	$calculated_discount = 0;
+	if ($coupon_code) {
+		$coupons = get_posts([
+			'post_type' => 'cwc_coupon',
+			'title' => $coupon_code,
+			'posts_per_page' => 1,
+			'post_status' => 'publish'
+		]);
+
+		if (!empty($coupons)) {
+			$coupon_id = $coupons[0]->ID;
+			$type = get_post_meta($coupon_id, '_cwc_coupon_type', true);
+			$coupon_amt = floatval(get_post_meta($coupon_id, '_cwc_coupon_amount', true));
+			$expiry = get_post_meta($coupon_id, '_cwc_coupon_expiry', true);
+			$limit = get_post_meta($coupon_id, '_cwc_coupon_limit', true);
+			$count = (int) get_post_meta($coupon_id, '_cwc_coupon_count', true);
+
+			$is_valid = true;
+			if (!empty($expiry) && strtotime($expiry) < current_time('timestamp')) {
+				$is_valid = false;
+			}
+			if (!empty($limit) && $count >= (int) $limit) {
+				$is_valid = false;
+			}
+
+			if ($is_valid) {
+				if ($type === 'percent') {
+					$calculated_discount = $calculated_subtotal * ($coupon_amt / 100);
+				} else {
+					$calculated_discount = $coupon_amt;
+				}
+			} else {
+				$coupon_code = ''; // Invalidate code if server-side check fails
+			}
+		} else {
+			$coupon_code = '';
+		}
+	}
+
+	$price_num = max(0, $calculated_subtotal - $calculated_discount);
+	$price = '₱ ' . number_format($price_num, 2);
+	$discount_amount = $calculated_discount;
 
 	/* ── Save booking record ── */
 	$booking_id = wp_insert_post([
@@ -530,8 +588,29 @@ function cwc_submit_booking()
 		update_post_meta($booking_id, '_cwc_bk_status', 'pending');
 		update_post_meta($booking_id, '_cwc_bk_guests', wp_json_encode($guests));
 		update_post_meta($booking_id, '_cwc_bk_nights', $nights);
-		$price_num = (float) preg_replace('/[^0-9.]/', '', $price);
+
+		if ($coupon_code) {
+			update_post_meta($booking_id, '_cwc_bk_coupon_code', $coupon_code);
+			update_post_meta($booking_id, '_cwc_bk_discount', $discount_amount);
+			update_post_meta($booking_id, '_cwc_bk_original_price', $calculated_subtotal);
+
+			// Increment coupon usage count
+			$coupons = get_posts([
+				'post_type' => 'cwc_coupon',
+				'title' => $coupon_code,
+				'posts_per_page' => 1,
+				'post_status' => 'publish'
+			]);
+			if (!empty($coupons)) {
+				$coupon_id = $coupons[0]->ID;
+				$count = (int) get_post_meta($coupon_id, '_cwc_coupon_count', true);
+				update_post_meta($coupon_id, '_cwc_coupon_count', $count + 1);
+			}
+		}
+
 		update_post_meta($booking_id, '_cwc_bk_price_num', $price_num);
+		update_post_meta($booking_id, '_cwc_bk_requests', $requests);
+		update_post_meta($booking_id, '_cwc_bk_marketing_consent', $marketing_consent);
 
 		if (!empty($room_post_id) && function_exists('cwc_sync_booking_room_link')) {
 			cwc_sync_booking_room_link($booking_id, $room_post_id);
@@ -595,11 +674,46 @@ function cwc_submit_booking()
 
 	}
 
-	// Retrieve auto-generated reference from the insert hook
+	/* ── Send initial email ── */
+	if (!in_array($payment_method, $paymongo_methods)) {
+		cwc_send_booking_confirmation_email($booking_id);
+		cwc_send_admin_booking_notification($booking_id);
+	} else {
+		// Even for PayMongo, notify admin that a session was started
+		cwc_send_admin_booking_notification($booking_id, true);
+	}
+
+	wp_send_json_success(['message' => 'Booking received and email sent.']);
+}
+add_action('wp_ajax_cwc_submit_booking', 'cwc_submit_booking');
+add_action('wp_ajax_nopriv_cwc_submit_booking', 'cwc_submit_booking');
+
+
+/**
+ * Send a premium booking confirmation email.
+ *
+ * @param int $booking_id The booking post ID.
+ * @return bool Whether the email was sent.
+ */
+function cwc_send_booking_confirmation_email($booking_id)
+{
+	$name = get_post_meta($booking_id, '_cwc_bk_name', true);
+	$email = get_post_meta($booking_id, '_cwc_bk_email', true);
+	$phone = get_post_meta($booking_id, '_cwc_bk_phone', true);
+	$checkin = get_post_meta($booking_id, '_cwc_bk_checkin', true);
+	$checkout = get_post_meta($booking_id, '_cwc_bk_checkout', true);
+	$room = get_post_meta($booking_id, '_cwc_bk_room', true);
+	$price = get_post_meta($booking_id, '_cwc_bk_price', true);
+	$payment_method = get_post_meta($booking_id, '_cwc_bk_payment', true);
+	$guests = json_decode(get_post_meta($booking_id, '_cwc_bk_guests', true), true);
+	$nights = get_post_meta($booking_id, '_cwc_bk_nights', true);
 	$ref = get_post_meta($booking_id, '_cwc_bk_ref', true);
 	$assigned_room = get_post_meta($booking_id, '_cwc_bk_assigned_room', true);
 
-	// Build the email content
+	if (!$email) {
+		return false;
+	}
+
 	ob_start();
 	?>
 	<p style="margin-bottom: 24px;">Hi <strong><?php echo esc_html($name); ?></strong>,</p>
@@ -608,59 +722,67 @@ function cwc_submit_booking()
 
 	<!-- Stay Summary Card -->
 	<div class="trip-card">
-		<div class="trip-card-header">
-			<span class="trip-card-header-label">Stay Summary</span>
-			<span class="trip-card-header-status">Confirmed</span>
-		</div>
+		<table class="trip-card-header" width="100%" border="0" cellspacing="0" cellpadding="0">
+			<tr>
+				<td align="left" valign="middle">
+					<span class="trip-card-header-label">Stay Summary</span>
+				</td>
+				<td align="right" valign="middle">
+					<span class="trip-card-header-status">Confirmed</span>
+				</td>
+			</tr>
+		</table>
 		<div style="padding: 24px;">
-			<div style="display: flex; justify-content: space-between; align-items: flex-start;">
-				<div>
-					<div
-						style="font-family: 'Sora', sans-serif; font-size: 22px; font-weight: 800; color: #1A1A1A; line-height: 1.2;">
-						<?php echo esc_html($room); ?>
-					</div>
-					<div style="font-family: 'Archivo', sans-serif; font-size: 13px; color: #666; margin-top: 6px;">CWC Wake
-						Park · Camarines Sur</div>
-				</div>
-				<?php if ($assigned_room): ?>
-					<div
-						style="text-align: right; background: #F5FAFC; padding: 10px 14px; border-radius: 6px; border: 1px solid #E1F2F9;">
+			<table width="100%" border="0" cellspacing="0" cellpadding="0">
+				<tr>
+					<td align="left" valign="top">
 						<div
-							style="font-family: 'Archivo', sans-serif; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: #0096C7; margin-bottom: 4px; font-weight: 600;">
-							Assigned Unit</div>
-						<div style="font-family: 'Sora', sans-serif; font-size: 16px; font-weight: 700; color: #1A1A1A;">
-							<?php echo esc_html($assigned_room); ?>
+							style="font-family: 'Sora', sans-serif; font-size: 22px; font-weight: 800; color: #1A1A1A; line-height: 1.2;">
+							<?php echo esc_html($room); ?>
 						</div>
-					</div>
-				<?php endif; ?>
-			</div>
+						<div style="font-family: 'Archivo', sans-serif; font-size: 13px; color: #666; margin-top: 6px;">CWC
+							Wake
+							Park · Camarines Sur</div>
+					</td>
+					<?php if ($assigned_room): ?>
+						<td align="right" valign="top">
+							<div
+								style="text-align: right; background: #F5FAFC; padding: 10px 14px; border-radius: 6px; border: 1px solid #E1F2F9; display: inline-block;">
+								<div
+									style="font-family: 'Archivo', sans-serif; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: #0096C7; margin-bottom: 4px; font-weight: 600;">
+									Assigned Unit</div>
+								<div
+									style="font-family: 'Sora', sans-serif; font-size: 16px; font-weight: 700; color: #1A1A1A;">
+									<?php echo esc_html($assigned_room); ?>
+								</div>
+							</div>
+						</td>
+					<?php endif; ?>
+				</tr>
+			</table>
 
 			<div
 				style="background: #F9F9F9; border-radius: 6px; padding: 20px; margin-top: 24px; border: 1px solid #EEEEEE;">
-				<div style="display: flex; gap: 24px;">
-					<div style="flex: 1;">
+				<div style="display: flex; justify-content: space-between;">
+					<div style="flex: 1; width: 31%; padding-right: 12px; box-sizing: border-box;">
 						<div
 							style="font-family: 'Archivo', sans-serif; font-size: 11px; letter-spacing: 0.05em; text-transform: uppercase; color: #888; margin-bottom: 6px; font-weight: 600;">
 							Check-in</div>
 						<div style="font-family: 'Sora', sans-serif; font-size: 15px; font-weight: 700; color: #1A1A1A;">
 							<?php echo esc_html(date('M j, Y', strtotime($checkin))); ?>
 						</div>
-						<div style="font-family: 'Archivo', sans-serif; font-size: 13px; color: #666; margin-top: 4px;">from
-							14:00</div>
 					</div>
 					<div style="width: 1px; background: #E0E0E0;"></div>
-					<div style="flex: 1;">
+					<div style="flex: 1; width: 31%; padding-left: 12px; padding-right: 12px; box-sizing: border-box;">
 						<div
 							style="font-family: 'Archivo', sans-serif; font-size: 11px; letter-spacing: 0.05em; text-transform: uppercase; color: #888; margin-bottom: 6px; font-weight: 600;">
 							Check-out</div>
 						<div style="font-family: 'Sora', sans-serif; font-size: 15px; font-weight: 700; color: #1A1A1A;">
 							<?php echo esc_html(date('M j, Y', strtotime($checkout))); ?>
 						</div>
-						<div style="font-family: 'Archivo', sans-serif; font-size: 13px; color: #666; margin-top: 4px;">by
-							12:00</div>
 					</div>
 					<div style="width: 1px; background: #E0E0E0;"></div>
-					<div style="flex: 1;">
+					<div style="flex: 1; width: 31%; padding-left: 12px; box-sizing: border-box;">
 						<div
 							style="font-family: 'Archivo', sans-serif; font-size: 11px; letter-spacing: 0.05em; text-transform: uppercase; color: #888; margin-bottom: 6px; font-weight: 600;">
 							Duration</div>
@@ -695,6 +817,14 @@ function cwc_submit_booking()
 				</tr>
 			<?php endforeach; ?>
 		<?php endif; ?>
+		<?php 
+		$bk_requests = get_post_meta($booking_id, '_cwc_bk_requests', true);
+		if (!empty($bk_requests)): ?>
+			<tr>
+				<td>Special Request</td>
+				<td style="font-style: italic; color: #b45309;"><?php echo esc_html($bk_requests); ?></td>
+			</tr>
+		<?php endif; ?>
 	</table>
 
 	<div class="details-title">Payment Summary</div>
@@ -721,22 +851,84 @@ function cwc_submit_booking()
 
 	$full_html = cwc_get_email_template('Booking Confirmation', $email_content, [
 		'ref' => $ref,
-		'banner_title' => "You're all set, " . explode(' ', $name)[0] . "!",
-		'banner_subtitle' => "Your reservation at CWC Wake Park is confirmed.<br/>A summary has been sent to " . esc_html($email)
+		'banner_title' => "You're all set!",
+		'banner_subtitle' => "Your booking has been received and is being processed."
 	]);
 
 	$headers = array('Content-Type: text/html; charset=UTF-8');
+	return wp_mail($email, 'Your Booking Confirmation - CWC Wake Park', $full_html, $headers);
+}
 
-	$sent = wp_mail($email, 'Your Booking Confirmation - CWC Wake Park', $full_html, $headers);
+/**
+ * Notify admin of a new booking.
+ */
+function cwc_send_admin_booking_notification($booking_id, $is_pending_payment = false)
+{
+	$admin_email = get_option('admin_email');
+	$name = get_post_meta($booking_id, '_cwc_bk_name', true);
+	$room = get_post_meta($booking_id, '_cwc_bk_room', true);
+	$checkin = get_post_meta($booking_id, '_cwc_bk_checkin', true);
+	$checkout = get_post_meta($booking_id, '_cwc_bk_checkout', true);
+	$ref = get_post_meta($booking_id, '_cwc_bk_ref', true);
+	$requests = get_post_meta($booking_id, '_cwc_bk_requests', true);
+	$price = get_post_meta($booking_id, '_cwc_bk_price', true);
 
-	if ($sent) {
-		wp_send_json_success(['message' => 'Booking received and email sent.']);
-	} else {
-		wp_send_json_error(['message' => 'Booking processed but email failed to send.']);
+	$subject = "New Booking Request: {$ref} - {$name}";
+	if ($is_pending_payment) {
+		$subject = "New Booking (Pending Payment): {$ref} - {$name}";
+	}
+
+	$message = "A new booking has been received.\n\n";
+	$message .= "Reference: {$ref}\n";
+	$message .= "Guest: {$name}\n";
+	$message .= "Room: {$room}\n";
+	$message .= "Dates: {$checkin} to {$checkout}\n";
+	$message .= "Amount: {$price}\n";
+	
+	if (!empty($requests)) {
+		$message .= "\nSPECIAL REQUESTS:\n{$requests}\n";
+	}
+
+	$message .= "\nView details in the dashboard: " . admin_url('edit.php?post_type=accommodation&page=cwc-booking-dashboard');
+
+	return wp_mail($admin_email, $subject, $message);
+}
+
+
+/**
+ * Handle redirect back from PayMongo success page.
+ */
+function cwc_handle_paymongo_return()
+{
+	if (isset($_GET['booking_success']) && $_GET['booking_success'] === '1' && isset($_GET['ref'])) {
+		$ref = sanitize_text_field(wp_unslash($_GET['ref']));
+
+		// Find booking by reference
+		$bookings = get_posts([
+			'post_type' => 'cwc_booking',
+			'meta_key' => '_cwc_bk_ref',
+			'meta_value' => $ref,
+			'posts_per_page' => 1,
+			'fields' => 'ids'
+		]);
+
+		if (!empty($bookings)) {
+			$booking_id = $bookings[0];
+
+			// Check if we already processed this
+			$is_paid = get_post_meta($booking_id, '_cwc_bk_paid_email_sent', true);
+			if (!$is_paid) {
+				update_post_meta($booking_id, '_cwc_bk_payment_status', 'paid');
+				update_post_meta($booking_id, '_cwc_bk_status', 'confirmed');
+				update_post_meta($booking_id, '_cwc_bk_paid_email_sent', '1');
+
+				cwc_send_booking_confirmation_email($booking_id);
+			}
+		}
 	}
 }
-add_action('wp_ajax_cwc_submit_booking', 'cwc_submit_booking');
-add_action('wp_ajax_nopriv_cwc_submit_booking', 'cwc_submit_booking');
+add_action('template_redirect', 'cwc_handle_paymongo_return');
+
 
 /**
  * Handle inquiry submission via AJAX from the Rates Manager.

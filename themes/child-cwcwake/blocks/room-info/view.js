@@ -607,10 +607,6 @@
 		const bookBtn = document.getElementById('cwc-book-btn');
 		if (bookBtn) {
 			bookBtn.addEventListener('click', async (e) => {
-				if (bookBtn.getAttribute('href') && bookBtn.getAttribute('href').includes('/contact/')) {
-					return; // Let the default link navigation proceed for Inquire
-				}
-
 				e.preventDefault();
 
 				const checkinEl = document.getElementById('cwc-ri-val-checkin');
@@ -681,7 +677,7 @@
 				bookBtn.textContent = origText;
 
 				let targetUrl = bookBtn.getAttribute('href');
-				if (!targetUrl || targetUrl === '#book') targetUrl = '/booking/';
+				if (!targetUrl || targetUrl === '#book') targetUrl = '/book-now/';
 
 				const bookingData = {
 					room: room,

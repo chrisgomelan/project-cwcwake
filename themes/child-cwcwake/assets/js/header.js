@@ -258,4 +258,24 @@
 
 	applyActiveMenuStates();
 
+	/* ---------- 4. Desktop Click-Outside-to-Close ---------- */
+	document.addEventListener('click', (event) => {
+		// Only relevant on desktop where the drawer isn't "open" as an off-canvas
+		if (DESKTOP_QUERY.matches && !drawer.classList.contains('is-open')) {
+			const openSubmenus = drawer.querySelectorAll('.wp-block-navigation-item.is-submenu-open');
+			if (openSubmenus.length > 0) {
+				const isClickInsideNav = drawer.contains(event.target);
+				if (!isClickInsideNav) {
+					openSubmenus.forEach(item => {
+						item.classList.remove('is-submenu-open');
+						const toggle = item.querySelector('.wp-block-navigation-submenu__toggle, .wp-block-navigation__submenu-icon');
+						if (toggle && toggle.tagName === 'BUTTON') {
+							toggle.setAttribute('aria-expanded', 'false');
+						}
+					});
+				}
+			}
+		}
+	});
+
 })();

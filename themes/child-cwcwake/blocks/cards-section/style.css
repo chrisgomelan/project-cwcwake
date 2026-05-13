@@ -59,6 +59,7 @@
 
 /* Left-align headings for Detailed and Overlay variants on Desktop */
 @media (min-width: 992px) {
+
 	.cwc-cards-section--detailed .cwc-cards-section__heading-wrap,
 	.cwc-cards-section--overlay .cwc-cards-section__heading-wrap {
 		text-align: left;
@@ -197,6 +198,7 @@
 	text-transform: capitalize;
 	transition: var(--wp--custom--transition--default);
 	box-shadow: var(--wp--custom--shadow--sm);
+	outline: none;
 }
 
 .cwc-cards-section__card-button:hover,
@@ -341,6 +343,7 @@
 }
 
 @media (max-width: 1024px) {
+
 	/* Global Hover Removal */
 	.cwc-cards-section__card:hover {
 		transform: none !important;
@@ -820,14 +823,17 @@
 		width: 100% !important;
 		box-sizing: border-box !important;
 	}
+
 	.cwc-cards-section--staggered .cwc-cards-section__item {
 		width: 100% !important;
 		margin-bottom: 2rem !important;
 		box-sizing: border-box !important;
 	}
+
 	.cwc-cards-section--staggered .cwc-cards-section__item:last-child {
 		margin-bottom: 0 !important;
 	}
+
 	.cwc-cards-section--staggered .cwc-cards-section__card--detailed,
 	.cwc-cards-section--staggered .cwc-cards-section__card--overlay {
 		width: 100% !important;

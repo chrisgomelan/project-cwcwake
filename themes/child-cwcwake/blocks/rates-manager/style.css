@@ -118,6 +118,7 @@
 	color: #1A1A1A;
 	cursor: pointer;
 	transition: background 0.2s ease, color 0.2s ease;
+	outline: none;
 }
 
 .cwc-rates-manager__dropdown-item:hover {
@@ -198,6 +199,7 @@
 	font-size: clamp(18px, 1.3vw, 20px);
 	text-decoration: none;
 	transition: transform 0.2s ease, background 0.2s ease;
+	outline: none;
 }
 
 .cwc-rates-manager__inquiry-btn:hover {

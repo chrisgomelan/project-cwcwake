@@ -17,7 +17,8 @@
 .cwc-single-post__inner {
 	width: 100%;
 	padding-top: clamp(32px, 5vw, 64px);
-	overflow: visible !important; /* Required for sticky TOC */
+	overflow: visible !important;
+	/* Required for sticky TOC */
 }
 
 .cwc-single-post__back-link {
@@ -128,8 +129,8 @@
 	the post-content block's inner layout. Override it so content and
 	images can fill the full width of our wider 75% column. */
 .cwc-single-post__content-box .wp-block-post-content,
-.cwc-single-post__content-box .wp-block-post-content > *,
-.cwc-single-post__content-box .is-layout-flow > * {
+.cwc-single-post__content-box .wp-block-post-content>*,
+.cwc-single-post__content-box .is-layout-flow>* {
 	max-width: none !important;
 }
 
@@ -194,7 +195,7 @@
 .cwc-single-post__content-box img {
 	border-radius: 0;
 	margin: clamp(16px, 2vw, 32px) 0;
-	width: 100%;
+	width: 100% !important;
 	height: 304px;
 	object-fit: cover;
 }

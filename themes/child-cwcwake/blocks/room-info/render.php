@@ -20,7 +20,8 @@
  * Availability (`_cwc_availability`) drives the booking UI:
  *
  *   - `available`    → normal Book Now button.
- *   - `fully-booked` → "Fully Booked" message + "Inquire" link.
+ *   - `fully-booked` → treated same as available (calendar days
+ *                      are disabled on a daily basis instead).
  *   - `maintenance`  → pricing aside hidden, "Coming Soon" badge
  *                      shown next to the title.
  *
@@ -189,11 +190,7 @@ $state = array(
 	'badge'        => '',
 );
 
-if ( 'fully-booked' === $availability ) {
-	$state['button_label'] = __( 'Inquire', 'child-cwcwake' );
-	$state['button_url']   = '/contact/';
-	$state['notice']       = __( 'Fully Booked', 'child-cwcwake' );
-} elseif ( 'maintenance' === $availability ) {
+if ( 'maintenance' === $availability ) {
 	$state['show_pricing'] = false;
 	$state['badge']        = __( 'Coming Soon', 'child-cwcwake' );
 }

@@ -78,6 +78,90 @@ function cwc_render_dash_date_filter($tab, $selected_date, $label = 'View Date')
 	<?php
 }
 
+/* AJAX: Return bookings as FullCalendar events */
+function cwc_ajax_get_bookings_events()
+{
+	check_ajax_referer('cwc_dash_nonce', 'nonce');
+
+	if (!current_user_can('manage_options')) {
+		wp_send_json_error(['message' => 'Unauthorized'], 403);
+	}
+
+	$bookings = cwc_get_all_bookings();
+	$events = [];
+
+	foreach ($bookings as $b) {
+		// Skip bookings marked completed — don't show on calendar overview
+		if (($b['status'] ?? '') === 'completed') {
+			continue;
+		}
+
+		if (empty($b['checkin']) || empty($b['checkout'])) {
+			continue;
+		}
+
+		$start = date('Y-m-d', strtotime($b['checkin']));
+		// Make end exclusive so nightly bookings render correctly
+		$end = date('Y-m-d', strtotime($b['checkout'] . ' +1 day'));
+
+		$unit_label = $b['assigned_room'] ?? '';
+		$room_label = $b['room'] ?? '';
+		$title_parts = [];
+		if (!empty($b['ref'])) $title_parts[] = $b['ref'];
+		if (!empty($b['name'])) $title_parts[] = $b['name'];
+		if (!empty($unit_label)) $title_parts[] = $unit_label;
+		$title = trim(implode(' • ', $title_parts));
+
+		$color = '#f59e0b';
+		if (($b['status'] ?? '') === 'confirmed') $color = '#10b981';
+		if (($b['status'] ?? '') === 'cancelled') $color = '#ef4444';
+
+		$events[] = [
+			'id' => (string) ($b['id'] ?? ''),
+			'title' => $title,
+			'start' => $start,
+			'end' => $end,
+			'allDay' => true,
+			'extendedProps' => [
+				'ref' => $b['ref'] ?? '',
+				'name' => $b['name'] ?? '',
+				'status' => $b['status'] ?? '',
+				'payment_status' => $b['payment_status'] ?? '',
+				'unit' => $unit_label,
+				'room' => $room_label,
+			],
+			'backgroundColor' => $color,
+			'borderColor' => $color,
+		];
+	}
+
+	wp_send_json_success($events);
+}
+add_action('wp_ajax_cwc_get_bookings_events', 'cwc_ajax_get_bookings_events');
+
+function cwc_ajax_get_booking_details()
+{
+	check_ajax_referer('cwc_dash_nonce', 'nonce');
+
+	if (!current_user_can('manage_options')) {
+		wp_send_json_error(['message' => 'Unauthorized'], 403);
+	}
+
+	$booking_id = isset($_POST['booking_id']) ? absint($_POST['booking_id']) : 0;
+	if (!$booking_id) {
+		wp_send_json_error(['message' => 'Missing booking ID'], 400);
+	}
+
+	$bookings = cwc_get_all_bookings(['p' => $booking_id]);
+	$booking = $bookings[0] ?? null;
+	if (!$booking) {
+		wp_send_json_error(['message' => 'Booking not found'], 404);
+	}
+
+	wp_send_json_success($booking);
+}
+add_action('wp_ajax_cwc_get_booking_details', 'cwc_ajax_get_booking_details');
+
 function cwc_render_dash_date_range_filter($tab, $start_date, $end_date)
 {
 	?>
@@ -296,7 +380,8 @@ function cwc_render_dash_room_tracking_sync($bookings)
 										<strong><?php echo esc_html($active_booking['name']); ?></strong>
 										<small><?php echo esc_html($active_booking['ref']); ?> ·
 											<?php echo esc_html($active_booking['checkin']); ?> →
-											<?php echo esc_html($active_booking['checkout']); ?>				<?php echo $unit_name ? ' · ' . esc_html($unit_name) : ''; ?></small>
+											<?php echo esc_html($active_booking['checkout']); ?>
+											<?php echo $unit_name ? ' · ' . esc_html($unit_name) : ''; ?></small>
 									</div>
 									<span
 										class="cwc-dash__status-dot cwc-dash__status-dot--<?php echo esc_attr($active_booking['status']); ?>">
@@ -456,16 +541,31 @@ function cwc_dashboard_admin_assets($hook)
 		[],
 		CWC_ACC_VERSION
 	);
+	// FullCalendar (used for interactive bookings calendar)
+	wp_enqueue_style(
+		'cwc-fullcalendar-css',
+		'https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css',
+		[],
+		'5.11.3'
+	);
+	wp_enqueue_script(
+		'cwc-fullcalendar-js',
+		'https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js',
+		[],
+		'5.11.3',
+		true
+	);
 	wp_enqueue_script(
 		'cwc-dashboard-js',
 		CWC_ACC_URL . 'includes/dashboard-assets/dashboard.js',
-		[],
+		array('cwc-fullcalendar-js'),
 		CWC_ACC_VERSION,
 		true
 	);
 	wp_localize_script('cwc-dashboard-js', 'cwcDash', [
 		'ajaxUrl' => admin_url('admin-ajax.php'),
 		'nonce' => wp_create_nonce('cwc_dash_nonce'),
+		'adminUrl' => admin_url('post.php'),
 	]);
 }
 add_action('admin_enqueue_scripts', 'cwc_dashboard_admin_assets');
@@ -532,9 +632,13 @@ function cwc_get_all_bookings($args = [])
 			'status' => $status,
 			'payment_status' => get_post_meta($post->ID, '_cwc_bk_payment_status', true) ?: 'unpaid',
 			'transaction_id' => get_post_meta($post->ID, '_cwc_bk_transaction_id', true),
+			'coupon_code' => get_post_meta($post->ID, '_cwc_bk_coupon_code', true),
+			'discount_num' => (float) get_post_meta($post->ID, '_cwc_bk_discount', true),
+			'discounted_total' => max(0, (float) get_post_meta($post->ID, '_cwc_bk_price_num', true) - (float) get_post_meta($post->ID, '_cwc_bk_discount', true)),
 			'guests' => json_decode(get_post_meta($post->ID, '_cwc_bk_guests', true) ?: '[]', true),
 			'audit_log' => json_decode(get_post_meta($post->ID, '_cwc_bk_audit_log', true) ?: '[]', true),
 			'email_log' => json_decode(get_post_meta($post->ID, '_cwc_bk_email_log', true) ?: '[]', true),
+			'requests' => get_post_meta($post->ID, '_cwc_bk_requests', true),
 		];
 	}
 	return $bookings;
@@ -545,7 +649,7 @@ function cwc_get_all_bookings($args = [])
    ──────────────────────────────────────────── */
 function cwc_render_booking_dashboard()
 {
-	$active_tab = isset($_GET['tab']) ? sanitize_key($_GET['tab']) : 'bookings';
+	$active_tab = isset($_GET['tab']) ? sanitize_key($_GET['tab']) : 'calendar';
 	$bookings = cwc_get_all_bookings();
 
 	// Stats
@@ -582,8 +686,8 @@ function cwc_render_booking_dashboard()
 		<nav class="cwc-dash__tabs">
 			<?php
 			$tabs = [
+				'calendar' => 'Calendar',
 				'bookings' => 'Bookings',
-				'guests' => 'Guests',
 				'payments' => 'Payments',
 				'room-tracking' => 'Room Units Tracking',
 				'availability' => 'Availability',
@@ -625,6 +729,9 @@ function cwc_render_booking_dashboard()
 		<div class="cwc-dash__content">
 			<?php
 			switch ($active_tab) {
+			case 'calendar':
+				cwc_render_dash_calendar($bookings);
+				break;
 				case 'guests':
 					cwc_render_dash_guests($bookings);
 					break;
@@ -663,6 +770,11 @@ function cwc_render_booking_dashboard()
 						<p><strong>Booking:</strong> <span id="modal-booking-ref"></span></p>
 						<p><strong>Guest:</strong> <span id="modal-guest-name"></span> (<span
 								id="modal-guest-email"></span>)</p>
+						<p id="modal-requests-wrap"
+							style="display:none; margin-top: 10px; padding-top: 10px; border-top: 1px solid #e2e8f0;">
+							<strong>Special Request:</strong><br>
+							<span id="modal-special-requests" style="font-style: italic; color: #b45309;"></span>
+						</p>
 					</div>
 					<div class="cwc-dash__modal-field">
 						<label for="modal-new-status">New Status</label>
@@ -689,6 +801,25 @@ function cwc_render_booking_dashboard()
 				<div class="cwc-dash__modal-footer">
 					<button class="button js-close-status-modal">Cancel</button>
 					<button class="button button-primary" id="modal-submit-status">Update Status</button>
+				</div>
+			</div>
+		</div>
+
+		<!-- Booking Details Modal -->
+		<div class="cwc-dash__modal" id="cwc-booking-details-modal" style="display:none;">
+			<div class="cwc-dash__modal-overlay js-close-booking-details-modal"></div>
+			<div class="cwc-dash__modal-container" style="max-width:780px;">
+				<div class="cwc-dash__modal-header">
+					<h3>Booking Details</h3>
+					<button class="cwc-dash__modal-close js-close-booking-details-modal">&times;</button>
+				</div>
+				<div class="cwc-dash__modal-body">
+					<div class="cwc-dash__modal-info" id="booking-details-content">
+						<p>Loading booking details...</p>
+					</div>
+				</div>
+				<div class="cwc-dash__modal-footer">
+					<button class="button js-close-booking-details-modal">Close</button>
 				</div>
 			</div>
 		</div>
@@ -759,6 +890,8 @@ function cwc_render_dash_bookings($bookings)
 					<option value="refunded">Refunded</option>
 				</select>
 			</div>
+
+			<!-- Calendar moved to Calendar tab -->
 		</div>
 		<?php if (empty($bookings)): ?>
 			<div class="cwc-dash__empty">
@@ -767,13 +900,45 @@ function cwc_render_dash_bookings($bookings)
 				<p>No bookings yet. Bookings will appear here once guests start reserving rooms.</p>
 			</div>
 		<?php else: ?>
+			<!-- Bulk Actions Bar -->
+			<div id="cwc-bulk-actions-bar" class="cwc-dash__bulk-bar" style="display: none;">
+				<div class="cwc-dash__bulk-info">
+					<span id="cwc-bulk-count">0</span> items selected
+				</div>
+				<div class="cwc-dash__bulk-controls">
+					<select id="cwc-bulk-status" class="cwc-dash__filter-select">
+						<option value="">Change Booking Status...</option>
+						<option value="pending">Mark as Pending</option>
+						<option value="confirmed">Mark as Confirmed</option>
+						<option value="cancelled">Mark as Cancelled</option>
+						<option value="completed">Mark as Completed</option>
+					</select>
+					<select id="cwc-bulk-payment" class="cwc-dash__filter-select">
+						<option value="">Change Payment Status...</option>
+						<option value="unpaid">Mark as Unpaid</option>
+						<option value="paid">Mark as Paid</option>
+						<option value="failed">Mark as Failed</option>
+						<option value="refunded">Mark as Refunded</option>
+					</select>
+					<label class="cwc-dash__bulk-checkbox-label"
+						style="display: flex; align-items: center; gap: 6px; font-size: 12px; cursor: pointer; margin-right: 8px;">
+						<input type="checkbox" id="cwc-bulk-send-email" checked style="margin: 0; width: 14px; height: 14px;">
+						Send Emails
+					</label>
+					<button id="cwc-bulk-apply" class="button button-primary">Apply Bulk Action</button>
+					<button id="cwc-bulk-cancel" class="button">Cancel</button>
+				</div>
+			</div>
+
 			<div class="cwc-dash__table-wrap">
 				<table class="cwc-dash__table" id="cwc-bookings-table">
 					<thead>
 						<tr>
+							<th style="width: 30px;"><input type="checkbox" id="cwc-bulk-select-all"></th>
 							<th>Ref ID</th>
 							<th>Guest</th>
 							<th>Room</th>
+							<th>Special Request</th>
 							<th>Unit</th>
 							<th>Check-in / Check-out</th>
 							<th>Nights</th>
@@ -791,7 +956,10 @@ function cwc_render_dash_bookings($bookings)
 								data-email="<?php echo esc_attr(strtolower($b['email'])); ?>"
 								data-phone="<?php echo esc_attr(strtolower($b['phone'])); ?>"
 								data-status="<?php echo esc_attr($b['status']); ?>"
-								data-payment-status="<?php echo esc_attr($b['payment_status']); ?>">
+								data-payment-status="<?php echo esc_attr($b['payment_status']); ?>"
+								data-requests="<?php echo esc_attr($b['requests']); ?>">
+
+								<td><input type="checkbox" class="cwc-row-checkbox" value="<?php echo esc_attr($b['id']); ?>"></td>
 
 								<td class="cwc-dash__td-ref"><strong><?php echo esc_html($b['ref']); ?></strong></td>
 								<td>
@@ -801,6 +969,16 @@ function cwc_render_dash_bookings($bookings)
 									</div>
 								</td>
 								<td><span class="cwc-dash__room-pill"><?php echo esc_html($b['room']); ?></span></td>
+								<td>
+									<?php if (!empty($b['requests'])): ?>
+										<div class="cwc-dash__requests-note" title="<?php echo esc_attr($b['requests']); ?>">
+											<span class="dashicons dashicons-warning"></span>
+											<?php echo esc_html($b['requests']); ?>
+										</div>
+									<?php else: ?>
+										<span style="color:#cbd5e1;">None</span>
+									<?php endif; ?>
+								</td>
 								<td>
 									<?php if (!empty($b['assigned_room'])): ?>
 										<span class="cwc-dash__unit-pill"><?php echo esc_html($b['assigned_room']); ?></span>
@@ -863,6 +1041,26 @@ function cwc_render_dash_bookings($bookings)
 	<?php
 }
 
+/* ─── TAB: Calendar (overview) ─── */
+function cwc_render_dash_calendar($bookings)
+{
+	?>
+	<div class="cwc-dash__card">
+		<div class="cwc-dash__card-header cwc-dash__card-header--with-actions">
+			<div class="cwc-dash__header-title">
+				<h2>Calendar Overview</h2>
+				<span class="cwc-dash__badge"><?php echo count($bookings); ?> records</span>
+			</div>
+		</div>
+
+		<div style="padding: 12px 16px 20px;">
+			<p style="margin:0 0 8px;color:#475569;">Month view — click an event to open the booking details.</p>
+			<div id="cwc-bookings-calendar" style="height:600px; background:#fff; border-radius:8px; padding:8px;"></div>
+		</div>
+	</div>
+	<?php
+}
+
 /* ─── TAB: Guests ─── */
 function cwc_render_dash_guests($bookings)
 {
@@ -905,6 +1103,7 @@ function cwc_render_dash_guests($bookings)
 							<th>Email</th>
 							<th>Phone</th>
 							<th>Room</th>
+							<th>Promo Code</th>
 							<th>Booking Status</th>
 						</tr>
 					</thead>
@@ -945,6 +1144,16 @@ function cwc_render_dash_guests($bookings)
 								<td><?php echo esc_html($b['email']); ?></td>
 								<td><?php echo esc_html($b['phone']); ?></td>
 								<td><span class="cwc-dash__room-pill"><?php echo esc_html($b['room']); ?></span></td>
+								<td>
+									<?php
+									$coupon = get_post_meta($b['id'], '_cwc_bk_coupon_code', true);
+									if ($coupon) {
+										echo '<span class="cwc-dash__badge" style="background:#ecfdf5;color:#059669;border:1px solid #10b981;">' . esc_html($coupon) . '</span>';
+									} else {
+										echo '<span style="color:#94a3b8;">—</span>';
+									}
+									?>
+								</td>
 								<td>
 									<span class="cwc-dash__status-dot cwc-dash__status-dot--<?php echo esc_attr($b['status']); ?>">
 										<?php echo esc_html(ucwords(str_replace('-', ' ', $b['status']))); ?>
@@ -1027,6 +1236,7 @@ function cwc_render_dash_payments($bookings)
 							<th>Guest</th>
 							<th>Method</th>
 							<th>Amount</th>
+							<th>Promo Code</th>
 							<th>Payment Status</th>
 							<th>Date</th>
 							<th></th>
@@ -1053,7 +1263,24 @@ function cwc_render_dash_payments($bookings)
 								<td>
 									<span class="cwc-dash__payment-tag"><?php echo esc_html(strtoupper($b['payment'])); ?></span>
 								</td>
-								<td class="cwc-dash__td-price"><?php echo esc_html($b['price']); ?></td>
+								<td class="cwc-dash__td-price">
+									<span style="color:<?php echo !empty($b['discount_num']) ? '#059669' : 'inherit'; ?>;font-weight:700;">
+										<?php echo esc_html('₱' . number_format((float) $b['discounted_total'], 2)); ?>
+									</span>
+									<?php if (!empty($b['discount_num'])): ?>
+										<small style="display:block;color:#000;">Original: <?php echo esc_html($b['price']); ?></small>
+										<small style="display:block;color:#dc2626;">Discount: -₱<?php echo esc_html(number_format((float) $b['discount_num'], 2)); ?></small>
+									<?php endif; ?>
+								</td>
+								<td>
+									<?php if (!empty($b['coupon_code'])): ?>
+										<span class="cwc-dash__badge" style="background:#ecfdf5;color:#059669;border:1px solid #10b981;">
+											<?php echo esc_html($b['coupon_code']); ?>
+										</span>
+									<?php else: ?>
+										<span style="color:#94a3b8;">—</span>
+									<?php endif; ?>
+								</td>
 								<td>
 									<span
 										class="cwc-dash__payment-badge cwc-dash__payment-badge--<?php echo esc_attr($b['payment_status']); ?>">

@@ -6,6 +6,12 @@
   "category": "widgets",
   "description": "Two-column FAQ layout with category sidebar, search, and accordion items.",
   "supports": { "html": false },
+  "attributes": {
+    "categories": {
+      "type": "array",
+      "default": []
+    }
+  },
   "textdomain": "child-cwcwake",
   "style": "file:./style.css",
   "viewScript": "file:./view.js",
