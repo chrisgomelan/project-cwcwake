@@ -530,6 +530,11 @@ require_once get_stylesheet_directory() . '/inc/contact-form-handler.php';
 require_once get_stylesheet_directory() . '/inc/newsletter-subscribe.php';
 
 /*
+ * Floating site chat (xAI Grok via REST proxy). Excluded on booking-flow pages.
+ */
+require_once get_stylesheet_directory() . '/inc/chat-assistant.php';
+
+/*
  * One-shot Contact page seeder — assigns the `page-contact` template
  * and populates the page with the two contact blocks if it is still
  * empty. Idempotent (option-guarded).

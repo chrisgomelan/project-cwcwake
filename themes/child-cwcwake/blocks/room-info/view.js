@@ -677,7 +677,7 @@
 				bookBtn.textContent = origText;
 
 				let targetUrl = bookBtn.getAttribute('href');
-				if (!targetUrl || targetUrl === '#book') targetUrl = '/booking/';
+				if (!targetUrl || targetUrl === '#book') targetUrl = '/book-now/';
 
 				const bookingData = {
 					room: room,
