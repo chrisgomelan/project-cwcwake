@@ -75,6 +75,25 @@ define( 'PAYMONGO_SECRET_KEY', 'sk_test_your_secret_key_here' );
 ```
 *(Ask the lead developer or check the team password manager for the actual test keys).*
 
+### 6. Groq API keys — floating chat assistant (optional)
+
+The **CWC Wake AI Assistant** (child theme `themes/child-cwcwake/inc/chat-assistant.php`) calls the [Groq](https://groq.com/) API from PHP. Add these defines in **`app/public/wp-config.php`** anywhere **before** `/* That's all, stop editing! Happy publishing. */`:
+
+| Constant | Required? | Description |
+|----------|-----------|-------------|
+| **`CWC_GROQ_API_KEY`** | **Yes** for chat to work | Groq secret API key (starts with `gsk_`). If missing or empty, the chat REST route will not call the model. |
+| **`CWC_GROQ_CHAT_MODEL`** | No | Overrides the default chat model. If omitted, the theme uses `llama-3.3-70b-versatile`. |
+
+Example:
+
+```php
+define( 'CWC_GROQ_API_KEY', 'gsk_your_secret_key_here' );
+// Optional — only if you want a different model id:
+// define( 'CWC_GROQ_CHAT_MODEL', 'llama-3.3-70b-versatile' );
+```
+
+**Security:** do not commit real keys to Git. Keep them only in each environment’s `wp-config.php` (or another file outside the repo).
+
 ---
 
 ## 🔄 How to Push Your Changes (To Share with Collaborators)
