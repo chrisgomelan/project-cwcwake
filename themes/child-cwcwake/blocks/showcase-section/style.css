@@ -13,7 +13,8 @@
 	background-size: cover;
 	background-position: center;
 	background-repeat: no-repeat;
-	padding: var(--wp--preset--spacing--70) clamp(1.5rem, 4vw, 4rem);
+	--cwc-showcase-pad-x: clamp(1.5rem, 4vw, 4rem);
+	padding: var(--wp--preset--spacing--70) var(--cwc-showcase-pad-x);
 	margin-block-start: 0 !important;
 	overflow: hidden;
 }
@@ -168,13 +169,17 @@
    ---------------------------------------- */
 
 .cwc-showcase--videos .cwc-showcase__grid {
+	--cwc-video-gap: clamp(0.75rem, 2.8vw, var(--wp--preset--spacing--40));
 	display: flex;
-	gap: var(--wp--preset--spacing--40);
+	gap: var(--cwc-video-gap);
 	overflow-x: auto;
 	scroll-snap-type: x mandatory;
 	scroll-behavior: smooth;
 	scrollbar-width: none;
 	-ms-overflow-style: none;
+	width: 100%;
+	min-width: 0;
+	box-sizing: border-box;
 }
 
 .cwc-showcase--videos .cwc-showcase__grid::-webkit-scrollbar {
@@ -182,7 +187,8 @@
 }
 
 .cwc-showcase--videos .cwc-showcase__card--video {
-	flex: 0 0 calc((100% - var(--wp--preset--spacing--40) * 2) / 3);
+	flex: 0 0 calc((100% - var(--cwc-video-gap) * 2) / 3);
+	min-width: 0;
 	scroll-snap-align: start;
 }
 
@@ -226,6 +232,12 @@
 	position: relative;
 	z-index: 1;
 	transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.cwc-showcase__lite-embed .cwc-showcase__play svg,
+.cwc-showcase__poster .cwc-showcase__play svg {
+	width: clamp(40px, 12vw, 64px);
+	height: clamp(40px, 12vw, 64px);
 }
 
 .cwc-showcase__poster:hover .cwc-showcase__play {
@@ -304,16 +316,19 @@
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	gap: var(--wp--preset--spacing--20);
+	gap: clamp(0.5rem, 3vw, var(--wp--preset--spacing--20));
 	margin-top: var(--wp--preset--spacing--40);
+	flex-wrap: wrap;
+	min-width: 0;
 }
 
 .cwc-showcase__arrow {
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	width: 72px;
-	height: 72px;
+	flex-shrink: 0;
+	width: clamp(44px, 14vw, 72px);
+	height: clamp(44px, 14vw, 72px);
 	background: none;
 	border: none;
 	color: rgba(255, 255, 255, 0.6);
@@ -327,29 +342,54 @@
 }
 
 .cwc-showcase__arrow svg {
-	width: 50px;
-	height: 50px;
+	width: clamp(26px, 9vw, 50px);
+	height: clamp(26px, 9vw, 50px);
 }
 
 .cwc-showcase__arrow:hover {
 	color: var(--wp--preset--color--background);
 }
 
+.cwc-showcase__carousel-nav--hidden {
+	display: none;
+}
+
 .cwc-showcase__dots {
 	display: flex;
-	gap: 16px;
+	gap: clamp(8px, 2.5vw, 16px);
+	align-items: center;
+	justify-content: center;
+	flex-wrap: wrap;
+	flex: 1 1 auto;
+	min-width: 0;
 }
 
 .cwc-showcase__dot {
-	width: 20px;
-	height: 20px;
+	appearance: none;
+	-webkit-appearance: none;
+	margin: 0;
+	padding: 0;
+	border: none;
+	flex-shrink: 0;
+	width: clamp(12px, 3.5vw, 20px);
+	height: clamp(12px, 3.5vw, 20px);
 	border-radius: 50%;
 	background: rgba(255, 255, 255, 0.3);
 	transition: background 0.2s ease;
+	cursor: pointer;
 }
 
 .cwc-showcase__dot--active {
 	background: var(--wp--preset--color--background);
+}
+
+.cwc-showcase__dot:focus {
+	outline: none;
+}
+
+.cwc-showcase__dot:focus-visible {
+	outline: 2px solid var(--wp--preset--color--background);
+	outline-offset: 3px;
 }
 
 /* ----------------------------------------
@@ -597,6 +637,27 @@
 	}
 }
 
+@media (max-width: 600px) {
+	/* Narrow phones: slightly tighter section padding + full-bleed video strip */
+	.cwc-showcase--videos {
+		--cwc-showcase-pad-x: clamp(0.75rem, 4.5vw, 1.25rem);
+	}
+
+	.cwc-showcase--videos .cwc-showcase__grid {
+		margin-left: calc(-1 * var(--cwc-showcase-pad-x));
+		margin-right: calc(-1 * var(--cwc-showcase-pad-x));
+		width: calc(100% + 2 * var(--cwc-showcase-pad-x));
+		padding-left: max(0.5rem, env(safe-area-inset-left, 0px));
+		padding-right: max(0.5rem, env(safe-area-inset-right, 0px));
+		box-sizing: border-box;
+		scroll-padding-inline: max(0.5rem, env(safe-area-inset-left, 0px));
+	}
+
+	.cwc-showcase--videos .cwc-showcase__card--video {
+		flex: 0 0 100%;
+	}
+}
+
 @media (min-width: 601px) and (max-width: 900px) {
 	.cwc-showcase__grid {
 		grid-template-columns: repeat(2, 1fr);
@@ -609,6 +670,6 @@
 	}
 
 	.cwc-showcase--videos .cwc-showcase__card--video {
-		flex: 0 0 calc((100% - var(--wp--preset--spacing--40)) / 2);
+		flex: 0 0 calc((100% - var(--cwc-video-gap)) / 2);
 	}
 }

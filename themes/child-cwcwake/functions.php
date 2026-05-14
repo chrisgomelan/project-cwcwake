@@ -903,6 +903,28 @@ function cwc_register_blocks() {
 add_action( 'init', 'cwc_register_blocks' );
 
 /**
+ * Pass absolute URLs to the Book a Room block script (AJAX + checkout redirect).
+ *
+ * Root-relative paths break when the site uses a port, a subdirectory, or a
+ * different host than the document origin (e.g. cached HTML vs live URL).
+ */
+function cwc_localize_book_a_room_script() {
+	$handle = 'cwc-book-a-room-view-script';
+	if ( ! wp_script_is( $handle, 'registered' ) ) {
+		return;
+	}
+	wp_localize_script(
+		$handle,
+		'cwcBookARoom',
+		array(
+			'ajaxUrl'    => admin_url( 'admin-ajax.php' ),
+			'bookingUrl' => home_url( '/booking/' ),
+		)
+	);
+}
+add_action( 'init', 'cwc_localize_book_a_room_script', 20 );
+
+/**
  * Manually enqueue room-info view script on single accommodation pages.
  *
  * The block viewScript declaration in block.json sometimes fails to
@@ -919,6 +941,14 @@ function cwc_enqueue_room_info_scripts() {
 			array(
 				'strategy'  => 'defer',
 				'in_footer' => true,
+			)
+		);
+		wp_localize_script(
+			'cwc-room-info-view',
+			'cwcRoomInfo',
+			array(
+				'ajaxUrl'    => admin_url( 'admin-ajax.php' ),
+				'bookingUrl' => home_url( '/booking/' ),
 			)
 		);
 	}
@@ -1175,6 +1205,28 @@ function cwc_block_hub_pages() {
 	}
 }
 add_action( 'template_redirect', 'cwc_block_hub_pages' );
+
+/**
+ * Use full home URL for the header "Book now" link (template part is plain HTML).
+ *
+ * @param string $block_content Rendered block HTML.
+ * @param array  $block        Block data.
+ * @return string
+ */
+function cwc_header_book_now_full_url( $block_content, $block ) {
+	if ( empty( $block['blockName'] ) || 'core/html' !== $block['blockName'] ) {
+		return $block_content;
+	}
+	if ( false === strpos( $block_content, 'cwc-header__book-btn' ) ) {
+		return $block_content;
+	}
+	return str_replace(
+		'href="/book-now/"',
+		'href="' . esc_url( home_url( '/book-now/' ) ) . '"',
+		$block_content
+	);
+}
+add_filter( 'render_block', 'cwc_header_book_now_full_url', 10, 2 );
 
 /**
  * Block URL parameters on the booking page.

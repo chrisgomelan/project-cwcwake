@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?><?xml-stylesheet type="text/xsl" href="//localhost:10083/main-sitemap.xsl"?>
+<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+	<sitemap>
+		<loc>http://localhost:10083/post-sitemap.xml</loc>
+		<lastmod>2026-05-06T03:08:44+00:00</lastmod>
+	</sitemap>
+	<sitemap>
+		<loc>http://localhost:10083/page-sitemap.xml</loc>
+		<lastmod>2026-05-13T09:46:40+00:00</lastmod>
+	</sitemap>
+	<sitemap>
+		<loc>http://localhost:10083/accommodation-sitemap.xml</loc>
+		<lastmod>2026-05-12T01:07:08+00:00</lastmod>
+	</sitemap>
+	<sitemap>
+		<loc>http://localhost:10083/cwc_album-sitemap.xml</loc>
+		<lastmod>2026-05-06T05:49:23+00:00</lastmod>
+	</sitemap>
+</sitemapindex>

@@ -1,4 +1,13 @@
 (() => {
+	const ajaxUrl =
+		typeof window.cwcBookARoom !== 'undefined' && window.cwcBookARoom.ajaxUrl
+			? window.cwcBookARoom.ajaxUrl
+			: '/wp-admin/admin-ajax.php';
+	const bookingPageUrl =
+		typeof window.cwcBookARoom !== 'undefined' && window.cwcBookARoom.bookingUrl
+			? window.cwcBookARoom.bookingUrl
+			: '/booking/';
+
 	document.addEventListener('DOMContentLoaded', () => {
 		const backdrop = document.getElementById('cwc-modal-backdrop');
 		if (!backdrop) {
@@ -29,7 +38,7 @@
 				formData.append('action', 'cwc_get_booked_dates');
 				formData.append('room', roomName);
 
-				const response = await fetch('/wp-admin/admin-ajax.php', { method: 'POST', body: formData });
+				const response = await fetch(ajaxUrl, { method: 'POST', body: formData });
 				const result = await response.json();
 				if (result.success) {
 					fullyBookedDates = result.data;
@@ -378,7 +387,7 @@
 				formData.append('checkin', checkin);
 				formData.append('checkout', checkout);
 
-				const response = await fetch('/wp-admin/admin-ajax.php', { method: 'POST', body: formData });
+				const response = await fetch(ajaxUrl, { method: 'POST', body: formData });
 				const result = await response.json();
 
 				if (!result.success) {
@@ -417,7 +426,7 @@
 			};
 			sessionStorage.setItem('cwc_booking_data', JSON.stringify(bookingData));
 
-			window.location.href = '/booking/';
+			window.location.href = bookingPageUrl;
 		});
 
 		// ─── Sticky Booking Bar Logic ───

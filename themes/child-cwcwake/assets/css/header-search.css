@@ -129,6 +129,11 @@
     color: #1e293b;
     transition: background 0.2s ease;
     font-weight: 400;
+    
+}
+
+.cwc-header__search-item:focus{
+    outline: #0096C7 1px solid;
 }
 
 .cwc-header__search-item:hover {
@@ -287,25 +292,91 @@
 
 .cwc-header__search-recommendations {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: flex-start;
     gap: 8px;
 }
 
 .cwc-header__search-rec-item {
+    appearance: none;
+    -webkit-appearance: none;
+    display: inline-block;
+    box-sizing: border-box;
+    max-width: 100%;
+    margin: 0;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
     font-size: 13px;
-    color: #1e293b;
-    text-decoration: none;
-    padding: 6px 12px;
-    background: #f1f5f9;
-    border-radius: 20px;
-    transition: all 0.2s ease;
-    width: fit-content;
     font-weight: 400;
+    line-height: 1.35;
+    color: #1e293b;
+    text-align: left;
+    text-decoration: none;
+    padding: 8px 14px;
+    background: #eef2f7;
+    border-radius: 9999px;
+    transition: background 0.2s ease, color 0.2s ease;
+    width: fit-content;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .cwc-header__search-rec-item:hover {
     background: var(--wp--preset--color--primary);
     color: #fff;
+}
+
+.cwc-header__search-rec-item:focus {
+    outline: none;
+}
+
+.cwc-header__search-rec-item:focus-visible {
+    outline: 2px solid var(--wp--preset--color--primary, #0096c7);
+    outline-offset: 2px;
+}
+
+a.cwc-header__search-rec-item {
+    /* Legacy anchor chips (if any) match button pills */
+    vertical-align: middle;
+}
+
+.cwc-header__search-section--recent {
+    margin-top: 8px;
+}
+
+.cwc-header__search-section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 8px;
+    padding-left: 4px;
+    padding-right: 2px;
+}
+
+.cwc-header__search-section-header .cwc-header__search-section-label {
+    margin-bottom: 0;
+    padding-left: 0;
+}
+
+.cwc-header__search-recent-clear {
+    flex-shrink: 0;
+    background: none;
+    border: none;
+    padding: 4px 8px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--wp--preset--color--primary, #0096c7);
+    cursor: pointer;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
+.cwc-header__search-recent-clear:hover {
+    color: #0369a1;
 }
 
 /* ── Mobile adjustments ──────────────────────────────────────── */

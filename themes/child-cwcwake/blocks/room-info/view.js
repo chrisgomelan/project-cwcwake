@@ -2,6 +2,16 @@
 	if (window.cwcRoomInfoInitialized) return;
 	window.cwcRoomInfoInitialized = true;
 
+	const roomAjaxUrl =
+		typeof window.cwcRoomInfo !== 'undefined' && window.cwcRoomInfo.ajaxUrl
+			? window.cwcRoomInfo.ajaxUrl
+			: '/wp-admin/admin-ajax.php';
+	const roomBookingPageUrl =
+		typeof window.cwcRoomInfo !== 'undefined' &&
+		(window.cwcRoomInfo.bookingUrl || window.cwcRoomInfo.bookNowUrl)
+			? window.cwcRoomInfo.bookingUrl || window.cwcRoomInfo.bookNowUrl
+			: '/booking/';
+
 	document.addEventListener('DOMContentLoaded', () => {
 
 		// ─── Only run on pages with the room-info pricing widget ───
@@ -268,7 +278,7 @@
 				formData.append('action', 'cwc_get_booked_dates');
 				formData.append('room', bookBtn.dataset.roomName);
 
-				const response = await fetch('/wp-admin/admin-ajax.php', { method: 'POST', body: formData });
+				const response = await fetch(roomAjaxUrl, { method: 'POST', body: formData });
 				const result = await response.json();
 				if (result.success) {
 					fullyBookedDates = result.data;
@@ -654,7 +664,7 @@
 					formData.append('checkin', checkin);
 					formData.append('checkout', checkout);
 
-					const response = await fetch('/wp-admin/admin-ajax.php', { method: 'POST', body: formData });
+					const response = await fetch(roomAjaxUrl, { method: 'POST', body: formData });
 					const result = await response.json();
 
 					if (result.success && result.data.fully_booked) {
@@ -677,7 +687,7 @@
 				bookBtn.textContent = origText;
 
 				let targetUrl = bookBtn.getAttribute('href');
-				if (!targetUrl || targetUrl === '#book') targetUrl = '/book-now/';
+				if (!targetUrl || targetUrl === '#book') targetUrl = roomBookingPageUrl;
 
 				const bookingData = {
 					room: room,

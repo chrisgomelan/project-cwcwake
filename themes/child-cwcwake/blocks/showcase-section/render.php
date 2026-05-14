@@ -234,20 +234,13 @@ $wrapper_attrs = get_block_wrapper_attributes(
 			<?php endforeach; ?>
 		</div>
 
-		<?php if ( 'videos' === $variant && count( $items ) > 3 ) : ?>
+		<?php if ( 'videos' === $variant && count( $items ) > 1 ) : ?>
 			<div class="cwc-showcase__carousel-nav">
-				<button class="cwc-showcase__arrow cwc-showcase__arrow--prev" aria-label="Previous">
+				<button type="button" class="cwc-showcase__arrow cwc-showcase__arrow--prev" aria-label="<?php echo esc_attr__( 'Previous', 'child-cwcwake' ); ?>">
 					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
 				</button>
-				<div class="cwc-showcase__dots">
-					<?php
-					$dots_count = ceil( count( $items ) / 3 );
-					for ( $i = 0; $i < $dots_count; $i++ ) :
-						?>
-						<span class="cwc-showcase__dot<?php echo 0 === $i ? ' cwc-showcase__dot--active' : ''; ?>"></span>
-					<?php endfor; ?>
-				</div>
-				<button class="cwc-showcase__arrow cwc-showcase__arrow--next" aria-label="Next">
+				<div class="cwc-showcase__dots" role="tablist" aria-label="<?php echo esc_attr__( 'Video slides', 'child-cwcwake' ); ?>"></div>
+				<button type="button" class="cwc-showcase__arrow cwc-showcase__arrow--next" aria-label="<?php echo esc_attr__( 'Next', 'child-cwcwake' ); ?>">
 					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
 				</button>
 			</div>
