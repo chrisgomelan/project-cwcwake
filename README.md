@@ -49,6 +49,8 @@ git clone https://github.com/chrisgomelan/project-cwcwake.git .
 ### 3. Import the Database (Posts, Pages, Meta Descriptions)
 Because Git only tracks *files*, we store the WordPress database in a file called `db-sync.sql`. You must import this to get the posts, pages, and SEO data.
 
+**Where that file is after you clone:** it sits in your cloned repo at **`wp-content/db-sync.sql`** — that is `…/app/public/wp-content/db-sync.sql` on disk (same level as the `themes/` and `plugins/` folders). Cloning only downloads this file; it does **not** load it into MySQL until you run the import command below.
+
 1. In LocalWP, right-click your site `project-cwcwake` and select **Open Site Shell**.
 2. A terminal will open. Run this command:
    ```bash
