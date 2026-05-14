@@ -13,7 +13,7 @@ Plain-language guides for people who keep the CWC Wake WordPress site up to date
 | Guide | What it covers |
 |--------|----------------|
 | [Orientation](01-orientation.md) | Who this is for, how to log in, roles in simple terms, when to ask technical help |
-| [Installation and environment](02-installation-and-environment.md) | What is already set up vs what you need day to day (no server steps) |
+| [Installation and environment](02-installation-and-environment.md) | LocalWP setup, clone, `db-sync.sql`, theme, optional keys, push/pull — same as repo [`README.md`](../README.md) |
 | [Core workflows](03-core-workflows.md) | Pages, posts, media, menus, publishing checks |
 | [When something goes wrong](04-when-something-goes-wrong.md) | Safe checks, when to stop, what to send support |
 | [Glossary](05-glossary.md) | Short definitions of common WordPress words |
