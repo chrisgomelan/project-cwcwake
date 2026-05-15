@@ -91,9 +91,20 @@ Because Git only tracks *files*, we store the WordPress database in a file calle
    ```
 
 3. Wait for the success message.
-4. Your site now has all the exact posts, settings, and media!
 
-### 4. Activate the theme
+### 4. Update the Site URLs (Crucial for Images)
+
+Because the database was exported from a different URL, you must update the links to match your local site. **If you skip this, images and logos will not appear.**
+
+1. In your Site Shell, run this command (replace the URLs with your actual ones):
+   ```bash
+   wp search-replace "original-domain.local" "your-local-domain.local"
+   ```
+   *Example: `wp search-replace "project-cwc.local" "project-cwc-test.local"`*
+
+2. Your site now has all the exact posts, settings, and media!
+
+### 5. Activate the theme
 
 1. Log in to WordPress admin at `http://project-cwcwake.local/wp-admin/`.
    - *Note: Login credentials will match whatever was exported in the `db-sync.sql` file.*
@@ -102,7 +113,13 @@ Because Git only tracks *files*, we store the WordPress database in a file calle
 
 > The parent theme **Twenty Twenty-Five** must be installed. It ships with WordPress by default.
 
-### 5. Configure PayMongo keys (optional)
+### 6. Activate the plugins
+
+1. Go to **Plugins → Installed Plugins**.
+2. Activate the **CWC Accommodations** plugin.
+3. Activate other supporting plugins as needed (Rank Math SEO, WP Mail SMTP, etc.).
+
+### 7. Configure PayMongo keys (optional)
 
 If you need to test the booking and payment flow locally, you must add the PayMongo API test keys to your local `wp-config.php` file (located one folder up from `wp-content/`).
 
@@ -115,7 +132,7 @@ define( 'PAYMONGO_SECRET_KEY', 'sk_test_your_secret_key_here' );
 
 *(Ask the lead developer or check the team password manager for the actual test keys).*
 
-### 6. Groq API keys — floating chat assistant (optional)
+### 8. Groq API keys — floating chat assistant (optional)
 
 The **CWC Wake AI Assistant** (child theme `themes/child-cwcwake/inc/chat-assistant.php`) calls the [Groq](https://groq.com/) API from PHP. Add these defines in **`app/public/wp-config.php`** anywhere **before** `/* That's all, stop editing! Happy publishing. */`:
 
@@ -196,6 +213,22 @@ When someone else pushes changes, you need to pull the files AND import their ne
    ```
 
 You are now fully synced with their changes!
+
+---
+
+## 🛠️ Common Post-Setup Issues
+
+### 1. Logo or Favicon (Tab Icon) is missing
+If the logo in the browser tab is missing after a pull:
+- **Cause:** The Site Icon setting is stored as an Attachment ID. If that ID doesn't match or the file was recently added, it may need to be re-saved.
+- **Fix:** Go to **Appearance → Customize → Site Identity** and re-select the Site Icon.
+- **Developer Note:** Ensure the original site has exported the latest `db-sync.sql` *after* the icon was set.
+
+### 2. Permalinks return 404
+If room pages or blog posts return a 404 error:
+- **Fix:** Go to **Settings → Permalinks** and simply click **Save Changes**. This flushes the rewrite rules.
+
+---
 
 ---
 

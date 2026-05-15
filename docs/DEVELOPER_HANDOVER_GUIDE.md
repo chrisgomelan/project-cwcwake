@@ -26,8 +26,10 @@ Local development uses **LocalWP**. Full setup instructions are in [`docs/02-ins
 3. Import the database:
    - Default: `wp db import wp-content/db-sync.sql`
    - Fallback (if connection fails): `mysql -u root -proot -h 127.0.0.1 -P [PORT] local < wp-content/db-sync.sql`
-4. Activate the `child-cwcwake` theme.
-5. Add API keys to `wp-config.php` if needed (PayMongo, Groq — see Section 9).
+4. Update URLs (for images/links): `wp search-replace "old-domain" "new-domain"`
+5. Activate the `child-cwcwake` theme.
+6. Activate the `cwc-accommodations` plugin.
+7. Add API keys to `wp-config.php` as needed.
 
 ### 2a. Key environment constants
 
@@ -438,6 +440,24 @@ Update third-party plugins (Rank Math, WP Mail SMTP, LiteSpeed Cache) through th
 | Custom blocks | `themes/child-cwcwake/blocks/` |
 | AI chat assistant | `themes/child-cwcwake/inc/chat-assistant.php` |
 | Coding standards | `themes/child-cwcwake/STANDARDS.md` |
+
+---
+
+## 19. Troubleshooting and common "gotchas"
+
+### Missing Logo/Favicon (Tab Icon)
+If the favicon in the browser tab is missing after a database import:
+- **Reason:** The `site_icon` setting stores an **Attachment ID**. If that ID does not match the imported `uploads` folder state, WordPress loses the reference.
+- **Fix:** Re-select the icon in **Appearance → Customize → Site Identity**.
+- **Prevention:** Always run a fresh `wp db export` on the source site *after* making structural changes like updating logos.
+
+### Permalinks returning 404
+If custom routes (like rooms or specific pages) fail after migration:
+- **Fix:** Go to **Settings → Permalinks** and click **Save Changes**. This forces WordPress to regenerate its internal `.htaccess` or Nginx rewrite rules.
+
+### "Not a WordPress installation" Error
+If running `wp` commands in the Site Shell:
+- **Fix:** Ensure you are in the `app/public` folder. Run `cd app/public` before running `wp` or `mysql` commands.
 
 ---
 
