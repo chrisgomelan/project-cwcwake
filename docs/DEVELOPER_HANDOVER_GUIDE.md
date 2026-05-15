@@ -23,7 +23,9 @@ Local development uses **LocalWP**. Full setup instructions are in [`docs/02-ins
 
 1. Create a LocalWP site with PHP 8.1+, Nginx, MySQL 8.0+.
 2. Clone the repo into the `wp-content/` directory.
-3. Import the database: `wp db import wp-content/db-sync.sql`.
+3. Import the database:
+   - Default: `wp db import wp-content/db-sync.sql`
+   - Fallback (if connection fails): `mysql -u root -proot -h 127.0.0.1 -P [PORT] local < wp-content/db-sync.sql`
 4. Activate the `child-cwcwake` theme.
 5. Add API keys to `wp-config.php` if needed (PayMongo, Groq — see Section 9).
 

@@ -56,13 +56,14 @@ cd ~/Local\ Sites/project-cwcwake/app/public/wp-content
 - *(PowerShell):* `Remove-Item -Recurse -Force themes, plugins, index.php`
 - *(Mac/Linux):* `rm -rf themes plugins index.php`
 
-**Clone the repo** directly into the `wp-content/` folder:
+**Initialize and sync the repository:**
 
 ```bash
-git clone https://github.com/chrisgomelan/project-cwcwake.git .
+git init
+git remote add origin https://github.com/chrisgomelan/project-cwcwake.git
+git fetch
+git reset --hard origin/main
 ```
-
-> **Important:** Note the `.` at the end — this ensures you clone directly into the current folder instead of making a subfolder.
 
 ### 3. Import the database (posts, pages, meta descriptions)
 
@@ -71,10 +72,22 @@ Because Git only tracks *files*, we store the WordPress database in a file calle
 **Where that file is after you clone:** it sits in your cloned repo at **`wp-content/db-sync.sql`** — that is `…/app/public/wp-content/db-sync.sql` on disk (same level as the `themes/` and `plugins/` folders). Cloning only downloads this file; it does **not** load it into MySQL until you run the import command below.
 
 1. In LocalWP, right-click your site `project-cwcwake` and select **Open Site Shell**.
-2. A terminal will open. Run this command:
+2. A terminal will open. **Ensure you are in the site's public folder** by running this command:
+
+   ```bash
+   cd "app/public"
+   ```
+
+3. Now run the import command:
 
    ```bash
    wp db import wp-content/db-sync.sql
+   ```
+
+   **💡 Troubleshooting: If you get a "Can't connect to MySQL" error:**
+   If the default command fails, find your site's **Port** in the LocalWP **Database** tab and run:
+   ```bash
+   mysql -u root -proot -h 127.0.0.1 -P YOUR_PORT local < wp-content/db-sync.sql
    ```
 
 3. Wait for the success message.
@@ -140,6 +153,17 @@ Before you commit, you must export your database to `db-sync.sql` so Git can tra
 
    *(This overwrites the existing file with your latest data).*
 
+   **💡 Troubleshooting: If you get a "Can't connect to MySQL" error:**
+   1. Go to the **Database** tab in LocalWP and find your **Port** (e.g., 10084).
+   2. Use this "Force" command instead:
+      ```bash
+      wp --dbhost="127.0.0.1:YOUR_PORT" db export wp-content/db-sync.sql
+      ```
+   3. Or use the direct MySQL command (most reliable on Windows):
+      ```bash
+      mysqldump -u root -proot -h 127.0.0.1 -P YOUR_PORT local > wp-content/db-sync.sql
+      ```
+
 ### Step 2: Commit and push
 
 Open your regular terminal in the `wp-content` folder and push everything:
@@ -193,6 +217,5 @@ wp-content/                          ← Git root
 ---
 
 ## Related
-
-- [Orientation](01-orientation.md)
-- [When something goes wrong](04-when-something-goes-wrong.md)
+- [Client User Guide](CLIENT_USER_GUIDE.md)
+- [Developer Handover Guide](DEVELOPER_HANDOVER_GUIDE.md)
