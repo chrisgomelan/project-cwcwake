@@ -27,9 +27,10 @@ Local development uses **LocalWP**. Full setup instructions are in [`docs/02-ins
    - Default: `wp db import wp-content/db-sync.sql`
    - Fallback (if connection fails): `mysql -u root -proot -h 127.0.0.1 -P [PORT] local < wp-content/db-sync.sql`
 4. Update URLs (for images/links): `wp search-replace "old-domain" "new-domain"`
-5. Activate the `child-cwcwake` theme.
-6. Activate the `cwc-accommodations` plugin.
-7. Add API keys to `wp-config.php` as needed.
+5. Log in to `/wp-admin` (User: `project-cwcwake` | Pass: `123456789`).
+6. Activate the `child-cwcwake` theme.
+7. Activate the `cwc-accommodations` plugin.
+8. Add API keys to `wp-config.php` as needed.
 
 ### 2a. Key environment constants
 

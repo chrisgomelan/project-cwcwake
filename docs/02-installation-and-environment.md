@@ -69,26 +69,20 @@ git reset --hard origin/main
 
 Because Git only tracks *files*, we store the WordPress database in a file called `db-sync.sql`. You must import this to get the posts, pages, and SEO data.
 
-**Where that file is after you clone:** it sits in your cloned repo at **`wp-content/db-sync.sql`** — that is `…/app/public/wp-content/db-sync.sql` on disk (same level as the `themes/` and `plugins/` folders). Cloning only downloads this file; it does **not** load it into MySQL until you run the import command below.
-
 1. In LocalWP, right-click your site `project-cwcwake` and select **Open Site Shell**.
-2. A terminal will open. **Ensure you are in the site's public folder** by running this command:
-
+2. **Wipe the default database** to ensure a clean import:
    ```bash
-   cd "app/public"
+   wp --dbhost="127.0.0.1:YOUR_PORT" db reset --yes
    ```
-
-3. Now run the import command:
-
-   ```bash
-   wp db import wp-content/db-sync.sql
-   ```
-
-   **💡 Troubleshooting: If you get a "Can't connect to MySQL" error:**
-   If the default command fails, find your site's **Port** in the LocalWP **Database** tab and run:
+3. **Import the CWC database**:
    ```bash
    mysql -u root -proot -h 127.0.0.1 -P YOUR_PORT local < wp-content/db-sync.sql
    ```
+
+   *(Wait for it to finish. If successful, you will see a new prompt with no errors).*
+
+   **💡 Troubleshooting Connection Errors:**
+   If you see "Can't connect to MySQL", go to the **Database** tab in LocalWP and find your **Port**. Use that number in place of `YOUR_PORT` above.
 
 3. Wait for the success message.
 
@@ -107,7 +101,9 @@ Because the database was exported from a different URL, you must update the link
 ### 5. Activate the theme
 
 1. Log in to WordPress admin at `http://project-cwcwake.local/wp-admin/`.
-   - *Note: Login credentials will match whatever was exported in the `db-sync.sql` file.*
+   - **Important:** Your initial LocalWP login will stop working after the import. Use the credentials from the sync file:
+   - **Username:** `project-cwcwake`
+   - **Password:** `123456789`
 2. Go to **Appearance → Themes**.
 3. Activate the **CWC Wake** child theme.
 
@@ -227,6 +223,20 @@ If the logo in the browser tab is missing after a pull:
 ### 2. Permalinks return 404
 If room pages or blog posts return a 404 error:
 - **Fix:** Go to **Settings → Permalinks** and simply click **Save Changes**. This flushes the rewrite rules.
+
+### 3. White Screen or "Fatal Error" (Missing vendor files)
+If the site crashes with an error about a missing `vendor` or `action-scheduler.php` file:
+- **Cause:** Some plugins depend on internal folders that might have been ignored or not fully pulled.
+- **Fix:** Ensure you have the latest code from `git pull`. If it still fails, temporarily rename that plugin's folder in `wp-content/plugins/` to disable it and get the admin back.
+- **Developer Note:** Check the `.gitignore` to ensure it is not ignoring `/vendor/` inside plugin subdirectories.
+
+### 4. Images are blank in Media Library or Grid
+If you see the image names but the boxes are blank (and they only appear when clicked):
+- **Cause:** To keep the repository small, we only track "Original" images. The small "Thumbnail" versions (e.g., `image-300x200.jpg`) are ignored by Git.
+- **Fix:** You must generate the thumbnails locally by running this command in your Site Shell:
+  ```bash
+  wp media regenerate --yes --url="http://your-local-domain.local"
+  ```
 
 ---
 
