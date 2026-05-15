@@ -39,7 +39,7 @@ themes/twentytwentyfive/
 
 # --- Dependency & build artifacts ---
 node_modules/
-vendor/
+/vendor/
 *.map
 
 # --- OS & editor junk ---
