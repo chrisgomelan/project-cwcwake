@@ -72,19 +72,17 @@ Because Git only tracks *files*, we store the WordPress database in a file calle
 1. In LocalWP, right-click your site `project-cwcwake` and select **Open Site Shell**.
 2. **Wipe the default database** to ensure a clean import:
    ```bash
-   wp --dbhost="127.0.0.1:YOUR_PORT" db reset --yes
+   wp --exec="define('DB_HOST','127.0.0.1:YOUR_PORT');" db reset --yes
    ```
 3. **Import the CWC database**:
    ```bash
-   mysql -u root -proot -h 127.0.0.1 -P YOUR_PORT local < wp-content/db-sync.sql
+   wp --exec="define('DB_HOST','127.0.0.1:YOUR_PORT');" db import wp-content/db-sync.sql
    ```
 
-   *(Wait for it to finish. If successful, you will see a new prompt with no errors).*
+   *(Wait for it to finish. If successful, you will see a success message).*
 
    **💡 Troubleshooting Connection Errors:**
    If you see "Can't connect to MySQL", go to the **Database** tab in LocalWP and find your **Port**. Use that number in place of `YOUR_PORT` above.
-
-3. Wait for the success message.
 
 ### 4. Update the Site URLs (Crucial for Images)
 
@@ -170,7 +168,7 @@ Before you commit, you must export your database to `db-sync.sql` so Git can tra
    1. Go to the **Database** tab in LocalWP and find your **Port** (e.g., 10084).
    2. Use this "Force" command instead:
       ```bash
-      wp --dbhost="127.0.0.1:YOUR_PORT" db export wp-content/db-sync.sql
+      wp --exec="define('DB_HOST','127.0.0.1:YOUR_PORT');" db export wp-content/db-sync.sql
       ```
    3. Or use the direct MySQL command (most reliable on Windows):
       ```bash

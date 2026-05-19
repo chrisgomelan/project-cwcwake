@@ -25,7 +25,7 @@ Local development uses **LocalWP**. Full setup instructions are in [`docs/02-ins
 2. Clone the repo into the `wp-content/` directory.
 3. Import the database:
    - Default: `wp db import wp-content/db-sync.sql`
-   - Fallback (if connection fails): `mysql -u root -proot -h 127.0.0.1 -P [PORT] local < wp-content/db-sync.sql`
+   - Fallback (if connection fails): `wp --exec="define('DB_HOST','127.0.0.1:[PORT]');" db import wp-content/db-sync.sql`
 4. Update URLs (for images/links): `wp search-replace "old-domain" "new-domain"`
 5. Log in to `/wp-admin` (User: `project-cwcwake` | Pass: `123456789`).
 6. Activate the `child-cwcwake` theme.

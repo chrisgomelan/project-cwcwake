@@ -56,6 +56,11 @@ Because Git only tracks *files*, we store the WordPress database in a file calle
    ```bash
    wp db import wp-content/db-sync.sql
    ```
+   **💡 Troubleshooting Connection Errors:**
+   If you see "Can't connect to MySQL" or similar database connection issues, use this command instead (replace `YOUR_PORT` with the **Port** found under the **Database** tab in LocalWP):
+   ```bash
+   wp --exec="define('DB_HOST','127.0.0.1:YOUR_PORT');" db import wp-content/db-sync.sql
+   ```
 3. Wait for the success message.
 4. Your site now has all the exact posts, settings, and media!
 
